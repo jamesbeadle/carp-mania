@@ -1,3 +1,4 @@
+import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { FeedCatalogue, FeedTypes } from '$lib/domain/feed';
 import { loadProfile, moneyShortfall, spendMoney } from '../gates/requireMoney';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
@@ -18,7 +19,7 @@ export async function FeedLake(locals: App.Locals, formData: FormData) {
 	if (shortfall) return shortfall;
 
 	const feed_stock = { ...lake.feed_stock, [feedType.value]: lake.feed_stock[feedType.value] + kilograms.value };
-	await locals.supabase.from('lakes').update({ feed_stock }).eq('id', lake.id);
-	await spendMoney(locals, profile, cost);
+	await trustedSupabase().from('lakes').update({ feed_stock }).eq('id', lake.id);
+	await spendMoney(profile, cost);
 	return { message: `Fed ${kilograms.value} kg of ${FeedCatalogue[feedType.value].label.toLowerCase()}` };
 }

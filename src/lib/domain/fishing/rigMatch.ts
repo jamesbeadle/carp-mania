@@ -1,10 +1,14 @@
+import type { Terrain } from '../layout/terrainAt';
 import { RigCatalogue, type RigName } from '../tackle/rigs';
-import type { Swim } from '../types';
+import type { BedType } from '../types';
 
-export function rigMatchScore(rig: RigName, swim: Swim) {
+const RockFishesLike: BedType = 'gravel';
+
+export function rigMatchScore(rig: RigName, terrain: Terrain) {
 	const profile = RigCatalogue[rig];
-	const suitsBed = profile.suitsBed.includes(swim.bed_type);
-	const suitsFeature = profile.suitsFeature.includes(swim.feature);
+	const bed = terrain.bed === 'rock' ? RockFishesLike : terrain.bed;
+	const suitsBed = profile.suitsBed.includes(bed);
+	const suitsFeature = profile.suitsFeature.includes(terrain.feature);
 	const suitability = (suitsBed ? 0.6 : 0.2) + (suitsFeature ? 0.4 : 0.1);
 	return suitability * profile.presentationScore;
 }

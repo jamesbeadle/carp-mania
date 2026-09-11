@@ -1,3 +1,4 @@
+import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { PikeRules, Prices } from '$lib/domain/economy';
 import { loadProfile, moneyShortfall, spendMoney } from '../gates/requireMoney';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
@@ -14,8 +15,8 @@ export async function StockPike(locals: App.Locals, formData: FormData) {
 	const shortfall = moneyShortfall(profile, cost);
 	if (shortfall) return shortfall;
 
-	await locals.supabase.from('lakes').update({ pike_count: lake.pike_count + count.value }).eq('id', lake.id);
-	await spendMoney(locals, profile, cost);
+	await trustedSupabase().from('lakes').update({ pike_count: lake.pike_count + count.value }).eq('id', lake.id);
+	await spendMoney(profile, cost);
 	return { message: `Introduced ${count.value} pike (they top out around ${PikeRules.MaximumWeightLb} lb)` };
 }
 
@@ -29,7 +30,7 @@ export async function StockPikeFood(locals: App.Locals, formData: FormData) {
 	const shortfall = moneyShortfall(profile, cost);
 	if (shortfall) return shortfall;
 
-	await locals.supabase.from('lakes').update({ pike_food: Number(lake.pike_food) + units.value }).eq('id', lake.id);
-	await spendMoney(locals, profile, cost);
+	await trustedSupabase().from('lakes').update({ pike_food: Number(lake.pike_food) + units.value }).eq('id', lake.id);
+	await spendMoney(profile, cost);
 	return { message: `Added ${units.value} units of perch, rudd and roach for the pike` };
 }
