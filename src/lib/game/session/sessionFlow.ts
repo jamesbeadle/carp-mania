@@ -1,15 +1,13 @@
 import { castTerrainFor } from '$lib/domain/fishing/castTerrain';
-import { pickCarpThatTookTheBait } from '$lib/domain/fishing/pickCarp';
+import { carpThatTookTheBait } from '$lib/domain/fishing/whoTookTheBait';
 import { HookHoldChance } from '$lib/domain/tackle/hooks';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
-import type { Carp, Swim } from '$lib/domain/types';
+import type { Swim } from '$lib/domain/types';
 import { toFraction, type Point } from '../scene/lakeShape';
 import { bringRodIn, castPointOf, isCastOut, restingRod, type CastRod } from '../scene/rodState';
-import { tackleMatchFor } from './biteRoller';
-import { favouriteSpotBonusFor } from './favouriteSpots';
 import { FightState } from './fightState.svelte';
-import type { LandedFish } from './landFish';
-import type { SessionState } from './sessionState.svelte';
+import { landedFishFor } from './landFish';
+import type { ActiveBite, SessionState } from './sessionState.svelte';
 
 export function chooseSwim(session: SessionState, swim: Swim) {
 	session.swim = swim;
@@ -28,6 +26,7 @@ export function castRod(session: SessionState, rodIndex: number, scenePoint: Poi
 	rod.baitPoint = scenePoint;
 	rod.terrain = castTerrainFor(session.lake, toFraction(scenePoint));
 	rod.phase = 'cast';
+	if (isCastOut(rod)) session.roller.rollAfterCast(rod, session.hour);
 	session.notice = null;
 }
 
@@ -36,25 +35,30 @@ export function nextRodToCast(session: SessionState) {
 }
 
 export function strike(session: SessionState) {
-	if (!session.bite) return;
-	const rod = session.rods[session.bite.rodIndex];
+	const bite = session.bite;
+	const rod = bite ? session.rods[bite.rodIndex] : null;
+	if (!bite || !rod || !isCastOut(rod)) return;
 	session.bite = null;
 	const isHookHolding = Math.random() < HookHoldChance[rod.setup.hook.size];
-	const carp = pickCarpThatTookTheBait(session.carp, Math.random(), favouriteSpotBonusFor(session.lake, session.season, rod));
+	const carp = fishOnTheEnd(session, rod, bite);
 	if (!isHookHolding || !carp) return dropTheFish(session, rod.index, 'The hook pulled on the strike — too small a hook for a carp.');
+	if (session.hasLandedToday(carp)) return dropTheFish(session, rod.index, `${carp.name} again — once on the bank is enough for one day. It shed the hook and went.`);
 	rod.phase = 'fighting';
+	session.hooked = bite;
 	session.fight = new FightState(carp, rod.setup.line.thickness);
 	session.phase = 'fighting';
 }
 
 export function finishFight(session: SessionState) {
 	const fight = session.fight;
+	const hooked = session.hooked;
 	const rod = session.rods.find((candidate) => candidate.phase === 'fighting');
-	if (!fight?.outcome || !rod || !isCastOut(rod) || !session.swim) return;
+	if (!fight?.outcome || !hooked || !rod || !isCastOut(rod) || !session.swim) return;
 	session.fight = null;
+	session.hooked = null;
 	if (fight.outcome === 'snapped') return dropTheFish(session, rod.index, 'Crack — the line snapped. Ease off when it runs.');
 	if (fight.outcome === 'hook_pulled') return dropTheFish(session, rod.index, 'Slack line and the hook fell out. Keep it tight.');
-	session.lastLanded = landedFishFor(session, session.swim, fight.carp, rod);
+	session.lastLanded = landedFishFor(session.lake, session.swim, fight.carp, rod, hooked, session.hour);
 	session.landedToday = [...session.landedToday, session.lastLanded];
 	bringRodIn(rod);
 	session.phase = 'landed';
@@ -65,17 +69,9 @@ export function returnToFishing(session: SessionState) {
 	session.phase = 'fishing';
 }
 
-function landedFishFor(session: SessionState, swim: Swim, carp: Carp, rod: CastRod): LandedFish {
-	return {
-		carp,
-		swim,
-		terrain: rod.terrain,
-		castPoint: castPointOf(rod),
-		rodIndex: rod.index,
-		setup: rod.setup,
-		match: tackleMatchFor(session.lake, rod),
-		hour: session.hour
-	};
+function fishOnTheEnd(session: SessionState, rod: CastRod, bite: ActiveBite) {
+	const spot = { terrain: rod.terrain, castPoint: castPointOf(rod) };
+	return carpThatTookTheBait(session.carp, bite.roll, { lake: session.lake, season: session.season }, spot);
 }
 
 function dropTheFish(session: SessionState, rodIndex: number, message: string) {

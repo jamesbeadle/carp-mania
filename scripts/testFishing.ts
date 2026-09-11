@@ -4,6 +4,7 @@ import { favouriteSpotOf, FavouriteSpotBiteBonus } from '../src/lib/domain/layou
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
 import type { Carp, Lake } from '../src/lib/domain/types';
+import { runBiteRollScenarios } from './testBiteRoll';
 
 const TakesToSample = 4000;
 
@@ -24,6 +25,7 @@ export function runFishingScenarios() {
 	assert.ok(bonusShare > plainShare, `a bait on the favourite spot skews the take: ${bonusShare} vs ${plainShare}`);
 	assert.equal(pickCarpThatTookTheBait([], 0.5, bonusForIslandLovers), null, 'an empty lake gives no fish');
 	console.log('fishing:', { islandLovers: islandLovers.length, plainShare: plainShare.toFixed(3), bonusShare: bonusShare.toFixed(3) });
+	runBiteRollScenarios();
 }
 
 function shareOfTakes(carp: Carp[], isCounted: (fish: Carp) => boolean, bonusFor: (fish: Carp) => number, random: () => number) {

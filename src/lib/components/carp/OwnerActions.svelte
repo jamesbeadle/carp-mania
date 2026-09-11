@@ -5,7 +5,9 @@
 
 	let { dossier }: { dossier: CarpDossier } = $props();
 
-	const refusal = $derived(whyDealerRefuses(dossier.carp));
+	const UpForSale = 'Up for sale — take it off the market before the dealer can have it';
+
+	const refusal = $derived(dossier.openListingId ? UpForSale : whyDealerRefuses(dossier.carp));
 	const dealerSharePercent = Math.round(DealerTerms.ShareOfGuidePrice * 100);
 </script>
 
@@ -19,7 +21,11 @@
 	<form method="POST" action="/lake?/sellToDealer" class="mt-5 flex flex-wrap gap-3">
 		<input type="hidden" name="carpId" value={dossier.carp.id} />
 		<button class="button-secondary" disabled={refusal !== null} title={refusal ?? `Sell ${dossier.carp.name} to the dealer`}>Sell to the dealer</button>
-		<a href="/lake#market" class="button-primary">List on the market</a>
+		{#if dossier.openListingId}
+			<a href="/market/{dossier.openListingId}" class="button-primary">See listing</a>
+		{:else}
+			<a href="/lake?list={dossier.carp.id}#market" class="button-primary">List on the market</a>
+		{/if}
 	</form>
 	{#if refusal}
 		<p class="mt-2 text-xs text-danger-400">{refusal}</p>

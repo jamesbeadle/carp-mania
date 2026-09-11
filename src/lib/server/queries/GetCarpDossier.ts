@@ -2,12 +2,14 @@ import { error } from '@sveltejs/kit';
 import type { CarpDossier, DossierLake, GrowthPoint } from '$lib/contracts/CarpDossier';
 import { dealerOfferFor } from '$lib/domain/market/dealer';
 import { guidePriceOf } from '$lib/domain/market/valuation';
+import type { ListingStatus } from '$lib/domain/marketTypes';
 import type { Carp, Catch } from '$lib/domain/types';
 import type { RegionCode } from '$lib/domain/world/regionCodes';
 import { requireUser } from '../gates/requireUser';
 import { loadCatchesOf, loadHeaviestCatchLbOf, loadLakeNames, loadTransfersOf } from './loadCarpHistory';
 
 const NotVisible = 'That fish is not on any water you can see';
+const OpenListing: ListingStatus = 'open';
 
 type LakeEmbed = { id: string; name: string; region: RegionCode; owner_id: string; profiles: { display_name: string } | null };
 type CarpRow = Carp & { lakes: LakeEmbed | null };
@@ -15,7 +17,12 @@ type CarpRow = Carp & { lakes: LakeEmbed | null };
 export async function GetCarpDossier(locals: App.Locals, carpId: string): Promise<CarpDossier> {
 	const user = requireUser(locals);
 	const { carp, lake } = await loadCarpWithLake(locals, carpId);
-	const [catches, heaviestCatchLb, transfers] = await Promise.all([loadCatchesOf(locals, carpId), loadHeaviestCatchLbOf(locals, carpId), loadTransfersOf(locals, carpId)]);
+	const [catches, heaviestCatchLb, transfers, openListingId] = await Promise.all([
+		loadCatchesOf(locals, carpId),
+		loadHeaviestCatchLbOf(locals, carpId),
+		loadTransfersOf(locals, carpId),
+		loadOpenListingIdOf(locals, carpId)
+	]);
 	const lakeNames = await loadLakeNames(locals, [lake.id, carp.origin_lake_id, ...transfers.flatMap((transfer) => [transfer.from_lake_id, transfer.to_lake_id])]);
 	return {
 		carp,
@@ -28,9 +35,14 @@ export async function GetCarpDossier(locals: App.Locals, carpId: string): Promis
 		dealerOffer: dealerOfferFor(carp),
 		bestEverLb: Math.max(heaviestCatchLb, Number(carp.weight_lb)),
 		growth: growthOf(catches, carp, new Date()),
-		openListingId: null,
+		openListingId,
 		isMine: lake.ownerId === user.id
 	};
+}
+
+async function loadOpenListingIdOf(locals: App.Locals, carpId: string): Promise<string | null> {
+	const { data: listing } = await locals.supabase.from('listings').select('id').eq('carp_id', carpId).eq('status', OpenListing).maybeSingle();
+	return listing ? (listing as { id: string }).id : null;
 }
 
 async function loadCarpWithLake(locals: App.Locals, carpId: string) {

@@ -48,6 +48,7 @@ Open http://localhost:5173, sign in with Google. Every player starts with £100,
 1. Import the GitHub repo in Vercel. Framework is detected as SvelteKit; no build settings to change.
 2. Add the three environment variables above under Settings → Environment Variables.
 3. After the first deploy, put the Vercel URL into Supabase Site URL and add `https://<your-app>.vercel.app/auth/callback` to Redirect URLs.
+4. If pg_cron is not enabled, add a fourth variable, `CRON_SECRET` (any long random string). `vercel.json` schedules `GET /cron/close-listings` every minute; Vercel sends the secret as `Authorization: Bearer …`, and the route calls `close_ended_listings()` through the service-role client. Without the variable the route answers 401 to every call, so it is harmless when pg_cron is doing the job.
 
 ## Useful commands
 

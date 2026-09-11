@@ -7,7 +7,11 @@
 	let { data } = $props();
 </script>
 
-<h1 class="mb-6 text-4xl text-volt-300">{data.angler.profile.display_name}</h1>
+<div class="mb-6 flex flex-wrap items-end gap-4">
+	<h1 class="text-4xl text-volt-300">{data.angler.profile.display_name}</h1>
+	<a href="/anglers/{data.angler.profile.id}" class="button-secondary ml-auto">My public page</a>
+	<a href="/anglers" class="text-sm text-mist-400 hover:text-mist-100">All anglers</a>
+</div>
 
 <div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
 	<section class="panel">

@@ -1,27 +1,52 @@
-import { biteChanceForOneHour, type BiteConditions } from '$lib/domain/fishing/biteChance';
-import { FishingDay } from '$lib/domain/fishing/sessionClock';
-import { spotBiteFactor } from '$lib/domain/fishing/spotFactor';
+import { biteRollFor, biteTimeOf, type BiteRoll, type WaterToday } from '$lib/domain/fishing/biteRoll';
 import { matchTackleToWater, type TackleMatch } from '$lib/domain/fishing/tackleMatch';
 import type { Lake } from '$lib/domain/types';
-import type { Season } from '$lib/domain/world/seasons';
-import { isCastOut, type CastRod, type RodOnBank } from '../scene/rodState';
+import type { CastRod } from '../scene/rodState';
 
 export const StrikeWindowSeconds = 4;
 
-function biteConditionsFor(rod: CastRod, season: Season): BiteConditions {
-	return { spotFactor: spotBiteFactor(rod.terrain, season), seasonFactor: season.biteFactor };
+export interface RolledBite {
+	rodIndex: number;
+	hour: number;
+	roll: BiteRoll;
 }
 
-export function biteChanceForOneRealSecond(lake: Lake, rod: CastRod, overallSkill: number, hour: number, season: Season) {
-	const match = tackleMatchFor(lake, rod);
-	const hourly = biteChanceForOneHour(lake, match.overall, overallSkill, hour, biteConditionsFor(rod, season));
-	return 1 - Math.pow(1 - hourly, 1 / FishingDay.RealSecondsPerFishingHour);
+export class BiteRoller {
+	private readonly rolledByRod = new Map<number, RolledBite>();
+	private readonly spentBites = new Set<string>();
+	private readonly seed: number;
+	private readonly water: WaterToday;
+
+	constructor(seed: number, water: WaterToday) {
+		this.seed = seed;
+		this.water = water;
+	}
+
+	rollAfterCast(rod: CastRod, clockHour: number): RolledBite {
+		const hour = Math.floor(clockHour);
+		const roll = biteRollFor(this.seed, rod.index, hour, { terrain: rod.terrain, setup: rod.setup }, this.water);
+		const rolled = { rodIndex: rod.index, hour, roll };
+		this.rolledByRod.set(rod.index, rolled);
+		return rolled;
+	}
+
+	biteDueOn(rod: CastRod, clockHour: number): RolledBite | null {
+		const rolled = this.rolledFor(rod, clockHour);
+		const isDue = rolled.roll.isTaking && clockHour >= biteTimeOf(rolled.hour, rolled.roll);
+		if (!isDue || this.spentBites.has(keyOf(rolled))) return null;
+		this.spentBites.add(keyOf(rolled));
+		return rolled;
+	}
+
+	private rolledFor(rod: CastRod, clockHour: number): RolledBite {
+		const cached = this.rolledByRod.get(rod.index);
+		if (cached && cached.hour === Math.floor(clockHour)) return cached;
+		return this.rollAfterCast(rod, clockHour);
+	}
 }
 
-export function rollForBite(lake: Lake, rod: RodOnBank, overallSkill: number, hour: number, secondsElapsed: number, random: () => number, season: Season) {
-	if (rod.phase !== 'cast' || !isCastOut(rod)) return false;
-	const perSecond = biteChanceForOneRealSecond(lake, rod, overallSkill, hour, season);
-	return random() < perSecond * secondsElapsed;
+function keyOf(bite: RolledBite) {
+	return `${bite.rodIndex}:${bite.hour}`;
 }
 
 export function tackleMatchFor(lake: Lake, rod: CastRod): TackleMatch {

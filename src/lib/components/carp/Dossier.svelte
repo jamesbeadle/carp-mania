@@ -10,7 +10,7 @@
 	import SaleHistory from './SaleHistory.svelte';
 	import TransitBadge from './TransitBadge.svelte';
 
-	let { dossier }: { dossier: CarpDossier } = $props();
+	let { dossier, hasListingLink = true }: { dossier: CarpDossier; hasListingLink?: boolean } = $props();
 </script>
 
 <section class="panel">
@@ -20,7 +20,7 @@
 			<h1 class="text-4xl text-volt-300">{dossier.carp.name} · {formatWeight(dossier.carp.weight_lb)}</h1>
 		</div>
 		<TransitBadge carp={dossier.carp} />
-		{#if dossier.openListingId}
+		{#if dossier.openListingId && hasListingLink}
 			<a href="/market/{dossier.openListingId}" class="button-primary ml-auto">See listing</a>
 		{/if}
 	</div>

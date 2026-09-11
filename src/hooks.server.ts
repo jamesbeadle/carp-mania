@@ -3,7 +3,7 @@ import { whereSetupSendsYou } from '$lib/server/gates/setupGate';
 import { createServerSupabase } from '$lib/supabase/createServerSupabase';
 import { safeGetSession } from '$lib/supabase/safeGetSession';
 
-const publicPaths = ['/', '/auth/callback', '/auth/signout'];
+const publicPaths = ['/', '/auth/callback', '/auth/signout', '/cron/close-listings'];
 
 function isPublicPath(pathname: string) {
 	return publicPaths.includes(pathname);

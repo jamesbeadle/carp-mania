@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { FishingVisit } from '$lib/contracts/FishingVisit';
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
@@ -15,9 +16,9 @@
 	import TackleBuilder from './TackleBuilder.svelte';
 	import WaterScreen from './WaterScreen.svelte';
 
-	let { lake, swims, carp, profile, visitId }: { lake: Lake; swims: Swim[]; carp: Carp[]; profile: Profile; visitId: string } = $props();
+	let { lake, swims, carp, profile, visit }: { lake: Lake; swims: Swim[]; carp: Carp[]; profile: Profile; visit: FishingVisit } = $props();
 
-	const session = new SessionState(lake, carp, profile);
+	const session = new SessionState(lake, carp, profile, visit);
 	const alarm = new BiteAlarm();
 	let isCatchSaved = $state<boolean | null>(null);
 	let isAlarmMuted = $state(false);
@@ -60,7 +61,7 @@
 		finishFight(session);
 		if (!session.lastLanded) return;
 		isCatchSaved = null;
-		isCatchSaved = await reportLandedFish(lake.id, visitId, profile, session.lastLanded);
+		isCatchSaved = await reportLandedFish(lake.id, visit.id, profile, session.lastLanded);
 	}
 </script>
 

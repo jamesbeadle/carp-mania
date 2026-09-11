@@ -6,6 +6,7 @@ export const ListingTerms = {
 	FeeShareOfStartingPrice: 0.01,
 	MinimumFee: 25,
 	CommissionShare: 0.08,
+	MinimumStartingPrice: 10,
 	MinimumConditionToList: 40,
 	MaximumOpenListingsPerLake: 20,
 	AuctionHours: [12, 24, 48, 72] as const,

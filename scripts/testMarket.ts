@@ -8,6 +8,7 @@ import { transportQuote } from '../src/lib/domain/market/transport';
 import { bandPrice, guidePriceOf } from '../src/lib/domain/market/valuation';
 import { carpNameForIndex } from '../src/lib/domain/naming/carpNames';
 import { seededRandom } from '../src/lib/domain/random';
+import { runListingScenarios } from './testListings';
 
 const QuartersPerPound = 4;
 
@@ -32,6 +33,7 @@ function farmDeliveryScenario() {
 
 export function runMarketScenarios() {
 	farmDeliveryScenario();
+	runListingScenarios();
 	assert.equal(bandPrice(10), 300);
 	assert.equal(bandPrice(20), 1000);
 	assert.equal(bandPrice(30), 3000);

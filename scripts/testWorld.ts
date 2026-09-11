@@ -9,8 +9,28 @@ import { isOnLand } from '../src/lib/domain/world/landCheck';
 import { whyPlotIsRefused } from '../src/lib/domain/world/plotRules';
 import { yearlyAverageGrowthFactor } from '../src/lib/domain/world/seasons';
 import { seasonFraction, seasonNameFor } from '../src/lib/domain/world/worldClock';
+import { filterWorldPins, NoWorldFilters } from '../src/lib/domain/world/worldFilters';
+import type { WorldPin } from '../src/lib/contracts/WorldPin';
+
+const pinsOnTheMap: WorldPin[] = [
+	{ id: 'kent', name: 'Bluebell Pit', ownerName: 'Sam', region: 'uk_ireland', latitude: 51.2, longitude: 0.6, reputation: 62, heaviestLb: 41.5, acres: 10, dayTicketFee: 35, listingCount: 3, anglersOnBankNow: 2 },
+	{ id: 'der', name: 'Lac du Der', ownerName: 'Luc', region: 'france', latitude: 48.6, longitude: 4.8, reputation: 80, heaviestLb: 58, acres: 30, dayTicketFee: 60, listingCount: 0, anglersOnBankNow: 0 },
+	{ id: 'tisza', name: 'Tisza Pit', ownerName: 'Márk', region: 'central_europe', latitude: 47.5, longitude: 20.5, reputation: 45, heaviestLb: 36, acres: 8, dayTicketFee: 20, listingCount: 1, anglersOnBankNow: 0 }
+];
+
+function runWorldFilterScenarios() {
+	const nobodysFavourites = new Set<string>();
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, region: 'france' }, nobodysFavourites).map((pin) => pin.id), ['der'], 'region keeps only French waters');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, isFavouritesOnly: true }, new Set(['tisza'])).map((pin) => pin.id), ['tisza'], 'favourites only');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, sort: 'biggest' }, nobodysFavourites).map((pin) => pin.id), ['der', 'kent', 'tisza'], 'biggest fish first');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, sort: 'biggest' }, new Set(['tisza'])).map((pin) => pin.id), ['tisza', 'der', 'kent'], 'a favourite comes first whatever the sort');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, search: 'luc' }, nobodysFavourites).map((pin) => pin.id), ['der'], 'search finds the owner');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, isForSaleOnly: true, maximumDayTicketFee: 30 }, nobodysFavourites).map((pin) => pin.id), ['tisza'], 'fish for sale under £30');
+	assert.deepEqual(filterWorldPins(pinsOnTheMap, { ...NoWorldFilters, isOnTheBankOnly: true, minimumReputation: 60 }, nobodysFavourites).map((pin) => pin.id), ['kent'], 'anglers on the bank at a reputable water');
+}
 
 export function runWorldScenarios() {
+	runWorldFilterScenarios();
 	const scale = layoutScaleFor(10);
 	assert.ok(Math.abs(scale.feetAcross - 808) < 1, `ten acres is 808 ft across, got ${scale.feetAcross}`);
 
