@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+
+@theme {
+	--font-display: 'Fraunces', 'Georgia', serif;
+	--font-body: 'Inter', system-ui, sans-serif;
+
+	--color-pond-950: #071a17;
+	--color-pond-900: #0f2f2a;
+	--color-pond-800: #17453d;
+	--color-pond-700: #1f5c50;
+	--color-pond-600: #2a7466;
+
+	--color-reed-500: #6f9a3c;
+	--color-reed-400: #8fb85a;
+	--color-reed-300: #b6d48a;
+
+	--color-mist-100: #f3efe4;
+	--color-mist-200: #e4dcc9;
+	--color-mist-400: #b9ae96;
+
+	--color-gold-500: #c8963e;
+	--color-gold-400: #dcb35e;
+	--color-gold-300: #ebcd8b;
+
+	--color-silt-700: #5a4630;
+	--color-silt-500: #8a6e4b;
+
+	--color-danger-500: #c8553d;
+	--color-danger-400: #e07a63;
+}
+
+@layer base {
+	body {
+		font-family: var(--font-body);
+	}
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+	}
+}
+
+@layer components {
+	.panel {
+		@apply rounded-2xl border border-pond-700 bg-pond-800/70 p-5 shadow-lg shadow-pond-950/40 backdrop-blur;
+	}
+	.button-primary {
+		@apply rounded-xl bg-gold-500 px-4 py-2 font-semibold text-pond-950 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50;
+	}
+	.button-secondary {
+		@apply rounded-xl border border-pond-600 px-4 py-2 font-semibold text-mist-100 transition hover:bg-pond-700 disabled:cursor-not-allowed disabled:opacity-50;
+	}
+	.field {
+		@apply w-full rounded-xl border border-pond-600 bg-pond-900 px-3 py-2 text-mist-100 outline-none focus:border-gold-400;
+	}
+	.stat-label {
+		@apply text-xs tracking-wide text-mist-400 uppercase;
+	}
+}
