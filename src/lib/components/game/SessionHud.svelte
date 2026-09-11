@@ -4,7 +4,7 @@
 	import { RigCatalogue } from '$lib/domain/tackle/rigs';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 
-	let { session, onStrike }: { session: SessionState; onStrike: () => void } = $props();
+	let { session, isAlarmMuted = $bindable(false), onStrike }: { session: SessionState; isAlarmMuted?: boolean; onStrike: () => void } = $props();
 
 	const phaseLabels = { idle: 'Not cast', cast: 'Fishing', biting: 'BITE!', fighting: 'Fish on' } as const;
 </script>
@@ -14,6 +14,9 @@
 		<span class="font-display text-3xl text-volt-300">{formatFishingHour(session.hour)}</span>
 		<span class="text-sm text-mist-400">{session.landedToday.length} landed · {session.lostToday} lost</span>
 	</div>
+	<label class="flex items-center gap-2 text-xs text-mist-400">
+		<input type="checkbox" bind:checked={isAlarmMuted} class="accent-volt-500" /> Mute bite alarm
+	</label>
 
 	{#if session.bite}
 		<button class="w-full animate-pulse rounded-xl bg-danger-500 px-4 py-4 text-xl font-bold text-mist-100" onclick={onStrike}>

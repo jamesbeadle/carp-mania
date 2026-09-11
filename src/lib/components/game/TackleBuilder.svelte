@@ -4,10 +4,20 @@
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
 	import RodSetupCard from './RodSetupCard.svelte';
 
-	let { lake, swim, overallSkill, onReady }: { lake: Lake; swim: Swim; overallSkill: number; onReady: (setups: RodSetup[]) => void } = $props();
+	interface Props {
+		lake: Lake;
+		swim: Swim;
+		overallSkill: number;
+		savedRods: RodSetup[];
+		onReady: (setups: RodSetup[]) => void;
+	}
 
-	let setups = $state<RodSetup[]>([defaultRodSetup(), defaultRodSetup(), defaultRodSetup()]);
-	let rodCount = $state(MaximumRods);
+	let { lake, swim, overallSkill, savedRods, onReady }: Props = $props();
+
+	const hasSavedRods = savedRods.length > 0;
+	const startingSetups = Array.from({ length: MaximumRods }, (_, index) => structuredClone(savedRods[index] ?? defaultRodSetup()));
+	let setups = $state<RodSetup[]>(startingSetups);
+	let rodCount = $state(hasSavedRods ? savedRods.length : MaximumRods);
 	const HintsUnlockAtSkill = 40;
 	const isShowingHints = $derived(overallSkill >= HintsUnlockAtSkill);
 </script>
@@ -18,6 +28,9 @@
 	<p class="mt-1 text-sm text-mist-400">
 		{BedTypeLabels[swim.bed_type]} bottom · {swim.depth_feet} ft · {SwimFeatureLabels[swim.feature]} · transparency {Math.round(Number(lake.transparency))}%
 	</p>
+	{#if hasSavedRods}
+		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
+	{/if}
 	{#if !isShowingHints}
 		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at skill {HintsUnlockAtSkill}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
 	{/if}

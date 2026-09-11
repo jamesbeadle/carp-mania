@@ -7,7 +7,7 @@ import { drawSwims, swimScenePoint } from '../render/drawSwims';
 import { drawWater } from '../render/drawWater';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { moveFishSchool, type SwimmingFish } from './fishSchool';
-import { IslandPath, LakePath, lakeCentre } from './lakeShape';
+import { IslandPath, LakePath, lakeCentre, type Point } from './lakeShape';
 import type { RodOnBank } from './rodState';
 
 export interface SceneInput {
@@ -49,4 +49,17 @@ export function createSceneDrawer() {
 
 export function isPointInWater(context: CanvasRenderingContext2D, x: number, y: number) {
 	return context.isPointInPath(LakePath(), x, y) && !context.isPointInPath(IslandPath(), x, y);
+}
+
+const CastLineSamples = 40;
+
+export function isCastClearOfIsland(context: CanvasRenderingContext2D, from: Point, to: Point) {
+	const island = IslandPath();
+	for (let step = 1; step < CastLineSamples; step++) {
+		const fraction = step / CastLineSamples;
+		const x = from.x + (to.x - from.x) * fraction;
+		const y = from.y + (to.y - from.y) * fraction;
+		if (context.isPointInPath(island, x, y)) return false;
+	}
+	return true;
 }

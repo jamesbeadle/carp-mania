@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Carp, Lake, Swim } from '$lib/domain/types';
 	import { createFishSchool } from '$lib/game/scene/fishSchool';
-	import { createSceneDrawer, isPointInWater } from '$lib/game/scene/drawScene';
+	import { createSceneDrawer, isCastClearOfIsland, isPointInWater } from '$lib/game/scene/drawScene';
 	import type { Point } from '$lib/game/scene/lakeShape';
 	import { SceneSize } from '$lib/game/scene/palette';
 	import { startRenderLoop, toScenePoint } from '$lib/game/scene/renderLoop';
@@ -17,9 +17,10 @@
 		isAnglerOnBank?: boolean;
 		onSwimClick?: (swim: Swim) => void;
 		onWaterClick?: (point: Point) => void;
+		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, selectedSwimId = null, rods = [], isAnglerOnBank = false, onSwimClick, onWaterClick }: Props = $props();
+	let { lake, swims, carp, selectedSwimId = null, rods = [], isAnglerOnBank = false, onSwimClick, onWaterClick, onCastBlockedByIsland }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let hoveredSwimId = $state<string | null>(null);
@@ -44,7 +45,11 @@
 		const swim = swimAt(point);
 		if (swim) return onSwimClick?.(swim);
 		const context = canvas.getContext('2d');
-		if (context && isPointInWater(context, point.x, point.y)) onWaterClick?.(point);
+		if (!context || !isPointInWater(context, point.x, point.y)) return;
+		const selectedSwim = swims.find((candidate) => candidate.id === selectedSwimId);
+		const isBlocked = selectedSwim && !isCastClearOfIsland(context, swimScenePoint(selectedSwim), point);
+		if (isBlocked) return onCastBlockedByIsland?.();
+		onWaterClick?.(point);
 	}
 </script>
 

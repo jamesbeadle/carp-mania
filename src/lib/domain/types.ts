@@ -1,3 +1,5 @@
+import type { RodSetup } from './tackle/rodSetup';
+
 export type BedType = 'gravel' | 'clay' | 'silt';
 export type SwimFeature = 'open_water' | 'weed_bed' | 'snag' | 'island_margin' | 'reed_line';
 export type CarpStrain = 'common' | 'mirror' | 'linear' | 'leather' | 'ghost';
@@ -13,6 +15,7 @@ export interface Profile {
 	bait_selection: number;
 	watercraft: number;
 	experience: number;
+	saved_rods: RodSetup[];
 }
 
 export interface Lake {
