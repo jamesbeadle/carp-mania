@@ -10,6 +10,7 @@ import { ClassicSwims, classicCarp, classicLake, classicSwims } from '../src/lib
 import { defaultRodSetup } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake, Swim } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
+import { runFishingScenarios } from './testFishing';
 import { runMarketScenarios } from './testMarket';
 import { runWorldScenarios } from './testWorld';
 
@@ -61,6 +62,7 @@ const chance = biteChanceForOneHour(fedLake, match.overall, 60, 6);
 assert.ok(chance > 0.05 && chance < 0.9, `sensible bite chance ${chance}`);
 console.log('match:', match, 'bite chance at dawn for a 60-skill angler:', chance.toFixed(3));
 
+runFishingScenarios();
 runMarketScenarios();
 runWorldScenarios();
 console.log('domain tests passed');

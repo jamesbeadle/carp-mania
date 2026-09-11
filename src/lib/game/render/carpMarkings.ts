@@ -5,7 +5,25 @@ export function drawStrainMarkings(context: CanvasRenderingContext2D, strain: Ca
 	if (strain === 'common') return drawFullScales(context, proportions, scale);
 	if (strain === 'mirror') return drawMirrorPlates(context, proportions, scale);
 	if (strain === 'linear') return drawLinearRows(context, proportions, scale);
+	if (strain === 'fully_scaled') return drawEvenPlates(context, proportions, scale);
 	if (strain === 'ghost') return drawGhostPatches(context, proportions, patch);
+}
+
+const EvenPlates = { NoseStart: 0.32, TailEnd: -0.34, StepOfLength: 0.045, SmallestStep: 2.2, RadiusAlong: 0.34, RadiusAcross: 0.42 } as const;
+
+function drawEvenPlates(context: CanvasRenderingContext2D, { length, width }: FishProportions, scale: string) {
+	context.fillStyle = scale;
+	const step = Math.max(EvenPlates.SmallestStep, length * EvenPlates.StepOfLength);
+	const rowCount = Math.ceil((length * (EvenPlates.NoseStart - EvenPlates.TailEnd)) / step);
+	for (let row = 0; row < rowCount; row++) {
+		const x = length * EvenPlates.NoseStart - row * step;
+		const halfWidth = flankHalfWidth(x, length, width);
+		for (let y = -halfWidth + (row % 2) * step * 0.5; y < halfWidth; y += step) {
+			context.beginPath();
+			context.ellipse(x, y, step * EvenPlates.RadiusAlong, step * EvenPlates.RadiusAcross, 0, 0, Math.PI * 2);
+			context.fill();
+		}
+	}
 }
 
 function drawFullScales(context: CanvasRenderingContext2D, { length, width }: FishProportions, scale: string) {

@@ -9,7 +9,8 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"audit:files": "node scripts/auditFileLengths.mjs",
-		"test:domain": "node --import ./scripts/registerTypescriptImports.mjs --experimental-strip-types scripts/testDomain.ts"
+		"test:domain": "node --import ./scripts/registerTypescriptImports.mjs --experimental-strip-types scripts/testDomain.ts",
+		"test:sql": "node scripts/testSql.mjs"
 	},
 	"dependencies": {
 		"@supabase/ssr": "^0.7.0",

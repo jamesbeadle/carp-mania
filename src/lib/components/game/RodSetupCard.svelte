@@ -6,12 +6,13 @@
 	import { RigCatalogue, RigNames } from '$lib/domain/tackle/rigs';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import { TubingColours, TubingLabels } from '$lib/domain/tackle/tubing';
-	import type { Lake, Swim } from '$lib/domain/types';
+	import type { Terrain } from '$lib/domain/layout/terrainAt';
+	import type { Lake } from '$lib/domain/types';
 	import { humanise } from '$lib/format/labels';
 
-	let { setup = $bindable(), rodNumber, lake, swim, isShowingHints }: { setup: RodSetup; rodNumber: number; lake: Lake; swim: Swim; isShowingHints: boolean } = $props();
+	let { setup = $bindable(), rodNumber, lake, terrain, isShowingHints }: { setup: RodSetup; rodNumber: number; lake: Lake; terrain: Terrain; isShowingHints: boolean } = $props();
 
-	const match = $derived(matchTackleToWater(setup, lake, swim));
+	const match = $derived(matchTackleToWater(setup, lake, terrain));
 	const percent = (score: number) => `${Math.round(score * 100)}%`;
 </script>
 

@@ -1,5 +1,5 @@
 import type { CarpStrain } from '$lib/domain/types';
-import { FishPalette } from '../scene/palette';
+import { FishPalette } from '../scene/fishPalette';
 import { drawDorsalRidge, drawHead, drawPairedFins } from './carpFins';
 import { backShading, traceCarpBody, traceCarpTail, type FishProportions } from './carpOutline';
 import { drawStrainMarkings } from './carpMarkings';

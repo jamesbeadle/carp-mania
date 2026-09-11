@@ -1,6 +1,7 @@
 import type { Swim } from '$lib/domain/types';
 import { toScene, type Point } from '../scene/lakeShape';
 import { BankPalette } from '../scene/palette';
+import { drawCanvasLabel } from './drawCanvasLabel';
 
 export const SwimPegRadius = 16;
 
@@ -14,7 +15,7 @@ export function drawSwims(context: CanvasRenderingContext2D, swims: Swim[], sele
 		const isSelected = swim.id === selectedSwimId;
 		const isHovered = swim.id === hoveredSwimId;
 		drawPeg(context, point, isSelected, isHovered);
-		drawLabel(context, point, swim.name, isSelected);
+		drawCanvasLabel(context, point, swim.name, isSelected ? BankPalette.PegSelected : BankPalette.Label, isSelected);
 	}
 }
 
@@ -36,19 +37,5 @@ function drawPeg(context: CanvasRenderingContext2D, point: Point, isSelected: bo
 		context.lineTo(plank, SwimPegRadius * 0.6);
 		context.stroke();
 	}
-	context.restore();
-}
-
-function drawLabel(context: CanvasRenderingContext2D, point: Point, name: string, isSelected: boolean) {
-	context.save();
-	context.font = `${isSelected ? '600 ' : ''}13px Inter, system-ui, sans-serif`;
-	context.textAlign = 'center';
-	context.fillStyle = 'hsla(0 0% 0% / 0.45)';
-	const width = context.measureText(name).width + 14;
-	context.beginPath();
-	context.roundRect(point.x - width / 2, point.y + 14, width, 20, 6);
-	context.fill();
-	context.fillStyle = isSelected ? BankPalette.PegSelected : BankPalette.Label;
-	context.fillText(name, point.x, point.y + 28);
 	context.restore();
 }

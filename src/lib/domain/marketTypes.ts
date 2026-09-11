@@ -15,6 +15,7 @@ export interface Listing {
 	buy_now_price: number | null;
 	listing_fee: number;
 	ends_at: string;
+	latest_ends_at: string;
 	status: ListingStatus;
 	sold_price: number | null;
 	buyer_id: string | null;
@@ -34,7 +35,8 @@ export interface Bid {
 
 export interface CarpTransfer {
 	id: string;
-	carp_id: string;
+	carp_id: string | null;
+	carp_name: string;
 	kind: TransferKind;
 	listing_id: string | null;
 	from_lake_id: string | null;
@@ -43,6 +45,7 @@ export interface CarpTransfer {
 	commission: number;
 	transport_cost: number;
 	distance_km: number;
+	farm_band: string | null;
 	departed_at: string;
 	arrives_at: string;
 	quarantine_until: string | null;

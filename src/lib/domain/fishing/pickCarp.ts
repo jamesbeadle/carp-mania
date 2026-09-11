@@ -2,9 +2,15 @@ import type { Carp } from '../types';
 
 const WarinessPerPoundAboveTwenty = 0.03;
 
-export function pickCarpThatTookTheBait(carpInLake: Carp[], randomFraction: number): Carp | null {
+export type TakeBonus = (carp: Carp) => number;
+
+export function sameChanceForEveryFish() {
+	return 1;
+}
+
+export function pickCarpThatTookTheBait(carpInLake: Carp[], randomFraction: number, bonusFor: TakeBonus = sameChanceForEveryFish): Carp | null {
 	if (carpInLake.length === 0) return null;
-	const weights = carpInLake.map(takeLikelihood);
+	const weights = carpInLake.map((carp) => takeLikelihood(carp) * bonusFor(carp));
 	const totalWeight = weights.reduce((total, weight) => total + weight, 0);
 	let remaining = randomFraction * totalWeight;
 	for (let index = 0; index < carpInLake.length; index++) {

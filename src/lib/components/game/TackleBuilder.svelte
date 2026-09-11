@@ -1,18 +1,21 @@
 <script lang="ts">
+	import { describeTerrain, terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
 	import { defaultRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Lake, Swim } from '$lib/domain/types';
+	import type { Season } from '$lib/domain/world/seasons';
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
 	import RodSetupCard from './RodSetupCard.svelte';
 
 	interface Props {
 		lake: Lake;
 		swim: Swim;
+		season: Season;
 		overallSkill: number;
 		savedRods: RodSetup[];
 		onReady: (setups: RodSetup[]) => void;
 	}
 
-	let { lake, swim, overallSkill, savedRods, onReady }: Props = $props();
+	let { lake, swim, season, overallSkill, savedRods, onReady }: Props = $props();
 
 	const hasSavedRods = savedRods.length > 0;
 	const startingSetups = Array.from({ length: MaximumRods }, (_, index) => structuredClone(savedRods[index] ?? defaultRodSetup()));
@@ -20,14 +23,16 @@
 	let rodCount = $state(hasSavedRods ? savedRods.length : MaximumRods);
 	const HintsUnlockAtSkill = 40;
 	const isShowingHints = $derived(overallSkill >= HintsUnlockAtSkill);
+	const terrainInFront = $derived(terrainInFrontOfSwim(lake, swim));
 </script>
 
 <section class="panel mb-4">
 	<p class="stat-label">Tackle up at</p>
 	<h2 class="text-2xl text-volt-300">{swim.name}</h2>
 	<p class="mt-1 text-sm text-mist-400">
-		{BedTypeLabels[swim.bed_type]} bottom · {swim.depth_feet} ft · {SwimFeatureLabels[swim.feature]} · transparency {Math.round(Number(lake.transparency))}%
+		Straight out in front: {describeTerrain(terrainInFront, BedTypeLabels, SwimFeatureLabels)} · transparency {Math.round(Number(lake.transparency))}% · season: {season.name}
 	</p>
+	<p class="mt-1 text-xs text-mist-400">The spot you cast to decides the bottom, the depth and the feature — the readouts below assume the water straight out from the peg.</p>
 	{#if hasSavedRods}
 		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
 	{/if}
@@ -42,7 +47,7 @@
 
 <div class="grid gap-4 md:grid-cols-3">
 	{#each setups.slice(0, rodCount) as _, index (index)}
-		<RodSetupCard bind:setup={setups[index]} rodNumber={index + 1} {lake} {swim} {isShowingHints} />
+		<RodSetupCard bind:setup={setups[index]} rodNumber={index + 1} {lake} terrain={terrainInFront} {isShowingHints} />
 	{/each}
 </div>
 
