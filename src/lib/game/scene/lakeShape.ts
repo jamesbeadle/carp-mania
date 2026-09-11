@@ -41,6 +41,14 @@ export function lakeCentre(): Point {
 	return { x: SceneSize.Width * 0.5, y: SceneSize.Height * 0.5 };
 }
 
+export function isPointInScenePath(context: CanvasRenderingContext2D, path: Path2D, point: Point) {
+	context.save();
+	context.setTransform(1, 0, 0, 1, 0, 0);
+	const isInside = context.isPointInPath(path, point.x, point.y);
+	context.restore();
+	return isInside;
+}
+
 export function isInsideWater(context: CanvasRenderingContext2D, lake: Path2D, island: Path2D, point: Point) {
-	return context.isPointInPath(lake, point.x, point.y) && !context.isPointInPath(island, point.x, point.y);
+	return isPointInScenePath(context, lake, point) && !isPointInScenePath(context, island, point);
 }

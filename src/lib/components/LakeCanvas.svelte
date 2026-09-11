@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Carp, Lake, Swim } from '$lib/domain/types';
+	import { applyCamera, BirdseyeCamera, cameraFor, easeCamera, toWorldPoint, type ViewMode } from '$lib/game/scene/camera';
 	import { createFishSchool } from '$lib/game/scene/fishSchool';
 	import { createSceneDrawer, isCastClearOfIsland, isPointInWater } from '$lib/game/scene/drawScene';
-	import type { Point } from '$lib/game/scene/lakeShape';
+	import { lakeCentre, type Point } from '$lib/game/scene/lakeShape';
 	import { SceneSize } from '$lib/game/scene/palette';
 	import { startRenderLoop, toScenePoint } from '$lib/game/scene/renderLoop';
 	import type { RodOnBank } from '$lib/game/scene/rodState';
@@ -15,38 +16,45 @@
 		selectedSwimId?: string | null;
 		rods?: RodOnBank[];
 		isAnglerOnBank?: boolean;
+		viewMode?: ViewMode;
 		onSwimClick?: (swim: Swim) => void;
 		onWaterClick?: (point: Point) => void;
 		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, selectedSwimId = null, rods = [], isAnglerOnBank = false, onSwimClick, onWaterClick, onCastBlockedByIsland }: Props = $props();
+	let { lake, swims, carp, selectedSwimId = null, rods = [], isAnglerOnBank = false, viewMode = 'birdseye', onSwimClick, onWaterClick, onCastBlockedByIsland }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let hoveredSwimId = $state<string | null>(null);
+	let camera = BirdseyeCamera;
+
+	const selectedSwim = $derived(swims.find((candidate) => candidate.id === selectedSwimId) ?? null);
+	const targetCamera = $derived(cameraFor(viewMode, selectedSwim ? swimScenePoint(selectedSwim) : null, lakeCentre()));
 
 	$effect(() => {
 		const school = createFishSchool(carp, lake.pike_count, lake.id.length * 7919);
 		const drawScene = createSceneDrawer();
-		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) =>
-			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank }, secondsElapsed, timeSeconds)
-		);
+		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) => {
+			camera = easeCamera(camera, targetCamera);
+			applyCamera(context, camera);
+			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank }, secondsElapsed, timeSeconds);
+		});
 	});
 
+	const worldPointOf = (event: MouseEvent) => toWorldPoint(camera, toScenePoint(canvas, event.clientX, event.clientY));
 	const swimAt = (point: Point) => swims.find((swim) => distance(swimScenePoint(swim), point) <= SwimPegRadius * 1.4);
 	const distance = (first: Point, second: Point) => Math.hypot(first.x - second.x, first.y - second.y);
 
 	function handleMove(event: MouseEvent) {
-		hoveredSwimId = swimAt(toScenePoint(canvas, event.clientX, event.clientY))?.id ?? null;
+		hoveredSwimId = swimAt(worldPointOf(event))?.id ?? null;
 	}
 
 	function handleClick(event: MouseEvent) {
-		const point = toScenePoint(canvas, event.clientX, event.clientY);
+		const point = worldPointOf(event);
 		const swim = swimAt(point);
 		if (swim) return onSwimClick?.(swim);
 		const context = canvas.getContext('2d');
-		if (!context || !isPointInWater(context, point.x, point.y)) return;
-		const selectedSwim = swims.find((candidate) => candidate.id === selectedSwimId);
+		if (!context || !isPointInWater(context, point)) return;
 		const isBlocked = selectedSwim && !isCastClearOfIsland(context, swimScenePoint(selectedSwim), point);
 		if (isBlocked) return onCastBlockedByIsland?.();
 		onWaterClick?.(point);

@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
+	import { BiteAlarm } from '$lib/game/session/biteAlarm';
 	import { reportLandedFish } from '$lib/game/session/landFish';
+	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { castRod, chooseSwim, finishFight, nextRodToCast, returnToFishing, strike, tackleUp } from '$lib/game/session/sessionFlow';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { BiteAlarm } from '$lib/game/session/biteAlarm';
-	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
-	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
-	import LakeCanvas from '../LakeCanvas.svelte';
-	import CatchPhoto from './CatchPhoto.svelte';
+	import type { ViewMode } from '$lib/game/scene/camera';
 	import DayOverSummary from './DayOverSummary.svelte';
-	import FightMeter from './FightMeter.svelte';
-	import SessionHud from './SessionHud.svelte';
+	import HowToPlay from './HowToPlay.svelte';
+	import KeyHints from './KeyHints.svelte';
 	import TackleBuilder from './TackleBuilder.svelte';
+	import WaterScreen from './WaterScreen.svelte';
 
 	let { lake, swims, carp, profile, visitId }: { lake: Lake; swims: Swim[]; carp: Carp[]; profile: Profile; visitId: string } = $props();
 
@@ -19,14 +19,7 @@
 	const alarm = new BiteAlarm();
 	let isCatchSaved = $state<boolean | null>(null);
 	let isAlarmMuted = $state(false);
-
-	$effect(() => {
-		if (session.bite) return alarm.start();
-		alarm.stop();
-	});
-	$effect(() => {
-		alarm.isMuted = isAlarmMuted;
-	});
+	let viewMode = $state<ViewMode>('birdseye');
 
 	$effect(() => {
 		let last = performance.now();
@@ -37,10 +30,18 @@
 		}, 100);
 		return () => clearInterval(interval);
 	});
+	$effect(() => {
+		if (session.bite) return alarm.start();
+		alarm.stop();
+	});
+	$effect(() => {
+		alarm.isMuted = isAlarmMuted;
+	});
 
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);
 		rememberRodSetups(lake.id, setups);
+		viewMode = 'swim';
 	}
 
 	function handleWaterClick(point: { x: number; y: number }) {
@@ -59,37 +60,28 @@
 	}
 </script>
 
-{#if session.phase === 'choose_swim'}
-	<p class="mb-3 text-mist-200">Walk the bank and click a swim peg to set up there. Think about the bottom, the depth and what the fish have been fed.</p>
-{/if}
-
 {#if session.phase === 'tackle_up' && session.swim}
 	<TackleBuilder {lake} swim={session.swim} overallSkill={session.overallSkill} savedRods={profile.saved_rods ?? []} onReady={handleTackleUp} />
 {:else if session.phase === 'day_over'}
 	<DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} />
 {:else}
-	<div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-		<LakeCanvas
+	<div class="mx-auto max-w-5xl space-y-4">
+		<WaterScreen
+			{session}
 			{lake}
 			{swims}
 			{carp}
-			selectedSwimId={session.swim?.id ?? null}
-			rods={session.rods}
-			isAnglerOnBank={session.phase !== 'choose_swim'}
+			{profile}
+			{isCatchSaved}
+			bind:viewMode
 			onSwimClick={(swim) => session.phase === 'choose_swim' && chooseSwim(session, swim)}
 			onWaterClick={handleWaterClick}
 			onCastBlockedByIsland={() => (session.notice = "You can't cast through the island — pick a spot with a clear line from your swim.")}
+			onStrike={() => strike(session)}
+			onFightFinished={handleFightFinished}
+			onContinue={() => returnToFishing(session)}
 		/>
-		<div>
-			{#if session.phase === 'fighting' && session.fight}
-				<FightMeter fight={session.fight} onFinished={handleFightFinished} />
-			{:else if session.phase === 'landed' && session.lastLanded}
-				<CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} isSaved={isCatchSaved} onContinue={() => returnToFishing(session)} />
-			{:else if session.phase === 'fishing'}
-				<SessionHud {session} bind:isAlarmMuted onStrike={() => strike(session)} />
-			{:else}
-				<section class="panel text-sm text-mist-400">Pick a swim on the map to begin.</section>
-			{/if}
-		</div>
+		<KeyHints bind:isAlarmMuted />
+		<HowToPlay />
 	</div>
 {/if}

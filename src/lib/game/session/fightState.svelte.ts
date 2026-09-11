@@ -1,4 +1,4 @@
-import { carpPullStrength, fightSecondsFor, isHookPulled, isLineSnapped, nextTension, TensionBand } from '$lib/domain/fishing/fight';
+import { carpPullStrength, fightSecondsFor, isFishRunning, isHookPulled, isLineSnapped, nextTension, TensionBand } from '$lib/domain/fishing/fight';
 import type { LineThickness } from '$lib/domain/tackle/lines';
 import type { Carp } from '$lib/domain/types';
 
@@ -8,6 +8,7 @@ export class FightState {
 	tension = $state<number>(TensionBand.Ideal);
 	secondsRemaining = $state(0);
 	isReeling = $state(false);
+	isRunning = $state(false);
 	outcome = $state<FightOutcome | null>(null);
 	readonly carp: Carp;
 	private readonly pullStrength: number;
@@ -21,7 +22,8 @@ export class FightState {
 
 	advance(secondsElapsed: number, timeSeconds: number) {
 		if (this.outcome) return;
-		const surge = 0.5 + Math.sin(timeSeconds * 1.7 + this.surgePhase) * 0.5 + Math.sin(timeSeconds * 5.3) * 0.15;
+		const surge = 0.5 + Math.sin(timeSeconds * 0.9 + this.surgePhase) * 0.5 + Math.sin(timeSeconds * 2.7) * 0.1;
+		this.isRunning = isFishRunning(surge);
 		this.tension = nextTension(this.tension, this.isReeling, this.pullStrength, secondsElapsed, surge);
 		this.secondsRemaining = Math.max(0, this.secondsRemaining - secondsElapsed);
 		this.outcome = this.judge();

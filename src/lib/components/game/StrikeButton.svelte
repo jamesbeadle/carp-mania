@@ -1,0 +1,20 @@
+<script lang="ts">
+	import type { ActiveBite } from '$lib/game/session/sessionState.svelte';
+
+	let { bite, onStrike }: { bite: ActiveBite; onStrike: () => void } = $props();
+
+	function strikeOnEnter(event: KeyboardEvent) {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+		onStrike();
+	}
+</script>
+
+<svelte:window onkeydown={strikeOnEnter} />
+
+<div class="absolute inset-0 flex items-center justify-center">
+	<button
+		class="animate-pulse rounded-full border-4 border-danger-400 bg-danger-500 px-12 py-8 font-display text-5xl font-extrabold tracking-wide text-mist-100 uppercase italic shadow-2xl shadow-danger-500/50"
+		onclick={onStrike}>Strike!<span class="block text-lg font-bold not-italic">Rod {bite.rodIndex + 1} · {bite.secondsLeft.toFixed(1)}s · or press Enter</span></button
+	>
+</div>
