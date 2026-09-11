@@ -18,7 +18,8 @@ export function summariseDays(outcomes: DayOutcome[]): WhileYouWereAway {
 		carpArrived: outcomes.flatMap((day) => day.arrivedCarp.map((fish) => fish.name)),
 		heatwaveDays: outcomes.filter((day) => day.isHeatwave).length,
 		recordsSet: recordsSetBetween(firstRecords.lakeRecordLb, lastRecords.lakeRecordLb),
-		worksCompleted: outcomes.flatMap((day) => day.worksCompleted.map((work) => workLabelFor(draftOf(work))))
+		worksCompleted: outcomes.flatMap((day) => day.worksCompleted.map((work) => workLabelFor(draftOf(work)))),
+		frySpawned: sum(outcomes, (day) => day.spawned.length)
 	};
 }
 

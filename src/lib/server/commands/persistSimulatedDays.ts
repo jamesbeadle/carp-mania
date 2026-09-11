@@ -12,11 +12,17 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 
 	await trusted.from('lakes').update(finalLake).eq('id', finalLake.id);
 	if (finalDay.carp.length > 0) await trusted.from('carp').upsert(finalDay.carp, { onConflict: 'id' });
+	await insertSpawnedFry(trusted, outcomes);
 	await insertHistory(trusted, outcomes);
 	if (takenCarpIds.length > 0) await trusted.from('carp').delete().in('id', takenCarpIds);
 	await trusted.from('profiles').update({ money: Number(profile.money) + netMoney }).eq('id', profile.id);
 	await insertNews(trusted, finalLake, outcomes, profile);
 	await persistCompletedWorks(trusted, finalLake, outcomes, profile.id);
+}
+
+async function insertSpawnedFry(trusted: SupabaseClient, outcomes: DayOutcome[]) {
+	const fry = outcomes.flatMap((day) => day.spawned);
+	if (fry.length > 0) await trusted.from('carp').insert(fry);
 }
 
 async function insertHistory(trusted: SupabaseClient, outcomes: DayOutcome[]) {

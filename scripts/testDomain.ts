@@ -14,7 +14,7 @@ import { runFishingScenarios } from './testFishing';
 import { runGroundworksScenarios } from './testGroundworks';
 import { runMarketScenarios } from './testMarket';
 import { runSiteScenarios } from './testSites';
-import { runWorldScenarios } from './testWorld';
+import { runSpawningScenarios, runWorldScenarios } from './testWorld';
 
 const random = seededRandom(42);
 const start = new Date('2026-01-01T00:00:00Z');
@@ -67,6 +67,7 @@ console.log('match:', match, 'bite chance at dawn for a 60-skill angler:', chanc
 runFishingScenarios();
 runMarketScenarios();
 runWorldScenarios();
+runSpawningScenarios();
 runGroundworksScenarios();
 runSiteScenarios();
 console.log('domain tests passed');

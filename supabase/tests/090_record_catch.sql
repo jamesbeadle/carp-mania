@@ -67,8 +67,11 @@ select test.assert_that((select count(*) from public.notifications where profile
 select test.assert_that((select count(*) from public.notifications where profile_id = test.player(90) and kind = 'record_set') = 2, 'and of both records');
 select test.assert_that((select count(*) from public.world_events where kind = 'record' and payload ->> 'scope' <> 'lake') = 0, 'no region or world records were claimed');
 update public.carp set weight_lb = 33 where id = :'thirtytwo';
+set role authenticated;
+select set_config('request.jwt.claim.sub', test.player(91)::text, false);
+select public.pay_day_ticket(:'lake') as second_visit \gset
 set role service_role;
-select public.record_catch(test.player(91), :'visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(91), :'second_visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
 reset role;
 select test.assert_that((select fame from public.carp where id = :'thirtytwo') = 15 + 13, 'a grown fish is a lake record again, but a personal best only once per angler');
 
@@ -87,14 +90,4 @@ select test.assert_that(
 );
 select test.assert_that((select count(*) from public.world_pins where id = :'private_lake') = 0, 'a private water is not on the globe');
 select test.assert_that((select count(*) from public.world_pins where id = test.lake_of(test.player(1))) = 0, 'an unpinned water is not on the globe');
-reset role;
-
-select test.give_carp(:'private_lake', 'Secret', 'leather', 22, 85, 0) as secret \gset
-set role authenticated;
-select set_config('request.jwt.claim.sub', test.player(91)::text, false);
-select test.assert_that((select count(*) from public.carp where id = :'secret') = 0, 'a private water''s fish are unseen');
-select set_config('request.jwt.claim.sub', test.player(93)::text, false);
-select public.list_carp_for_sale(:'secret', 'auction', 500, null, null, 48);
-select set_config('request.jwt.claim.sub', test.player(91)::text, false);
-select test.assert_that((select count(*) from public.carp where id = :'secret') = 1, 'until it is up for sale');
 reset role;

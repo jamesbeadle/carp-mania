@@ -11,8 +11,9 @@ export interface WhileYouWereAway {
 	heatwaveDays: number;
 	recordsSet: string[];
 	worksCompleted: string[];
+	frySpawned: number;
 }
 
 export function nothingHappened(): WhileYouWereAway {
-	return { daysSimulated: 0, anglersVisited: 0, fishCaught: 0, feesCollected: 0, lodgeTakings: 0, bailiffWages: 0, aeratorRunning: 0, carpTakenByPike: [], carpArrived: [], heatwaveDays: 0, recordsSet: [], worksCompleted: [] };
+	return { daysSimulated: 0, anglersVisited: 0, fishCaught: 0, feesCollected: 0, lodgeTakings: 0, bailiffWages: 0, aeratorRunning: 0, carpTakenByPike: [], carpArrived: [], heatwaveDays: 0, recordsSet: [], worksCompleted: [], frySpawned: 0 };
 }

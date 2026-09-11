@@ -14,6 +14,7 @@ import { isHeatwaveToday, sufferHeatwave } from './heatwave';
 import { lapseTransfersForOneDay } from './lapseTransfers';
 import { driftFertilityForOneDay } from './naturalFood';
 import { letPikeHuntForOneDay } from './pikePredation';
+import { isFirstDayOfSpring, spawnFry, type NewBornCarp } from './spawning';
 import { simulateVisitingAnglers, type NewCatch, type NewVisit } from './visitingAnglers';
 
 export interface DayContext {
@@ -39,6 +40,7 @@ export interface DayOutcome {
 	isHeatwave: boolean;
 	records: StandingRecords;
 	worksCompleted: LakeWork[];
+	spawned: NewBornCarp[];
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext): DayOutcome {
@@ -51,6 +53,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
 	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd);
+	const spawned = isFirstDayOfSpring(context.dayStart, context.dayEnd, hunted.lake.latitude) ? spawnFry(hunted.lake, aged, random) : [];
 
 	return {
 		lake: { ...hunted.lake, reputation: reputationAfterDay(hunted.lake, anglers.catches) },
@@ -66,7 +69,8 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		aeratorRunning: hasAerator(hunted.lake) ? Prices.AeratorDailyRunning : 0,
 		isHeatwave,
 		records: anglers.records,
-		worksCompleted: works.completed
+		worksCompleted: works.completed,
+		spawned
 	};
 }
 

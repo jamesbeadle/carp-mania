@@ -65,3 +65,15 @@ select test.assert_that((select count(*) from public.notifications) = 0, 'anothe
 select test.assert_that((select count(*) from public.favourite_lakes) = 0, 'favourites are private');
 reset role;
 select test.assert_that((select name from public.lakes where owner_id = test.player(20)) = 'Renamed Water', 'another player cannot rename it');
+
+select test.give_lake(test.player(21), 'Hidden Pool', 'uk_ireland', 54.5, -3.1, 4) as hidden_pool \gset
+update public.lakes set is_public = false where id = :'hidden_pool';
+select test.give_carp(:'hidden_pool', 'Secret', 'leather', 22, 85, 0) as secret \gset
+set role authenticated;
+select set_config('request.jwt.claim.sub', test.player(20)::text, false);
+select test.assert_that((select count(*) from public.carp where id = :'secret') = 0, 'a private water''s fish are unseen');
+select set_config('request.jwt.claim.sub', test.player(21)::text, false);
+select public.list_carp_for_sale(:'secret', 'auction', 500, null, null, 48);
+select set_config('request.jwt.claim.sub', test.player(20)::text, false);
+select test.assert_that((select count(*) from public.carp where id = :'secret') = 1, 'until it is up for sale');
+reset role;

@@ -37,6 +37,9 @@
 		{#if summary.worksCompleted.length > 0}
 			<p class="mt-2 text-sm text-mist-200">Works finished: {summary.worksCompleted.join(', ')}.</p>
 		{/if}
+		{#if summary.frySpawned > 0}
+			<p class="mt-2 text-sm text-mist-200">The carp spawned in the weed — {summary.frySpawned} fry nobody has seen yet.</p>
+		{/if}
 		{#if summary.carpArrived.length > 0}
 			<p class="mt-2 text-sm text-mist-200">Arrived and in the lake: {summary.carpArrived.join(', ')}.</p>
 		{/if}

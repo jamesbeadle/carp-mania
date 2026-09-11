@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { newWaterEvent } from '$lib/domain/simulation/worldEvents';
 import { whyPlotIsRefused } from '$lib/domain/world/plotRules';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { readFormNumber } from '../gates/readFormNumber';
@@ -25,5 +26,6 @@ export async function PinLakeOnGlobe(locals: App.Locals, formData: FormData) {
 		.eq('id', lake.id)
 		.is('latitude', null);
 	if (error) return fail(500, { message: `Could not pin your water: ${error.message}` });
+	await trustedSupabase().from('world_events').insert(newWaterEvent(lake.id, lake.name, lake.region));
 	redirect(303, HomeOncePinned);
 }

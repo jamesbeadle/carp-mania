@@ -9,6 +9,8 @@ import { isOnLand } from '../src/lib/domain/world/landCheck';
 import { whyPlotIsRefused } from '../src/lib/domain/world/plotRules';
 import { yearlyAverageGrowthFactor } from '../src/lib/domain/world/seasons';
 import { seasonFraction, seasonNameFor } from '../src/lib/domain/world/worldClock';
+import { seededRandom } from '../src/lib/domain/random';
+import { isFirstDayOfSpring, spawnFry } from '../src/lib/domain/simulation/spawning';
 import { filterWorldPins, NoWorldFilters } from '../src/lib/domain/world/worldFilters';
 import type { WorldPin } from '../src/lib/contracts/WorldPin';
 
@@ -70,4 +72,18 @@ export function runWorldScenarios() {
 	assert.equal(whyPlotIsRefused('france', 48.86, 2.35), null, 'Paris is a fine French plot');
 	assert.equal(whyPlotIsRefused('uk_ireland', 53.5, -5.2), 'That spot is in the sea', 'the Irish Sea is inside the bounds but wet');
 	console.log('world:', { classicWaterAcres: acres, londonToParis });
+}
+
+export function runSpawningScenarios() {
+	const fertile = { id: 'lake-s', weed: 30, fertility: 70 };
+	const adults = Array.from({ length: 12 }, (_, index) => ({ id: `adult-${index}`, lake_id: 'lake-s', name: `Adult ${index}`, strain: 'mirror' as const, weight_lb: 15, age_years: 5, condition: 80, times_caught: 0, origin: 'wild' as const, origin_lake_id: 'lake-s', fame: 0, is_catalogued: true, transit_until: null, quarantine_until: null }));
+	const fry = spawnFry(fertile, adults, seededRandom(3));
+	assert.ok(fry.length >= 3 && fry.length <= 8, `a fertile lake spawns 3–8 fry, got ${fry.length}`);
+	assert.ok(fry.every((fish) => fish.origin === 'bred' && !fish.is_catalogued && fish.weight_lb <= 4), 'fry are small, bred and unseen');
+	assert.equal(spawnFry({ id: 'lake-s', weed: 10, fertility: 70 }, adults, seededRandom(3)).length, 0, 'no weed, no spawning');
+	const hour = 60 * 60 * 1000;
+	const yearOfDays = Array.from({ length: 365 }, (_, day) => new Date(Date.UTC(2026, 0, 1) + day * hour));
+	const springStarts = yearOfDays.filter((dayStart) => isFirstDayOfSpring(dayStart, new Date(dayStart.getTime() + hour), 51)).length;
+	assert.equal(springStarts, 1, 'spring starts exactly once a fishery year in the north');
+	console.log('spawning:', { fry: fry.length });
 }
