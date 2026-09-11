@@ -1,4 +1,5 @@
 import { redirect, type Handle } from '@sveltejs/kit';
+import { whereSetupSendsYou } from '$lib/server/gates/setupGate';
 import { createServerSupabase } from '$lib/supabase/createServerSupabase';
 import { safeGetSession } from '$lib/supabase/safeGetSession';
 
@@ -15,8 +16,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { user } = await event.locals.safeGetSession();
 	event.locals.user = user;
 
-	const isSignedIn = user !== null;
-	if (!isSignedIn && !isPublicPath(event.url.pathname)) redirect(303, '/');
+	const pathname = event.url.pathname;
+	if (!user && !isPublicPath(pathname)) redirect(303, '/');
+	if (user && !isPublicPath(pathname)) {
+		const destination = await whereSetupSendsYou(event.locals, user.id, pathname);
+		if (destination) redirect(303, destination);
+	}
 
 	return resolve(event, {
 		filterSerializedResponseHeaders: (name) => name === 'content-range' || name === 'x-supabase-api-version'

@@ -7,7 +7,7 @@
 
 <div class="flex min-h-full flex-col">
 	{#if data.user}
-		<NavigationBar user={data.user} />
+		<NavigationBar user={data.user} unreadCount={data.unreadCount} />
 	{/if}
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
 		{@render children()}

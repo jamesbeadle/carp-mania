@@ -3,6 +3,7 @@ import { netMoneyFor, type DayOutcome } from '$lib/domain/simulation/simulateOne
 import { bigCatchEvent, isBigNpcCatch, recordEvent } from '$lib/domain/simulation/worldEvents';
 import type { Lake, Profile } from '$lib/domain/types';
 import { arrivalNotifications } from './arrivalNotifications';
+import { persistCompletedWorks } from './persistCompletedWorks';
 
 export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: Lake, outcomes: DayOutcome[], profile: Profile) {
 	const finalDay = outcomes[outcomes.length - 1];
@@ -15,6 +16,7 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 	if (takenCarpIds.length > 0) await trusted.from('carp').delete().in('id', takenCarpIds);
 	await trusted.from('profiles').update({ money: Number(profile.money) + netMoney }).eq('id', profile.id);
 	await insertNews(trusted, finalLake, outcomes, profile);
+	await persistCompletedWorks(trusted, finalLake, outcomes, profile.id);
 }
 
 async function insertHistory(trusted: SupabaseClient, outcomes: DayOutcome[]) {

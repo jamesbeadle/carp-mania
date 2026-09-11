@@ -1,7 +1,9 @@
 <script lang="ts">
-	import FisherySummaryCard from '$lib/components/home/FisherySummaryCard.svelte';
 	import AnglerSummaryCard from '$lib/components/home/AnglerSummaryCard.svelte';
+	import FisherySummaryCard from '$lib/components/home/FisherySummaryCard.svelte';
+	import InboxCard from '$lib/components/home/InboxCard.svelte';
 	import WhileYouWereAway from '$lib/components/home/WhileYouWereAway.svelte';
+	import WorksInProgressCard from '$lib/components/home/WorksInProgressCard.svelte';
 
 	let { data } = $props();
 </script>
@@ -13,4 +15,6 @@
 <div class="grid gap-6 md:grid-cols-2">
 	<FisherySummaryCard lake={data.fishery.lake} carp={data.fishery.carp} />
 	<AnglerSummaryCard profile={data.profile} />
+	<WorksInProgressCard works={data.works} />
+	<InboxCard notifications={data.unreadNotifications} unreadCount={data.unreadCount} />
 </div>

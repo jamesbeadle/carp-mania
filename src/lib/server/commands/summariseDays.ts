@@ -1,4 +1,6 @@
 import type { WhileYouWereAway } from '$lib/contracts/WhileYouWereAway';
+import { workLabelFor } from '$lib/domain/groundworks/workLabels';
+import { draftOf } from '$lib/domain/groundworks/worksLedger';
 import type { DayOutcome } from '$lib/domain/simulation/simulateOneDay';
 
 export function summariseDays(outcomes: DayOutcome[]): WhileYouWereAway {
@@ -16,7 +18,7 @@ export function summariseDays(outcomes: DayOutcome[]): WhileYouWereAway {
 		carpArrived: outcomes.flatMap((day) => day.arrivedCarp.map((fish) => fish.name)),
 		heatwaveDays: outcomes.filter((day) => day.isHeatwave).length,
 		recordsSet: recordsSetBetween(firstRecords.lakeRecordLb, lastRecords.lakeRecordLb),
-		worksCompleted: []
+		worksCompleted: outcomes.flatMap((day) => day.worksCompleted.map((work) => workLabelFor(draftOf(work))))
 	};
 }
 

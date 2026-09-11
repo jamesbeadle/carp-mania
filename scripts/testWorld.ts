@@ -5,6 +5,8 @@ import { terrainAt } from '../src/lib/domain/layout/terrainAt';
 import { isInWater, waterAcres } from '../src/lib/domain/layout/waterArea';
 import { strainWeightsFor } from '../src/lib/domain/strains';
 import { greatCircleKilometres } from '../src/lib/domain/world/greatCircle';
+import { isOnLand } from '../src/lib/domain/world/landCheck';
+import { whyPlotIsRefused } from '../src/lib/domain/world/plotRules';
 import { yearlyAverageGrowthFactor } from '../src/lib/domain/world/seasons';
 import { seasonFraction, seasonNameFor } from '../src/lib/domain/world/worldClock';
 
@@ -37,5 +39,15 @@ export function runWorldScenarios() {
 
 	const londonToParis = greatCircleKilometres({ latitude: 51.5, longitude: -0.12 }, { latitude: 48.86, longitude: 2.35 });
 	assert.ok(londonToParis > 330 && londonToParis < 360, `London to Paris is about 344 km, got ${londonToParis}`);
+
+	assert.ok(isOnLand(51.5, -0.12), 'London is on land');
+	assert.ok(isOnLand(47.5, 19.05), 'Budapest is on land');
+	assert.ok(isOnLand(43.7, -79.4), 'Toronto is on land');
+	assert.ok(!isOnLand(30, -40), 'the middle of the Atlantic is sea');
+	assert.ok(!isOnLand(56, 3), 'the North Sea is sea');
+	const parisForABritishLake = whyPlotIsRefused('uk_ireland', 48.86, 2.35);
+	assert.ok(parisForABritishLake?.includes('UK & Ireland'), `Paris is outside the UK: ${parisForABritishLake}`);
+	assert.equal(whyPlotIsRefused('france', 48.86, 2.35), null, 'Paris is a fine French plot');
+	assert.equal(whyPlotIsRefused('uk_ireland', 53.5, -5.2), 'That spot is in the sea', 'the Irish Sea is inside the bounds but wet');
 	console.log('world:', { classicWaterAcres: acres, londonToParis });
 }

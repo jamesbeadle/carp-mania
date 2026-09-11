@@ -5,7 +5,9 @@ import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '
 import type { Carp, Lake, Swim } from '../types';
 import { overallWaterQuality } from '../waterQuality';
 import type { Season } from '../world/seasons';
+import type { LakeWork } from '../worldTypes';
 import { ageCarpIfNewYear } from './ageing';
+import { completeDueWorks } from './completeWorks';
 import { driftWaterForOneDay, hasAerator } from './driftWater';
 import { feedTheLakeForOneDay } from './feedTheLake';
 import { isHeatwaveToday, sufferHeatwave } from './heatwave';
@@ -19,6 +21,7 @@ export interface DayContext {
 	dayEnd: Date;
 	season: Season;
 	records: StandingRecords;
+	works: LakeWork[];
 }
 
 export interface DayOutcome {
@@ -35,10 +38,12 @@ export interface DayOutcome {
 	aeratorRunning: number;
 	isHeatwave: boolean;
 	records: StandingRecords;
+	worksCompleted: LakeWork[];
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext): DayOutcome {
-	const fed = feedTheLakeForOneDay({ ...lake, fertility: driftFertilityForOneDay(lake) }, carp, context.season.growthFactor);
+	const works = completeDueWorks(lake, context.works, context.dayEnd);
+	const fed = feedTheLakeForOneDay({ ...works.lake, fertility: driftFertilityForOneDay(works.lake) }, carp, context.season.growthFactor);
 	const watered = driftWaterForOneDay(fed.lake);
 	const hunted = letPikeHuntForOneDay(watered, fed.carp, random);
 	const lapsed = lapseTransfersForOneDay(hunted.carp, context.dayEnd);
@@ -60,7 +65,8 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		bailiffWages: hunted.lake.has_bailiff ? Prices.BailiffDailyWage : 0,
 		aeratorRunning: hasAerator(hunted.lake) ? Prices.AeratorDailyRunning : 0,
 		isHeatwave,
-		records: anglers.records
+		records: anglers.records,
+		worksCompleted: works.completed
 	};
 }
 

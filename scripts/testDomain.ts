@@ -11,7 +11,9 @@ import { defaultRodSetup } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake, Swim } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
 import { runFishingScenarios } from './testFishing';
+import { runGroundworksScenarios } from './testGroundworks';
 import { runMarketScenarios } from './testMarket';
+import { runSiteScenarios } from './testSites';
 import { runWorldScenarios } from './testWorld';
 
 const random = seededRandom(42);
@@ -34,7 +36,7 @@ for (const classic of ClassicSwims) {
 function contextForDay(dayIndex: number, currentLake: Lake): DayContext {
 	const dayStart = new Date(start.getTime() + dayIndex * FisheryClock.RealMillisecondsPerFisheryDay);
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
-	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet() };
+	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [] };
 }
 
 const fedLake: Lake = { ...lake, feed_stock: { ...lake.feed_stock, fishmeal_boilies: 40 } };
@@ -65,4 +67,6 @@ console.log('match:', match, 'bite chance at dawn for a 60-skill angler:', chanc
 runFishingScenarios();
 runMarketScenarios();
 runWorldScenarios();
+runGroundworksScenarios();
+runSiteScenarios();
 console.log('domain tests passed');
