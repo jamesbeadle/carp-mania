@@ -10,10 +10,10 @@
 {#if catches.length === 0}
 	<p class="text-sm text-mist-400">No catches reported yet.</p>
 {:else}
-	<ul class="divide-y divide-pond-700/60">
+	<ul class="divide-y divide-carbon-700/60">
 		{#each catches as caught (caught.id)}
 			<li class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm">
-				<span class="font-semibold text-gold-300">{formatWeight(caught.weight_lb)}</span>
+				<span class="font-semibold text-volt-300">{formatWeight(caught.weight_lb)}</span>
 				<span class="text-mist-100">{caught.carp_id ? (carpNames[caught.carp_id] ?? 'Unnamed carp') : 'Unnamed carp'}</span>
 				<span class="text-mist-400">by {caught.angler_name}</span>
 				<span class="text-mist-400">· {caught.swim_name} · {humanise(caught.rig)} · {humanise(caught.bait)} · size {caught.hook_size}</span>

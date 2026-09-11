@@ -9,13 +9,13 @@
 
 <section class="panel space-y-4">
 	<p class="stat-label">Dusk</p>
-	<h2 class="text-3xl text-gold-300">Rods in — {landed.length} carp landed</h2>
+	<h2 class="text-3xl text-volt-300">Rods in — {landed.length} carp landed</h2>
 	<p class="text-mist-200">
 		{#if landed.length === 0}A blank. It happens to everyone — try a different swim or bait tomorrow.{:else}Best of the day {formatWeight(heaviest)}. {lost} lost.{/if}
 	</p>
 	<ul class="grid gap-2 text-sm sm:grid-cols-2">
 		{#each landed as fish, index (index)}
-			<li class="rounded-lg bg-pond-900 px-3 py-2"><span class="text-gold-300">{formatWeight(fish.carp.weight_lb)}</span> {fish.carp.name} from {fish.swim.name}</li>
+			<li class="rounded-lg bg-carbon-900 px-3 py-2"><span class="text-volt-300">{formatWeight(fish.carp.weight_lb)}</span> {fish.carp.name} from {fish.swim.name}</li>
 		{/each}
 	</ul>
 	<div class="flex gap-3">

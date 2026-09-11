@@ -11,7 +11,7 @@
 </script>
 
 <section class="panel">
-	<h3 class="mb-1 text-xl text-gold-300">Predators</h3>
+	<h3 class="mb-1 text-xl text-volt-300">Predators</h3>
 	<p class="mb-4 text-sm text-mist-400">
 		Pike are slow swimmers but fast at the strike: they ambush the sick carp and can't catch the strong ones. They never grow past
 		{PikeRules.MaximumWeightLb} lb here. Feed them perch, rudd and roach or they die back. They also eat crayfish, which cleans the water.

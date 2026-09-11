@@ -21,15 +21,13 @@
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	{#key data.fishery.lake.id + data.fishery.carp.length}
-		<LakeCanvas lake={data.fishery.lake} swims={data.fishery.swims} carp={data.fishery.carp} />
-	{/key}
+	<LakeCanvas lake={data.fishery.lake} swims={data.fishery.swims} carp={data.fishery.carp} />
 	<LakeOverview lake={data.fishery.lake} profile={data.profile} />
 </div>
 
 <nav class="mt-8 mb-4 flex flex-wrap gap-2">
 	{#each tabs as tab (tab)}
-		<button class="rounded-full px-4 py-1.5 text-sm font-medium transition" class:bg-gold-500={activeTab === tab} class:text-pond-950={activeTab === tab} class:bg-pond-800={activeTab !== tab} onclick={() => (activeTab = tab)}>{tab}</button>
+		<button class="rounded-full px-4 py-1.5 text-sm font-medium transition" class:bg-volt-500={activeTab === tab} class:text-carbon-950={activeTab === tab} class:bg-carbon-800={activeTab !== tab} onclick={() => (activeTab = tab)}>{tab}</button>
 	{/each}
 </nav>
 

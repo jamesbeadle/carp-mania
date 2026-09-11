@@ -11,7 +11,7 @@
 
 <section class="panel space-y-3">
 	<div class="flex items-baseline justify-between">
-		<span class="font-display text-3xl text-gold-300">{formatFishingHour(session.hour)}</span>
+		<span class="font-display text-3xl text-volt-300">{formatFishingHour(session.hour)}</span>
 		<span class="text-sm text-mist-400">{session.landedToday.length} landed · {session.lostToday} lost</span>
 	</div>
 
@@ -20,15 +20,15 @@
 			STRIKE! Rod {session.bite.rodIndex + 1} — {session.bite.secondsLeft.toFixed(1)}s
 		</button>
 	{:else if session.notice}
-		<p class="rounded-xl bg-pond-900 px-3 py-2 text-sm text-mist-200">{session.notice}</p>
+		<p class="rounded-xl bg-carbon-900 px-3 py-2 text-sm text-mist-200">{session.notice}</p>
 	{/if}
 
 	<ul class="space-y-2 text-sm">
 		{#each session.rods as rod (rod.index)}
-			<li class="flex items-center gap-2 rounded-lg bg-pond-900 px-3 py-2" class:ring-2={rod.phase === 'biting'} class:ring-danger-400={rod.phase === 'biting'}>
+			<li class="flex items-center gap-2 rounded-lg bg-carbon-900 px-3 py-2" class:ring-2={rod.phase === 'biting'} class:ring-danger-400={rod.phase === 'biting'}>
 				<span class="font-semibold">Rod {rod.index + 1}</span>
 				<span class="text-mist-400">{RigCatalogue[rod.setup.rig].label} · {BaitCatalogue[rod.setup.bait].label}</span>
-				<span class="ml-auto" class:text-gold-300={rod.phase === 'cast'} class:text-danger-400={rod.phase === 'biting'}>{phaseLabels[rod.phase]}</span>
+				<span class="ml-auto" class:text-volt-300={rod.phase === 'cast'} class:text-danger-400={rod.phase === 'biting'}>{phaseLabels[rod.phase]}</span>
 			</li>
 		{/each}
 	</ul>

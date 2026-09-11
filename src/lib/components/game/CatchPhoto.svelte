@@ -26,7 +26,7 @@
 
 <section class="panel space-y-4">
 	<p class="stat-label">On the mat at {formatFishingHour(landed.hour)}</p>
-	<h2 class="text-3xl text-gold-300">{landed.carp.name} — {formatWeight(landed.carp.weight_lb)}</h2>
+	<h2 class="text-3xl text-volt-300">{landed.carp.name} — {formatWeight(landed.carp.weight_lb)}</h2>
 	<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
 	<p class="text-sm text-mist-200">
 		A {StrainCatalogue[landed.carp.strain].label.toLowerCase()} carp for {anglerName} at {lakeName}, from {landed.swim.name}.

@@ -8,7 +8,7 @@
 </script>
 
 <section class="panel">
-	<h3 class="mb-1 text-xl text-gold-300">Water &amp; bailiff</h3>
+	<h3 class="mb-1 text-xl text-volt-300">Water &amp; bailiff</h3>
 	<p class="mb-4 text-sm text-mist-400">
 		Silt and weed creep up every day; colour and transparency follow. A bailiff clears weed, keeps silt down, tidies the banks and
 		makes sure every angler pays. Wages are {formatMoney(Prices.BailiffDailyWage)} a day.
@@ -17,7 +17,7 @@
 	<div class="mt-5">
 		{#if lake.has_bailiff}
 			<form method="POST" action="?/dismissBailiff" class="flex items-center gap-3">
-				<span class="text-sm text-reed-300">Bailiff on the bank.</span>
+				<span class="text-sm text-volt-300">Bailiff on the bank.</span>
 				<button class="button-secondary">Dismiss</button>
 			</form>
 		{:else}

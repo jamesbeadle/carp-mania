@@ -12,7 +12,7 @@
 </script>
 
 <section class="panel">
-	<h3 class="mb-1 text-xl text-gold-300">The stock</h3>
+	<h3 class="mb-1 text-xl text-volt-300">The stock</h3>
 	<p class="mb-4 text-sm text-mist-400">{carp.length} identified carp. Bigger fish cost a lot more — above 25 lb the price climbs steeply.</p>
 	<form method="POST" action="?/stockCarp" class="mb-5 grid gap-2 sm:grid-cols-[auto_auto_1fr] sm:items-end">
 		<label>

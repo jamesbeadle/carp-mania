@@ -16,7 +16,7 @@
 </script>
 
 <section class="panel space-y-3">
-	<h3 class="text-lg text-gold-300">Rod {rodNumber}</h3>
+	<h3 class="text-lg text-volt-300">Rod {rodNumber}</h3>
 	<div class="grid grid-cols-2 gap-2">
 		<label><span class="stat-label">Line colour</span>
 			<select bind:value={setup.line.colour} class="field">{#each LineColours as colour (colour)}<option value={colour}>{LineColourLabels[colour]}</option>{/each}</select></label>
@@ -42,6 +42,6 @@
 			<div><dt class="text-mist-400">Bait</dt><dd>{percent(match.bait)}</dd></div>
 			<div><dt class="text-mist-400">Tubing</dt><dd>{percent(match.tubing)}</dd></div>
 		</dl>
-		<p class="text-center text-sm">Overall match <span class="font-semibold text-gold-300">{percent(match.overall)}</span></p>
+		<p class="text-center text-sm">Overall match <span class="font-semibold text-volt-300">{percent(match.overall)}</span></p>
 	{/if}
 </section>

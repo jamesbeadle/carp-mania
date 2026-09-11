@@ -15,7 +15,7 @@
 		<button class="button-secondary">Rename</button>
 	</form>
 	<dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-		<div><dt class="stat-label">Money</dt><dd class="text-2xl text-gold-300">{formatMoney(profile.money)}</dd></div>
+		<div><dt class="stat-label">Money</dt><dd class="text-2xl text-volt-300">{formatMoney(profile.money)}</dd></div>
 		<div><dt class="stat-label">Reputation</dt><dd class="text-2xl">{Math.round(Number(lake.reputation))}<span class="text-sm text-mist-400">/100</span></dd></div>
 		<div><dt class="stat-label">Anglers a day</dt><dd class="text-2xl">{anglersToday}</dd></div>
 		<div><dt class="stat-label">They'll pay up to</dt><dd class="text-2xl">{formatMoney(willingness)}</dd></div>

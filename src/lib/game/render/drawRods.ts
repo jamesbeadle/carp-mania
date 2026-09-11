@@ -48,14 +48,14 @@ function drawLine(context: CanvasRenderingContext2D, tip: Point, bait: Point, is
 function drawBaitMarker(context: CanvasRenderingContext2D, bait: Point, phase: RodOnBank['phase'], timeSeconds: number) {
 	const isDisturbed = phase === 'biting' || phase === 'fighting';
 	if (isDisturbed) drawRipples(context, bait, timeSeconds);
-	context.fillStyle = 'hsla(0 0% 100% / 0.7)';
+	context.fillStyle = 'hsl(192 100% 56%)';
 	context.beginPath();
 	context.arc(bait.x, bait.y, 2.5, 0, Math.PI * 2);
 	context.fill();
 }
 
 export function drawRipples(context: CanvasRenderingContext2D, centre: Point, timeSeconds: number) {
-	context.strokeStyle = 'hsla(0 0% 100% / 0.35)';
+	context.strokeStyle = 'hsla(119 79% 57% / 0.55)';
 	context.lineWidth = 1.5;
 	for (let ring = 0; ring < 3; ring++) {
 		const radius = ((timeSeconds * 18 + ring * 9) % 27) + 3;

@@ -1,32 +1,37 @@
 @import 'tailwindcss';
 
 @theme {
-	--font-display: 'Fraunces', 'Georgia', serif;
+	--font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
 	--font-body: 'Inter', system-ui, sans-serif;
 
-	--color-pond-950: #071a17;
-	--color-pond-900: #0f2f2a;
-	--color-pond-800: #17453d;
-	--color-pond-700: #1f5c50;
-	--color-pond-600: #2a7466;
+	--color-carbon-950: #060806;
+	--color-carbon-900: #0c0f0c;
+	--color-carbon-800: #141914;
+	--color-carbon-700: #1f261f;
+	--color-carbon-600: #2c362c;
 
-	--color-reed-500: #6f9a3c;
-	--color-reed-400: #8fb85a;
-	--color-reed-300: #b6d48a;
+	--color-volt-600: #2bc12a;
+	--color-volt-500: #3ee83a;
+	--color-volt-400: #6cf56a;
+	--color-volt-300: #a5fca3;
 
-	--color-mist-100: #f3efe4;
-	--color-mist-200: #e4dcc9;
-	--color-mist-400: #b9ae96;
+	--color-surge-600: #12a8d6;
+	--color-surge-500: #1fd3ff;
+	--color-surge-400: #5ee3ff;
+	--color-surge-300: #a3efff;
 
-	--color-gold-500: #c8963e;
-	--color-gold-400: #dcb35e;
-	--color-gold-300: #ebcd8b;
+	--color-mist-100: #f2f7f2;
+	--color-mist-200: #d9e2d9;
+	--color-mist-400: #8f9d8f;
+
+	--color-danger-500: #e5322d;
+	--color-danger-400: #ff5f5a;
 
 	--color-silt-700: #5a4630;
 	--color-silt-500: #8a6e4b;
 
-	--color-danger-500: #c8553d;
-	--color-danger-400: #e07a63;
+	--shadow-volt: 0 0 24px rgba(62, 232, 58, 0.35);
+	--shadow-surge: 0 0 24px rgba(31, 211, 255, 0.35);
 }
 
 @layer base {
@@ -37,23 +42,30 @@
 	h2,
 	h3 {
 		font-family: var(--font-display);
+		font-weight: 800;
+		font-style: italic;
+		text-transform: uppercase;
+		letter-spacing: 0.01em;
 	}
 }
 
 @layer components {
 	.panel {
-		@apply rounded-2xl border border-pond-700 bg-pond-800/70 p-5 shadow-lg shadow-pond-950/40 backdrop-blur;
+		@apply rounded-xl border border-carbon-700 bg-carbon-800/85 p-5 shadow-lg shadow-carbon-950/60 backdrop-blur;
 	}
 	.button-primary {
-		@apply rounded-xl bg-gold-500 px-4 py-2 font-semibold text-pond-950 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50;
+		@apply rounded-md bg-volt-500 px-4 py-2 font-display text-lg font-bold tracking-wide text-carbon-950 uppercase italic transition hover:bg-volt-400 hover:shadow-volt disabled:cursor-not-allowed disabled:opacity-50;
 	}
 	.button-secondary {
-		@apply rounded-xl border border-pond-600 px-4 py-2 font-semibold text-mist-100 transition hover:bg-pond-700 disabled:cursor-not-allowed disabled:opacity-50;
+		@apply rounded-md border border-surge-500/70 px-4 py-2 font-display text-lg font-bold tracking-wide text-surge-400 uppercase italic transition hover:bg-surge-500/10 hover:shadow-surge disabled:cursor-not-allowed disabled:opacity-50;
 	}
 	.field {
-		@apply w-full rounded-xl border border-pond-600 bg-pond-900 px-3 py-2 text-mist-100 outline-none focus:border-gold-400;
+		@apply w-full rounded-md border border-carbon-600 bg-carbon-900 px-3 py-2 text-mist-100 outline-none focus:border-volt-500;
 	}
 	.stat-label {
-		@apply text-xs tracking-wide text-mist-400 uppercase;
+		@apply font-display text-sm tracking-widest text-mist-400 uppercase;
+	}
+	.glow-text {
+		text-shadow: 0 0 18px rgba(62, 232, 58, 0.45);
 	}
 }

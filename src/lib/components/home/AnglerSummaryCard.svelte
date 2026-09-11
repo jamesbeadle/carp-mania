@@ -15,7 +15,7 @@
 
 <section class="panel">
 	<p class="stat-label">My angler</p>
-	<h2 class="mb-4 text-3xl text-gold-300">{profile.display_name}</h2>
+	<h2 class="mb-4 text-3xl text-volt-300">{profile.display_name}</h2>
 	<dl class="grid grid-cols-2 gap-4 text-sm">
 		<div><dt class="stat-label">Money</dt><dd class="text-2xl">{formatMoney(profile.money)}</dd></div>
 		<div><dt class="stat-label">Overall skill</dt><dd class="text-2xl">{Math.round(skill)}</dd></div>

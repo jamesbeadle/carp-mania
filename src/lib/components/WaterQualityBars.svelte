@@ -14,16 +14,16 @@
 	]);
 	const tone = (reading: { value: number; isGoodWhenHigh: boolean }) => {
 		const goodness = reading.isGoodWhenHigh ? reading.value : 100 - reading.value;
-		return goodness > 60 ? 'bg-reed-400' : goodness > 35 ? 'bg-gold-400' : 'bg-danger-400';
+		return goodness > 60 ? 'bg-volt-400' : goodness > 35 ? 'bg-surge-400' : 'bg-danger-400';
 	};
 </script>
 
-<p class="mb-3 text-sm">Overall water quality <span class="font-semibold text-gold-300">{Math.round(quality)}%</span></p>
+<p class="mb-3 text-sm">Overall water quality <span class="font-semibold text-volt-300">{Math.round(quality)}%</span></p>
 <ul class="space-y-2">
 	{#each readings as reading (reading.label)}
 		<li>
 			<div class="mb-1 flex justify-between text-xs text-mist-400"><span>{reading.label}</span><span>{Math.round(reading.value)}</span></div>
-			<div class="h-2 overflow-hidden rounded-full bg-pond-950">
+			<div class="h-2 overflow-hidden rounded-full bg-carbon-950">
 				<div class="h-full rounded-full {tone(reading)}" style="width: {reading.value}%"></div>
 			</div>
 		</li>

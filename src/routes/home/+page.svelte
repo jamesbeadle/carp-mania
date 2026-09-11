@@ -6,7 +6,7 @@
 	let { data } = $props();
 </script>
 
-<h1 class="mb-6 text-4xl text-gold-300">Welcome back, {data.profile.display_name}</h1>
+<h1 class="mb-6 text-4xl text-volt-300">Welcome back, {data.profile.display_name}</h1>
 
 <WhileYouWereAway summary={data.whileAway} />
 

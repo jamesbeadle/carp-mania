@@ -13,14 +13,14 @@
 </script>
 
 <section class="panel">
-	<h3 class="mb-1 text-xl text-gold-300">Feed</h3>
+	<h3 class="mb-1 text-xl text-volt-300">Feed</h3>
 	<p class="mb-4 text-sm text-mist-400">
 		{carpCount} carp eat about {dailyRationKilograms(carpCount).toFixed(1)} kg a day. Stock in the lake lasts
 		<span class="text-mist-100">{daysOfFeedLeft} days</span>. Protein grows fish; hemp and particles keep them keen.
 	</p>
 	<ul class="mb-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
 		{#each FeedTypes as type (type)}
-			<li class="rounded-lg bg-pond-900 px-3 py-2">
+			<li class="rounded-lg bg-carbon-900 px-3 py-2">
 				<span class="block text-mist-400">{FeedCatalogue[type].label}</span>
 				<span class="text-mist-100">{Number(lake.feed_stock[type]).toFixed(1)} kg</span>
 			</li>

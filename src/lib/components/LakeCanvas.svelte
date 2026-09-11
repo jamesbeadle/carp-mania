@@ -23,14 +23,14 @@
 
 	let canvas: HTMLCanvasElement;
 	let hoveredSwimId = $state<string | null>(null);
-	const school = createFishSchool(carp, lake.pike_count, lake.id.length * 7919);
-	const drawScene = createSceneDrawer();
 
-	$effect(() =>
-		startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) =>
+	$effect(() => {
+		const school = createFishSchool(carp, lake.pike_count, lake.id.length * 7919);
+		const drawScene = createSceneDrawer();
+		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) =>
 			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank }, secondsElapsed, timeSeconds)
-		)
-	);
+		);
+	});
 
 	const swimAt = (point: Point) => swims.find((swim) => distance(swimScenePoint(swim), point) <= SwimPegRadius * 1.4);
 	const distance = (first: Point, second: Point) => Math.hypot(first.x - second.x, first.y - second.y);
@@ -50,7 +50,7 @@
 
 <canvas
 	bind:this={canvas}
-	class="aspect-[3/2] w-full cursor-pointer rounded-2xl border border-pond-700 shadow-xl shadow-pond-950/60"
+	class="aspect-[3/2] w-full cursor-pointer rounded-2xl border border-carbon-700 shadow-xl shadow-carbon-950/60"
 	width={SceneSize.Width}
 	height={SceneSize.Height}
 	onmousemove={handleMove}

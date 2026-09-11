@@ -31,17 +31,17 @@
 <svelte:window onkeydown={(event) => handleKey(event, true)} onkeyup={(event) => handleKey(event, false)} />
 
 <section class="panel space-y-4">
-	<h3 class="text-xl text-gold-300">Fish on! Something around {formatWeight(Math.round(Number(fight.carp.weight_lb) / 5) * 5)}</h3>
-	<div class="relative h-8 overflow-hidden rounded-full bg-pond-950">
-		<div class="absolute inset-y-0 bg-reed-500/40" style="left: {TensionBand.SlackBelow * 100}%; width: {(TensionBand.SnapAbove - TensionBand.SlackBelow) * 100}%"></div>
-		<div class="absolute inset-y-0 w-1.5 rounded-full bg-gold-300 transition-[left] duration-75" style="left: calc({fight.tension * 100}% - 3px)"></div>
+	<h3 class="text-xl text-volt-300">Fish on! Something around {formatWeight(Math.round(Number(fight.carp.weight_lb) / 5) * 5)}</h3>
+	<div class="relative h-8 overflow-hidden rounded-full bg-carbon-950">
+		<div class="absolute inset-y-0 bg-gradient-to-r from-volt-500/50 via-surge-500/40 to-volt-500/50" style="left: {TensionBand.SlackBelow * 100}%; width: {(TensionBand.SnapAbove - TensionBand.SlackBelow) * 100}%"></div>
+		<div class="absolute inset-y-0 w-1.5 rounded-full bg-volt-300 transition-[left] duration-75" style="left: calc({fight.tension * 100}% - 3px)"></div>
 	</div>
 	<div class="flex justify-between text-xs text-mist-400"><span>Slack — hook falls out</span><span>Tight — line snaps</span></div>
 	<button
 		class="w-full select-none rounded-xl px-4 py-4 text-lg font-bold transition"
-		class:bg-gold-500={fight.isReeling}
-		class:text-pond-950={fight.isReeling}
-		class:bg-pond-700={!fight.isReeling}
+		class:bg-volt-500={fight.isReeling}
+		class:text-carbon-950={fight.isReeling}
+		class:bg-carbon-700={!fight.isReeling}
 		onmousedown={startReeling}
 		onmouseup={stopReeling}
 		onmouseleave={stopReeling}

@@ -11,7 +11,7 @@
 
 <section class="panel">
 	<p class="stat-label">My fishery</p>
-	<h2 class="mb-4 text-3xl text-gold-300">{lake.name}</h2>
+	<h2 class="mb-4 text-3xl text-volt-300">{lake.name}</h2>
 	<dl class="grid grid-cols-2 gap-4 text-sm">
 		<div><dt class="stat-label">Reputation</dt><dd class="text-2xl">{Math.round(Number(lake.reputation))}</dd></div>
 		<div><dt class="stat-label">Day ticket</dt><dd class="text-2xl">{formatMoney(lake.day_ticket_fee)}</dd></div>

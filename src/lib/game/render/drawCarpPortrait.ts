@@ -1,22 +1,14 @@
 import type { CarpStrain } from '$lib/domain/types';
-import { FishPalette } from '../scene/palette';
-import { drawBody, drawFins, drawLinearLine, drawMirrorScales, drawShadow, drawTail } from './fishBody';
+import { carpProportions, drawCarp } from './drawCarp';
 
-const PortraitLength = { Base: 120, PerPound: 3.2 } as const;
+const PortraitLength = { Base: 150, PerPound: 4 } as const;
 
 export function drawCarpPortrait(context: CanvasRenderingContext2D, strain: CarpStrain, weightPounds: number, canvasWidth: number, canvasHeight: number, timeSeconds: number) {
 	drawMat(context, canvasWidth, canvasHeight);
 	const length = Math.min(canvasWidth * 0.8, PortraitLength.Base + weightPounds * PortraitLength.PerPound);
-	const width = length * 0.42;
-	const colours = FishPalette[strain];
 	context.save();
 	context.translate(canvasWidth / 2, canvasHeight / 2);
-	drawShadow(context, length, width);
-	drawTail(context, length, width, Math.sin(timeSeconds * 3) * 4, colours.fin);
-	drawFins(context, length, width, colours.fin);
-	drawBody(context, length, width, colours.body, colours.belly);
-	if (strain === 'mirror') drawMirrorScales(context, length, width, colours.belly);
-	if (strain === 'linear') drawLinearLine(context, length, colours.belly);
+	drawCarp(context, strain, carpProportions(length), timeSeconds, 0);
 	context.restore();
 }
 

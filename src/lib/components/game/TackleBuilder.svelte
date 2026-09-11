@@ -14,7 +14,7 @@
 
 <section class="panel mb-4">
 	<p class="stat-label">Tackle up at</p>
-	<h2 class="text-2xl text-gold-300">{swim.name}</h2>
+	<h2 class="text-2xl text-volt-300">{swim.name}</h2>
 	<p class="mt-1 text-sm text-mist-400">
 		{BedTypeLabels[swim.bed_type]} bottom · {swim.depth_feet} ft · {SwimFeatureLabels[swim.feature]} · transparency {Math.round(Number(lake.transparency))}%
 	</p>

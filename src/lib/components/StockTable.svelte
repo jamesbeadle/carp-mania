@@ -7,7 +7,7 @@
 
 	let isShowingAll = $state(false);
 	const visibleCarp = $derived(isShowingAll ? carp : carp.slice(0, limit));
-	const conditionTone = (condition: number) => (condition < 35 ? 'text-danger-400' : condition < 60 ? 'text-gold-300' : 'text-reed-300');
+	const conditionTone = (condition: number) => (condition < 35 ? 'text-danger-400' : condition < 60 ? 'text-surge-300' : 'text-volt-300');
 </script>
 
 <div class="overflow-x-auto">
@@ -24,10 +24,10 @@
 		</thead>
 		<tbody>
 			{#each visibleCarp as fish (fish.id)}
-				<tr class="border-t border-pond-700/60">
+				<tr class="border-t border-carbon-700/60">
 					<td class="py-2 pr-3 font-medium text-mist-100">{fish.name}</td>
 					<td class="py-2 pr-3">{StrainCatalogue[fish.strain].label}</td>
-					<td class="py-2 pr-3 text-gold-300">{formatWeight(fish.weight_lb)}</td>
+					<td class="py-2 pr-3 text-volt-300">{formatWeight(fish.weight_lb)}</td>
 					<td class="py-2 pr-3">{fish.age_years} yrs</td>
 					<td class="py-2 pr-3 {conditionTone(Number(fish.condition))}">{Math.round(Number(fish.condition))}%</td>
 					<td class="py-2">{fish.times_caught}×</td>
@@ -37,7 +37,7 @@
 	</table>
 </div>
 {#if carp.length > limit}
-	<button class="mt-3 text-sm text-gold-300 hover:underline" onclick={() => (isShowingAll = !isShowingAll)}>
+	<button class="mt-3 text-sm text-volt-300 hover:underline" onclick={() => (isShowingAll = !isShowingAll)}>
 		{isShowingAll ? 'Show fewer' : `Show all ${carp.length} fish`}
 	</button>
 {/if}
