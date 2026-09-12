@@ -6,9 +6,11 @@
 	import { BiteAlarm } from '$lib/game/session/biteAlarm';
 	import { reportLandedFish } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
+	import { quarterHourOf, sessionAmbienceFor } from '$lib/game/session/sessionAmbience';
 	import { castRod, chooseSwim, finishFight, nextRodToCast, returnToFishing, strike, tackleUp } from '$lib/game/session/sessionFlow';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { watchFishShowing } from '$lib/game/session/showingFish';
+	import { sound } from '$lib/game/sound/soundEngine.svelte';
 	import DayOverSummary from './DayOverSummary.svelte';
 	import HowToPlay from './HowToPlay.svelte';
 	import KeyHints from './KeyHints.svelte';
@@ -22,6 +24,7 @@
 	let isCatchSaved = $state<boolean | null>(null);
 	let isAlarmMuted = $state(false);
 	let showingAt = $state<LayoutPoint[]>([]);
+	const ambientHour = $derived(quarterHourOf(session.hour));
 
 	$effect(() => {
 		let last = performance.now();
@@ -40,6 +43,8 @@
 	$effect(() => {
 		alarm.isMuted = isAlarmMuted;
 	});
+	$effect(() => sound.startAmbience(sessionAmbienceFor(lake, visit.visitedAt, ambientHour)));
+	$effect(() => () => sound.stopAmbience());
 
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);

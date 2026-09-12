@@ -1,0 +1,16 @@
+{
+	"name": "Carp Mania",
+	"short_name": "Carp Mania",
+	"description": "A fishery you run. A lake you fish.",
+	"start_url": "/home",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "any",
+	"background_color": "#060806",
+	"theme_color": "#060806",
+	"icons": [
+		{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+		{ "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+	]
+}
