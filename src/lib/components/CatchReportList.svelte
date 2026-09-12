@@ -4,7 +4,7 @@
 	import { humanise } from '$lib/format/labels';
 	import { formatWeight } from '$lib/format/weight';
 
-	let { catches, carpNames = {} }: { catches: Catch[]; carpNames?: Record<string, string> } = $props();
+	let { catches, carpNames = {}, lakeNames = {} }: { catches: Catch[]; carpNames?: Record<string, string>; lakeNames?: Record<string, string> } = $props();
 
 	const UnnamedCarp = 'Unnamed carp';
 </script>
@@ -25,6 +25,9 @@
 					<a href="/anglers/{caught.angler_id}" class="text-mist-400 hover:underline">by {caught.angler_name}</a>
 				{:else}
 					<span class="text-mist-400">by {caught.angler_name}</span>
+				{/if}
+				{#if lakeNames[caught.lake_id]}
+					<a href="/lakes/{caught.lake_id}" class="text-surge-400 hover:underline">at {lakeNames[caught.lake_id]}</a>
 				{/if}
 				<span class="text-mist-400">· {caught.swim_name} · {humanise(caught.rig)} · {humanise(caught.bait)} · size {caught.hook_size}</span>
 				<span class="ml-auto text-xs text-mist-400">{formatWhen(caught.caught_at)}</span>

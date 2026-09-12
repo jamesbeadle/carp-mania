@@ -45,6 +45,6 @@
 	</section>
 	<section class="panel lg:col-span-2">
 		<h2 class="mb-3 text-xl text-volt-300">Recent catches</h2>
-		<CatchReportList catches={angler.recentCatches} carpNames={angler.carpNames} />
+		<CatchReportList catches={angler.recentCatches} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />
 	</section>
 </div>

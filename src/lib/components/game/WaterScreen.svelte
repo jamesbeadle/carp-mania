@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
-	import type { ViewMode } from '$lib/game/scene/camera';
 	import type { Point } from '$lib/game/scene/lakeShape';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { WatercraftShowsFishFrom } from '$lib/game/session/showingFish';
@@ -14,7 +13,6 @@
 	import SessionClock from './SessionClock.svelte';
 	import SessionNotice from './SessionNotice.svelte';
 	import StrikeButton from './StrikeButton.svelte';
-	import ViewToggle from './ViewToggle.svelte';
 
 	interface Props {
 		session: SessionState;
@@ -24,7 +22,6 @@
 		profile: Profile;
 		showingAt: LayoutPoint[];
 		isCatchSaved: boolean | null;
-		viewMode: ViewMode;
 		onSwimClick: (swim: Swim) => void;
 		onWaterClick: (point: Point) => void;
 		onCastBlockedByIsland: () => void;
@@ -33,16 +30,15 @@
 		onContinue: () => void;
 	}
 
-	let { session, lake, swims, carp, profile, showingAt, isCatchSaved, viewMode = $bindable(), onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue }: Props = $props();
+	let { session, lake, swims, carp, profile, showingAt, isCatchSaved, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue }: Props = $props();
 
 	const canReadTheWater = $derived(Number(profile.watercraft) >= WatercraftShowsFishFrom);
 	const fishShowingAt = $derived(canReadTheWater ? showingAt : []);
 </script>
 
 <div class="relative">
-	<LakeCanvas {lake} {swims} {carp} selectedSwimId={session.swim?.id ?? null} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} {viewMode} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
+	<LakeCanvas {lake} {swims} {carp} selectedSwimId={session.swim?.id ?? null} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 	<NextStepPrompt {session} />
-	<ViewToggle bind:viewMode hasSwim={session.swim !== null} />
 	{#if session.phase !== 'choose_swim'}<SessionClock hour={session.hour} season={session.season} landed={session.landedToday.length} lost={session.lostToday} />{/if}
 	{#if session.rods.length > 0}<RodStatusBar rods={session.rods} />{/if}
 	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}

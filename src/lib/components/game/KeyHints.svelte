@@ -6,8 +6,7 @@
 		{ key: 'Click water', action: 'cast next rod' },
 		{ key: 'Enter', action: 'strike' },
 		{ key: 'Hold Space', action: 'reel' },
-		{ key: 'Release', action: 'give line on a run' },
-		{ key: 'V', action: "bird's-eye / swim view" }
+		{ key: 'Release', action: 'give line on a run' }
 	];
 </script>
 

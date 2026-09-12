@@ -26,6 +26,6 @@
 	</section>
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>
-		<CatchReportList catches={data.angler.catches} />
+		<CatchReportList catches={data.angler.catches} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
 	</section>
 </div>
