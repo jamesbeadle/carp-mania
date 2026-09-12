@@ -13,3 +13,15 @@ select test.assert_that((select region from public.lakes where owner_id = test.p
 select test.assert_that((select is_setup_complete from public.lakes where owner_id = test.player(10)), 'a lake is set up unless told otherwise');
 
 select test.assert_refused($$update public.profiles set money = -1 where id = test.player(10)$$, 'profiles_money_never_negative');
+
+set role service_role;
+select public.debit_money(test.player(10), 250, 'A day ticket');
+select public.credit_money(test.player(10), 50);
+select public.settle_day_takings(test.player(10), -200000);
+reset role;
+select test.assert_that(test.money_of(test.player(10)) = 0, 'a losing run of days settles at nothing, never below');
+select test.assert_refused($$select public.debit_money(test.player(10), 1, 'A pint')$$, 'costs');
+set role authenticated;
+select set_config('request.jwt.claim.sub', test.player(10)::text, false);
+select test.assert_refused($$select public.settle_day_takings(test.player(10), 1000000)$$, 'permission denied');
+reset role;

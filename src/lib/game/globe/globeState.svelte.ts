@@ -1,3 +1,4 @@
+import { untrack } from 'svelte';
 import type { GlobePoint } from '$lib/domain/world/greatCircle';
 import type { GeoProjection } from 'd3-geo';
 import type { PinMarker } from './clusterPins';
@@ -38,9 +39,10 @@ export class GlobeState {
 		this.velocity = StillVelocity;
 	}
 
-	flyTo(point: GlobePoint, zoom = this.view.zoom) {
+	flyTo(point: GlobePoint, zoom?: number) {
 		this.velocity = StillVelocity;
-		this.flight = startFlight($state.snapshot(this.view), { centre: { latitude: point.latitude, longitude: point.longitude }, zoom: clampedZoom(zoom) }, Date.now());
+		const from = untrack(() => $state.snapshot(this.view));
+		this.flight = startFlight(from, { centre: { latitude: point.latitude, longitude: point.longitude }, zoom: clampedZoom(zoom ?? from.zoom) }, Date.now());
 	}
 
 	pointAt(x: number, y: number): GlobePoint | null {

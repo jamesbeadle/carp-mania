@@ -50,7 +50,7 @@ export function worldUrlForLake(lakeId: string): string {
 
 function searchParamsFrom(filters: WorldFilters, selectedLakeId: string | null): URLSearchParams {
 	const params = new URLSearchParams();
-	setIfPresent(params, WorldParam.Search, filters.search.trim());
+	setIfPresent(params, WorldParam.Search, filters.search);
 	setIfPresent(params, WorldParam.Region, filters.region);
 	setIfPresent(params, WorldParam.Reputation, filters.minimumReputation);
 	setIfPresent(params, WorldParam.Biggest, filters.minimumHeaviestLb);

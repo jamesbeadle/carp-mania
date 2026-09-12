@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { netMoneyFor, type DayOutcome } from '$lib/domain/simulation/simulateOneDay';
 import { bigCatchEvent, isBigNpcCatch, recordEvent } from '$lib/domain/simulation/worldEvents';
 import type { Lake, Profile } from '$lib/domain/types';
+import { settleDayTakings } from '../gates/requireMoney';
 import { arrivalNotifications } from './arrivalNotifications';
 import { persistCompletedWorks } from './persistCompletedWorks';
 
@@ -15,7 +16,7 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 	await insertSpawnedFry(trusted, outcomes);
 	await insertHistory(trusted, outcomes);
 	if (takenCarpIds.length > 0) await trusted.from('carp').delete().in('id', takenCarpIds);
-	await trusted.from('profiles').update({ money: Number(profile.money) + netMoney }).eq('id', profile.id);
+	await settleDayTakings(profile.id, netMoney);
 	await insertNews(trusted, finalLake, outcomes, profile);
 	await persistCompletedWorks(trusted, finalLake, outcomes, profile.id);
 }

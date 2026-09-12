@@ -903,3 +903,26 @@ The globe is drawn by hand on canvas with `d3-geo` (orthographic projection, dra
 | Should works close the lake to anglers? | No; disturbance thins them instead, which reads better on the ledger. |
 | Should a player's balance be public on their angler page? | No. Reputation and fish are public; money is not. |
 | Does the farm restock weekly per region, or per player? | Per region; it makes the region a shared place and a busy region a competitive one. |
+
+---
+
+## 11. Build notes — where the code departs from this document
+
+Written after the build. Everything above stands unless a line here says otherwise.
+
+- **Swims are instant.** Building a swim is £350 and appears at once rather than a one-day work; moving is £150, removing £100, renaming free. The three-earthworks-in-progress cap counts earthworks only.
+- **"Extend the water" is the shoreline tool.** There is one work, `reshape_shoreline`: the Shore tool drags vertices, the Extend tool inserts a vertex and drags it; the price is £900 per 100 ft moved plus £3,500 and eight days per whole acre of water added. Polygon union was not worth its weight.
+- **Buying land rescales the plan.** `BuyAdjacentLand` grows `plot_acres` and rescales the layout and swims about the scene centre, and is refused while earthworks are in progress.
+- **Money moves in SQL.** Every debit and credit in app code goes through `debit_money`, `credit_money` and `settle_day_takings` (service role only, `0010`), so two purchases at once cannot lose an update and a run of bad days settles at £0, never below.
+- **The fish farm counts supply by `profiles.home_region`**, which `BuySite` copies onto the lake; they agree by construction.
+- **A leading bidder cannot raise their own bid**, a seller's lake must be pinned to list, and a listing's anti-sniping cap is stored as `listings.latest_ends_at`.
+- **`record_catch` is service-role only** and now also refuses a day ticket older than two hours and a second capture of the same fish on the same visit (locked on the visit row, so parallel requests serialise). The client mirrors the rule: a fish already landed today sheds the hook at the strike.
+- **A listed fish is visible to everyone signed in**, even from a private lake, so the market and the dossier work.
+- **`world_pins` is a `security_invoker` view** and only lists open, pinned lakes; favourites come from `GetMyFavourites` and are joined on the client.
+- **Best anglers** are ranked in code over the top two hundred by watercraft, because PostgREST cannot order by an average of four columns.
+- **Personal-best fame is once per angler per fish.**
+- **The classic water is 5.39 acres** of its ten-acre plot once `acres` means water rather than plot.
+- **Fish loiter uniformly** in the scene; the "showing" ripples mark favourite spots instead.
+- **Fry are born uncatalogued** on the first day of spring in a weedy, fertile lake with at least ten adults — 3 to 8 a year, `origin 'bred'`.
+- **Wheel zoom on the globe is about its centre**, and only hovered or selected pins carry a label.
+- **Not exercised against a live Supabase** in the build environment: every route is type-checked, built and link-audited, the domain and SQL are tested, but the first sign-in on a real project is the first end-to-end run.

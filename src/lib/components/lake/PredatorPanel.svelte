@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { PikeRules, Prices } from '$lib/domain/economy';
+	import { PikeFoodOrder, sensiblePikeMaximumFor } from '$lib/domain/pikeStocking';
 	import type { Lake } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 
@@ -7,6 +8,7 @@
 
 	let pikeCount = $state(2);
 	let foodUnits = $state(10);
+	const mostPike = $derived(sensiblePikeMaximumFor(lake.acres));
 	const daysOfPikeFood = $derived(lake.pike_count === 0 ? 0 : Math.floor(Number(lake.pike_food) / (lake.pike_count * PikeRules.FoodEatenPerPikePerDay)));
 </script>
 
@@ -24,15 +26,15 @@
 	<div class="grid gap-3 sm:grid-cols-2">
 		<form method="POST" action="?/stockPike" class="flex items-end gap-2">
 			<label class="flex-1">
-				<span class="stat-label">Pike ({formatMoney(Prices.Pike)} each)</span>
-				<input name="count" type="number" min="1" max="12" bind:value={pikeCount} class="field" />
+				<span class="stat-label">Pike ({formatMoney(Prices.Pike)} each, up to {mostPike} for this water)</span>
+				<input name="count" type="number" min="1" max={mostPike} step="1" bind:value={pikeCount} class="field" />
 			</label>
 			<button class="button-primary">Introduce</button>
 		</form>
 		<form method="POST" action="?/stockPikeFood" class="flex items-end gap-2">
 			<label class="flex-1">
 				<span class="stat-label">Pike food units ({formatMoney(Prices.PikeFoodPerUnit)} each)</span>
-				<input name="units" type="number" min="1" max="200" bind:value={foodUnits} class="field" />
+				<input name="units" type="number" min={PikeFoodOrder.MinimumUnits} max={PikeFoodOrder.MaximumUnits} bind:value={foodUnits} class="field" />
 			</label>
 			<button class="button-secondary">Add</button>
 		</form>
