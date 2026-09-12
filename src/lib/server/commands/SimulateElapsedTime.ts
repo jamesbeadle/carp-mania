@@ -1,6 +1,7 @@
 import { nothingHappened, type WhileYouWereAway } from '$lib/contracts/WhileYouWereAway';
 import { summariseEstate, type WaterSummary } from '$lib/domain/estate/summariseEstate';
 import type { StandingRecords } from '$lib/domain/market/records';
+import type { BookedWindow } from '$lib/domain/matches/bookings';
 import { seededRandom } from '$lib/domain/random';
 import { fisheryDaysElapsedSince, FisheryClock, simulatedUntilAfter } from '$lib/domain/simulation/elapsedDays';
 import { simulateOneDay, type DayOutcome } from '$lib/domain/simulation/simulateOneDay';
@@ -11,6 +12,7 @@ import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
 import { GetStandingRecords } from '../queries/GetStandingRecords';
+import { loadBookings } from '../queries/loadBookings';
 import { loadMyWaters } from '../queries/loadMyWaters';
 import { loadWorksInProgress } from '../queries/loadWorksInProgress';
 import { persistSimulatedDays } from './persistSimulatedDays';
@@ -20,6 +22,7 @@ interface LakeLife {
 	carp: Carp[];
 	swims: Swim[];
 	works: LakeWork[];
+	bookings: BookedWindow[];
 }
 
 export async function SimulateElapsedTime(locals: App.Locals): Promise<WhileYouWereAway> {
@@ -53,7 +56,7 @@ function runDays(lake: Lake, life: LakeLife, days: number, records: StandingReco
 	for (let day = 0; day < days; day++) {
 		const dayStart = new Date(new Date(lake.simulated_until).getTime() + day * FisheryClock.RealMillisecondsPerFisheryDay);
 		const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
-		const outcome = simulateOneDay(currentLake, currentCarp, life.swims, random, { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: currentRecords, works: currentWorks });
+		const outcome = simulateOneDay(currentLake, currentCarp, life.swims, random, { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: currentRecords, works: currentWorks, bookings: life.bookings });
 		outcomes.push(outcome);
 		currentLake = outcome.lake;
 		currentCarp = outcome.carp;
@@ -64,10 +67,11 @@ function runDays(lake: Lake, life: LakeLife, days: number, records: StandingReco
 }
 
 async function loadLakeLife(locals: App.Locals, lake: Lake): Promise<LakeLife> {
-	const [{ data: carp }, { data: swims }, works] = await Promise.all([
+	const [{ data: carp }, { data: swims }, works, bookings] = await Promise.all([
 		locals.supabase.from('carp').select('*').eq('lake_id', lake.id),
 		locals.supabase.from('swims').select('*').eq('lake_id', lake.id),
-		loadWorksInProgress(locals, lake.id)
+		loadWorksInProgress(locals, lake.id),
+		loadBookings(locals, lake.id, lake.simulated_until)
 	]);
-	return { carp: (carp ?? []) as Carp[], swims: (swims ?? []) as Swim[], works };
+	return { carp: (carp ?? []) as Carp[], swims: (swims ?? []) as Swim[], works, bookings };
 }

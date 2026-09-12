@@ -30,10 +30,19 @@ export interface WaterOfLegend {
 	catches: number;
 }
 
+export interface MatchWinner {
+	anglerId: string;
+	anglerName: string;
+	trophies: number;
+	prizeMoney: number;
+	latestTitle: string;
+}
+
 export interface HallOfFame {
 	scope: LeaderboardScope;
 	biggestEver: HallOfFameCatch[];
 	legends: CarpMemorial[];
 	mostFishLanded: ProlificAngler[];
 	watersOfLegend: WaterOfLegend[];
+	matchWinners: MatchWinner[];
 }

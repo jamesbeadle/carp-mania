@@ -1,3 +1,6 @@
 {
-	"crons": [{ "path": "/cron/close-listings", "schedule": "* * * * *" }]
+	"crons": [
+		{ "path": "/cron/close-listings", "schedule": "* * * * *" },
+		{ "path": "/cron/close-matches", "schedule": "* * * * *" }
+	]
 }

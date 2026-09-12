@@ -4,7 +4,6 @@
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 	import { BiteAlarm } from '$lib/game/session/biteAlarm';
-	import { buzzForBite } from '$lib/game/session/haptics';
 	import { reportLandedFish } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { quarterHourOf, sessionConditionsFor } from '$lib/game/session/sessionConditions';
@@ -21,7 +20,16 @@
 	import TackleBuilder from './TackleBuilder.svelte';
 	import WaterScreen from './WaterScreen.svelte';
 
-	let { lake, swims, carp, profile, visit }: { lake: Lake; swims: Swim[]; carp: Carp[]; profile: Profile; visit: FishingVisit } = $props();
+	interface Props {
+		lake: Lake;
+		swims: Swim[];
+		carp: Carp[];
+		profile: Profile;
+		visit: FishingVisit;
+		matchBoardHref?: string | null;
+	}
+
+	let { lake, swims, carp, profile, visit, matchBoardHref = null }: Props = $props();
 
 	const session = new SessionState(lake, carp, profile, visit);
 	const alarm = new BiteAlarm();
@@ -33,14 +41,8 @@
 
 	$effect(() => startTicking(session));
 	$effect(() => watchFishShowing(lake, session.carp, session.season, (spots) => (showingAt = spots)));
-	$effect(() => {
-		if (!session.bite) return alarm.stop();
-		alarm.start();
-		buzzForBite();
-	});
-	$effect(() => {
-		alarm.isMuted = isAlarmMuted;
-	});
+	$effect(() => alarm.follow(session.bite !== null));
+	$effect(() => void (alarm.isMuted = isAlarmMuted));
 	$effect(() => sound.startAmbience(ambientSceneFor(conditions)));
 	$effect(() => () => sound.stopAmbience());
 
@@ -87,7 +89,7 @@
 		onContinue={() => returnToFishing(session)}
 	>
 		{#snippet overTheSky()}
-			<SessionChrome {lake} {session} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />
+			<SessionChrome {lake} {session} {matchBoardHref} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />
 			<KeyHints />
 		{/snippet}
 	</WaterScreen>

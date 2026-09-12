@@ -1,6 +1,7 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import KnownFishList from '$lib/components/legacy/KnownFishList.svelte';
+	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { formatWhen } from '$lib/format/dates';
 	import { formatWeight } from '$lib/format/weight';
@@ -40,6 +41,7 @@
 				<div><dt class="stat-label">Final skill</dt><dd class="text-xl">{fisherman.final_skill === null ? '—' : Math.round(Number(fisherman.final_skill))}</dd></div>
 			</dl>
 		</section>
+		<TrophyCabinet trophies={book.trophies} />
 		<KnownFishList fishKnown={book.fishKnown} />
 	</div>
 	<section class="panel">

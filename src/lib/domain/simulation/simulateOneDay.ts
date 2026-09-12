@@ -1,5 +1,6 @@
 import { Prices } from '../economy';
 import type { StandingRecords } from '../market/records';
+import { isBookedOut, type BookedWindow } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '../reputation';
 import type { Carp, Lake, Swim } from '../types';
@@ -15,7 +16,7 @@ import { lapseTransfersForOneDay } from './lapseTransfers';
 import { driftFertilityForOneDay } from './naturalFood';
 import { letPikeHuntForOneDay } from './pikePredation';
 import { isFirstDayOfSpring, spawnFry, type NewBornCarp } from './spawning';
-import { simulateVisitingAnglers, type NewCatch, type NewVisit } from './visitingAnglers';
+import { noAnglersToday, simulateVisitingAnglers, type NewCatch, type NewVisit } from './visitingAnglers';
 
 export interface DayContext {
 	dayStart: Date;
@@ -23,6 +24,7 @@ export interface DayContext {
 	season: Season;
 	records: StandingRecords;
 	works: LakeWork[];
+	bookings: BookedWindow[];
 }
 
 export interface DayOutcome {
@@ -50,7 +52,9 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const watered = driftWaterForOneDay(fed.lake);
 	const hunted = letPikeHuntForOneDay(watered, fed.carp, random);
 	const lapsed = lapseTransfersForOneDay(hunted.carp, context.dayEnd);
-	const anglers = simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, context.season, context.records);
+	const anglers = isBookedOut(context.bookings, context.dayStart, context.dayEnd)
+		? noAnglersToday(context.records)
+		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, context.season, context.records);
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
 	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd, random);

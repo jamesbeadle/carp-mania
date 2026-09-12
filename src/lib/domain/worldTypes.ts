@@ -22,7 +22,11 @@ export type NotificationKind =
 	| 'works_complete'
 	| 'record_set'
 	| 'big_catch_on_your_water'
-	| 'fish_died';
+	| 'fish_died'
+	| 'match_booked'
+	| 'match_cancelled'
+	| 'match_won'
+	| 'match_over';
 
 export interface Notification {
 	id: string;
@@ -35,7 +39,7 @@ export interface Notification {
 	read_at: string | null;
 }
 
-export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died' | 'handover';
+export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died' | 'handover' | 'match_announced' | 'match_won';
 
 export interface WorldEvent {
 	id: string;

@@ -38,6 +38,10 @@ export function anglersArrivingToday(lake: Lake, season: Pick<Season, 'anglerFac
 	return Math.max(0, Math.round(wanting * carPark * disturbed * Math.max(0.2, affordability)));
 }
 
+export function noAnglersToday(standing: StandingRecords): AnglerDay {
+	return { visits: [], catches: [], records: standing, lodgeTakings: 0 };
+}
+
 export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, season: Season, standing: StandingRecords): AnglerDay {
 	const day: AnglerDay = { visits: [], catches: [], records: standing, lodgeTakings: 0 };
 	const count = anglersArrivingToday(lake, season);
