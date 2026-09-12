@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant short (@media (max-height: 500px));
+
 @theme {
 	--font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
 	--font-body: 'Inter', system-ui, sans-serif;

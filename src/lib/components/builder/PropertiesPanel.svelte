@@ -4,6 +4,7 @@
 	import type { Lake, Profile, Swim } from '$lib/domain/types';
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
 	import { ToolCatalogue } from '$lib/game/builder/toolCatalogue';
+	import { pointerWords } from '$lib/game/stage/pointerWords';
 	import DraftControls from './DraftControls.svelte';
 	import DrawingControls from './DrawingControls.svelte';
 	import FacilityPicker from './FacilityPicker.svelte';
@@ -32,7 +33,7 @@
 	<div>
 		<h3 class="text-xl text-volt-300">{tool.label}</h3>
 		{#if blurb}<p class="mt-1 text-sm text-mist-200">{blurb}</p>{/if}
-		<p class="mt-1 text-xs text-mist-400">{tool.hint}</p>
+		<p class="mt-1 text-xs text-mist-400">{pointerWords(tool.hint)}</p>
 	</div>
 	{#if builder.notice}
 		<p class="rounded-lg border border-volt-500/40 bg-volt-500/10 px-3 py-2 text-sm text-volt-300">{builder.notice}</p>
