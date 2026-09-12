@@ -12,6 +12,8 @@
 
 	const pathname = $derived(page.url.pathname);
 	const isStage = $derived(page.data.isStage === true);
+	const isImmersive = $derived(page.data.isImmersive === true);
+	const hasChrome = $derived(data.user !== null && !isImmersive);
 	const avatarUrl = $derived((data.user?.user_metadata?.avatar_url as string | undefined) ?? null);
 
 	function unlockSound() {
@@ -27,7 +29,7 @@
 <svelte:window onpointerdowncapture={unlockSound} onkeydowncapture={unlockSound} onclickcapture={tapSound} />
 
 <div class="flex min-h-dvh flex-col" class:h-dvh={isStage} class:overflow-hidden={isStage}>
-	{#if data.user}
+	{#if hasChrome}
 		<GameHud {pathname} money={data.hud.money} unreadCount={data.unreadCount} {avatarUrl} />
 	{/if}
 	<main class={isStage ? 'relative min-h-0 flex-1' : 'mx-auto w-full max-w-6xl flex-1 px-4 py-6'}>
@@ -37,7 +39,7 @@
 			</div>
 		{/key}
 	</main>
-	{#if data.user}
+	{#if hasChrome}
 		<BottomTabBar {pathname} />
 	{/if}
 </div>

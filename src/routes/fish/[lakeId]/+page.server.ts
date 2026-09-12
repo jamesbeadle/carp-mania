@@ -10,7 +10,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const profile = await loadProfile(locals);
 	const visitId = url.searchParams.get('visit');
 	const visit = visitId ? await GetFishingVisit(locals, params.lakeId, visitId) : null;
-	return { water, profile, visit };
+	const isOnTheWater = visit !== null;
+	return { water, profile, visit, isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {
