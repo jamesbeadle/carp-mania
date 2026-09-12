@@ -1,5 +1,6 @@
 import type { FishingVisit } from '$lib/contracts/FishingVisit';
 import { overallAnglerSkill } from '$lib/domain/anglerSkills';
+import type { TheBar } from '$lib/domain/fishing/honours';
 import { FishingDay } from '$lib/domain/fishing/sessionClock';
 import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
@@ -27,13 +28,15 @@ export class SessionState {
 	landedToday = $state<LandedFish[]>([]);
 	lostToday = $state(0);
 	notice = $state<string | null>(null);
+	bar: TheBar;
 	readonly lake: Lake;
 	readonly carp: Carp[];
 	readonly profile: Profile;
 	readonly season: Season;
 	readonly roller: BiteRoller;
 
-	constructor(lake: Lake, carp: Carp[], profile: Profile, visit: FishingVisit) {
+	constructor(lake: Lake, carp: Carp[], profile: Profile, visit: FishingVisit, bar: TheBar) {
+		this.bar = bar;
 		this.lake = lake;
 		this.carp = carpInBiteOrder(carp);
 		this.profile = profile;

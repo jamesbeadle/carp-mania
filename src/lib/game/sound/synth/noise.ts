@@ -15,11 +15,11 @@ export function noiseBufferFor(context: AudioContext, colour: NoiseColour): Audi
 	return created;
 }
 
-export function startNoise(context: AudioContext, colour: NoiseColour): AudioBufferSourceNode {
+export function startNoise(context: AudioContext, colour: NoiseColour, when = context.currentTime): AudioBufferSourceNode {
 	const source = context.createBufferSource();
 	source.buffer = noiseBufferFor(context, colour);
 	source.loop = true;
-	source.start();
+	source.start(when);
 	return source;
 }
 

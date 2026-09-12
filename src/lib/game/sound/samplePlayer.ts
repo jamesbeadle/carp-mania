@@ -8,7 +8,7 @@ export async function playSample(context: AudioContext, destination: AudioNode, 
 	source.start();
 }
 
-function decodedSample(context: AudioContext, url: string) {
+export function decodedSample(context: AudioContext, url: string) {
 	const cached = decoded.get(url);
 	if (cached) return cached;
 	const loading = fetch(url)
