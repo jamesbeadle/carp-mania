@@ -38,5 +38,5 @@ One new query, `GetHudSummary`, gives the HUD its money on every screen alongsid
 
 1. **Game shell** — hub, HUD, tab bar, transitions, game styling, sound engine and ambience, touch on every canvas, install-to-home-screen. *(built)*
 2. **Fishing feel** — touch controls for strike and reel, haptics, fishing sounds, a proper bite alarm on the engine, the weigh-in celebration, the tackle builder on a phone. *(built: `fullscreen-fishing`, then `fishing-feel`)*
-3. **Game screens** — market as the tackle shop, world as the signpost, groundworks with a finger, the noticeboard, the lodge with the bailiff, setup as a story.
+3. **Game screens** — market as the tackle shop, world as the signpost, groundworks with a finger, the noticeboard, the lodge with the bailiff, setup as a story. *(built: `game-screens` — a place banner under the live sky on every deep screen, with a vignette of the place)*
 4. **Speed and lists** — parallel and streamed loads with skeletons, preloading, paging and filters on lakes, inbox, catches, feed and leaderboards.
