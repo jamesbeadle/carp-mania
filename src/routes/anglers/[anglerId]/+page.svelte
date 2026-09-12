@@ -5,6 +5,7 @@
 	import FamousFish from '$lib/components/angler/FamousFish.svelte';
 	import PersonalBests from '$lib/components/angler/PersonalBests.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
+	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { formatWeight } from '$lib/format/weight';
 
 	let { data } = $props();
@@ -18,6 +19,7 @@
 	<div>
 		<p class="stat-label"><a href="/anglers" class="hover:text-mist-100">Anglers</a></p>
 		<h1 class="text-4xl text-volt-300">{angler.profile.display_name}</h1>
+		{#if angler.line}<p class="text-sm text-mist-400">Aged {angler.line.age} · {placeInTheLine(angler.line.generation)}</p>{/if}
 	</div>
 	{#if angler.isViewer}
 		<p class="ml-auto text-sm text-mist-400">This is you. <a href="/angler" class="text-volt-300 hover:underline">Open my angler</a></p>

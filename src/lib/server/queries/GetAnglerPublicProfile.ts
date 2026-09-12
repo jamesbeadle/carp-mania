@@ -1,7 +1,9 @@
 import { error } from '@sveltejs/kit';
-import type { AnglerPublicProfile, AnglerWater, PublicAngler } from '$lib/contracts/AnglerPublicProfile';
+import type { AnglerPublicProfile, AnglerWater, PlaceInTheLine, PublicAngler } from '$lib/contracts/AnglerPublicProfile';
 import { overallAnglerSkill } from '$lib/domain/anglerSkills';
+import { diaryAgeOf } from '$lib/domain/legacy/diary';
 import { requireUser } from '../gates/requireUser';
+import { loadLine } from './GetFishermanDiary';
 import { loadCarpNames, loadFamousFishCaughtBy, loadHeaviestCatchesBy, loadLatestCatchesBy } from './loadAnglerCatches';
 import { loadLakeNames } from './loadCarpHistory';
 import { skillsOf } from './skillsOf';
@@ -15,11 +17,12 @@ const WaterColumns = 'id, name, region, acres, reputation, day_ticket_fee';
 export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: string): Promise<AnglerPublicProfile> {
 	const viewer = requireUser(locals);
 	const profile = await loadAngler(locals, anglerId);
-	const [water, personalBests, recentCatches, famousFish] = await Promise.all([
+	const [water, personalBests, recentCatches, famousFish, line] = await Promise.all([
 		loadWaterRunBy(locals, anglerId),
 		loadHeaviestCatchesBy(locals, anglerId, PersonalBestLimit),
 		loadLatestCatchesBy(locals, anglerId, RecentCatchLimit),
-		loadFamousFishCaughtBy(locals, anglerId)
+		loadFamousFishCaughtBy(locals, anglerId),
+		loadPlaceInTheLine(locals, anglerId)
 	]);
 	const catches = [...personalBests, ...recentCatches];
 	const [carpNames, lakeNames] = await Promise.all([
@@ -28,6 +31,7 @@ export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: strin
 	]);
 	return {
 		profile,
+		line,
 		overallSkill: overallAnglerSkill(skillsOf(profile)),
 		water,
 		personalBests,
@@ -37,6 +41,11 @@ export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: strin
 		lakeNames,
 		isViewer: viewer.id === profile.id
 	};
+}
+
+async function loadPlaceInTheLine(locals: App.Locals, anglerId: string): Promise<PlaceInTheLine | null> {
+	const current = (await loadLine(locals, anglerId)).find((fisherman) => fisherman.retired_at === null);
+	return current ? { generation: current.generation, age: diaryAgeOf(current, new Date()) } : null;
 }
 
 async function loadAngler(locals: App.Locals, anglerId: string): Promise<PublicAngler> {

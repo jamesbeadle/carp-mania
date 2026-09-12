@@ -35,7 +35,7 @@ export interface Notification {
 	read_at: string | null;
 }
 
-export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died';
+export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died' | 'handover';
 
 export interface WorldEvent {
 	id: string;
