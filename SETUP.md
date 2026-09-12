@@ -17,13 +17,13 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0014_the_matches.sql`, `0014a_fishing_the_match.sql`, `0014b_booking_a_match.sql`, `0014c_the_prizes.sql`, `0014d_closing_a_match.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
-   - Site URL: `http://localhost:5173` for now (change to your Vercel URL after deploying).
-   - Redirect URLs: add `http://localhost:5173/auth/callback` and later `https://<your-app>.vercel.app/auth/callback`.
+   - Site URL: `http://localhost:5173` for now (change to the live domain after deploying — `https://carp-mania.com` for the real game).
+   - Redirect URLs: add `http://localhost:5173/auth/callback`, and later the live domain's `/auth/callback` (`https://carp-mania.com/auth/callback` and `https://carp-mania.vercel.app/auth/callback` for the real game).
 
 ## 2. Google OAuth client
 
 1. console.cloud.google.com → APIs & Services → Credentials → Create credentials → OAuth client ID → Web application.
-2. Authorised redirect URI: `https://<your-project-ref>.supabase.co/auth/v1/callback` (Supabase shows this exact URL under Authentication → Providers → Google).
+2. Authorised redirect URI: `https://<your-project-ref>.supabase.co/auth/v1/callback` (Supabase shows this exact URL under Authentication → Providers → Google). The real game's Supabase project answers on its own hostname, `api.carp-mania.com`, so its redirect URI is `https://api.carp-mania.com/auth/v1/callback` — `DOMAIN.md` Part B explains why and how.
 3. Copy the Client ID and Client Secret into Supabase → Authentication → Providers → Google, and enable the provider.
 4. If the consent screen asks, set it to External and add yourself as a test user while it's in testing mode.
 
@@ -39,6 +39,8 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role key>
 
 `SUPABASE_SERVICE_ROLE_KEY` is server-only: it bypasses row-level security and is how the server writes money, fish and works on the players' behalf. Never prefix it `PUBLIC_` and never commit it.
 
+`PUBLIC_SUPABASE_URL` is whichever hostname the project answers on: the real game uses its custom domain, `https://api.carp-mania.com`, and the `https://egeaybjpzcaejfeuolpz.supabase.co` address works just the same.
+
 Then:
 
 ```
@@ -53,6 +55,10 @@ Open http://localhost:5173, sign in with Google. Every player starts with £100,
 2. Add the three environment variables above under Settings → Environment Variables.
 3. After the first deploy, put the Vercel URL into Supabase Site URL and add `https://<your-app>.vercel.app/auth/callback` to Redirect URLs.
 4. If pg_cron is not enabled, add a fourth variable, `CRON_SECRET` (any long random string). `vercel.json` schedules `GET /cron/close-listings` and `GET /cron/close-matches` every minute; Vercel sends the secret as `Authorization: Bearer …`, and the routes call `close_ended_listings()` and `close_ended_matches()` through the service-role client. Without the variable the routes answer 401 to every call, so they are harmless when pg_cron is doing the job.
+
+## 5. The domain
+
+The real game lives at `https://carp-mania.com` (registered at 123 Reg, served by Vercel) and its Supabase project at `https://api.carp-mania.com`, so Google's sign-in screen names the game rather than `supabase.co`. `DOMAIN.md` is the step-by-step for both: the DNS records, the Vercel and Supabase settings, the Google Cloud changes, and the order to do them in so nobody is locked out mid-switch.
 
 ## Useful commands
 

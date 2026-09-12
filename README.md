@@ -8,7 +8,7 @@ A web game about running a carp fishery and fishing it. Every player finds a wat
 
 SvelteKit · Tailwind · Supabase (Google login, Postgres, Realtime) · Vercel.
 
-See `SETUP.md` to run it, `DESIGN.md` for the original stories and rules, and `DESIGN-2.md` for the world, the lake builder and the fish market. `CLAUDE.md` is the coding standard every file follows.
+See `SETUP.md` to run it, `DOMAIN.md` for carp-mania.com and the sign-in on its own name, `DESIGN.md` for the original stories and rules, and `DESIGN-2.md` for the world, the lake builder and the fish market. `CLAUDE.md` is the coding standard every file follows.
 
 ```
 src/lib/domain      the rules of the game — pure TypeScript, no framework, runnable with npm run test:domain
