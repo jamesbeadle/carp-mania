@@ -1,11 +1,12 @@
 import type { WorldActivity } from '$lib/contracts/WorldActivity';
+import { placeInTheLine } from '$lib/domain/legacy/diary';
 import { isRegionCode, type RegionCode } from '$lib/domain/world/regionCodes';
 import { RegionCatalogue } from '$lib/domain/world/regions';
 import type { WorldEventKind } from '$lib/domain/worldTypes';
 import { formatMoney } from '$lib/format/money';
 import { formatWeight } from '$lib/format/weight';
 
-export const FeedGlyph: Record<WorldEventKind, string> = { big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝', fish_died: '✝' };
+export const FeedGlyph: Record<WorldEventKind, string> = { big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝', fish_died: '✝', handover: '⚘' };
 
 interface PayloadWords {
 	fishName: string;
@@ -17,6 +18,8 @@ interface PayloadWords {
 	anglerName: string | null;
 	cause: string | null;
 	ageYears: number;
+	heirName: string;
+	placeInTheLine: string;
 }
 
 const SomewhereOnEarth = 'a far-off region';
@@ -27,7 +30,8 @@ const Writers: Record<WorldEventKind, (activity: WorldActivity, words: PayloadWo
 	new_water: (activity, words) => `New water opened in ${words.region}: ${activity.lakeName}`,
 	record: (activity, words) => `${words.scope} record: ${words.fishName} ${words.weight} at ${activity.lakeName}`,
 	island_built: (activity, words) => `${activity.lakeName} built ${words.islandName}`,
-	fish_died: (activity, words) => `${words.fishName} (${words.weight}) has died at ${activity.lakeName}${words.cause === 'pike' ? ' — the pike had it' : ` — old age, at ${words.ageYears}`}`
+	fish_died: (activity, words) => `${words.fishName} (${words.weight}) has died at ${activity.lakeName}${words.cause === 'pike' ? ' — the pike had it' : ` — old age, at ${words.ageYears}`}`,
+	handover: (activity, words) => `${activity.lakeName} passes to ${words.heirName}, ${words.placeInTheLine}`
 };
 
 export function feedLineFor(activity: WorldActivity): string {
@@ -46,7 +50,9 @@ function wordsFrom(activity: WorldActivity): PayloadWords {
 		islandName: text('islandName') ?? 'an island',
 		anglerName: text('anglerName'),
 		cause: text('cause'),
-		ageYears: amount('ageYears')
+		ageYears: amount('ageYears'),
+		heirName: text('heirName') ?? 'an heir',
+		placeInTheLine: placeInTheLine(amount('generation') || 1)
 	};
 }
 

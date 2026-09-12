@@ -1,6 +1,7 @@
 <script lang="ts">
 	import BailiffNote from '$lib/components/hub/BailiffNote.svelte';
 	import HubCaption from '$lib/components/hub/HubCaption.svelte';
+	import LastCastSheet from '$lib/components/hub/LastCastSheet.svelte';
 	import PlaceSheets from '$lib/components/hub/PlaceSheets.svelte';
 	import BankPlace from '$lib/components/stage/BankPlace.svelte';
 	import LakeStage from '$lib/components/stage/LakeStage.svelte';
@@ -11,12 +12,13 @@
 	import { BankPlaces, placePointsFor, type BankPlace as Place, type PlaceId } from '$lib/game/stage/bankPlaces';
 	import { StageClock } from '$lib/game/stage/stageClock.svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const clock = new StageClock();
 	const rises = new AmbientRises();
 	let openPlace = $state<PlaceId | null>(null);
-	let isNoteOpen = $state(data.whileAway.daysSimulated > 0);
+	let isNoteOpen = $state(data.whileAway.daysSimulated > 0 && !data.diary.isRetirementDue);
+	let isLastCastOpen = $state(data.diary.isRetirementDue);
 
 	const lake = $derived(data.fishery.lake);
 	const conditions = $derived(stageConditionsFor(lake, clock.now));
@@ -37,6 +39,7 @@
 	function close() {
 		openPlace = null;
 		isNoteOpen = false;
+		isLastCastOpen = false;
 		sound.play('close');
 	}
 </script>
@@ -46,7 +49,7 @@
 <div class="h-full">
 	<LakeStage {lake} swims={data.fishery.swims} carp={data.fishery.carp} {conditions} showingAt={rises.points}>
 		{#snippet overTheSky()}
-			<HubCaption profile={data.profile} {lake} {conditions} />
+			<HubCaption profile={data.profile} {lake} {conditions} diary={data.diary} />
 		{/snippet}
 		{#snippet overTheLake()}
 			{#each BankPlaces as place (place.id)}
@@ -69,3 +72,4 @@
 	loadedAt={data.loadedAt}
 />
 <BailiffNote summary={data.whileAway} isOpen={isNoteOpen} onClose={close} />
+<LastCastSheet diary={data.diary} lakeName={lake.name} failure={form?.message ?? null} isOpen={isLastCastOpen} onClose={close} />

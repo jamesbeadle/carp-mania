@@ -1,6 +1,8 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
+	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
+	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 
@@ -8,7 +10,10 @@
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
-	<h1 class="text-4xl text-volt-300">{data.angler.profile.display_name}</h1>
+	<div>
+		<h1 class="text-4xl text-volt-300">{data.angler.profile.display_name}</h1>
+		<p class="text-sm text-mist-400">Aged {data.angler.diary.age} · {placeInTheLine(data.angler.diary.current.generation)}{#if data.angler.diary.isSlowingDown} · slowing down now{/if}</p>
+	</div>
 	<a href="/anglers/{data.angler.profile.id}" class="button-secondary ml-auto">My public page</a>
 	<a href="/anglers" class="text-sm text-mist-400 hover:text-mist-100">All anglers</a>
 </div>
@@ -27,7 +32,9 @@
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>
 		<CatchReportList catches={data.angler.catches} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
+		<a href="/angler/scrapbook/{data.angler.diary.current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
 	</section>
+	<div class="lg:col-span-2"><FamilyLine line={data.angler.diary.line} currentId={data.angler.diary.current.id} /></div>
 </div>
 <form method="POST" action="/auth/signout" class="mt-8 text-center lg:hidden">
 	<button class="text-sm text-mist-400 hover:text-mist-100">Sign out</button>

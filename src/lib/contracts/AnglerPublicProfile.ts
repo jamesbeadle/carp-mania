@@ -15,8 +15,14 @@ export interface FamousFish {
 	lakeName: string;
 }
 
+export interface PlaceInTheLine {
+	generation: number;
+	age: number;
+}
+
 export interface AnglerPublicProfile {
 	profile: PublicAngler;
+	line: PlaceInTheLine | null;
 	overallSkill: number;
 	water: AnglerWater | null;
 	personalBests: Catch[];

@@ -3,6 +3,7 @@ import { WorldScope, type LeaderboardScope } from '$lib/contracts/Leaderboards';
 import type { CarpMemorial } from '$lib/domain/memorialTypes';
 import { requireUser } from '../gates/requireUser';
 import { loadCarpNames } from './loadAnglerCatches';
+import { loadStillSwimming } from './loadStillSwimming';
 
 const BoardLength = 10;
 const Descending = { ascending: false } as const;
@@ -52,13 +53,6 @@ async function loadBiggestEver(locals: App.Locals, scope: LeaderboardScope): Pro
 		caughtAt: row.caught_at,
 		isStillSwimming: row.carp_id !== null && stillSwimming.has(row.carp_id)
 	}));
-}
-
-async function loadStillSwimming(locals: App.Locals, carpIds: (string | null)[]) {
-	const ids = carpIds.filter((carpId): carpId is string => carpId !== null);
-	if (ids.length === 0) return new Set<string>();
-	const { data } = await locals.supabase.from('carp').select('id').in('id', ids);
-	return new Set(((data ?? []) as { id: string }[]).map((fish) => fish.id));
 }
 
 async function loadLegends(locals: App.Locals, scope: LeaderboardScope): Promise<CarpMemorial[]> {

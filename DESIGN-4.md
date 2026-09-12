@@ -57,7 +57,7 @@ The world page grows a Hall of fame tab beside the leaderboards; the signpost sh
 
 ## 6. Phases
 
-1. **Fish deaths and the hall of fame.** *(building)*
-2. **Generations** — the diary clock, the handover, the heir, the scrapbook.
+1. **Fish deaths and the hall of fame.** *(built)*
+2. **Generations** — the diary clock, the handover, the heir, the scrapbook. *(built)*
 3. **More waters** — buying, switching, the estate in the lodge.
 4. **Matches** — booking, entries, the live board, prizes and trophies.

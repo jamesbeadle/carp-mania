@@ -1,0 +1,50 @@
+<script lang="ts">
+	import CatchReportList from '$lib/components/CatchReportList.svelte';
+	import KnownFishList from '$lib/components/legacy/KnownFishList.svelte';
+	import { placeInTheLine } from '$lib/domain/legacy/diary';
+	import { formatWhen } from '$lib/format/dates';
+	import { formatWeight } from '$lib/format/weight';
+
+	let { data } = $props();
+
+	const book = $derived(data.scrapbook);
+	const fisherman = $derived(book.fisherman);
+	const yearsFished = $derived(fisherman.retired_at ? `${formatWhen(fisherman.started_at)} to ${formatWhen(fisherman.retired_at)}` : `since ${formatWhen(fisherman.started_at)}`);
+</script>
+
+<svelte:head><title>{fisherman.name}'s scrapbook · Carp Mania</title></svelte:head>
+
+{#if data.isJustHandedDown}
+	<section class="panel mb-6 border-volt-500/40">
+		<p class="stat-label">Handed down</p>
+		<p class="mt-1 text-mist-100">{fisherman.name} has packed the rods away. This is what he left behind — the water is yours now.</p>
+		<a href="/home" class="button-primary mt-4 inline-block">Down to the water</a>
+	</section>
+{/if}
+
+<div class="mb-6 flex flex-wrap items-end gap-4">
+	<div>
+		<p class="stat-label">Scrapbook · {placeInTheLine(fisherman.generation)}</p>
+		<h1 class="text-4xl text-volt-300">{fisherman.name}</h1>
+		<p class="text-sm text-mist-400">{fisherman.retired_at ? `Retired at ${book.age}` : `Aged ${book.age}, still fishing`} · fished {yearsFished}</p>
+	</div>
+	<a href={book.isMine ? '/angler' : '/anglers'} class="ml-auto text-sm text-surge-400 hover:underline">← {book.isMine ? 'My angler' : 'Anglers'}</a>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
+	<div class="space-y-6">
+		<section class="panel">
+			<dl class="grid grid-cols-3 gap-3 text-sm">
+				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{book.totalCatches}</dd></div>
+				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(book.personalBestLb)}</dd></div>
+				<div><dt class="stat-label">Final skill</dt><dd class="text-xl">{fisherman.final_skill === null ? '—' : Math.round(Number(fisherman.final_skill))}</dd></div>
+			</dl>
+		</section>
+		<KnownFishList fishKnown={book.fishKnown} />
+	</div>
+	<section class="panel">
+		<h2 class="mb-3 text-xl text-volt-300">Every fish on the bank</h2>
+		<CatchReportList catches={book.catches} carpNames={book.carpNames} lakeNames={book.lakeNames} />
+		{#if book.totalCatches > book.catches.length}<p class="mt-2 text-xs text-mist-400">The last {book.catches.length} of {book.totalCatches}.</p>{/if}
+	</section>
+</div>
