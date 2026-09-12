@@ -1,10 +1,10 @@
 import { DailyFeed, FeedCatalogue, FeedTypes, totalFeedKilograms } from './feed';
 import type { Carp, FeedType } from './types';
 
-export const CarpWeight = { StarterMinimumLb: 10, StarterMaximumLb: 15, HeaviestPossibleLb: 62 } as const;
+export const CarpWeight = { StarterMinimumLb: 10, StarterMaximumLb: 15 } as const;
 
-const PoundsGainedPerProteinDay = 0.035;
-const GrowthSlowsAboveLb = 40;
+export const GrowthRate = { PoundsGainedPerProteinDay: 0.035, SlowsAboveLb: 40, SlowingFactor: 0.4 } as const;
+export const Hunger = { ShrinksBelowCondition: 40, PoundsLostPerDay: 0.02 } as const;
 
 export function dailyRationKilograms(carpCount: number) {
 	return (carpCount / 100) * DailyFeed.KilogramsPerHundredCarp;
@@ -22,11 +22,16 @@ export function feedConditionScore(feedStock: Record<FeedType, number>) {
 	return FeedTypes.reduce((score, feedType) => score + (feedStock[feedType] / total) * FeedCatalogue[feedType].conditionScore, 0);
 }
 
-export function growCarpForOneDay(carp: Carp, proteinScore: number, rationFraction: number): Carp {
-	const slowing = carp.weight_lb > GrowthSlowsAboveLb ? 0.4 : 1;
-	const gained = PoundsGainedPerProteinDay * proteinScore * rationFraction * slowing;
-	const weight_lb = Math.min(CarpWeight.HeaviestPossibleLb, round(carp.weight_lb + gained));
+export function growCarpForOneDay(carp: Carp, proteinScore: number, rationFraction: number, growthFactor: number, ceilingLb: number): Carp {
+	const slowing = carp.weight_lb > GrowthRate.SlowsAboveLb ? GrowthRate.SlowingFactor : 1;
+	const gained = GrowthRate.PoundsGainedPerProteinDay * proteinScore * rationFraction * slowing * growthFactor;
+	const weight_lb = Math.min(Math.max(carp.weight_lb, ceilingLb), round(carp.weight_lb + gained));
 	return { ...carp, weight_lb };
+}
+
+export function shrinkHungryCarp(carp: Carp): Carp {
+	if (carp.condition >= Hunger.ShrinksBelowCondition) return carp;
+	return { ...carp, weight_lb: Math.max(1, round(carp.weight_lb - Hunger.PoundsLostPerDay)) };
 }
 
 export function consumeFeedForOneDay(feedStock: Record<FeedType, number>, ration: number) {

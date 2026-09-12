@@ -1,0 +1,88 @@
+import assert from 'node:assert/strict';
+import { biteRollFor, biteTimeOf, type BiteRoll, type RodInTheWater, type WaterToday } from '../src/lib/domain/fishing/biteRoll';
+import { castTerrainFor } from '../src/lib/domain/fishing/castTerrain';
+import { DayTicket, isDayTicketStillValid } from '../src/lib/domain/fishing/dayTicket';
+import { FishingDay, FishingHoursPerDay } from '../src/lib/domain/fishing/sessionClock';
+import { mix } from '../src/lib/domain/fishing/sessionSeed';
+import { carpForRolledBite, carpInBiteOrder, carpThatTookTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
+import { seededRandom } from '../src/lib/domain/random';
+import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
+import { defaultRodSetup, MaximumRods } from '../src/lib/domain/tackle/rodSetup';
+import type { Carp, Lake } from '../src/lib/domain/types';
+import { seasonFor } from '../src/lib/domain/world/seasons';
+
+const VisitSeed = 123456789;
+const DecentSkill = 60;
+const CastPoint = { x: 0.5, y: 0.5 };
+const SeedsToCheck = 40;
+const MinutesPerHour = 60;
+const MillisecondsPerHour = 60 * 60 * 1000;
+
+interface Slot {
+	rodIndex: number;
+	hour: number;
+	roll: BiteRoll;
+}
+
+export function runBiteRollScenarios() {
+	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
+	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
+	const water: WaterToday = { lake, overallSkill: DecentSkill, season: seasonFor(lake, new Date('2026-06-01T00:00:00Z')) };
+	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), setup: defaultRodSetup() };
+
+	const roll = biteRollFor(VisitSeed, 0, 7, rod, water);
+	assert.deepEqual(roll, biteRollFor(VisitSeed, 0, 7, rod, water), 'the same inputs give the same roll');
+	assert.notDeepEqual(roll, biteRollFor(VisitSeed, 1, 7, rod, water), 'another rod rolls differently');
+	assert.notDeepEqual(roll, biteRollFor(VisitSeed, 0, 8, rod, water), 'another hour rolls differently');
+	assert.ok(roll.minuteOfHour >= 0 && roll.minuteOfHour < MinutesPerHour, 'the bite falls inside the hour');
+	assert.ok(biteTimeOf(7, roll) >= 7 && biteTimeOf(7, roll) < 8, 'the bite time is inside the hour');
+	assertEverySlotHasItsOwnStream();
+
+	const slots = slotsAcrossTheDay(rod, water);
+	const takes = slots.filter((slot) => slot.roll.isTaking);
+	const misses = slots.filter((slot) => !slot.roll.isTaking);
+	assert.ok(takes.length >= 1, 'a decent setup gets at least one take in a day');
+	assert.ok(misses.length >= 1, 'not every hour produces a fish');
+	assertTheServerAgreesWithTheClient(takes[0], misses[0], carp, water, rod);
+	assertDayTicketsLapse();
+	console.log('bite roll:', { takesInADay: takes.length, firstTake: takes[0] });
+}
+
+function slotsAcrossTheDay(rod: RodInTheWater, water: WaterToday): Slot[] {
+	const slots: Slot[] = [];
+	for (let rodIndex = 0; rodIndex < MaximumRods; rodIndex++) {
+		for (let hour = FishingDay.StartHour; hour < FishingDay.EndHour; hour++) {
+			slots.push({ rodIndex, hour, roll: biteRollFor(VisitSeed, rodIndex, hour, rod, water) });
+		}
+	}
+	return slots;
+}
+
+function assertEverySlotHasItsOwnStream() {
+	for (let seed = 1; seed <= SeedsToCheck; seed++) {
+		const streams = new Set<number>();
+		for (let rodIndex = 0; rodIndex < MaximumRods; rodIndex++) {
+			for (let hour = FishingDay.StartHour; hour < FishingDay.EndHour; hour++) streams.add(mix(seed, rodIndex, hour));
+		}
+		assert.equal(streams.size, MaximumRods * FishingHoursPerDay, `seed ${seed} gives every rod-hour its own stream`);
+	}
+}
+
+function assertTheServerAgreesWithTheClient(take: Slot, miss: Slot, carp: Carp[], water: WaterToday, rod: RodInTheWater) {
+	const spot = { terrain: rod.terrain, castPoint: CastPoint };
+	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), take.roll, water, spot);
+	const carpAsTheServerLoadsThem = [...carp].reverse();
+	const reportOf = (slot: Slot) => ({ seed: VisitSeed, rodIndex: slot.rodIndex, hour: slot.hour, castPoint: CastPoint, setup: rod.setup });
+	const serverPick = carpForRolledBite(reportOf(take), water, carpAsTheServerLoadsThem);
+	assert.ok(clientPick && serverPick, 'both sides find a fish');
+	assert.equal(serverPick.id, clientPick.id, 'the server picks the same carp as the client');
+	assert.equal(carpForRolledBite(reportOf(miss), water, carp), null, 'an hour without a take cannot be claimed');
+}
+
+function assertDayTicketsLapse() {
+	const ticketTime = new Date('2026-09-11T10:00:00Z');
+	const anHourOn = new Date(ticketTime.getTime() + MillisecondsPerHour);
+	const longAfter = new Date(ticketTime.getTime() + (DayTicket.ValidForHours + 1) * MillisecondsPerHour);
+	assert.ok(isDayTicketStillValid(ticketTime.toISOString(), anHourOn), 'a ticket is good an hour on');
+	assert.ok(!isDayTicketStillValid(ticketTime.toISOString(), longAfter), 'a ticket lapses');
+}

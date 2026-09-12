@@ -1,9 +1,13 @@
+import type { LakeLayout } from './layout/layoutTypes';
 import type { RodSetup } from './tackle/rodSetup';
+import type { RegionCode } from './world/regionCodes';
 
-export type BedType = 'gravel' | 'clay' | 'silt';
-export type SwimFeature = 'open_water' | 'weed_bed' | 'snag' | 'island_margin' | 'reed_line';
-export type CarpStrain = 'common' | 'mirror' | 'linear' | 'leather' | 'ghost';
+export type BedType = 'gravel' | 'clay' | 'silt' | 'rock';
+export type SwimFeature = 'open_water' | 'weed_bed' | 'snag' | 'island_margin' | 'reed_line' | 'gravel_bar' | 'lily_pads';
+export type CarpStrain = 'common' | 'mirror' | 'linear' | 'leather' | 'ghost' | 'fully_scaled';
+export type CarpOrigin = 'farm' | 'wild' | 'bred' | 'classic';
 export type FeedType = 'fishmeal_boilies' | 'hemp' | 'maize' | 'particles' | 'worms' | 'shrimp';
+export type SiteType = 'gravel_pit' | 'quarry' | 'clay_pit' | 'estate_lake' | 'farm_pond' | 'greenfield' | 'classic';
 
 export interface Profile {
 	id: string;
@@ -16,6 +20,9 @@ export interface Profile {
 	watercraft: number;
 	experience: number;
 	saved_rods: RodSetup[];
+	home_region: RegionCode | null;
+	plot_latitude: number | null;
+	plot_longitude: number | null;
 }
 
 export interface Lake {
@@ -36,6 +43,15 @@ export interface Lake {
 	feed_stock: Record<FeedType, number>;
 	is_public: boolean;
 	simulated_until: string;
+	region: RegionCode;
+	latitude: number | null;
+	longitude: number | null;
+	site_type: SiteType;
+	plot_acres: number;
+	layout: LakeLayout;
+	fertility: number;
+	disturbance: number;
+	is_setup_complete: boolean;
 }
 
 export interface Swim {
@@ -44,9 +60,6 @@ export interface Swim {
 	name: string;
 	position_x: number;
 	position_y: number;
-	bed_type: BedType;
-	depth_feet: number;
-	feature: SwimFeature;
 }
 
 export interface Carp {
@@ -58,28 +71,12 @@ export interface Carp {
 	age_years: number;
 	condition: number;
 	times_caught: number;
+	origin: CarpOrigin;
+	origin_lake_id: string | null;
+	fame: number;
+	is_catalogued: boolean;
+	transit_until: string | null;
+	quarantine_until: string | null;
 }
 
-export interface Catch {
-	id: string;
-	lake_id: string;
-	carp_id: string;
-	angler_id: string | null;
-	angler_name: string;
-	weight_lb: number;
-	swim_name: string;
-	rig: string;
-	bait: string;
-	hook_size: number;
-	caught_at: string;
-}
-
-export interface LakeVisit {
-	id: string;
-	lake_id: string;
-	angler_id: string | null;
-	angler_name: string;
-	fee_paid: number;
-	fish_caught: number;
-	visited_at: string;
-}
+export type { Catch, LakeVisit } from './historyTypes';

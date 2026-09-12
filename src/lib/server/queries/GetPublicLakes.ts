@@ -6,7 +6,7 @@ export async function GetPublicLakes(locals: App.Locals): Promise<PublicLakeSumm
 	requireUser(locals);
 	const { data: lakes } = await locals.supabase
 		.from('lakes')
-		.select('*, profiles!lakes_owner_id_fkey(display_name), carp(weight_lb)')
+		.select('*, profiles!lakes_owner_id_fkey(display_name), carp!carp_lake_id_fkey(weight_lb)')
 		.eq('is_public', true)
 		.order('reputation', { ascending: false });
 	return (lakes ?? []).map(summarise);

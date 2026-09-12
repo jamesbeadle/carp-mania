@@ -19,16 +19,6 @@ function drawShoreline(context: CanvasRenderingContext2D, lake: Path2D) {
 	context.restore();
 }
 
-export function drawIsland(context: CanvasRenderingContext2D, island: Path2D) {
-	context.save();
-	context.fillStyle = BankPalette.GrassNear;
-	context.fill(island);
-	context.lineWidth = 8;
-	context.strokeStyle = BankPalette.Shore;
-	context.stroke(island);
-	context.restore();
-}
-
 function drawTufts(context: CanvasRenderingContext2D) {
 	context.save();
 	context.strokeStyle = BankPalette.Reed;

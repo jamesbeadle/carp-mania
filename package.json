@@ -9,17 +9,24 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"audit:files": "node scripts/auditFileLengths.mjs",
-		"test:domain": "node --experimental-strip-types scripts/testDomain.ts"
+		"audit:routes": "node scripts/auditRoutes.mjs",
+		"test:domain": "node --import ./scripts/registerTypescriptImports.mjs --experimental-strip-types scripts/testDomain.ts",
+		"test:sql": "node scripts/testSql.mjs"
 	},
 	"dependencies": {
 		"@supabase/ssr": "^0.7.0",
-		"@supabase/supabase-js": "^2.57.0"
+		"@supabase/supabase-js": "^2.57.0",
+		"d3-geo": "^3.1.1",
+		"topojson-client": "^3.1.0",
+		"world-atlas": "^2.0.2"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^5.7.0",
 		"@sveltejs/kit": "^2.27.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@tailwindcss/vite": "^4.1.0",
+		"@types/d3-geo": "^3.1.1",
+		"@types/topojson-client": "^3.1.5",
 		"svelte": "^5.38.0",
 		"svelte-check": "^4.3.0",
 		"tailwindcss": "^4.1.0",

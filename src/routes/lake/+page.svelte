@@ -8,20 +8,30 @@
 	import LedgerPanel from '$lib/components/lake/LedgerPanel.svelte';
 	import PredatorPanel from '$lib/components/lake/PredatorPanel.svelte';
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
+	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
+	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
 	import { PikeRules } from '$lib/domain/economy';
+	import { inProgressShapesFor } from '$lib/game/builder/draftShapes';
+	import { onMount } from 'svelte';
 
 	let { data, form } = $props();
 
-	const tabs = ['Stock', 'Feed', 'Predators', 'Water', 'Ledger'] as const;
+	const tabs = ['Stock', 'Feed', 'Predators', 'Water', 'Groundworks', 'Market', 'Ledger'] as const;
+	const MarketAnchor = '#market';
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const sickCarpCount = $derived(data.fishery.carp.filter((fish) => Number(fish.condition) < PikeRules.SickCarpConditionBelow).length);
+	const worksUnderway = $derived(inProgressShapesFor(data.groundworks.inProgress, data.fishery.lake));
+
+	onMount(() => {
+		if (location.hash === MarketAnchor) activeTab = 'Market';
+	});
 </script>
 
 <WhileYouWereAway summary={data.whileAway} />
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas lake={data.fishery.lake} swims={data.fishery.swims} carp={data.fishery.carp} />
+	<LakeCanvas lake={data.fishery.lake} swims={data.fishery.swims} carp={data.fishery.carp} drafts={worksUnderway} />
 	<LakeOverview lake={data.fishery.lake} profile={data.profile} />
 </div>
 
@@ -31,8 +41,16 @@
 	{/each}
 </nav>
 
-{#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} />{/if}
+{#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} lake={data.fishery.lake} farmStock={data.farmStock} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffPanel lake={data.fishery.lake} />{/if}
+{#if activeTab === 'Groundworks'}
+	<p class="mb-4 text-sm text-mist-400">
+		Islands, bars, holes, shelves, reeds, swims and the shoreline are all shaped in the editor.
+		<a href="/lake/works" class="button-primary ml-3 inline-block px-4 py-1.5 text-base">Open the groundworks editor</a>
+	</p>
+	<WorksLedgerPanel inProgress={data.groundworks.inProgress} ledger={data.groundworks.ledger} />
+{/if}
+{#if activeTab === 'Market'}<MarketPanel activity={data.marketActivity} carp={data.fishery.carp} loadedAt={data.loadedAt} />{/if}
 {#if activeTab === 'Ledger'}<LedgerPanel visits={data.fishery.visits} catches={data.fishery.catches} carp={data.fishery.carp} />{/if}

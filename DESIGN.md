@@ -1,5 +1,7 @@
 # Carp Mania — Design
 
+> This is the first design. `DESIGN-2.md` builds on it — the globe, the lake builder and the fish market — and changes it where it says so (starter fishery → setup, stocking → the farm and the market, swim terrain → the cast spot). Read both.
+
 Derived top-down, as CLAUDE.md asks: stories → views → site map → data → backend.
 
 ## 1. User stories

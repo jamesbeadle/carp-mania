@@ -1,15 +1,17 @@
+import type { FishingVisit } from '$lib/contracts/FishingVisit';
 import { overallAnglerSkill } from '$lib/domain/anglerSkills';
 import { FishingDay } from '$lib/domain/fishing/sessionClock';
+import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
-import type { RodOnBank } from '../scene/rodState';
-import { rollForBite, StrikeWindowSeconds } from './biteRoller';
+import { seasonFor, type Season } from '$lib/domain/world/seasons';
+import { isCastOut, type RodOnBank } from '../scene/rodState';
+import { BiteRoller, StrikeWindowSeconds, type RolledBite } from './biteRoller';
 import type { FightState } from './fightState.svelte';
 import type { LandedFish } from './landFish';
 
 export type SessionPhase = 'choose_swim' | 'tackle_up' | 'fishing' | 'fighting' | 'landed' | 'day_over';
 
-export interface ActiveBite {
-	rodIndex: number;
+export interface ActiveBite extends RolledBite {
 	secondsLeft: number;
 }
 
@@ -19,6 +21,7 @@ export class SessionState {
 	swim = $state<Swim | null>(null);
 	rods = $state<RodOnBank[]>([]);
 	bite = $state<ActiveBite | null>(null);
+	hooked = $state<RolledBite | null>(null);
 	fight = $state<FightState | null>(null);
 	lastLanded = $state<LandedFish | null>(null);
 	landedToday = $state<LandedFish[]>([]);
@@ -27,11 +30,15 @@ export class SessionState {
 	readonly lake: Lake;
 	readonly carp: Carp[];
 	readonly profile: Profile;
+	readonly season: Season;
+	readonly roller: BiteRoller;
 
-	constructor(lake: Lake, carp: Carp[], profile: Profile) {
+	constructor(lake: Lake, carp: Carp[], profile: Profile, visit: FishingVisit) {
 		this.lake = lake;
-		this.carp = carp;
+		this.carp = carpInBiteOrder(carp);
 		this.profile = profile;
+		this.season = seasonFor(lake, new Date(visit.visitedAt));
+		this.roller = new BiteRoller(visit.seed, { lake, overallSkill: this.overallSkill, season: this.season });
 	}
 
 	get overallSkill() {
@@ -47,21 +54,25 @@ export class SessionState {
 		return this.hour >= FishingDay.EndHour;
 	}
 
+	hasLandedToday(carp: Carp) {
+		return this.landedToday.some((landed) => landed.carp.id === carp.id);
+	}
+
 	tick(secondsElapsed: number) {
 		if (this.phase !== 'fishing') return;
 		this.hour += secondsElapsed / FishingDay.RealSecondsPerFishingHour;
 		if (this.isDayOver) return this.endDay();
 		if (this.bite) return this.countDownBite(secondsElapsed);
-		this.rollAllRods(secondsElapsed);
+		this.fireTheFirstDueBite();
 	}
 
-	private rollAllRods(secondsElapsed: number) {
-		if (!this.swim) return;
+	private fireTheFirstDueBite() {
 		for (const rod of this.rods) {
-			const isBiting = rollForBite(this.lake, this.swim, rod, this.overallSkill, this.hour, secondsElapsed, Math.random);
-			if (!isBiting) continue;
+			if (rod.phase !== 'cast' || !isCastOut(rod)) continue;
+			const due = this.roller.biteDueOn(rod, this.hour);
+			if (!due) continue;
 			rod.phase = 'biting';
-			this.bite = { rodIndex: rod.index, secondsLeft: StrikeWindowSeconds };
+			this.bite = { ...due, secondsLeft: StrikeWindowSeconds };
 			return;
 		}
 	}

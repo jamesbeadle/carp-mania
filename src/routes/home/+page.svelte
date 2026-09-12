@@ -1,7 +1,12 @@
 <script lang="ts">
-	import FisherySummaryCard from '$lib/components/home/FisherySummaryCard.svelte';
 	import AnglerSummaryCard from '$lib/components/home/AnglerSummaryCard.svelte';
+	import FisherySummaryCard from '$lib/components/home/FisherySummaryCard.svelte';
+	import InboxCard from '$lib/components/home/InboxCard.svelte';
+	import MarketWatchCard from '$lib/components/home/MarketWatchCard.svelte';
+	import PinYourWaterCard from '$lib/components/home/PinYourWaterCard.svelte';
 	import WhileYouWereAway from '$lib/components/home/WhileYouWereAway.svelte';
+	import WorksInProgressCard from '$lib/components/home/WorksInProgressCard.svelte';
+	import WorldFeedCard from '$lib/components/home/WorldFeedCard.svelte';
 
 	let { data } = $props();
 </script>
@@ -11,6 +16,13 @@
 <WhileYouWereAway summary={data.whileAway} />
 
 <div class="grid gap-6 md:grid-cols-2">
+	{#if data.fishery.lake.latitude === null}
+		<PinYourWaterCard lakeName={data.fishery.lake.name} />
+	{/if}
 	<FisherySummaryCard lake={data.fishery.lake} carp={data.fishery.carp} />
 	<AnglerSummaryCard profile={data.profile} />
+	<WorksInProgressCard works={data.works} />
+	<InboxCard notifications={data.unreadNotifications} unreadCount={data.unreadCount} />
+	<MarketWatchCard watch={data.marketWatch} loadedAt={data.loadedAt} />
+	<WorldFeedCard feed={data.worldFeed} />
 </div>

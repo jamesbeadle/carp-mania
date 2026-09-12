@@ -1,4 +1,4 @@
-import { FishPalette } from '../scene/palette';
+import { FishPalette } from '../scene/fishPalette';
 
 export function drawPike(context: CanvasRenderingContext2D, length: number, timeSeconds: number, phase: number) {
 	const width = length * 0.16;

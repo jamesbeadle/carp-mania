@@ -1,9 +1,10 @@
-import { lakeCentre } from '../scene/lakeShape';
+import type { Point } from '../scene/lakeShape';
 import { SceneSize, waterColour } from '../scene/palette';
 
-export function drawWater(context: CanvasRenderingContext2D, lake: Path2D, transparency: number, timeSeconds: number) {
-	const centre = lakeCentre();
-	const depth = context.createRadialGradient(centre.x, centre.y, 40, centre.x, centre.y, SceneSize.Width * 0.5);
+const DeepestRadius = 40;
+
+export function drawWater(context: CanvasRenderingContext2D, lake: Path2D, centre: Point, transparency: number, timeSeconds: number) {
+	const depth = context.createRadialGradient(centre.x, centre.y, DeepestRadius, centre.x, centre.y, SceneSize.Width * 0.5);
 	depth.addColorStop(0, waterColour(transparency, 1));
 	depth.addColorStop(1, waterColour(transparency, 0));
 	context.save();

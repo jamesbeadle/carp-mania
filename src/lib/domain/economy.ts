@@ -1,17 +1,16 @@
-export const StarterFishery = {
-	Money: 5000,
+export const StartingFloat = { Money: 100000, GiftToExistingPlayers: 95000 } as const;
+
+export const ClassicFishery = {
 	Acres: 10,
 	CarpCount: 100,
 	DayTicketFee: 20
 } as const;
 
 export const Prices = {
-	CarpPerPound: 45,
-	BigCarpPremiumAboveLb: 25,
-	BigCarpPremiumPerPound: 60,
 	Pike: 120,
 	PikeFoodPerUnit: 15,
-	BailiffDailyWage: 60
+	BailiffDailyWage: 60,
+	AeratorDailyRunning: 15
 } as const;
 
 export const PikeRules = {
@@ -27,8 +26,7 @@ export const FeeCollection = {
 	WithoutBailiff: 0.55
 } as const;
 
-export function priceOfCarp(weightPounds: number) {
-	const basePrice = weightPounds * Prices.CarpPerPound;
-	const poundsOverPremiumLine = Math.max(0, weightPounds - Prices.BigCarpPremiumAboveLb);
-	return Math.round(basePrice + poundsOverPremiumLine * Prices.BigCarpPremiumPerPound);
-}
+export const FacilityEffects = {
+	CarParkAnglerFactor: 1.15,
+	LodgeTakingsPerAngler: 4
+} as const;

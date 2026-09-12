@@ -1,5 +1,5 @@
 import type { SwimmingFish } from '../scene/fishSchool';
-import { fishVisibility } from '../scene/palette';
+import { fishVisibility } from '../scene/fishPalette';
 import { carpProportions, drawCarp } from './drawCarp';
 import { drawPike } from './drawPike';
 
