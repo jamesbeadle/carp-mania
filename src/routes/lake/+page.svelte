@@ -11,8 +11,10 @@
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
+	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import { PikeRules } from '$lib/domain/economy';
 	import { inProgressShapesFor } from '$lib/game/builder/draftShapes';
+	import { bailiffsWord } from '$lib/game/lodge/bailiffsWord';
 	import { onMount } from 'svelte';
 
 	let { data, form } = $props();
@@ -22,13 +24,24 @@
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const sickCarpCount = $derived(data.fishery.carp.filter((fish) => Number(fish.condition) < PikeRules.SickCarpConditionBelow).length);
 	const worksUnderway = $derived(inProgressShapesFor(data.groundworks.inProgress, data.fishery.lake));
+	const lake = $derived(data.fishery.lake);
+	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 
 	onMount(() => {
 		if (location.hash === MarketAnchor) activeTab = 'Market';
 	});
 </script>
 
-<div class="mb-4"><EstateSwitcher waters={data.waters} currentId={data.fishery.lake.id} returnTo="/lake" /></div>
+<svelte:head><title>The lodge at {lake.name} · Carp Mania</title></svelte:head>
+
+<PlaceBanner kind="lodge" title={lake.name} blurb="The lodge · {Number(lake.acres)} acres · {word}" skyOver={lake} hasBailiff={lake.has_bailiff}>
+	{#snippet aside()}<div class="inline-block rounded-xl bg-carbon-950/45 px-2 py-1 backdrop-blur"><EstateSwitcher waters={data.waters} currentId={lake.id} returnTo="/lake" /></div>{/snippet}
+	{#snippet actions()}
+		<a href="/lake/works" class="button-secondary text-base">Groundworks</a>
+		<a href="/lakes/{lake.id}/host-a-match" class="button-secondary text-base">Host a match</a>
+		<a href="/fish/{lake.id}" class="button-primary text-base">Go fishing</a>
+	{/snippet}
+</PlaceBanner>
 <WhileYouWereAway summary={data.whileAway} />
 <ActionMessage {form} />
 

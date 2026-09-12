@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import FilterRail from '$lib/components/world/FilterRail.svelte';
 	import type { FlyToTarget } from '$lib/components/world/FlyToButtons.svelte';
 	import LiveFeed from '$lib/components/world/LiveFeed.svelte';
@@ -65,14 +66,16 @@
 	}
 </script>
 
-<div class="mb-4 flex flex-wrap items-end gap-4">
-	<div>
-		<h1 class="text-4xl text-volt-300">The world</h1>
-		<p class="text-mist-400">Every open water in the game, pinned where it is. Spin, zoom, click a pin.</p>
-	</div>
-	<a href="/world/hall-of-fame" class="button-secondary ml-auto text-base">Hall of fame</a>
-	<button class="button-secondary text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
-</div>
+<svelte:head><title>The world · Carp Mania</title></svelte:head>
+
+<PlaceBanner kind="signpost" title="The world" blurb="Every open water in the game, pinned where it is. Spin, zoom, tap a pin.">
+	{#snippet actions()}
+		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>
+		<a href="/matches" class="button-secondary text-base">Matches</a>
+		<a href="/anglers" class="button-secondary text-base">Anglers</a>
+		<button class="button-secondary text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
+	{/snippet}
+</PlaceBanner>
 
 <div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)_20rem]">
 	<div class:hidden={!isRailOpen} class="lg:block">

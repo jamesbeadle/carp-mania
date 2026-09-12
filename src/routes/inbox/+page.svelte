@@ -1,24 +1,23 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
 	import NotificationList from '$lib/components/inbox/NotificationList.svelte';
+	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 
 	let { data, form } = $props();
 
 	const unreadCount = $derived(data.inbox.unreadCount);
-	const unreadLine = $derived(unreadCount === 0 ? 'All read.' : `${unreadCount} unread.`);
+	const unreadLine = $derived(unreadCount === 0 ? 'Nothing new pinned up.' : `${unreadCount} new ${unreadCount === 1 ? 'note' : 'notes'} pinned up.`);
 </script>
 
-<div class="mb-6 flex flex-wrap items-end gap-4">
-	<div>
-		<h1 class="text-4xl text-volt-300">Inbox</h1>
-		<p class="text-mist-400">{unreadLine} Outbids, sales, arrivals, finished works and records set on your water.</p>
-	</div>
-	{#if unreadCount > 0}
-		<form method="POST" action="?/markAllRead" class="ml-auto">
-			<button class="button-secondary">Mark all read</button>
-		</form>
-	{/if}
-</div>
+<svelte:head><title>The noticeboard · Carp Mania</title></svelte:head>
+
+{#snippet takeThemAllDown()}
+	<form method="POST" action="?/markAllRead">
+		<button class="button-secondary">Take them all down</button>
+	</form>
+{/snippet}
+
+<PlaceBanner kind="noticeboard" title="The noticeboard" blurb="{unreadLine} Outbids, sales, arrivals, finished works, matches and records set on your water." noteCount={Math.max(1, unreadCount)} actions={unreadCount > 0 ? takeThemAllDown : undefined} />
 
 <ActionMessage {form} />
 <NotificationList notifications={data.inbox.notifications} />
