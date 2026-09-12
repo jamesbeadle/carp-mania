@@ -11,9 +11,10 @@ function isPublicPath(pathname: string) {
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerSupabase(event);
-	event.locals.safeGetSession = () => safeGetSession(event.locals.supabase);
+	const sessionForThisRequest = safeGetSession(event.locals.supabase);
+	event.locals.safeGetSession = () => sessionForThisRequest;
 
-	const { user } = await event.locals.safeGetSession();
+	const { user } = await sessionForThisRequest;
 	event.locals.user = user;
 
 	const pathname = event.url.pathname;

@@ -1,4 +1,5 @@
 import type { Fisherman } from '$lib/domain/legacy/fishermanTypes';
+import type { ListPage } from '$lib/domain/lists/paging';
 import type { Trophy } from '$lib/domain/matches/matchTypes';
 import type { Catch } from '$lib/domain/types';
 
@@ -13,8 +14,7 @@ export interface KnownFish {
 export interface Scrapbook {
 	fisherman: Fisherman;
 	age: number;
-	catches: Catch[];
-	totalCatches: number;
+	catches: ListPage<Catch>;
 	personalBestLb: number;
 	fishKnown: KnownFish[];
 	trophies: Trophy[];

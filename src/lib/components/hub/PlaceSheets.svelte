@@ -14,6 +14,7 @@
 	import PinYourWaterCard from '../home/PinYourWaterCard.svelte';
 	import WorksInProgressCard from '../home/WorksInProgressCard.svelte';
 	import WorldFeedCard from '../home/WorldFeedCard.svelte';
+	import Skeleton from '../loading/Skeleton.svelte';
 	import NextMatchCard from '../matches/NextMatchCard.svelte';
 	import PlaceSheet from '../stage/PlaceSheet.svelte';
 
@@ -25,15 +26,16 @@
 		works: LakeWork[];
 		unreadNotifications: Notification[];
 		unreadCount: number;
-		marketWatch: MyMarketActivity;
-		worldFeed: WorldActivity[];
+		marketWatch: Promise<MyMarketActivity>;
+		worldFeed: Promise<WorldActivity[]>;
 		loadedAt: string;
 		waters: Lake[];
-		nextMatch: MatchCard | null;
+		nextMatch: Promise<MatchCard | null>;
 	}
 
 	let { openPlace, onClose, fishery, profile, works, unreadNotifications, unreadCount, marketWatch, worldFeed, loadedAt, waters, nextMatch }: Props = $props();
 
+	const CouldNotLoad = 'That would not load. Close the sheet and open it again.';
 	const title = $derived(BankPlaces.find((place) => place.id === openPlace)?.label ?? '');
 	const isUnpinned = $derived(fishery.lake.latitude === null);
 </script>
@@ -45,16 +47,34 @@
 		<FisherySummaryCard lake={fishery.lake} carp={fishery.carp} />
 		<WorksInProgressCard {works} />
 	{:else if openPlace === 'shop'}
-		<MarketWatchCard watch={marketWatch} {loadedAt} />
+		{#await marketWatch}
+			<Skeleton title="Market watch" rows={4} />
+		{:then watch}
+			<MarketWatchCard {watch} {loadedAt} />
+		{:catch}
+			<p class="text-sm text-mist-400">{CouldNotLoad}</p>
+		{/await}
 	{:else if openPlace === 'noticeboard'}
 		<InboxCard notifications={unreadNotifications} {unreadCount} />
 	{:else if openPlace === 'jetty'}
 		<AnglerSummaryCard {profile} />
 		<a href="/fish/{fishery.lake.id}" class="button-secondary block text-center">Fish my own water</a>
-		<NextMatchCard {nextMatch} {loadedAt} />
+		{#await nextMatch}
+			<Skeleton title="Matches" rows={2} />
+		{:then match}
+			<NextMatchCard nextMatch={match} {loadedAt} />
+		{:catch}
+			<p class="text-sm text-mist-400">{CouldNotLoad}</p>
+		{/await}
 	{:else if openPlace === 'signpost'}
 		{#if isUnpinned}<PinYourWaterCard lakeName={fishery.lake.name} />{/if}
-		<WorldFeedCard feed={worldFeed} />
+		{#await worldFeed}
+			<Skeleton title="The world" rows={6} />
+		{:then feed}
+			<WorldFeedCard {feed} />
+		{:catch}
+			<p class="text-sm text-mist-400">{CouldNotLoad}</p>
+		{/await}
 		<a href="/world/hall-of-fame" class="button-secondary block text-center">The hall of fame</a>
 	{/if}
 </PlaceSheet>

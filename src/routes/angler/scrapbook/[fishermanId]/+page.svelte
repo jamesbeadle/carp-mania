@@ -2,7 +2,9 @@
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import KnownFishList from '$lib/components/legacy/KnownFishList.svelte';
 	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
+	import Pager from '$lib/components/lists/Pager.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
+	import { listPathFor } from '$lib/domain/lists/listPath';
 	import { formatWhen } from '$lib/format/dates';
 	import { formatWeight } from '$lib/format/weight';
 
@@ -10,6 +12,7 @@
 
 	const book = $derived(data.scrapbook);
 	const fisherman = $derived(book.fisherman);
+	const hrefFor = (page: number) => listPathFor(`/angler/scrapbook/${fisherman.id}`, {}, page);
 	const yearsFished = $derived(fisherman.retired_at ? `${formatWhen(fisherman.started_at)} to ${formatWhen(fisherman.retired_at)}` : `since ${formatWhen(fisherman.started_at)}`);
 </script>
 
@@ -36,7 +39,7 @@
 	<div class="space-y-6">
 		<section class="panel">
 			<dl class="grid grid-cols-3 gap-3 text-sm">
-				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{book.totalCatches}</dd></div>
+				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{book.catches.total}</dd></div>
 				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(book.personalBestLb)}</dd></div>
 				<div><dt class="stat-label">Final skill</dt><dd class="text-xl">{fisherman.final_skill === null ? '—' : Math.round(Number(fisherman.final_skill))}</dd></div>
 			</dl>
@@ -46,7 +49,7 @@
 	</div>
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">Every fish on the bank</h2>
-		<CatchReportList catches={book.catches} carpNames={book.carpNames} lakeNames={book.lakeNames} />
-		{#if book.totalCatches > book.catches.length}<p class="mt-2 text-xs text-mist-400">The last {book.catches.length} of {book.totalCatches}.</p>{/if}
+		<CatchReportList catches={book.catches.items} carpNames={book.carpNames} lakeNames={book.lakeNames} />
+		<Pager page={book.catches} noun="catch" plural="catches" {hrefFor} />
 	</section>
 </div>

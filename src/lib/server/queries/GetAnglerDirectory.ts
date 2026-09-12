@@ -1,54 +1,46 @@
-import type { AnglerDirectoryEntry, AnglerSkills, NamedWater } from '$lib/contracts/AnglerDirectory';
-import { overallAnglerSkill } from '$lib/domain/anglerSkills';
+import type { AnglerDirectory, AnglerDirectoryEntry, AnglerSkills, NamedWater } from '$lib/contracts/AnglerDirectory';
+import { AnglerListing, type AnglerFilters, type AnglerSort } from '$lib/domain/lists/anglerFilters';
+import { listPageOf, rangeOf } from '$lib/domain/lists/paging';
 import { requireUser } from '../gates/requireUser';
 import { skillsOf } from './skillsOf';
 
-const DirectorySize = 100;
-const AnglerColumns = 'id, display_name, avatar_url, experience, line_selection, rig_selection, bait_selection, watercraft, catches(weight_lb)';
-const TheirCatches = 'catches';
-
-type AnglerRow = AnglerSkills & {
+type SummaryRow = AnglerSkills & {
 	id: string;
 	display_name: string;
 	avatar_url: string | null;
 	experience: number;
-	catches: { weight_lb: number }[];
+	overall_skill: number;
+	personal_best_lb: number;
 };
 type WaterRow = NamedWater & { owner_id: string };
 type AnglerWithoutWater = Omit<AnglerDirectoryEntry, 'water'>;
 
-export async function GetAnglerDirectory(locals: App.Locals): Promise<AnglerDirectoryEntry[]> {
+const SortOrders: Record<AnglerSort, string> = { skill: 'overall_skill', best: 'personal_best_lb', landed: 'experience' };
+
+export async function GetAnglerDirectory(locals: App.Locals, filters: AnglerFilters): Promise<AnglerDirectory> {
 	requireUser(locals);
-	const anglers = await loadAnglersWithTheirBest(locals);
-	const topAnglers = anglers.map(summarise).sort(bestSkillFirst).slice(0, DirectorySize);
-	const waters = await loadWatersRunBy(locals, topAnglers.map((angler) => angler.id));
-	return topAnglers.map((angler) => ({ ...angler, water: waters[angler.id] ?? null }));
+	const page = { number: filters.page, size: AnglerListing.PageSize };
+	const { from, to } = rangeOf(page);
+	let query = locals.supabase.from('angler_summaries').select('*', { count: 'exact' });
+	if (filters.region) query = query.eq('home_region', filters.region);
+	if (filters.search) query = query.ilike('display_name', `%${filters.search}%`);
+	const { data, count } = await query.order(SortOrders[filters.sort], { ascending: false }).order('display_name').range(from, to);
+	const anglers = ((data ?? []) as SummaryRow[]).map(summarise);
+	const waters = await loadWatersRunBy(locals, anglers.map((angler) => angler.id));
+	const entries = anglers.map((angler) => ({ ...angler, water: waters[angler.id] ?? null }));
+	return { page: listPageOf(entries, count ?? 0, page), filters };
 }
 
-async function loadAnglersWithTheirBest(locals: App.Locals): Promise<AnglerRow[]> {
-	const { data: anglers } = await locals.supabase
-		.from('profiles')
-		.select(AnglerColumns)
-		.order('weight_lb', { ascending: false, referencedTable: TheirCatches })
-		.limit(1, { referencedTable: TheirCatches });
-	return (anglers ?? []) as AnglerRow[];
-}
-
-function summarise(row: AnglerRow): AnglerWithoutWater {
-	const skills = skillsOf(row);
+function summarise(row: SummaryRow): AnglerWithoutWater {
 	return {
 		id: row.id,
 		displayName: row.display_name,
 		avatarUrl: row.avatar_url,
-		skills,
-		overallSkill: overallAnglerSkill(skills),
-		personalBestLb: Number(row.catches[0]?.weight_lb ?? 0),
+		skills: skillsOf(row),
+		overallSkill: Number(row.overall_skill),
+		personalBestLb: Number(row.personal_best_lb),
 		totalCatches: row.experience
 	};
-}
-
-function bestSkillFirst(first: AnglerWithoutWater, second: AnglerWithoutWater) {
-	return second.overallSkill - first.overallSkill;
 }
 
 async function loadWatersRunBy(locals: App.Locals, anglerIds: string[]): Promise<Record<string, NamedWater>> {

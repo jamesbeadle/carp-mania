@@ -3,6 +3,7 @@ import { NameHeir } from '$lib/server/commands/NameHeir';
 import { SimulateElapsedTime } from '$lib/server/commands/SimulateElapsedTime';
 import { SwitchWater } from '$lib/server/commands/SwitchWater';
 import { loadProfile } from '$lib/server/gates/requireMoney';
+import { requireUser } from '$lib/server/gates/requireUser';
 import { GetFishermanDiary } from '$lib/server/queries/GetFishermanDiary';
 import { GetHomeHub } from '$lib/server/queries/GetHomeHub';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
@@ -12,12 +13,17 @@ import { GetWorldActivity, WorldActivityLimit } from '$lib/server/queries/GetWor
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
+	const user = requireUser(locals);
 	const whileAway = await SimulateElapsedTime(locals);
-	const [fishery, profile, hub, diary] = await Promise.all([GetMyFishery(locals), loadProfile(locals), GetHomeHub(locals), GetFishermanDiary(locals)]);
-	const [worldFeed, marketWatch, waters, nextMatch] = await Promise.all([
-		GetWorldActivity(locals, WorldActivityLimit.HomeHub), GetMyMarketActivity(locals), loadMyWaters(locals, profile.id), GetMyNextMatch(locals)
+	const [fishery, profile, hub, diary, waters] = await Promise.all([
+		GetMyFishery(locals), loadProfile(locals), GetHomeHub(locals), GetFishermanDiary(locals), loadMyWaters(locals, user.id)
 	]);
-	return { profile, fishery, whileAway, worldFeed, marketWatch, diary, waters, nextMatch, loadedAt: new Date().toISOString(), isStage: true, ...hub };
+	const behindTheSheets = {
+		worldFeed: GetWorldActivity(locals, { limit: WorldActivityLimit.HomeHub }),
+		marketWatch: GetMyMarketActivity(locals),
+		nextMatch: GetMyNextMatch(locals)
+	};
+	return { profile, fishery, whileAway, diary, waters, ...behindTheSheets, loadedAt: new Date().toISOString(), isStage: true, ...hub };
 };
 
 export const actions: Actions = {

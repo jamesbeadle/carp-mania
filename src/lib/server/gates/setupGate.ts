@@ -8,10 +8,10 @@ const SetupPath = '/setup';
 
 export async function whereSetupSendsYou(locals: App.Locals, ownerId: string, pathname: string): Promise<string | null> {
 	if (isUnderAny(pathname, OpenDuringSetup)) return null;
-	const waters = await loadMyWaters(locals, ownerId);
+	const [waters, currentLakeId] = await Promise.all([loadMyWaters(locals, ownerId), loadCurrentLakeId(locals, ownerId)]);
 	const hasAnOpenWater = waters.some((water) => water.is_setup_complete);
 	if (!hasAnOpenWater) return firstWaterGate(waters.length > 0, pathname);
-	const current = currentWaterOf(waters, await loadCurrentLakeId(locals, ownerId));
+	const current = currentWaterOf(waters, currentLakeId);
 	const isRunningAnUnfinishedWater = current !== null && !current.is_setup_complete && isUnderAny(pathname, RunTheWaterPaths) && !isUnderAny(pathname, OpenOnceTheWaterExists);
 	return isRunningAnUnfinishedWater ? SetupPath : null;
 }

@@ -7,10 +7,16 @@ import { GetLake } from '$lib/server/queries/GetLake';
 import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
 
+const VisitParam = 'visit';
+
 export const load: PageServerLoad = async ({ locals, params, url }) => {
-	const [water, profile, matches] = await Promise.all([GetLake(locals, params.lakeId), loadProfile(locals), GetMatchesAtWater(locals, params.lakeId)]);
-	const visitId = url.searchParams.get('visit');
-	const visit = visitId ? await GetFishingVisit(locals, params.lakeId, visitId) : null;
+	const visitId = url.searchParams.get(VisitParam);
+	const [water, profile, matches, visit] = await Promise.all([
+		GetLake(locals, params.lakeId),
+		loadProfile(locals),
+		GetMatchesAtWater(locals, params.lakeId),
+		visitId ? GetFishingVisit(locals, params.lakeId, visitId) : null
+	]);
 	const isOnTheWater = visit !== null;
 	const bar = isOnTheWater ? await GetTheBar(locals, water.lake) : null;
 	return { water, profile, visit, bar, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };

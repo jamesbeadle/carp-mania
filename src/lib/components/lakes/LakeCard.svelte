@@ -25,7 +25,7 @@
 		<div><dt class="stat-label">Biggest</dt><dd class="text-xl">{formatWeight(summary.heaviestCarpLb)}</dd></div>
 	</dl>
 	<p class="text-sm text-mist-400">
-		Transparency {Math.round(Number(summary.lake.transparency))}% · {summary.lake.has_bailiff ? 'bailiffed' : 'no bailiff'} · {summary.lake.pike_count} pike
+		{summary.swimCount} {summary.swimCount === 1 ? 'peg' : 'pegs'} · transparency {Math.round(Number(summary.lake.transparency))}% · {summary.lake.has_bailiff ? 'bailiffed' : 'no bailiff'} · {summary.lake.pike_count} pike
 		{#if isOnTheGlobe}· <a href={worldUrlForLake(summary.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
 	</p>
 	<div class="mt-auto flex items-center gap-3">

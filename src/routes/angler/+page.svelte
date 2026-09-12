@@ -3,11 +3,16 @@
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
 	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
+	import Pager from '$lib/components/lists/Pager.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
+	import { listPathFor } from '$lib/domain/lists/listPath';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 
 	let { data } = $props();
+
+	const MyAnglerPath = '/angler';
+	const hrefFor = (page: number) => listPathFor(MyAnglerPath, {}, page);
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
@@ -23,7 +28,7 @@
 	<section class="panel">
 		<dl class="mb-6 grid grid-cols-3 gap-3 text-sm">
 			<div><dt class="stat-label">Money</dt><dd class="text-xl">{formatMoney(data.angler.profile.money)}</dd></div>
-			<div><dt class="stat-label">Landed</dt><dd class="text-xl">{data.angler.totalCatches}</dd></div>
+			<div><dt class="stat-label">Landed</dt><dd class="text-xl">{data.angler.catches.total}</dd></div>
 			<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(data.angler.personalBestLb)}</dd></div>
 		</dl>
 		<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
@@ -32,7 +37,8 @@
 	</section>
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>
-		<CatchReportList catches={data.angler.catches} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
+		<CatchReportList catches={data.angler.catches.items} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
+		<Pager page={data.angler.catches} noun="catch" plural="catches" {hrefFor} />
 		<a href="/angler/scrapbook/{data.angler.diary.current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
 	</section>
 	<div class="lg:col-span-2"><TrophyCabinet trophies={data.angler.trophies} /></div>

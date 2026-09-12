@@ -6,8 +6,6 @@ import type { GlobeArc } from '$lib/game/globe/drawArcs';
 import type { GlobePulse } from '$lib/game/globe/drawPulses';
 import { arcFor, liveArcs, livePulses, pulseFor } from './realtimeFeed';
 
-const FeedLength = 50;
-
 export class LiveWorld {
 	feed = $state<WorldActivity[]>([]);
 	arcs = $state<GlobeArc[]>([]);
@@ -23,11 +21,19 @@ export class LiveWorld {
 	}
 
 	receive(event: WorldEvent, now = Date.now()) {
-		if (this.feed.some((activity) => activity.id === event.id)) return;
+		if (this.hasSeen(event.id)) return;
 		const findPin = (lakeId: string) => this.pins.find((pin) => pin.id === lakeId) ?? null;
-		this.feed = [activityFrom(event, findPin), ...this.feed].slice(0, FeedLength);
+		this.feed = [activityFrom(event, findPin), ...this.feed];
 		this.arcs = withNew(liveArcs(this.arcs, now), arcFor(event, findPin, now));
 		this.pulses = withNew(livePulses(this.pulses, now), pulseFor(event, findPin, now));
+	}
+
+	remember(older: WorldActivity[]) {
+		this.feed = [...this.feed, ...older.filter((activity) => !this.hasSeen(activity.id))];
+	}
+
+	private hasSeen(activityId: string) {
+		return this.feed.some((activity) => activity.id === activityId);
 	}
 }
 

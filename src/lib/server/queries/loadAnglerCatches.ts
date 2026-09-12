@@ -1,56 +1,35 @@
 import type { FamousFish } from '$lib/contracts/AnglerPublicProfile';
+import { listPageOf, rangeOf, type ListPage } from '$lib/domain/lists/paging';
 import type { CarpStrain, Catch } from '$lib/domain/types';
 import { loadMemorialNames } from './loadMemorialNames';
 
 const FamousFromFame = 20;
-const FamousFishColumns = 'carp!inner(id, name, strain, weight_lb, fame, lake_id, lakes!carp_lake_id_fkey(name))';
 const PrivateWater = 'A private water';
+const CatchHistoryPageSize = 20;
 
-type CatchOrder = 'weight_lb' | 'caught_at';
-type FamousCatchRow = {
-	carp: { id: string; name: string; strain: CarpStrain; weight_lb: number; fame: number; lake_id: string; lakes: { name: string } | null };
-};
+export type CaughtBy = { angler_id: string } | { fisherman_id: string };
+type FamousFishRow = { id: string; name: string; strain: CarpStrain; weight_lb: number; fame: number; lake_id: string; lake_name: string | null };
 type NamedRow = { id: string; name: string };
 
-export function loadHeaviestCatchesBy(locals: App.Locals, anglerId: string, limit: number) {
-	return loadCatchesBy(locals, anglerId, 'weight_lb', limit);
-}
-
-export function loadLatestCatchesBy(locals: App.Locals, anglerId: string, limit: number) {
-	return loadCatchesBy(locals, anglerId, 'caught_at', limit);
-}
-
-async function loadCatchesBy(locals: App.Locals, anglerId: string, highestFirst: CatchOrder, limit: number): Promise<Catch[]> {
-	const { data: catches } = await locals.supabase
-		.from('catches')
-		.select('*')
-		.eq('angler_id', anglerId)
-		.order(highestFirst, { ascending: false })
-		.limit(limit);
+export async function loadHeaviestCatchesBy(locals: App.Locals, anglerId: string, limit: number): Promise<Catch[]> {
+	const { data: catches } = await locals.supabase.from('catches').select('*').eq('angler_id', anglerId).order('weight_lb', { ascending: false }).limit(limit);
 	return (catches ?? []) as Catch[];
 }
 
+export async function loadCatchHistoryOf(locals: App.Locals, caughtBy: CaughtBy, pageNumber: number): Promise<ListPage<Catch>> {
+	const page = { number: pageNumber, size: CatchHistoryPageSize };
+	const { from, to } = rangeOf(page);
+	const { data, count } = await locals.supabase.from('catches').select('*', { count: 'exact' }).match(caughtBy).order('caught_at', { ascending: false }).order('id').range(from, to);
+	return listPageOf((data ?? []) as Catch[], count ?? 0, page);
+}
+
 export async function loadFamousFishCaughtBy(locals: App.Locals, anglerId: string): Promise<FamousFish[]> {
-	const { data: famousCatches } = await locals.supabase
-		.from('catches')
-		.select(FamousFishColumns)
-		.eq('angler_id', anglerId)
-		.gte('carp.fame', FamousFromFame);
-	const fish = (famousCatches ?? []).map(famousFishFrom);
-	return distinctById(fish).sort(mostFamousFirst);
+	const { data: famousFish } = await locals.supabase.rpc('famous_fish_caught_by', { angler: anglerId, fame_from: FamousFromFame });
+	return ((famousFish ?? []) as FamousFishRow[]).map(famousFishFrom);
 }
 
-function famousFishFrom(row: unknown): FamousFish {
-	const { lakes, ...carp } = (row as FamousCatchRow).carp;
-	return { id: carp.id, name: carp.name, strain: carp.strain, weightLb: Number(carp.weight_lb), fame: carp.fame, lakeId: carp.lake_id, lakeName: lakes?.name ?? PrivateWater };
-}
-
-function distinctById(fish: FamousFish[]) {
-	return [...new Map(fish.map((one) => [one.id, one])).values()];
-}
-
-function mostFamousFirst(first: FamousFish, second: FamousFish) {
-	return second.fame - first.fame;
+function famousFishFrom(fish: FamousFishRow): FamousFish {
+	return { id: fish.id, name: fish.name, strain: fish.strain, weightLb: Number(fish.weight_lb), fame: fish.fame, lakeId: fish.lake_id, lakeName: fish.lake_name ?? PrivateWater };
 }
 
 export async function loadCarpNames(locals: App.Locals, carpIds: (string | null)[]): Promise<Record<string, string>> {

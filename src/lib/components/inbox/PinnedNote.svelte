@@ -4,7 +4,7 @@
 	import { humanise } from '$lib/format/labels';
 	import { PlacePalette as Paint } from '$lib/game/scene/placePalette';
 
-	let { notification, tilt }: { notification: Notification; tilt: number } = $props();
+	let { notification, tilt, markReadAction }: { notification: Notification; tilt: number; markReadAction: string } = $props();
 
 	const isUnread = $derived(notification.read_at === null);
 	const paper = $derived(isUnread ? Paint.Paper : Paint.PaperOld);
@@ -18,7 +18,7 @@
 	<div class="mt-auto flex items-center gap-3 pt-2">
 		<a href={notification.link} class="rounded-md bg-carbon-950 px-3 py-1 font-display text-base font-bold tracking-wide text-mist-100 uppercase italic transition hover:bg-carbon-800 active:scale-95">Open</a>
 		{#if isUnread}
-			<form method="POST" action="?/markRead">
+			<form method="POST" action={markReadAction}>
 				<input type="hidden" name="notificationId" value={notification.id} />
 				<button class="text-sm underline opacity-70 hover:opacity-100">Take it down</button>
 			</form>

@@ -4,6 +4,7 @@ import { GetHallOfFame } from '$lib/server/queries/GetHallOfFame';
 
 const RegionParam = 'region';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-	return { hall: await GetHallOfFame(locals, leaderboardScopeFrom(url.searchParams.get(RegionParam))) };
+export const load: PageServerLoad = ({ locals, url }) => {
+	const scope = leaderboardScopeFrom(url.searchParams.get(RegionParam));
+	return { scope, hall: GetHallOfFame(locals, scope) };
 };

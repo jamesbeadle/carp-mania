@@ -4,27 +4,26 @@ import { overallAnglerSkill } from '$lib/domain/anglerSkills';
 import { diaryAgeOf } from '$lib/domain/legacy/diary';
 import { requireUser } from '../gates/requireUser';
 import { loadLine } from './GetFishermanDiary';
-import { loadCarpNames, loadFamousFishCaughtBy, loadHeaviestCatchesBy, loadLatestCatchesBy } from './loadAnglerCatches';
+import { loadCarpNames, loadCatchHistoryOf, loadFamousFishCaughtBy, loadHeaviestCatchesBy } from './loadAnglerCatches';
 import { loadLakeNames } from './loadCarpHistory';
 import { skillsOf } from './skillsOf';
 
 const PersonalBestLimit = 5;
-const RecentCatchLimit = 20;
 const NoSuchAngler = 'No angler by that name';
 const PublicColumns = 'id, display_name, avatar_url, experience, line_selection, rig_selection, bait_selection, watercraft';
 const WaterColumns = 'id, name, region, acres, reputation, day_ticket_fee';
 
-export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: string): Promise<AnglerPublicProfile> {
+export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: string, pageNumber: number): Promise<AnglerPublicProfile> {
 	const viewer = requireUser(locals);
-	const profile = await loadAngler(locals, anglerId);
-	const [waters, personalBests, recentCatches, famousFish, line] = await Promise.all([
+	const [profile, waters, personalBests, recentCatches, famousFish, line] = await Promise.all([
+		loadAngler(locals, anglerId),
 		loadWatersRunBy(locals, anglerId),
 		loadHeaviestCatchesBy(locals, anglerId, PersonalBestLimit),
-		loadLatestCatchesBy(locals, anglerId, RecentCatchLimit),
+		loadCatchHistoryOf(locals, { angler_id: anglerId }, pageNumber),
 		loadFamousFishCaughtBy(locals, anglerId),
 		loadPlaceInTheLine(locals, anglerId)
 	]);
-	const catches = [...personalBests, ...recentCatches];
+	const catches = [...personalBests, ...recentCatches.items];
 	const [carpNames, lakeNames] = await Promise.all([
 		loadCarpNames(locals, catches.map((caught) => caught.carp_id)),
 		loadLakeNames(locals, catches.map((caught) => caught.lake_id))

@@ -1,5 +1,4 @@
 import type { BestAnglerEntry, BiggestAliveEntry, BiggestEverEntry, TopReputationEntry } from '$lib/contracts/Leaderboards';
-import { overallAnglerSkill } from '$lib/domain/anglerSkills';
 
 const UnknownOwner = 'Unknown owner';
 const UnknownWater = 'An unknown water';
@@ -34,10 +33,7 @@ export interface TopReputationRow {
 export interface BestAnglerRow {
 	id: string;
 	display_name: string;
-	line_selection: number;
-	rig_selection: number;
-	bait_selection: number;
-	watercraft: number;
+	overall_skill: number;
 }
 
 export function biggestAliveEntry(row: BiggestAliveRow): BiggestAliveEntry {
@@ -53,11 +49,5 @@ export function topReputationEntry(row: TopReputationRow): TopReputationEntry {
 }
 
 export function bestAnglerEntry(row: BestAnglerRow): BestAnglerEntry {
-	const skills = {
-		line_selection: Number(row.line_selection),
-		rig_selection: Number(row.rig_selection),
-		bait_selection: Number(row.bait_selection),
-		watercraft: Number(row.watercraft)
-	};
-	return { profileId: row.id, displayName: row.display_name, overallSkill: overallAnglerSkill(skills) };
+	return { profileId: row.id, displayName: row.display_name, overallSkill: Number(row.overall_skill) };
 }

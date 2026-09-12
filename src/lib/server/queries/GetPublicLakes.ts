@@ -1,26 +1,32 @@
+import type { PublicLakeSummary, WatersToFish } from '$lib/contracts/PublicLakeSummary';
+import { listPageOf, rangeOf } from '$lib/domain/lists/paging';
+import { WaterListing, type WaterFilters, type WaterSort } from '$lib/domain/lists/waterFilters';
 import type { Lake } from '$lib/domain/types';
 import { requireUser } from '../gates/requireUser';
-import type { PublicLakeSummary } from '$lib/contracts/PublicLakeSummary';
 
-export async function GetPublicLakes(locals: App.Locals): Promise<PublicLakeSummary[]> {
+type SummaryRow = Lake & { owner_name: string; carp_count: number; heaviest_lb: number; swim_count: number };
+
+const SortOrders: Record<WaterSort, { column: string; ascending: boolean }> = {
+	reputation: { column: 'reputation', ascending: false },
+	biggest: { column: 'heaviest_lb', ascending: false },
+	most_stock: { column: 'carp_count', ascending: false },
+	cheapest: { column: 'day_ticket_fee', ascending: true },
+	newest: { column: 'created_at', ascending: false }
+};
+
+export async function GetPublicLakes(locals: App.Locals, filters: WaterFilters): Promise<WatersToFish> {
 	requireUser(locals);
-	const { data: lakes } = await locals.supabase
-		.from('lakes')
-		.select('*, profiles!lakes_owner_id_fkey(display_name), carp!carp_lake_id_fkey(weight_lb)')
-		.eq('is_public', true)
-		.order('reputation', { ascending: false });
-	return (lakes ?? []).map(summarise);
+	const page = { number: filters.page, size: WaterListing.PageSize };
+	const { from, to } = rangeOf(page);
+	const order = SortOrders[filters.sort];
+	let query = locals.supabase.from('lake_summaries').select('*', { count: 'exact' }).eq('is_public', true).eq('is_setup_complete', true);
+	if (filters.region) query = query.eq('region', filters.region);
+	if (filters.search) query = query.ilike('name', `%${filters.search}%`);
+	const { data, count } = await query.order(order.column, { ascending: order.ascending }).order('id').range(from, to);
+	return { page: listPageOf(((data ?? []) as SummaryRow[]).map(summarise), count ?? 0, page), filters };
 }
 
-type LakeRow = Lake & { profiles: { display_name: string } | null; carp: { weight_lb: number }[] };
-
-function summarise(row: unknown): PublicLakeSummary {
-	const { profiles, carp, ...lake } = row as LakeRow;
-	const weights = carp.map((fish) => Number(fish.weight_lb));
-	return {
-		lake: lake as Lake,
-		ownerName: profiles?.display_name ?? 'Unknown owner',
-		carpCount: weights.length,
-		heaviestCarpLb: weights.length > 0 ? Math.max(...weights) : 0
-	};
+function summarise(row: SummaryRow): PublicLakeSummary {
+	const { owner_name, carp_count, heaviest_lb, swim_count, ...lake } = row;
+	return { lake: lake as Lake, ownerName: owner_name, carpCount: carp_count, heaviestCarpLb: Number(heaviest_lb), swimCount: swim_count };
 }

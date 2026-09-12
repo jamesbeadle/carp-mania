@@ -8,7 +8,9 @@
 	import LiveFeed from '$lib/components/world/LiveFeed.svelte';
 	import PostcardDrawer from '$lib/components/world/PostcardDrawer.svelte';
 	import WorldStage from '$lib/components/world/WorldStage.svelte';
+	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import type { WorldPin } from '$lib/contracts/WorldPin';
+	import { olderFeedPathFor, type FeedGroup } from '$lib/domain/world/feedGroups';
 	import { filterWorldPins, type WorldFilters } from '$lib/domain/world/worldFilters';
 	import { LiveWorld } from '$lib/game/world/liveWorld.svelte';
 	import { subscribeToWorldEvents } from '$lib/game/world/realtimeFeed';
@@ -60,6 +62,13 @@
 		stage.flyTo(pin.latitude, pin.longitude, FlyToZoom);
 	}
 
+	async function loadOlder(before: string, group: FeedGroup | null): Promise<WorldActivity[]> {
+		const response = await fetch(olderFeedPathFor(before, group));
+		const older = response.ok ? ((await response.json()) as WorldActivity[]) : [];
+		live.remember(older);
+		return older;
+	}
+
 	function biggestFishPin() {
 		const [heaviest] = [...data.pins].sort((first, second) => second.heaviestLb - first.heaviestLb);
 		return heaviest ?? null;
@@ -83,7 +92,7 @@
 	</div>
 	<div class="flex min-w-0 flex-col gap-4">
 		<WorldStage bind:this={stage} pins={matches} hasAnyPins={data.pins.length > 0} selectedPinId={selectedLakeId} arcs={live.arcs} pulses={live.pulses} onSelect={select} />
-		<LiveFeed feed={live.feed} onPick={pickLake} />
+		<LiveFeed feed={live.feed} onPick={pickLake} onLoadOlder={loadOlder} />
 	</div>
 	<PostcardDrawer lakeId={selectedLakeId} isFavourite={isSelectedAFavourite} onClose={() => select(null)} />
 </div>

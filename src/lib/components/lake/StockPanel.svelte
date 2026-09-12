@@ -1,11 +1,18 @@
 <script lang="ts">
 	import type { FarmBandStock } from '$lib/contracts/FishFarmStock';
 	import type { Carp, Lake } from '$lib/domain/types';
+	import Skeleton from '../loading/Skeleton.svelte';
 	import DealerPanel from '../market/DealerPanel.svelte';
 	import FishFarmPanel from '../market/FishFarmPanel.svelte';
 	import StockTable from '../StockTable.svelte';
 
-	let { carp, lake, farmStock }: { carp: Carp[]; lake: Lake; farmStock: FarmBandStock[] } = $props();
+	interface Props {
+		carp: Carp[];
+		lake: Lake;
+		farmStock: Promise<FarmBandStock[]>;
+	}
+
+	let { carp, lake, farmStock }: Props = $props();
 
 	const cataloguedCarp = $derived(carp.filter((fish) => fish.is_catalogued));
 </script>
@@ -17,6 +24,12 @@
 </section>
 
 <div class="mt-6 grid gap-6 lg:grid-cols-2">
-	<FishFarmPanel {farmStock} carp={cataloguedCarp} waterAcres={Number(lake.acres)} />
+	{#await farmStock}
+		<Skeleton title="The fish farm" rows={5} />
+	{:then bands}
+		<FishFarmPanel farmStock={bands} carp={cataloguedCarp} waterAcres={Number(lake.acres)} />
+	{:catch}
+		<section class="panel"><p class="text-sm text-mist-400">The fish farm is not answering the phone. Try again in a moment.</p></section>
+	{/await}
 	<DealerPanel carp={cataloguedCarp} />
 </div>

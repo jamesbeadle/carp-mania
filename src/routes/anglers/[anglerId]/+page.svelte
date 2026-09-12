@@ -5,12 +5,15 @@
 	import FamousFish from '$lib/components/angler/FamousFish.svelte';
 	import PersonalBests from '$lib/components/angler/PersonalBests.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
+	import Pager from '$lib/components/lists/Pager.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
+	import { listPathFor } from '$lib/domain/lists/listPath';
 	import { formatWeight } from '$lib/format/weight';
 
 	let { data } = $props();
 
 	const angler = $derived(data.angler);
+	const hrefFor = (page: number) => listPathFor(`/anglers/${angler.profile.id}`, {}, page);
 	const personalBestLb = $derived(angler.personalBests.length > 0 ? Number(angler.personalBests[0].weight_lb) : 0);
 </script>
 
@@ -46,7 +49,8 @@
 		<FamousFish fish={angler.famousFish} />
 	</section>
 	<section class="panel lg:col-span-2">
-		<h2 class="mb-3 text-xl text-volt-300">Recent catches</h2>
-		<CatchReportList catches={angler.recentCatches} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />
+		<h2 class="mb-3 text-xl text-volt-300">Catches</h2>
+		<CatchReportList catches={angler.recentCatches.items} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />
+		<Pager page={angler.recentCatches} noun="catch" plural="catches" {hrefFor} />
 	</section>
 </div>
