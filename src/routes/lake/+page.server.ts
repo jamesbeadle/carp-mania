@@ -10,20 +10,21 @@ import { SellCarpToDealer } from '$lib/server/commands/SellCarpToDealer';
 import { SetDayTicketFee } from '$lib/server/commands/SetDayTicketFee';
 import { SimulateElapsedTime } from '$lib/server/commands/SimulateElapsedTime';
 import { StockPike, StockPikeFood } from '$lib/server/commands/StockPike';
+import { SwitchWater } from '$lib/server/commands/SwitchWater';
 import { loadProfile } from '$lib/server/gates/requireMoney';
 import { GetFishFarmStock } from '$lib/server/queries/GetFishFarmStock';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
 import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
+import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const whileAway = await SimulateElapsedTime(locals);
 	const fishery = await GetMyFishery(locals);
 	const profile = await loadProfile(locals);
 	const farmStock = await GetFishFarmStock(locals, profile.home_region ?? fishery.lake.region);
-	const groundworks = await GetMyGroundworks(locals);
-	const marketActivity = await GetMyMarketActivity(locals);
-	return { fishery, profile, whileAway, farmStock, groundworks, marketActivity, loadedAt: new Date().toISOString() };
+	const [groundworks, marketActivity, waters] = await Promise.all([GetMyGroundworks(locals), GetMyMarketActivity(locals), loadMyWaters(locals, profile.id)]);
+	return { fishery, profile, whileAway, farmStock, groundworks, marketActivity, waters, loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {
@@ -38,5 +39,6 @@ export const actions: Actions = {
 	rename: ({ locals, request }) => request.formData().then((formData) => RenameLake(locals, formData)),
 	cancelWorks: ({ locals, request }) => request.formData().then((formData) => CancelGroundworks(locals, formData)),
 	listForSale: ({ locals, request }) => request.formData().then((formData) => ListCarpForSale(locals, formData)),
-	cancelListing: ({ locals, request }) => request.formData().then((formData) => CancelListing(locals, formData))
+	cancelListing: ({ locals, request }) => request.formData().then((formData) => CancelListing(locals, formData)),
+	switchWater: ({ locals, request }) => request.formData().then((formData) => SwitchWater(locals, formData))
 };

@@ -3,14 +3,15 @@
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
 
-	let { water, anglerName }: { water: AnglerWater | null; anglerName: string } = $props();
+	let { waters, anglerName }: { waters: AnglerWater[]; anglerName: string } = $props();
 
 	const AcresDecimals = 1;
 </script>
 
-<section class="panel">
-	<p class="stat-label">{anglerName}'s water</p>
-	{#if water}
+<section class="panel space-y-6">
+	<p class="stat-label">{anglerName}'s {waters.length > 1 ? 'waters' : 'water'}</p>
+	{#each waters as water (water.id)}
+		<div>
 		<h2 class="mb-4 text-3xl text-volt-300">{water.name}</h2>
 		<dl class="grid grid-cols-3 gap-4 text-sm">
 			<div><dt class="stat-label">Region</dt><dd class="text-mist-100">{RegionCatalogue[water.region].label}</dd></div>
@@ -22,7 +23,9 @@
 			<a href="/lakes/{water.id}" class="button-secondary ml-auto">Look around</a>
 			<a href="/fish/{water.id}" class="button-primary">Fish here</a>
 		</div>
-	{:else}
+		</div>
+	{/each}
+	{#if waters.length === 0}
 		<h2 class="mb-2 text-3xl text-volt-300">No water open to anglers</h2>
 		<p class="text-sm text-mist-400">Either they have not found their water yet, or the gates are closed.</p>
 	{/if}

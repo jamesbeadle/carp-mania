@@ -12,7 +12,8 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0006_the_layout.sql`, `0007_the_works.sql`, `0008_the_world.sql`,
    `0009_the_market.sql`, `0009b_transport.sql`, `0009c_listing.sql`, `0009d_bidding.sql`, `0009e_settling.sql`, `0009f_closing.sql`, `0009g_the_hardened_catch.sql`, `0009h_record_catch.sql`, `0009i_the_visit_seed_and_pins.sql`, `0009j_the_schedules.sql`, `0010_money_moves_in_one_place.sql`,
    `0011_the_memorial.sql`, `0011b_the_owner_on_the_catch.sql`, `0011c_the_hall_of_fame.sql`,
-   `0012_the_generations.sql`, `0012b_the_handover.sql`, `0012c_the_fisherman_on_the_catch.sql`.
+   `0012_the_generations.sql`, `0012b_the_handover.sql`, `0012c_the_fisherman_on_the_catch.sql`,
+   `0013_the_estate.sql`, `0013b_the_current_water_in_the_market.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to your Vercel URL after deploying).

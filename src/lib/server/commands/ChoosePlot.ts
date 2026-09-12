@@ -3,16 +3,17 @@ import { whyPlotIsRefused } from '$lib/domain/world/plotRules';
 import { isRegionCode } from '$lib/domain/world/regionCodes';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { readFormNumber } from '../gates/readFormNumber';
-import { alreadyHasAWater, hasLakeAlready } from '../gates/requireNoLakeYet';
-import { requireUser } from '../gates/requireUser';
+import { loadProfile } from '../gates/requireMoney';
+import { roomForAnotherWater } from '../gates/requireRoomForAnotherWater';
 
 const Latitude = { South: -90, North: 90 } as const;
 const Longitude = { West: -180, East: 180 } as const;
 const NextStep = '/setup?step=2';
 
 export async function ChoosePlot(locals: App.Locals, formData: FormData) {
-	const user = requireUser(locals);
-	if (await hasLakeAlready(locals)) return alreadyHasAWater();
+	const noRoom = await roomForAnotherWater(locals);
+	if (noRoom) return noRoom;
+	const profile = await loadProfile(locals);
 
 	const region = String(formData.get('region') ?? '');
 	if (!isRegionCode(region)) return fail(400, { message: 'Choose a region first' });
@@ -25,7 +26,7 @@ export async function ChoosePlot(locals: App.Locals, formData: FormData) {
 
 	await trustedSupabase()
 		.from('profiles')
-		.update({ home_region: region, plot_latitude: latitude.value, plot_longitude: longitude.value })
-		.eq('id', user.id);
+		.update({ home_region: profile.home_region ?? region, plot_region: region, plot_latitude: latitude.value, plot_longitude: longitude.value })
+		.eq('id', profile.id);
 	redirect(303, NextStep);
 }

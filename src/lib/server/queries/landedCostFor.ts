@@ -2,6 +2,7 @@ import type { LandedCost } from '$lib/contracts/ListingPage';
 import { transportQuote, type LakeOnGlobe } from '$lib/domain/market/transport';
 import type { Listing } from '$lib/domain/marketTypes';
 import type { Lake } from '$lib/domain/types';
+import { loadCurrentWater } from './loadMyWaters';
 
 type LakePin = Pick<Lake, 'id' | 'latitude' | 'longitude' | 'region'>;
 type PinnedLake = LakePin & { latitude: number; longitude: number };
@@ -36,8 +37,8 @@ async function quoteBetween(locals: App.Locals, sellerLake: PinnedLake, myLake: 
 }
 
 async function loadMyLakePin(locals: App.Locals, ownerId: string): Promise<LakePin | null> {
-	const { data: lake } = await locals.supabase.from('lakes').select(PinColumns).eq('owner_id', ownerId).maybeSingle();
-	return lake as LakePin | null;
+	const water = await loadCurrentWater(locals, ownerId);
+	return water ? { id: water.id, latitude: water.latitude, longitude: water.longitude, region: water.region } : null;
 }
 
 async function loadLakePin(locals: App.Locals, lakeId: string): Promise<LakePin | null> {

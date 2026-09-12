@@ -76,7 +76,7 @@ export function runSiteScenarios() {
 	assert.equal(priceOfSite('greenfield', 'uk_ireland', 10), 48000, 'six acres dug');
 	assert.equal(priceOfSite('gravel_pit', 'danube', 20), 26000, 'the Danube pit');
 	historyScenario(stockScenario());
-	const profile = { id: 'owner-1', display_name: 'Ann', home_region: 'france' as const, plot_latitude: 47.1, plot_longitude: 2.3 };
+	const profile = { id: 'owner-1', display_name: 'Ann', home_region: 'france' as const, plot_region: 'france' as const, plot_latitude: 47.1, plot_longitude: 2.3, current_lake_id: null };
 	const lake = newLakeFor({ ...profile, avatar_url: null, money: 100000, line_selection: 25, rig_selection: 25, bait_selection: 25, watercraft: 25, experience: 0, saved_rods: [] }, 'quarry', 15, 'Ann\'s Water', new Date());
 	assert.ok(!lake.is_public && !lake.is_setup_complete && lake.region === 'france' && lake.plot_acres === 15 && lake.acres > 7 && lake.fertility === 12);
 	assert.ok(siteStartsWith('gravel_pit').includes('2 islands') && siteStartsWith('estate_lake').includes('2 named thirties'));

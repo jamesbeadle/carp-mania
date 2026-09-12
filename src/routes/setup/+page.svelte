@@ -11,12 +11,15 @@
 	import { WizardStep } from '$lib/contracts/SetupProgress';
 
 	let { data, form } = $props();
+
+	const isBuyingAnother = $derived(data.progress.openWaters.length > 0);
 </script>
 
 <header class="mb-6 flex flex-wrap items-end gap-6">
 	<div>
-		<p class="stat-label">Carp Mania</p>
-		<h1 class="text-4xl text-volt-300">Find your water</h1>
+		<p class="stat-label">{isBuyingAnother ? 'Your estate' : 'Carp Mania'}</p>
+		<h1 class="text-4xl text-volt-300">{isBuyingAnother ? 'Buy another water' : 'Find your water'}</h1>
+		{#if isBuyingAnother}<a href="/lake" class="text-sm text-surge-400 hover:underline">← Back to {data.progress.openWaters.length === 1 ? data.progress.openWaters[0].name : 'my waters'}</a>{/if}
 	</div>
 	<div class="w-full sm:ml-auto sm:w-96"><BudgetBar moneyLeft={data.progress.moneyLeft} /></div>
 </header>

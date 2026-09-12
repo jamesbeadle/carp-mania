@@ -4,6 +4,7 @@ import { requireUser } from '../gates/requireUser';
 import { loadLakeNames } from './loadCarpHistory';
 import { loadMyBids } from './loadMyBids';
 import { isOpenListing, loadMyListings } from './loadMyListings';
+import { loadCurrentWater } from './loadMyWaters';
 
 const Sale: TransferKind = 'sale';
 const LedgerLimit = 50;
@@ -25,8 +26,8 @@ export async function GetMyMarketActivity(locals: App.Locals): Promise<MyMarketA
 }
 
 async function loadMyLakeId(locals: App.Locals, ownerId: string): Promise<string | null> {
-	const { data: lake } = await locals.supabase.from('lakes').select('id').eq('owner_id', ownerId).maybeSingle();
-	return lake ? (lake as { id: string }).id : null;
+	const water = await loadCurrentWater(locals, ownerId);
+	return water?.id ?? null;
 }
 
 async function loadMySales(locals: App.Locals, lakeId: string | null): Promise<CarpTransfer[]> {

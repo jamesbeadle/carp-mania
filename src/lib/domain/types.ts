@@ -21,8 +21,10 @@ export interface Profile {
 	experience: number;
 	saved_rods: RodSetup[];
 	home_region: RegionCode | null;
+	plot_region: RegionCode | null;
 	plot_latitude: number | null;
 	plot_longitude: number | null;
+	current_lake_id: string | null;
 }
 
 export interface Lake {

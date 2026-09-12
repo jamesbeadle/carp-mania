@@ -17,8 +17,8 @@ const WaterColumns = 'id, name, region, acres, reputation, day_ticket_fee';
 export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: string): Promise<AnglerPublicProfile> {
 	const viewer = requireUser(locals);
 	const profile = await loadAngler(locals, anglerId);
-	const [water, personalBests, recentCatches, famousFish, line] = await Promise.all([
-		loadWaterRunBy(locals, anglerId),
+	const [waters, personalBests, recentCatches, famousFish, line] = await Promise.all([
+		loadWatersRunBy(locals, anglerId),
 		loadHeaviestCatchesBy(locals, anglerId, PersonalBestLimit),
 		loadLatestCatchesBy(locals, anglerId, RecentCatchLimit),
 		loadFamousFishCaughtBy(locals, anglerId),
@@ -33,7 +33,7 @@ export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: strin
 		profile,
 		line,
 		overallSkill: overallAnglerSkill(skillsOf(profile)),
-		water,
+		waters,
 		personalBests,
 		recentCatches,
 		famousFish,
@@ -54,7 +54,7 @@ async function loadAngler(locals: App.Locals, anglerId: string): Promise<PublicA
 	return angler as PublicAngler;
 }
 
-async function loadWaterRunBy(locals: App.Locals, anglerId: string): Promise<AnglerWater | null> {
-	const { data: water } = await locals.supabase.from('lakes').select(WaterColumns).eq('owner_id', anglerId).maybeSingle();
-	return water as AnglerWater | null;
+async function loadWatersRunBy(locals: App.Locals, anglerId: string): Promise<AnglerWater[]> {
+	const { data: waters } = await locals.supabase.from('lakes').select(WaterColumns).eq('owner_id', anglerId).eq('is_public', true).eq('is_setup_complete', true).order('created_at');
+	return (waters ?? []) as AnglerWater[];
 }
