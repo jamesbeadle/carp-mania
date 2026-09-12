@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { clampedStep, WizardStep, type SetupProgress, type SetupStep } from '$lib/contracts/SetupProgress';
+import { hasChosenPlot } from '$lib/domain/sites/chosenPlot';
 import { isRegionCode, type RegionCode } from '$lib/domain/world/regionCodes';
 import { BuyCarpFromFishFarm } from '$lib/server/commands/BuyCarpFromFishFarm';
 import { BuySite } from '$lib/server/commands/BuySite';
@@ -13,14 +14,15 @@ import { GetRegionGuide } from '$lib/server/queries/GetRegionGuide';
 import { GetSetupProgress } from '$lib/server/queries/GetSetupProgress';
 
 const HomeOnceOpen = '/home';
+const AnotherWaterParam = 'another';
 const DefaultRegion: RegionCode = 'uk_ireland';
 const StepPostedTo: Record<string, SetupStep> = { rename: WizardStep.Name, buyFromFarm: WizardStep.Stock, open: WizardStep.OpenTheGates };
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const progress = await GetSetupProgress(locals);
-	if (progress.lake?.is_setup_complete) redirect(303, HomeOnceOpen);
+	if (isNothingLeftToSetUp(progress, url)) redirect(303, HomeOnceOpen);
 	const step = clampedStep(progress, requestedStep(url, progress));
-	const region = regionToGuide(url, progress.profile.home_region);
+	const region = regionToGuide(url, progress.profile.plot_region);
 	const [guide, fishery, farmStock] = await Promise.all([
 		GetRegionGuide(locals, region),
 		progress.lake ? GetMyFishery(locals) : null,
@@ -28,6 +30,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	]);
 	return { progress, step, guide, fishery, farmStock };
 };
+
+function isNothingLeftToSetUp(progress: SetupProgress, url: URL) {
+	const isBuyingAnother = url.searchParams.get(AnotherWaterParam) !== null || hasChosenPlot(progress.profile);
+	return progress.lake === null && progress.openWaters.length > 0 && !isBuyingAnother && postedActionName(url) === '';
+}
 
 function requestedStep(url: URL, progress: SetupProgress) {
 	const explicit = url.searchParams.get('step');

@@ -36,7 +36,7 @@
 		<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
 		<SkillBars profile={angler.profile} />
 	</section>
-	<AnglerWaterCard water={angler.water} anglerName={angler.profile.display_name} />
+	<AnglerWaterCard waters={angler.waters} anglerName={angler.profile.display_name} />
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">Personal bests</h2>
 		<PersonalBests catches={angler.personalBests} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />

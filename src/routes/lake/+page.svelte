@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
+	import EstateSwitcher from '$lib/components/estate/EstateSwitcher.svelte';
 	import LakeCanvas from '$lib/components/LakeCanvas.svelte';
 	import WhileYouWereAway from '$lib/components/home/WhileYouWereAway.svelte';
 	import BailiffPanel from '$lib/components/lake/BailiffPanel.svelte';
@@ -27,6 +28,7 @@
 	});
 </script>
 
+<div class="mb-4"><EstateSwitcher waters={data.waters} currentId={data.fishery.lake.id} returnTo="/lake" /></div>
 <WhileYouWereAway summary={data.whileAway} />
 <ActionMessage {form} />
 

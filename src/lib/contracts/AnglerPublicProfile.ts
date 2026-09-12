@@ -24,7 +24,7 @@ export interface AnglerPublicProfile {
 	profile: PublicAngler;
 	line: PlaceInTheLine | null;
 	overallSkill: number;
-	water: AnglerWater | null;
+	waters: AnglerWater[];
 	personalBests: Catch[];
 	recentCatches: Catch[];
 	famousFish: FamousFish[];

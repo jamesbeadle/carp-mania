@@ -1,15 +1,17 @@
 import { nothingHappened, type WhileYouWereAway } from '$lib/contracts/WhileYouWereAway';
+import { summariseEstate, type WaterSummary } from '$lib/domain/estate/summariseEstate';
 import type { StandingRecords } from '$lib/domain/market/records';
 import { seededRandom } from '$lib/domain/random';
 import { fisheryDaysElapsedSince, FisheryClock, simulatedUntilAfter } from '$lib/domain/simulation/elapsedDays';
 import { simulateOneDay, type DayOutcome } from '$lib/domain/simulation/simulateOneDay';
-import type { Carp, Lake, Swim } from '$lib/domain/types';
+import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 import { seasonFor } from '$lib/domain/world/seasons';
 import type { LakeWork } from '$lib/domain/worldTypes';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { loadProfile } from '../gates/requireMoney';
-import { requireOwnedLake } from '../gates/requireOwnedLake';
+import { requireUser } from '../gates/requireUser';
 import { GetStandingRecords } from '../queries/GetStandingRecords';
+import { loadMyWaters } from '../queries/loadMyWaters';
 import { loadWorksInProgress } from '../queries/loadWorksInProgress';
 import { persistSimulatedDays } from './persistSimulatedDays';
 import { summariseDays } from './summariseDays';
@@ -21,15 +23,22 @@ interface LakeLife {
 }
 
 export async function SimulateElapsedTime(locals: App.Locals): Promise<WhileYouWereAway> {
-	const lake = await requireOwnedLake(locals);
-	const daysToSimulate = fisheryDaysElapsedSince(lake.simulated_until, new Date());
-	if (daysToSimulate === 0 || !lake.is_setup_complete) return nothingHappened();
+	const user = requireUser(locals);
+	const openWaters = (await loadMyWaters(locals, user.id)).filter((water) => water.is_setup_complete);
+	if (openWaters.length === 0) return nothingHappened();
+	const profile = await loadProfile(locals);
+	const summaries: WaterSummary[] = [];
+	for (const lake of openWaters) summaries.push({ waterName: lake.name, summary: await simulateWater(locals, lake, profile) });
+	return summariseEstate(summaries);
+}
 
+async function simulateWater(locals: App.Locals, lake: Lake, profile: Profile): Promise<WhileYouWereAway> {
+	const daysToSimulate = fisheryDaysElapsedSince(lake.simulated_until, new Date());
+	if (daysToSimulate === 0) return nothingHappened();
 	const trusted = trustedSupabase();
 	const [life, records] = await Promise.all([loadLakeLife(locals, lake), GetStandingRecords(trusted, lake)]);
 	const outcomes = runDays(lake, life, daysToSimulate, records);
 	const finalLake = { ...outcomes[outcomes.length - 1].lake, simulated_until: simulatedUntilAfter(lake.simulated_until, daysToSimulate) };
-	const profile = await loadProfile(locals);
 	await persistSimulatedDays(trusted, finalLake, outcomes, profile);
 	return summariseDays(outcomes);
 }

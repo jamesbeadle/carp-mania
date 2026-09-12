@@ -70,6 +70,7 @@
 	marketWatch={data.marketWatch}
 	worldFeed={data.worldFeed}
 	loadedAt={data.loadedAt}
+	waters={data.waters}
 />
 <BailiffNote summary={data.whileAway} isOpen={isNoteOpen} onClose={close} />
 <LastCastSheet diary={data.diary} lakeName={lake.name} failure={form?.message ?? null} isOpen={isLastCastOpen} onClose={close} />

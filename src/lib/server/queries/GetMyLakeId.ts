@@ -1,7 +1,8 @@
 import { requireUser } from '../gates/requireUser';
+import { loadCurrentWater } from './loadMyWaters';
 
 export async function GetMyLakeId(locals: App.Locals): Promise<string | null> {
 	const user = requireUser(locals);
-	const { data: lake } = await locals.supabase.from('lakes').select('id').eq('owner_id', user.id).maybeSingle();
-	return (lake as { id: string } | null)?.id ?? null;
+	const water = await loadCurrentWater(locals, user.id);
+	return water?.id ?? null;
 }

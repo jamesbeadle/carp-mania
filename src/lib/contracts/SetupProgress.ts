@@ -18,6 +18,7 @@ export interface SetupProgress {
 	profile: Profile;
 	lake: Lake | null;
 	moneyLeft: number;
+	openWaters: Lake[];
 }
 
 export function reachableSteps(progress: Pick<SetupProgress, 'step' | 'lake'>): SetupStep[] {
