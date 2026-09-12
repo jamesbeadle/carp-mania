@@ -1,13 +1,16 @@
 <script lang="ts">
 	import type { FishingVisit } from '$lib/contracts/FishingVisit';
+	import type { TheBar } from '$lib/domain/fishing/honours';
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
-	import { BiteAlarm } from '$lib/game/session/biteAlarm';
+	import { bringTheFishIn, castTheNextRod, strikeAtTheBite } from '$lib/game/session/anglerActions';
+	import { buzzForBite } from '$lib/game/session/haptics';
 	import { reportLandedFish } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { quarterHourOf, sessionConditionsFor } from '$lib/game/session/sessionConditions';
-	import { castRod, chooseSwim, finishFight, nextRodToCast, returnToFishing, strike, tackleUp } from '$lib/game/session/sessionFlow';
+	import { chooseSwim, returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
+	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { watchFishShowing } from '$lib/game/session/showingFish';
 	import { startTicking } from '$lib/game/session/tickSession';
@@ -26,13 +29,13 @@
 		carp: Carp[];
 		profile: Profile;
 		visit: FishingVisit;
+		bar: TheBar;
 		matchBoardHref?: string | null;
 	}
 
-	let { lake, swims, carp, profile, visit, matchBoardHref = null }: Props = $props();
+	let { lake, swims, carp, profile, visit, bar, matchBoardHref = null }: Props = $props();
 
-	const session = new SessionState(lake, carp, profile, visit);
-	const alarm = new BiteAlarm();
+	const session = new SessionState(lake, carp, profile, visit, bar);
 	let isCatchSaved = $state<boolean | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
@@ -40,30 +43,28 @@
 	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 
 	$effect(() => startTicking(session));
-	$effect(() => watchFishShowing(lake, session.carp, session.season, (spots) => (showingAt = spots)));
-	$effect(() => alarm.follow(session.bite !== null));
-	$effect(() => void (alarm.isMuted = isAlarmMuted));
+	$effect(() => watchFishShowing(lake, session.carp, session.season, showFish));
+	$effect(() => followTheBiteAlarm(session.bite !== null, isAlarmMuted));
+	$effect(() => void (session.bite && buzzForBite()));
 	$effect(() => sound.startAmbience(ambientSceneFor(conditions)));
 	$effect(() => () => sound.stopAmbience());
+	$effect(() => quietTheBank);
+
+	function showFish(spots: LayoutPoint[]) {
+		showingAt = spots;
+		if (spots.length > 0) sound.play('rise');
+	}
 
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);
 		rememberRodSetups(lake.id, setups);
 	}
 
-	function handleWaterClick(point: { x: number; y: number }) {
-		if (session.phase !== 'fishing') return;
-		alarm.arm();
-		const rod = nextRodToCast(session);
-		if (!rod) return (session.notice = 'All rods are out. Wait for a bite.');
-		castRod(session, rod.index, point);
-	}
-
 	async function handleFightFinished() {
-		finishFight(session);
-		if (!session.lastLanded) return;
+		const landed = bringTheFishIn(session);
+		if (!landed) return;
 		isCatchSaved = null;
-		isCatchSaved = await reportLandedFish(lake.id, visit.id, profile, session.lastLanded);
+		isCatchSaved = await reportLandedFish(lake.id, visit.id, profile, landed);
 	}
 </script>
 
@@ -82,9 +83,9 @@
 		{showingAt}
 		{isCatchSaved}
 		onSwimClick={(swim) => session.phase === 'choose_swim' && chooseSwim(session, swim)}
-		onWaterClick={handleWaterClick}
+		onWaterClick={(point) => castTheNextRod(session, point)}
 		onCastBlockedByIsland={() => (session.notice = "You can't cast through the island — pick a spot with a clear line from your swim.")}
-		onStrike={() => strike(session)}
+		onStrike={() => strikeAtTheBite(session)}
 		onFightFinished={handleFightFinished}
 		onContinue={() => returnToFishing(session)}
 	>

@@ -1,5 +1,6 @@
 import type { CatchReport, SkillGains } from '$lib/contracts/CatchReport';
 import { skillGainFromCatch } from '$lib/domain/anglerSkills';
+import type { Honours } from '$lib/domain/fishing/honours';
 import type { TackleMatch } from '$lib/domain/fishing/tackleMatch';
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { Terrain } from '$lib/domain/layout/terrainAt';
@@ -18,9 +19,10 @@ export interface LandedFish {
 	setup: RodSetup;
 	match: TackleMatch;
 	hour: number;
+	honours: Honours;
 }
 
-export function landedFishFor(lake: Lake, swim: Swim, carp: Carp, rod: CastRod, bite: RolledBite, hourOnTheMat: number): LandedFish {
+export function landedFishFor(lake: Lake, swim: Swim, carp: Carp, rod: CastRod, bite: RolledBite, hourOnTheMat: number, honours: Honours): LandedFish {
 	return {
 		carp,
 		swim,
@@ -30,7 +32,8 @@ export function landedFishFor(lake: Lake, swim: Swim, carp: Carp, rod: CastRod, 
 		biteHour: bite.hour,
 		setup: rod.setup,
 		match: tackleMatchFor(lake, rod),
-		hour: hourOnTheMat
+		hour: hourOnTheMat,
+		honours
 	};
 }
 

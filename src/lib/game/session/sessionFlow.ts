@@ -1,4 +1,5 @@
 import { castTerrainFor } from '$lib/domain/fishing/castTerrain';
+import { honoursFor, raiseTheBar } from '$lib/domain/fishing/honours';
 import { carpThatTookTheBait } from '$lib/domain/fishing/whoTookTheBait';
 import { HookHoldChance } from '$lib/domain/tackle/hooks';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
@@ -58,7 +59,9 @@ export function finishFight(session: SessionState) {
 	session.hooked = null;
 	if (fight.outcome === 'snapped') return dropTheFish(session, rod.index, 'Crack — the line snapped. Ease off when it runs.');
 	if (fight.outcome === 'hook_pulled') return dropTheFish(session, rod.index, 'Slack line and the hook fell out. Keep it tight.');
-	session.lastLanded = landedFishFor(session.lake, session.swim, fight.carp, rod, hooked, session.hour);
+	const weightLb = Number(fight.carp.weight_lb);
+	session.lastLanded = landedFishFor(session.lake, session.swim, fight.carp, rod, hooked, session.hour, honoursFor(weightLb, session.bar));
+	session.bar = raiseTheBar(weightLb, session.bar);
 	session.landedToday = [...session.landedToday, session.lastLanded];
 	bringRodIn(rod);
 	session.phase = 'landed';

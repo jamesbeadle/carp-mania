@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { TensionBand } from '$lib/domain/fishing/fight';
 	import type { FightState } from '$lib/game/session/fightState.svelte';
+	import { buzzForARun } from '$lib/game/session/haptics';
+	import { followTheFight } from '$lib/game/session/sessionSounds';
 	import { formatWeight } from '$lib/format/weight';
 
 	let { fight, onFinished }: { fight: FightState; onFinished: () => void } = $props();
@@ -18,6 +20,10 @@
 		handle = requestAnimationFrame(frame);
 		return () => cancelAnimationFrame(handle);
 	});
+
+	$effect(() => followTheFight(fight.isReeling, fight.isRunning));
+	$effect(() => void (fight.isRunning && buzzForARun()));
+	$effect(() => () => followTheFight(false, false));
 
 	const startReeling = () => (fight.isReeling = true);
 	const stopReeling = () => (fight.isReeling = false);

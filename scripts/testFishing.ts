@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { honourKindsOf, honoursFor, isARecord, raiseTheBar } from '../src/lib/domain/fishing/honours';
 import { pickCarpThatTookTheBait, sameChanceForEveryFish } from '../src/lib/domain/fishing/pickCarp';
 import { favouriteSpotOf, FavouriteSpotBiteBonus } from '../src/lib/domain/layout/favouriteFeature';
 import { seededRandom } from '../src/lib/domain/random';
@@ -9,6 +10,7 @@ import { runBiteRollScenarios } from './testBiteRoll';
 const TakesToSample = 4000;
 
 export function runFishingScenarios() {
+	runHonourScenarios();
 	const random = seededRandom(11);
 	const lake: Lake = { id: 'lake-fishing', ...classicLake('owner-1', 'Bonus Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, random).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
@@ -35,4 +37,16 @@ function shareOfTakes(carp: Carp[], isCounted: (fish: Carp) => boolean, bonusFor
 		if (taker && isCounted(taker)) counted += 1;
 	}
 	return counted / TakesToSample;
+}
+
+function runHonourScenarios() {
+	const bar = { standing: { lakeRecordLb: 20, regionRecordLb: 30, worldRecordLb: 50 }, personalBestLb: 12 };
+	assert.deepEqual(honourKindsOf(honoursFor(10, bar)), [], 'a small fish earns nothing');
+	assert.deepEqual(honourKindsOf(honoursFor(15, bar)), ['personal_best'], 'beating your own best is an honour');
+	assert.deepEqual(honourKindsOf(honoursFor(31, bar)), ['region_record', 'lake_record', 'personal_best'], 'a region record is a lake record and a personal best too, biggest first');
+	assert.equal(isARecord(honoursFor(15, bar)), false);
+	assert.equal(isARecord(honoursFor(21, bar)), true);
+	const raised = raiseTheBar(31, bar);
+	assert.deepEqual(raised, { standing: { lakeRecordLb: 31, regionRecordLb: 31, worldRecordLb: 50 }, personalBestLb: 31 }, 'the bar rises to the fish');
+	assert.deepEqual(honourKindsOf(honoursFor(31, raised)), [], 'the same weight again is no longer an honour');
 }

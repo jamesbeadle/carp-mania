@@ -10,14 +10,26 @@
 	import type { Lake } from '$lib/domain/types';
 	import { humanise } from '$lib/format/labels';
 
-	let { setup = $bindable(), rodNumber, lake, terrain, isShowingHints }: { setup: RodSetup; rodNumber: number; lake: Lake; terrain: Terrain; isShowingHints: boolean } = $props();
+	interface Props {
+		setup: RodSetup;
+		rodNumber: number;
+		lake: Lake;
+		terrain: Terrain;
+		isShowingHints: boolean;
+		onCopyToEveryRod: (() => void) | null;
+	}
+
+	let { setup = $bindable(), rodNumber, lake, terrain, isShowingHints, onCopyToEveryRod }: Props = $props();
 
 	const match = $derived(matchTackleToWater(setup, lake, terrain));
 	const percent = (score: number) => `${Math.round(score * 100)}%`;
 </script>
 
 <section class="panel space-y-3">
-	<h3 class="text-lg text-volt-300">Rod {rodNumber}</h3>
+	<div class="flex items-baseline gap-3">
+		<h3 class="text-lg text-volt-300">Rod {rodNumber}</h3>
+		{#if onCopyToEveryRod}<button type="button" class="ml-auto text-xs text-surge-400 hover:underline" onclick={onCopyToEveryRod}>Same on every rod</button>{/if}
+	</div>
 	<div class="grid grid-cols-2 gap-2">
 		<label><span class="stat-label">Line colour</span>
 			<select bind:value={setup.line.colour} class="field">{#each LineColours as colour (colour)}<option value={colour}>{LineColourLabels[colour]}</option>{/each}</select></label>

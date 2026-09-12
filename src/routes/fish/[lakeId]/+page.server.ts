@@ -5,13 +5,15 @@ import { loadProfile } from '$lib/server/gates/requireMoney';
 import { GetFishingVisit } from '$lib/server/queries/GetFishingVisit';
 import { GetLake } from '$lib/server/queries/GetLake';
 import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
+import { GetTheBar } from '$lib/server/queries/GetTheBar';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const [water, profile, matches] = await Promise.all([GetLake(locals, params.lakeId), loadProfile(locals), GetMatchesAtWater(locals, params.lakeId)]);
 	const visitId = url.searchParams.get('visit');
 	const visit = visitId ? await GetFishingVisit(locals, params.lakeId, visitId) : null;
 	const isOnTheWater = visit !== null;
-	return { water, profile, visit, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
+	const bar = isOnTheWater ? await GetTheBar(locals, water.lake) : null;
+	return { water, profile, visit, bar, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {

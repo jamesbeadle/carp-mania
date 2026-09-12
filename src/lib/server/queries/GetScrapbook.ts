@@ -6,6 +6,7 @@ import { requireUser } from '../gates/requireUser';
 import { loadFisherman } from './GetFishermanDiary';
 import { loadCarpNames } from './loadAnglerCatches';
 import { loadLakeNames } from './loadCarpHistory';
+import { loadPersonalBestOf } from './loadPersonalBest';
 import { loadStillSwimming } from './loadStillSwimming';
 import { loadTrophiesOf } from './loadTrophies';
 
@@ -37,11 +38,6 @@ export async function GetScrapbook(locals: App.Locals, fishermanId: string): Pro
 async function loadCatchesOf(locals: App.Locals, fishermanId: string) {
 	const { data, count } = await locals.supabase.from('catches').select('*', { count: 'exact' }).eq('fisherman_id', fishermanId).order('caught_at', { ascending: false }).limit(ScrapbookLength);
 	return { catches: (data ?? []) as Catch[], totalCatches: count ?? 0 };
-}
-
-async function loadPersonalBestOf(locals: App.Locals, fishermanId: string) {
-	const { data } = await locals.supabase.from('catches').select('weight_lb').eq('fisherman_id', fishermanId).order('weight_lb', { ascending: false }).limit(1).maybeSingle();
-	return data ? Number((data as { weight_lb: number }).weight_lb) : 0;
 }
 
 function fishKnownFrom(catches: Catch[], carpNames: Record<string, string>, stillSwimming: Set<string>): KnownFish[] {
