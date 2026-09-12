@@ -16,7 +16,7 @@ import { isFishable } from './lapseTransfers';
 
 const GoodAnglerCatchesPerDay = 19;
 
-export type NewCatch = Omit<Catch, 'id' | 'caught_at'>;
+export type NewCatch = Omit<Catch, 'id' | 'caught_at' | 'owner_name'>;
 export type NewVisit = Omit<LakeVisit, 'id' | 'visited_at'>;
 
 export interface AnglerDay {

@@ -10,7 +10,8 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0001_tables.sql`, `0002_policies.sql`, `0003_functions.sql`, `0004_saved_rods.sql`,
    `0005_the_money_once.sql` (run it exactly once: it gifts every existing player £95,000), `0005b_the_fish.sql`, `0005c_trusted_writes.sql`, `0005d_the_guide_price.sql`, `0005e_the_farm_order_checks.sql`, `0005f_the_fish_farm.sql`, `0005g_the_dealer.sql`,
    `0006_the_layout.sql`, `0007_the_works.sql`, `0008_the_world.sql`,
-   `0009_the_market.sql`, `0009b_transport.sql`, `0009c_listing.sql`, `0009d_bidding.sql`, `0009e_settling.sql`, `0009f_closing.sql`, `0009g_the_hardened_catch.sql`, `0009h_record_catch.sql`, `0009i_the_visit_seed_and_pins.sql`, `0009j_the_schedules.sql`, `0010_money_moves_in_one_place.sql`.
+   `0009_the_market.sql`, `0009b_transport.sql`, `0009c_listing.sql`, `0009d_bidding.sql`, `0009e_settling.sql`, `0009f_closing.sql`, `0009g_the_hardened_catch.sql`, `0009h_record_catch.sql`, `0009i_the_visit_seed_and_pins.sql`, `0009j_the_schedules.sql`, `0010_money_moves_in_one_place.sql`,
+   `0011_the_memorial.sql`, `0011b_the_owner_on_the_catch.sql`, `0011c_the_hall_of_fame.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to your Vercel URL after deploying).

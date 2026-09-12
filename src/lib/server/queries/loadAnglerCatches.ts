@@ -1,5 +1,6 @@
 import type { FamousFish } from '$lib/contracts/AnglerPublicProfile';
 import type { CarpStrain, Catch } from '$lib/domain/types';
+import { loadMemorialNames } from './loadMemorialNames';
 
 const FamousFromFame = 20;
 const FamousFishColumns = 'carp!inner(id, name, strain, weight_lb, fame, lake_id, lakes!carp_lake_id_fkey(name))';
@@ -56,5 +57,7 @@ export async function loadCarpNames(locals: App.Locals, carpIds: (string | null)
 	const distinctIds = [...new Set(carpIds.filter((carpId): carpId is string => Boolean(carpId)))];
 	if (distinctIds.length === 0) return {};
 	const { data: carp } = await locals.supabase.from('carp').select('id, name').in('id', distinctIds);
-	return Object.fromEntries(((carp ?? []) as NamedRow[]).map((fish) => [fish.id, fish.name]));
+	const living = Object.fromEntries(((carp ?? []) as NamedRow[]).map((fish) => [fish.id, fish.name]));
+	const remembered = await loadMemorialNames(locals, distinctIds.filter((carpId) => !(carpId in living)));
+	return { ...remembered, ...living };
 }

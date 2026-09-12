@@ -10,6 +10,7 @@ import { ClassicSwims, classicCarp, classicLake, classicSwims } from '../src/lib
 import { defaultRodSetup } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake, Swim } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
+import { runAgeingScenarios } from './testAgeing';
 import { runFishingScenarios } from './testFishing';
 import { runGroundworksScenarios } from './testGroundworks';
 import { runMarketScenarios } from './testMarket';
@@ -68,6 +69,7 @@ runFishingScenarios();
 runMarketScenarios();
 runWorldScenarios();
 runSpawningScenarios();
+runAgeingScenarios();
 runGroundworksScenarios();
 runSiteScenarios();
 console.log('domain tests passed');

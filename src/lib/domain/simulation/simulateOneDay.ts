@@ -31,6 +31,7 @@ export interface DayOutcome {
 	catches: NewCatch[];
 	visits: NewVisit[];
 	carpTakenByPike: Carp[];
+	carpDiedOfOldAge: Carp[];
 	arrivedCarp: Carp[];
 	carpOutOfQuarantine: Carp[];
 	feesCollected: number;
@@ -52,15 +53,16 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const anglers = simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, context.season, context.records);
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
-	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd);
-	const spawned = isFirstDayOfSpring(context.dayStart, context.dayEnd, hunted.lake.latitude) ? spawnFry(hunted.lake, aged, random) : [];
+	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd, random);
+	const spawned = isFirstDayOfSpring(context.dayStart, context.dayEnd, hunted.lake.latitude) ? spawnFry(hunted.lake, aged.carp, random) : [];
 
 	return {
 		lake: { ...hunted.lake, reputation: reputationAfterDay(hunted.lake, anglers.catches) },
-		carp: aged,
+		carp: aged.carp,
 		catches: anglers.catches,
 		visits: anglers.visits,
 		carpTakenByPike: hunted.carpTakenByPike,
+		carpDiedOfOldAge: aged.diedOfOldAge,
 		arrivedCarp: lapsed.arrived,
 		carpOutOfQuarantine: lapsed.outOfQuarantine,
 		feesCollected: anglers.visits.reduce((total, visit) => total + visit.fee_paid, 0),

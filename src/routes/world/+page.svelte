@@ -70,7 +70,8 @@
 		<h1 class="text-4xl text-volt-300">The world</h1>
 		<p class="text-mist-400">Every open water in the game, pinned where it is. Spin, zoom, click a pin.</p>
 	</div>
-	<button class="button-secondary ml-auto text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
+	<a href="/world/hall-of-fame" class="button-secondary ml-auto text-base">Hall of fame</a>
+	<button class="button-secondary text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
 </div>
 
 <div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)_20rem]">
