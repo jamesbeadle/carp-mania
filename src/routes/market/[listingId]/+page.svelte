@@ -21,6 +21,9 @@
 	});
 </script>
 
+<svelte:head><title>{data.listingPage.dossier.carp.name} for sale · Carp Mania</title></svelte:head>
+
+<p class="mb-4"><a href="/market" class="text-sm text-surge-400 hover:underline">← Back to the tackle shop</a></p>
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">

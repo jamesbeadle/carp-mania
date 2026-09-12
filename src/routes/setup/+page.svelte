@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
+	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import BudgetBar from '$lib/components/setup/BudgetBar.svelte';
 	import NameStep from '$lib/components/setup/NameStep.svelte';
 	import OpenTheGatesStep from '$lib/components/setup/OpenTheGatesStep.svelte';
@@ -9,20 +10,24 @@
 	import SurveyStep from '$lib/components/setup/SurveyStep.svelte';
 	import WhereStep from '$lib/components/setup/WhereStep.svelte';
 	import { WizardStep } from '$lib/contracts/SetupProgress';
+	import { AnotherWaterStory, SetupStory } from '$lib/game/setup/setupStory';
 
 	let { data, form } = $props();
 
 	const isBuyingAnother = $derived(data.progress.openWaters.length > 0);
+	const chapter = $derived(isBuyingAnother && data.step === WizardStep.ChoosePlot ? AnotherWaterStory : SetupStory[data.step]);
+	const backWords = $derived(data.progress.openWaters.length === 1 ? data.progress.openWaters[0].name : 'my waters');
 </script>
 
-<header class="mb-6 flex flex-wrap items-end gap-6">
-	<div>
-		<p class="stat-label">{isBuyingAnother ? 'Your estate' : 'Carp Mania'}</p>
-		<h1 class="text-4xl text-volt-300">{isBuyingAnother ? 'Buy another water' : 'Find your water'}</h1>
-		{#if isBuyingAnother}<a href="/lake" class="text-sm text-surge-400 hover:underline">← Back to {data.progress.openWaters.length === 1 ? data.progress.openWaters[0].name : 'my waters'}</a>{/if}
-	</div>
-	<div class="w-full sm:ml-auto sm:w-96"><BudgetBar moneyLeft={data.progress.moneyLeft} /></div>
-</header>
+<svelte:head><title>{isBuyingAnother ? 'Buy another water' : 'Find your water'} · Carp Mania</title></svelte:head>
+
+<PlaceBanner kind="office" title={isBuyingAnother ? 'Buy another water' : 'Find your water'} blurb={chapter.line} words={chapter.sign} skyOver={data.progress.lake}>
+	{#snippet aside()}<p class="stat-label text-mist-100/90">{chapter.heading}</p>{/snippet}
+	{#snippet actions()}
+		<div class="w-full sm:w-80"><BudgetBar moneyLeft={data.progress.moneyLeft} /></div>
+		{#if isBuyingAnother}<a href="/lake" class="button-secondary text-base">← {backWords}</a>{/if}
+	{/snippet}
+</PlaceBanner>
 
 <StepRail current={data.step} progress={data.progress} />
 <ActionMessage {form} />
