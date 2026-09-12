@@ -1,3 +1,3 @@
-import { bankStretchTool } from './bankStretchTool';
+import { drawnShapeTool } from './drawnShapeTool';
 
-export const shelfTool = bankStretchTool((points) => ({ kind: 'margin_shelf', points, bed: 'gravel' }));
+export const shelfTool = drawnShapeTool((points) => ({ kind: 'margin_shelf', points, bed: 'gravel' }));

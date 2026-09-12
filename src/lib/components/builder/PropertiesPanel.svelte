@@ -5,6 +5,7 @@
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
 	import { ToolCatalogue } from '$lib/game/builder/toolCatalogue';
 	import DraftControls from './DraftControls.svelte';
+	import DrawingControls from './DrawingControls.svelte';
 	import FacilityPicker from './FacilityPicker.svelte';
 	import LandPanel from './LandPanel.svelte';
 	import NewSwimPanel from './NewSwimPanel.svelte';
@@ -40,6 +41,7 @@
 	{#if builder.tool === 'land'}<LandPanel {lake} {hasEarthworksInProgress} />{/if}
 	{#if builder.tool === 'swim' && builder.swimPoint}<NewSwimPanel {lake} {swims} point={builder.swimPoint} />{/if}
 	{#if builder.tool === 'select' && selectedSwim}<SelectedSwimPanel {lake} {swims} swim={selectedSwim} movePoint={builder.swimPoint} />{/if}
+	{#if builder.isDrawing}<DrawingControls {builder} />{/if}
 	{#if builder.draft}<DraftControls {builder} />{/if}
 	{#if builder.draft && quote}<QuotePanel {builder} {quote} money={Number(profile.money)} />{/if}
 </aside>

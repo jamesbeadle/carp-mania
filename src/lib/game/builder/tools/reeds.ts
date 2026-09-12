@@ -1,3 +1,3 @@
-import { bankStretchTool } from './bankStretchTool';
+import { drawnShapeTool } from './drawnShapeTool';
 
-export const reedsTool = bankStretchTool((points) => ({ kind: 'reed_bed', points }));
+export const reedsTool = drawnShapeTool((points) => ({ kind: 'reed_bed', points }));

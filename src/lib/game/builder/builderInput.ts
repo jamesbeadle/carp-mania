@@ -28,12 +28,17 @@ export function createPointerGestures(handlers: PointerGestureHandlers) {
 		handlers.onDrag(point);
 	}
 
-	function up(point: LayoutPoint) {
+	function up(point: LayoutPoint, clickCount = 1) {
 		if (!pressedAt) return;
-		const finish = isDragging ? handlers.onDragEnd : handlers.onClick;
-		finish(point);
+		releaseHandlerFor(clickCount)?.(point);
 		pressedAt = null;
 		isDragging = false;
+	}
+
+	function releaseHandlerFor(clickCount: number) {
+		if (isDragging) return handlers.onDragEnd;
+		const isSecondClickOfADoubleClick = clickCount > 1;
+		return isSecondClickOfADoubleClick ? null : handlers.onClick;
 	}
 
 	return {

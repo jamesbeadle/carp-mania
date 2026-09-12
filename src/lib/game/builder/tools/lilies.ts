@@ -1,3 +1,3 @@
-import { areaTool } from './areaTool';
+import { drawnShapeTool } from './drawnShapeTool';
 
-export const liliesTool = areaTool((points) => ({ kind: 'lily_pads', points }));
+export const liliesTool = drawnShapeTool((points) => ({ kind: 'lily_pads', points }));
