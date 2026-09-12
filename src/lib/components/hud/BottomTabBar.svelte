@@ -5,7 +5,7 @@
 	let { pathname }: { pathname: string } = $props();
 </script>
 
-<nav class="tab-bar sticky bottom-0 z-30 grid grid-cols-5 border-t border-carbon-700 bg-carbon-950/92 backdrop-blur lg:hidden" aria-label="Main">
+<nav class="tab-bar sticky bottom-0 z-30 grid grid-cols-5 border-t border-carbon-700 bg-carbon-950/92 backdrop-blur lg:hidden" aria-label="Main" data-sveltekit-preload-data="tap">
 	{#each MainTabs as tab (tab.id)}
 		{@const isCurrent = isTabCurrent(tab, pathname)}
 		<a

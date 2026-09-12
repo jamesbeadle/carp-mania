@@ -3,6 +3,9 @@ import { isRegionCode, type RegionCode } from '$lib/domain/world/regionCodes';
 export const WorldScope = 'world';
 export type LeaderboardScope = RegionCode | typeof WorldScope;
 
+export const BoardLengths = [10, 25, 50] as const;
+export type BoardLength = (typeof BoardLengths)[number];
+
 export interface BiggestAliveEntry {
 	carpId: string;
 	name: string;
@@ -42,4 +45,13 @@ export interface Leaderboards {
 export function leaderboardScopeFrom(requested: string | null): LeaderboardScope {
 	if (requested && isRegionCode(requested)) return requested;
 	return WorldScope;
+}
+
+export function boardLengthFrom(requested: string | null): BoardLength {
+	const wanted = Number(requested);
+	return BoardLengths.find((length) => length === wanted) ?? BoardLengths[0];
+}
+
+export function leaderboardsPathFor(scope: LeaderboardScope, top: BoardLength) {
+	return `/world/leaderboards?region=${scope}&top=${top}`;
 }

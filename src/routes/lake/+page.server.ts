@@ -12,6 +12,7 @@ import { SimulateElapsedTime } from '$lib/server/commands/SimulateElapsedTime';
 import { StockPike, StockPikeFood } from '$lib/server/commands/StockPike';
 import { SwitchWater } from '$lib/server/commands/SwitchWater';
 import { loadProfile } from '$lib/server/gates/requireMoney';
+import { requireUser } from '$lib/server/gates/requireUser';
 import { GetFishFarmStock } from '$lib/server/queries/GetFishFarmStock';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
@@ -19,11 +20,12 @@ import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
+	const user = requireUser(locals);
 	const whileAway = await SimulateElapsedTime(locals);
-	const fishery = await GetMyFishery(locals);
-	const profile = await loadProfile(locals);
-	const farmStock = await GetFishFarmStock(locals, profile.home_region ?? fishery.lake.region);
-	const [groundworks, marketActivity, waters] = await Promise.all([GetMyGroundworks(locals), GetMyMarketActivity(locals), loadMyWaters(locals, profile.id)]);
+	const [fishery, profile, groundworks, marketActivity, waters] = await Promise.all([
+		GetMyFishery(locals), loadProfile(locals), GetMyGroundworks(locals), GetMyMarketActivity(locals), loadMyWaters(locals, user.id)
+	]);
+	const farmStock = GetFishFarmStock(locals, profile.home_region ?? fishery.lake.region);
 	return { fishery, profile, whileAway, farmStock, groundworks, marketActivity, waters, loadedAt: new Date().toISOString() };
 };
 

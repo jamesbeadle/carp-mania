@@ -1,19 +1,21 @@
+import { InboxListing, type InboxFilters } from '$lib/domain/lists/inboxFilters';
+import { listPageOf, rangeOf, type ListPage } from '$lib/domain/lists/paging';
 import type { Notification } from '$lib/domain/worldTypes';
 import { requireUser } from '../gates/requireUser';
 import { GetUnreadCount } from './GetUnreadCount';
 
-const InboxLimit = 100;
-
 export interface Inbox {
-	notifications: Notification[];
+	notes: ListPage<Notification>;
 	unreadCount: number;
+	filters: InboxFilters;
 }
 
-export async function GetInbox(locals: App.Locals): Promise<Inbox> {
+export async function GetInbox(locals: App.Locals, filters: InboxFilters): Promise<Inbox> {
 	const user = requireUser(locals);
-	const [{ data: notifications }, unreadCount] = await Promise.all([
-		locals.supabase.from('notifications').select('*').eq('profile_id', user.id).order('created_at', { ascending: false }).limit(InboxLimit),
-		GetUnreadCount(locals)
-	]);
-	return { notifications: (notifications ?? []) as Notification[], unreadCount };
+	const page = { number: filters.page, size: InboxListing.PageSize };
+	const { from, to } = rangeOf(page);
+	let query = locals.supabase.from('notifications').select('*', { count: 'exact' }).eq('profile_id', user.id);
+	if (filters.isUnreadOnly) query = query.is('read_at', null);
+	const [{ data, count }, unreadCount] = await Promise.all([query.order('created_at', { ascending: false }).order('id').range(from, to), GetUnreadCount(locals)]);
+	return { notes: listPageOf((data ?? []) as Notification[], count ?? 0, page), unreadCount, filters };
 }

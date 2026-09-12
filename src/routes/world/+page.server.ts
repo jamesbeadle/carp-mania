@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const [pins, favouriteIds, feed, myLakeId] = await Promise.all([
 		GetWorldPins(locals),
 		GetMyFavourites(locals),
-		GetWorldActivity(locals, WorldActivityLimit.LiveFeed),
+		GetWorldActivity(locals, { limit: WorldActivityLimit.LiveFeed }),
 		GetMyLakeId(locals)
 	]);
 	return { pins, favouriteIds, feed, myLakeId };
