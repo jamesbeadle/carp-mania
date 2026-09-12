@@ -22,9 +22,9 @@ select test.assert_that(:offer = 1109, 'the dealer pays 55% of guide, rounded');
 select test.assert_that(test.money_of(test.player(40)) = 101109, 'the money lands at once');
 select test.assert_that((select count(*) from public.carp where id = :'prime') = 0, 'the fish is gone');
 select test.assert_that(
-	(select count(*) from public.carp_transfers where carp_name = 'Prime' and carp_id is null and kind = 'dealer_purchase'
+	(select count(*) from public.carp_transfers where carp_name = 'Prime' and carp_id = :'prime' and kind = 'dealer_purchase'
 		and from_lake_id = test.lake_of(test.player(40)) and to_lake_id is null and price = 1109) = 1,
-	'the transfer keeps the name and the price'
+	'the transfer keeps the fish, the name and the price'
 );
 
 select test.assert_refused(format('select public.sell_to_dealer(%L)', :'poorly'), 'under 30 condition');

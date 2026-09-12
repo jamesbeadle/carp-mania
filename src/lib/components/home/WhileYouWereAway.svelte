@@ -49,6 +49,9 @@
 		{#if summary.carpTakenByPike.length > 0}
 			<p class="mt-2 text-sm text-mist-400">The pike took {summary.carpTakenByPike.join(', ')} — sick fish, out of the water.</p>
 		{/if}
+		{#if summary.carpDiedOfOldAge.length > 0}
+			<p class="mt-2 text-sm text-mist-400">{summary.carpDiedOfOldAge.join(', ')} died of old age — in the book now, never to be caught again.</p>
+		{/if}
 		{#if isCapped}
 			<p class="mt-2 text-xs text-mist-400">{FisheryClock.MaximumDaysSimulatedPerVisit} fishery days is as far as the water runs on its own. Any longer and the fish just waited for you.</p>
 		{/if}

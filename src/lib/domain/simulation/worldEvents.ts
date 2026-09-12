@@ -1,8 +1,10 @@
+import type { Carp } from '../types';
 import type { WorldEvent, WorldEventKind } from '../worldTypes';
 
 export type NewWorldEvent = Omit<WorldEvent, 'id' | 'created_at'>;
 
 export const BigCatch = { ByPlayerFromLb: 30, ByNpcFromLb: 40 } as const;
+const Remembered = { FromFame: 20, FromLb: 30 } as const;
 
 export function bigCatchEvent(lakeId: string, fishName: string, weightLb: number, anglerName: string): NewWorldEvent {
 	return event('big_catch', lakeId, { fishName, weightLb, anglerName });
@@ -22,6 +24,14 @@ export function newWaterEvent(lakeId: string, lakeName: string, region: string):
 
 export function islandBuiltEvent(lakeId: string, lakeName: string, islandName: string): NewWorldEvent {
 	return event('island_built', lakeId, { lakeName, islandName });
+}
+
+export function fishDiedEvent(lakeId: string, fishName: string, weightLb: number, ageYears: number, cause: 'pike' | 'old_age'): NewWorldEvent {
+	return event('fish_died', lakeId, { fishName, weightLb, ageYears, cause });
+}
+
+export function isRemembered(fish: Pick<Carp, 'fame' | 'weight_lb'>) {
+	return fish.fame >= Remembered.FromFame || Number(fish.weight_lb) >= Remembered.FromLb;
 }
 
 export function isBigNpcCatch(weightLb: number) {

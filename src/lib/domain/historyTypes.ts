@@ -4,6 +4,7 @@ export interface Catch {
 	carp_id: string;
 	angler_id: string | null;
 	angler_name: string;
+	owner_name: string | null;
 	weight_lb: number;
 	swim_name: string;
 	rig: string;

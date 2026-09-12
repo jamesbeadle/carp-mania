@@ -8,6 +8,7 @@ import type { Carp, Catch, Lake } from '../types';
 import { SiteTemplates } from './siteTemplates';
 
 export const HistoryCatchesPerDay = { Minimum: 2, Maximum: 5 } as const;
+const PreviousOwner = 'The old estate';
 
 export type NewCatch = Omit<Catch, 'id'>;
 
@@ -47,6 +48,7 @@ function oneCatch(lakeId: string, fish: Carp, swimNames: string[], caughtAt: Dat
 		carp_id: fish.id,
 		angler_id: null,
 		angler_name: randomAnglerName(random(), random()),
+		owner_name: PreviousOwner,
 		weight_lb: Number(fish.weight_lb),
 		swim_name: pickRandom(random, swimNames),
 		rig: pickRandom(random, RigNames),

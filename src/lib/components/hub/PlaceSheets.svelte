@@ -47,5 +47,6 @@
 	{:else if openPlace === 'signpost'}
 		{#if isUnpinned}<PinYourWaterCard lakeName={fishery.lake.name} />{/if}
 		<WorldFeedCard feed={worldFeed} />
+		<a href="/world/hall-of-fame" class="button-secondary block text-center">The hall of fame</a>
 	{/if}
 </PlaceSheet>

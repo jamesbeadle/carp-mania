@@ -21,7 +21,8 @@ export type NotificationKind =
 	| 'quarantine_over'
 	| 'works_complete'
 	| 'record_set'
-	| 'big_catch_on_your_water';
+	| 'big_catch_on_your_water'
+	| 'fish_died';
 
 export interface Notification {
 	id: string;
@@ -34,7 +35,7 @@ export interface Notification {
 	read_at: string | null;
 }
 
-export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built';
+export type WorldEventKind = 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died';
 
 export interface WorldEvent {
 	id: string;

@@ -5,7 +5,7 @@ import type { WorldEventKind } from '$lib/domain/worldTypes';
 import { formatMoney } from '$lib/format/money';
 import { formatWeight } from '$lib/format/weight';
 
-export const FeedGlyph: Record<WorldEventKind, string> = { big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝' };
+export const FeedGlyph: Record<WorldEventKind, string> = { big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝', fish_died: '✝' };
 
 interface PayloadWords {
 	fishName: string;
@@ -15,6 +15,8 @@ interface PayloadWords {
 	scope: string;
 	islandName: string;
 	anglerName: string | null;
+	cause: string | null;
+	ageYears: number;
 }
 
 const SomewhereOnEarth = 'a far-off region';
@@ -24,7 +26,8 @@ const Writers: Record<WorldEventKind, (activity: WorldActivity, words: PayloadWo
 	sale: (activity, words) => `${words.fishName} sold for ${words.price} → ${activity.otherLakeName ?? 'a new home'}`,
 	new_water: (activity, words) => `New water opened in ${words.region}: ${activity.lakeName}`,
 	record: (activity, words) => `${words.scope} record: ${words.fishName} ${words.weight} at ${activity.lakeName}`,
-	island_built: (activity, words) => `${activity.lakeName} built ${words.islandName}`
+	island_built: (activity, words) => `${activity.lakeName} built ${words.islandName}`,
+	fish_died: (activity, words) => `${words.fishName} (${words.weight}) has died at ${activity.lakeName}${words.cause === 'pike' ? ' — the pike had it' : ` — old age, at ${words.ageYears}`}`
 };
 
 export function feedLineFor(activity: WorldActivity): string {
@@ -41,7 +44,9 @@ function wordsFrom(activity: WorldActivity): PayloadWords {
 		region: regionLabelFor(text('region') ?? activity.region),
 		scope: capitalised(text('scope') ?? 'lake'),
 		islandName: text('islandName') ?? 'an island',
-		anglerName: text('anglerName')
+		anglerName: text('anglerName'),
+		cause: text('cause'),
+		ageYears: amount('ageYears')
 	};
 }
 
