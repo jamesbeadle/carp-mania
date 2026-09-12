@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { MatchCard } from '$lib/contracts/MatchCard';
 	import type { MyMarketActivity } from '$lib/contracts/MyMarketActivity';
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import type { MyFishery } from '$lib/server/queries/GetMyFishery';
@@ -13,6 +14,7 @@
 	import PinYourWaterCard from '../home/PinYourWaterCard.svelte';
 	import WorksInProgressCard from '../home/WorksInProgressCard.svelte';
 	import WorldFeedCard from '../home/WorldFeedCard.svelte';
+	import NextMatchCard from '../matches/NextMatchCard.svelte';
 	import PlaceSheet from '../stage/PlaceSheet.svelte';
 
 	interface Props {
@@ -27,9 +29,10 @@
 		worldFeed: WorldActivity[];
 		loadedAt: string;
 		waters: Lake[];
+		nextMatch: MatchCard | null;
 	}
 
-	let { openPlace, onClose, fishery, profile, works, unreadNotifications, unreadCount, marketWatch, worldFeed, loadedAt, waters }: Props = $props();
+	let { openPlace, onClose, fishery, profile, works, unreadNotifications, unreadCount, marketWatch, worldFeed, loadedAt, waters, nextMatch }: Props = $props();
 
 	const title = $derived(BankPlaces.find((place) => place.id === openPlace)?.label ?? '');
 	const isUnpinned = $derived(fishery.lake.latitude === null);
@@ -48,6 +51,7 @@
 	{:else if openPlace === 'jetty'}
 		<AnglerSummaryCard {profile} />
 		<a href="/fish/{fishery.lake.id}" class="button-secondary block text-center">Fish my own water</a>
+		<NextMatchCard {nextMatch} {loadedAt} />
 	{:else if openPlace === 'signpost'}
 		{#if isUnpinned}<PinYourWaterCard lakeName={fishery.lake.name} />{/if}
 		<WorldFeedCard feed={worldFeed} />

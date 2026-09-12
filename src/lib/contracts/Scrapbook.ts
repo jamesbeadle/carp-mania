@@ -1,4 +1,5 @@
 import type { Fisherman } from '$lib/domain/legacy/fishermanTypes';
+import type { Trophy } from '$lib/domain/matches/matchTypes';
 import type { Catch } from '$lib/domain/types';
 
 export interface KnownFish {
@@ -16,6 +17,7 @@ export interface Scrapbook {
 	totalCatches: number;
 	personalBestLb: number;
 	fishKnown: KnownFish[];
+	trophies: Trophy[];
 	carpNames: Record<string, string>;
 	lakeNames: Record<string, string>;
 	isMine: boolean;

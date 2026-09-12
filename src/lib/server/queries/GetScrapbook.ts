@@ -7,6 +7,7 @@ import { loadFisherman } from './GetFishermanDiary';
 import { loadCarpNames } from './loadAnglerCatches';
 import { loadLakeNames } from './loadCarpHistory';
 import { loadStillSwimming } from './loadStillSwimming';
+import { loadTrophiesOf } from './loadTrophies';
 
 const ScrapbookLength = 100;
 const NoSuchFisherman = 'Nobody by that name has fished here';
@@ -16,7 +17,7 @@ export async function GetScrapbook(locals: App.Locals, fishermanId: string): Pro
 	const viewer = requireUser(locals);
 	const fisherman = await loadFisherman(locals, fishermanId);
 	if (!fisherman) error(404, NoSuchFisherman);
-	const [{ catches, totalCatches }, personalBestLb] = await Promise.all([loadCatchesOf(locals, fishermanId), loadPersonalBestOf(locals, fishermanId)]);
+	const [{ catches, totalCatches }, personalBestLb, trophies] = await Promise.all([loadCatchesOf(locals, fishermanId), loadPersonalBestOf(locals, fishermanId), loadTrophiesOf(locals, fishermanId)]);
 	const carpIds = catches.map((caught) => caught.carp_id);
 	const [carpNames, lakeNames, stillSwimming] = await Promise.all([loadCarpNames(locals, carpIds), loadLakeNames(locals, catches.map((caught) => caught.lake_id)), loadStillSwimming(locals, carpIds)]);
 	return {
@@ -26,6 +27,7 @@ export async function GetScrapbook(locals: App.Locals, fishermanId: string): Pro
 		totalCatches,
 		personalBestLb,
 		fishKnown: fishKnownFrom(catches, carpNames, stillSwimming),
+		trophies,
 		carpNames,
 		lakeNames,
 		isMine: fisherman.profile_id === viewer.id

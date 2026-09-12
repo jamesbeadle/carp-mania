@@ -3,7 +3,7 @@
 	import HonourRoll from '$lib/components/hall/HonourRoll.svelte';
 	import LegendsBoard from '$lib/components/hall/LegendsBoard.svelte';
 	import ScopeTabs from '$lib/components/hall/ScopeTabs.svelte';
-	import { anglerHonours, waterHonours } from '$lib/game/world/honourRolls';
+	import { anglerHonours, matchHonours, waterHonours } from '$lib/game/world/honourRolls';
 
 	let { data } = $props();
 
@@ -28,5 +28,6 @@
 	<div class="grid gap-6">
 		<HonourRoll title="Most fish landed" blurb="Signed-in anglers by fish on the bank, for life." honours={anglerHonours(data.hall.mostFishLanded)} emptyWords="Nobody has wet a line here yet." />
 		<HonourRoll title="Waters of legend" blurb="Waters by the best fish they ever produced, owner credited." honours={waterHonours(data.hall.watersOfLegend)} emptyWords="No water has produced a fish worth remembering yet." />
+		<HonourRoll title="Match winners" blurb="Anglers by trophies won in matches, across every generation of their line." honours={matchHonours(data.hall.matchWinners)} emptyWords="No match has been fished yet." />
 	</div>
 </div>

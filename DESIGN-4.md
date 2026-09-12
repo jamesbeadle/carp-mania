@@ -33,7 +33,7 @@ Decisions taken up front: anglers age faster than the fishery (a diary year ever
 - **The bailiff's note** and the world feed mention deaths: the pike took *X*; *Y* died of old age at 31.
 - **The fisherman's diary** (phase 2): age on the angler page; a letter when the old man's time comes; naming the heir; the scrapbook per generation (`/angler/scrapbook/[fishermanId]`); the family line (“third fisherman at Willow Pool”).
 - **The estate** (phase 3): the lodge lists every water with a switch; the current water drives every `/lake` screen; a new water is bought through the setup wizard from the world map.
-- **Matches** (phase 4): `/matches` (open and coming), `/matches/[matchId]` (the board, entries, the pot, enter), hosting from a lake's page (`/lakes/[lakeId]/host-a-match`), the water shows *booked for a match* while closed.
+- **Matches** (phase 4): `/matches` (in play, coming up, recent results), `/matches/[matchId]` (the live board, the pot and its split, take a peg, the host's call-it-off), hosting from a lake's page (`/lakes/[lakeId]/host-a-match`, with the booking fee worked out as you type), the water's page and the day-ticket office show *booked for a match* while it runs (entrants see *fish the match* instead, and a *match in play · the board* pill on the water), the jetty sheet shows your next match, the hall of fame gains *Match winners*, and every winner's scrapbook gains a trophy cabinet.
 
 ## 3. Site map
 
@@ -46,18 +46,18 @@ The world page grows a Hall of fame tab beside the leaderboards; the signpost sh
 - Old age: a carp is safe until 22, then each fishery new year carries a rising chance of dying, certain by 45.
 - Phase 2: `fishermen` (one row per generation: profile, name, generation number, born at, started at, retired at, final skills, catch count, personal best); `catches.fisherman_id`; profiles carry the diary start so age is derived, and the hidden age at which the current fisherman will retire.
 - Phase 3: `profiles.current_lake_id`; ownership is already per lake.
-- Phase 4: `matches`, `match_entries`; a lake's `booked_until`.
+- Phase 4: `matches` (water, host, title, window, entry fee, host stake, booking fee, the most-catches share, pegs = the water's swims when booked, status open/settled/cancelled), `match_entries` (angler and the fisherman who fished it), `trophies` (per fisherman, so they stay in the scrapbook after a handover: kind, match, water, catches or weight, prize). Nothing is stored on the lake — a water is booked whenever an open or settled match overlaps, and the simulation reads that straight from `matches`.
 
 ## 5. Backend
 
 - Phase 1: the simulation records deaths (pike, old age) into the memorial and the note; `record_catch` and the simulation's catches write `owner_name`; `GetHallOfFame` (SQL functions for the grouped boards); the dossier and catch lists fall back to the memorial.
 - Phase 2: `RetireFisherman` / `NameHeir` commands; the diary clock; scrapbook queries.
 - Phase 3: `BuyAnotherWater`, `SwitchWater`; `requireOwnedLake` becomes the current water; the simulation runs every owned water.
-- Phase 4: `HostMatch`, `EnterMatch`, `CloseMatch` (cron), the booking gate on day tickets.
+- Phase 4: `HostMatch` → `book_match` (a public, set-up water with pegs; starts 1 hour to a week ahead, lasts 3/6/12/24 hours; no overlap on the water; three open matches per host; the booking fee — six anglers' day tickets an hour, at least £100, nothing on your own water — goes to the owner and the stake into the pot); `EnterMatch` → `enter_match` (until the match ends, while pegs last; the entry fee joins the pot); `CancelMatch` → `cancel_match` (host, before the start: entries and stake back, booking fee spent); `close_ended_matches` (pg_cron every minute, or `/cron/close-matches`) → `close_match`: the pot is split by the host's share, ties share, trophies and notifications go out, `match_won` hits the feed, and a match with nothing caught refunds everyone. `match_board` ranks entrants by catches then heaviest fish inside the window; `pay_day_ticket` refuses non-entrants while a match runs and is free for entrants; the simulation lets no NPC anglers visit a booked-out hour; `match_winners` feeds the hall of fame.
 
 ## 6. Phases
 
 1. **Fish deaths and the hall of fame.** *(built)*
 2. **Generations** — the diary clock, the handover, the heir, the scrapbook. *(built)*
 3. **More waters** — buying, switching, the estate in the lodge. *(built)*
-4. **Matches** — booking, entries, the live board, prizes and trophies.
+4. **Matches** — booking, entries, the live board, prizes and trophies. *(built)*

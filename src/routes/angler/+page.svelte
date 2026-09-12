@@ -2,6 +2,7 @@
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
+	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
@@ -34,6 +35,7 @@
 		<CatchReportList catches={data.angler.catches} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
 		<a href="/angler/scrapbook/{data.angler.diary.current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
 	</section>
+	<div class="lg:col-span-2"><TrophyCabinet trophies={data.angler.trophies} /></div>
 	<div class="lg:col-span-2"><FamilyLine line={data.angler.diary.line} currentId={data.angler.diary.current.id} /></div>
 </div>
 <form method="POST" action="/auth/signout" class="mt-8 text-center lg:hidden">

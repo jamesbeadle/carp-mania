@@ -16,6 +16,7 @@ import { runEstateScenarios } from './testEstate';
 import { runFishingScenarios } from './testFishing';
 import { runGroundworksScenarios } from './testGroundworks';
 import { runMarketScenarios } from './testMarket';
+import { runMatchScenarios } from './testMatches';
 import { runSiteScenarios } from './testSites';
 import { runSpawningScenarios, runWorldScenarios } from './testWorld';
 
@@ -39,7 +40,7 @@ for (const classic of ClassicSwims) {
 function contextForDay(dayIndex: number, currentLake: Lake): DayContext {
 	const dayStart = new Date(start.getTime() + dayIndex * FisheryClock.RealMillisecondsPerFisheryDay);
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
-	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [] };
+	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [] };
 }
 
 const fedLake: Lake = { ...lake, feed_stock: { ...lake.feed_stock, fishmeal_boilies: 40 } };
@@ -74,6 +75,7 @@ runSpawningScenarios();
 runAgeingScenarios();
 runDiaryScenarios();
 runEstateScenarios();
+runMatchScenarios();
 runGroundworksScenarios();
 runSiteScenarios();
 console.log('domain tests passed');

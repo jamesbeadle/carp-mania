@@ -1,3 +1,5 @@
+import { buzzForBite } from './haptics';
+
 const AlarmTone = { HighHertz: 2600, LowHertz: 2100, BeepSeconds: 0.09, GapMilliseconds: 170, Volume: 0.18 } as const;
 
 export class BiteAlarm {
@@ -21,6 +23,12 @@ export class BiteAlarm {
 		if (!this.beeping) return;
 		clearInterval(this.beeping);
 		this.beeping = null;
+	}
+
+	follow(hasBite: boolean) {
+		if (!hasBite) return this.stop();
+		this.start();
+		buzzForBite();
 	}
 
 	private beep() {

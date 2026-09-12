@@ -7,14 +7,17 @@ import { GetFishermanDiary } from '$lib/server/queries/GetFishermanDiary';
 import { GetHomeHub } from '$lib/server/queries/GetHomeHub';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
+import { GetMyNextMatch } from '$lib/server/queries/GetMyNextMatch';
 import { GetWorldActivity, WorldActivityLimit } from '$lib/server/queries/GetWorldActivity';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const whileAway = await SimulateElapsedTime(locals);
 	const [fishery, profile, hub, diary] = await Promise.all([GetMyFishery(locals), loadProfile(locals), GetHomeHub(locals), GetFishermanDiary(locals)]);
-	const [worldFeed, marketWatch, waters] = await Promise.all([GetWorldActivity(locals, WorldActivityLimit.HomeHub), GetMyMarketActivity(locals), loadMyWaters(locals, profile.id)]);
-	return { profile, fishery, whileAway, worldFeed, marketWatch, diary, waters, loadedAt: new Date().toISOString(), isStage: true, ...hub };
+	const [worldFeed, marketWatch, waters, nextMatch] = await Promise.all([
+		GetWorldActivity(locals, WorldActivityLimit.HomeHub), GetMyMarketActivity(locals), loadMyWaters(locals, profile.id), GetMyNextMatch(locals)
+	]);
+	return { profile, fishery, whileAway, worldFeed, marketWatch, diary, waters, nextMatch, loadedAt: new Date().toISOString(), isStage: true, ...hub };
 };
 
 export const actions: Actions = {

@@ -3,10 +3,13 @@ import { placeInTheLine } from '$lib/domain/legacy/diary';
 import { isRegionCode, type RegionCode } from '$lib/domain/world/regionCodes';
 import { RegionCatalogue } from '$lib/domain/world/regions';
 import type { WorldEventKind } from '$lib/domain/worldTypes';
+import { formatWhen } from '$lib/format/dates';
 import { formatMoney } from '$lib/format/money';
 import { formatWeight } from '$lib/format/weight';
 
-export const FeedGlyph: Record<WorldEventKind, string> = { big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝', fish_died: '✝', handover: '⚘' };
+export const FeedGlyph: Record<WorldEventKind, string> = {
+	big_catch: '✦', sale: '⇢', new_water: '✚', record: '⚑', island_built: '🏝', fish_died: '✝', handover: '⚘', match_announced: '⚔', match_won: '🏆'
+};
 
 interface PayloadWords {
 	fishName: string;
@@ -20,6 +23,12 @@ interface PayloadWords {
 	ageYears: number;
 	heirName: string;
 	placeInTheLine: string;
+	matchTitle: string;
+	hostName: string;
+	startsAt: string;
+	entryFee: string;
+	winners: string;
+	pot: string;
 }
 
 const SomewhereOnEarth = 'a far-off region';
@@ -31,7 +40,9 @@ const Writers: Record<WorldEventKind, (activity: WorldActivity, words: PayloadWo
 	record: (activity, words) => `${words.scope} record: ${words.fishName} ${words.weight} at ${activity.lakeName}`,
 	island_built: (activity, words) => `${activity.lakeName} built ${words.islandName}`,
 	fish_died: (activity, words) => `${words.fishName} (${words.weight}) has died at ${activity.lakeName}${words.cause === 'pike' ? ' — the pike had it' : ` — old age, at ${words.ageYears}`}`,
-	handover: (activity, words) => `${activity.lakeName} passes to ${words.heirName}, ${words.placeInTheLine}`
+	handover: (activity, words) => `${activity.lakeName} passes to ${words.heirName}, ${words.placeInTheLine}`,
+	match_announced: (activity, words) => `${words.matchTitle} at ${activity.lakeName} — ${words.hostName} is hosting, ${words.startsAt}, ${words.entryFee} to enter`,
+	match_won: (activity, words) => `${words.matchTitle} at ${activity.lakeName} went to ${words.winners}, ${words.pot} in prizes`
 };
 
 export function feedLineFor(activity: WorldActivity): string {
@@ -52,7 +63,13 @@ function wordsFrom(activity: WorldActivity): PayloadWords {
 		cause: text('cause'),
 		ageYears: amount('ageYears'),
 		heirName: text('heirName') ?? 'an heir',
-		placeInTheLine: placeInTheLine(amount('generation') || 1)
+		placeInTheLine: placeInTheLine(amount('generation') || 1),
+		matchTitle: text('matchTitle') ?? 'A match',
+		hostName: text('hostName') ?? 'somebody',
+		startsAt: text('startsAt') ? formatWhen(text('startsAt') as string) : 'soon',
+		entryFee: formatMoney(amount('entryFee')),
+		winners: text('winners') ?? 'nobody',
+		pot: formatMoney(amount('pot'))
 	};
 }
 
