@@ -1,3 +1,3 @@
-import { areaTool } from './areaTool';
+import { drawnShapeTool } from './drawnShapeTool';
 
-export const dredgeTool = areaTool((points) => ({ kind: 'dredge', points }));
+export const dredgeTool = drawnShapeTool((points) => ({ kind: 'dredge', points }));

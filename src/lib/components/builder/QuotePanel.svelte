@@ -45,7 +45,6 @@
 		</ul>
 	{/if}
 	{#if !canAfford}<p class="text-sm text-danger-400">That is more than the {formatMoney(money)} you have.</p>{/if}
-	{#if builder.isDrawing}<p class="text-xs text-mist-400">Finish the shape to order it.</p>{/if}
 	<div class="flex gap-2">
 		<button class="button-primary flex-1 px-2 text-base" disabled={!canOrder} onclick={order}>Order works {formatMoney(quote.cost)}</button>
 		<button class="button-secondary px-3 text-base" onclick={() => builder.clear()}>Cancel</button>

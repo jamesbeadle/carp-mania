@@ -3,6 +3,7 @@
 	import type { Carp, Lake, Swim } from '$lib/domain/types';
 	import { createPointerGestures } from '$lib/game/builder/builderInput';
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
+	import { finishDrawing } from '$lib/game/builder/finishDrawing';
 	import { toolHandlersFor } from '$lib/game/builder/tools/toolFor';
 	import type { ToolContext, ToolHandlers } from '$lib/game/builder/tools/toolHandlers';
 	import type { DraftShape } from '$lib/game/render/drawUnderConstruction';
@@ -46,6 +47,7 @@
 		if (isTyping) return;
 		if (event.key === 'Escape') builder.clear();
 		if (event.key === 'Backspace') builder.undoLastPoint();
+		if (event.key === 'Enter') finishDrawing(builder);
 	}
 </script>
 
@@ -60,7 +62,7 @@
 		gestures.down(pointOf(event));
 	}}
 	onmousemove={(event) => gestures.move(pointOf(event))}
-	onmouseup={(event) => gestures.up(pointOf(event))}
+	onmouseup={(event) => gestures.up(pointOf(event), event.detail)}
 	onmouseleave={() => gestures.leave()}
 	ondblclick={(event) => gestures.doubleClick(pointOf(event))}
 >
