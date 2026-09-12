@@ -9,7 +9,6 @@
 	import { castRod, chooseSwim, finishFight, nextRodToCast, returnToFishing, strike, tackleUp } from '$lib/game/session/sessionFlow';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { watchFishShowing } from '$lib/game/session/showingFish';
-	import type { ViewMode } from '$lib/game/scene/camera';
 	import DayOverSummary from './DayOverSummary.svelte';
 	import HowToPlay from './HowToPlay.svelte';
 	import KeyHints from './KeyHints.svelte';
@@ -22,7 +21,6 @@
 	const alarm = new BiteAlarm();
 	let isCatchSaved = $state<boolean | null>(null);
 	let isAlarmMuted = $state(false);
-	let viewMode = $state<ViewMode>('birdseye');
 	let showingAt = $state<LayoutPoint[]>([]);
 
 	$effect(() => {
@@ -46,7 +44,6 @@
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);
 		rememberRodSetups(lake.id, setups);
-		viewMode = 'swim';
 	}
 
 	function handleWaterClick(point: { x: number; y: number }) {
@@ -79,7 +76,6 @@
 			{profile}
 			{showingAt}
 			{isCatchSaved}
-			bind:viewMode
 			onSwimClick={(swim) => session.phase === 'choose_swim' && chooseSwim(session, swim)}
 			onWaterClick={handleWaterClick}
 			onCastBlockedByIsland={() => (session.notice = "You can't cast through the island — pick a spot with a clear line from your swim.")}
