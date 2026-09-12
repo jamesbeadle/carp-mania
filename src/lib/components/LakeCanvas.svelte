@@ -44,11 +44,11 @@
 		});
 	});
 
-	const scenePointOf = (event: MouseEvent) => toScenePoint(canvas, event.clientX, event.clientY);
+	const scenePointOf = (event: MouseEvent | PointerEvent) => toScenePoint(canvas, event.clientX, event.clientY);
 	const swimAt = (point: Point) => swims.find((swim) => distance(swimScenePoint(swim), point) <= SwimHitRadius);
 	const distance = (first: Point, second: Point) => Math.hypot(first.x - second.x, first.y - second.y);
 
-	function handleMove(event: MouseEvent) {
+	function handleMove(event: PointerEvent) {
 		hoveredSwimId = swimAt(scenePointOf(event))?.id ?? null;
 	}
 
@@ -70,6 +70,6 @@
 	class="aspect-[3/2] w-full cursor-pointer rounded-2xl border border-carbon-700 shadow-xl shadow-carbon-950/60"
 	width={SceneSize.Width}
 	height={SceneSize.Height}
-	onmousemove={handleMove}
+	onpointermove={handleMove}
 	onclick={handleClick}
 ></canvas>

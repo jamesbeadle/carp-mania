@@ -36,7 +36,7 @@
 		onDragEnd: act('onDragEnd')
 	});
 
-	function pointOf(event: MouseEvent): LayoutPoint {
+	function pointOf(event: PointerEvent): LayoutPoint {
 		const canvas = wrapper.querySelector('canvas');
 		if (!canvas) return { x: 0, y: 0 };
 		return toFraction(toScenePoint(canvas, event.clientX, event.clientY));
@@ -55,16 +55,18 @@
 
 <div
 	bind:this={wrapper}
-	class="select-none"
+	class="touch-none select-none"
 	role="presentation"
-	onmousedown={(event) => {
+	onpointerdown={(event) => {
 		event.preventDefault();
+		event.currentTarget.setPointerCapture(event.pointerId);
 		gestures.down(pointOf(event));
 	}}
-	onmousemove={(event) => gestures.move(pointOf(event))}
-	onmouseup={(event) => gestures.up(pointOf(event), event.detail)}
-	onmouseleave={() => gestures.leave()}
-	ondblclick={(event) => gestures.doubleClick(pointOf(event))}
+	onpointermove={(event) => gestures.move(pointOf(event))}
+	onpointerup={(event) => gestures.up(pointOf(event))}
+	onpointercancel={() => gestures.leave()}
+	onpointerleave={() => gestures.leave()}
+	oncontextmenu={(event) => event.preventDefault()}
 >
 	<LakeCanvas lake={sceneLake} swims={sceneSwims} {carp} {drafts} selectedSwimId={builder.selectedSwimId} />
 </div>

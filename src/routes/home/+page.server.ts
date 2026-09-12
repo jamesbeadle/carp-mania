@@ -11,5 +11,5 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const [fishery, profile, hub] = await Promise.all([GetMyFishery(locals), loadProfile(locals), GetHomeHub(locals)]);
 	const worldFeed = await GetWorldActivity(locals, WorldActivityLimit.HomeHub);
 	const marketWatch = await GetMyMarketActivity(locals);
-	return { profile, fishery, whileAway, worldFeed, marketWatch, loadedAt: new Date().toISOString(), ...hub };
+	return { profile, fishery, whileAway, worldFeed, marketWatch, loadedAt: new Date().toISOString(), isStage: true, ...hub };
 };

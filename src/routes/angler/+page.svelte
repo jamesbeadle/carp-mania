@@ -29,3 +29,6 @@
 		<CatchReportList catches={data.angler.catches} carpNames={data.angler.carpNames} lakeNames={data.angler.lakeNames} />
 	</section>
 </div>
+<form method="POST" action="/auth/signout" class="mt-8 text-center lg:hidden">
+	<button class="text-sm text-mist-400 hover:text-mist-100">Sign out</button>
+</form>

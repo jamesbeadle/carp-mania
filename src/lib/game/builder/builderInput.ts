@@ -2,6 +2,7 @@ import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { sceneDistance } from './sceneDistance';
 
 const DragStartsAfterScenePixels = 6;
+const DoubleTap = { WithinMilliseconds: 300, WithinScenePixels: 14 } as const;
 
 export interface PointerGestureHandlers {
 	onHover: (point: LayoutPoint | null) => void;
@@ -15,6 +16,8 @@ export interface PointerGestureHandlers {
 export function createPointerGestures(handlers: PointerGestureHandlers) {
 	let pressedAt: LayoutPoint | null = null;
 	let isDragging = false;
+	let lastTapAt: LayoutPoint | null = null;
+	let lastTapMilliseconds = 0;
 
 	function move(point: LayoutPoint) {
 		handlers.onHover(point);
@@ -23,22 +26,26 @@ export function createPointerGestures(handlers: PointerGestureHandlers) {
 		if (isStillAClick) return;
 		if (!isDragging) {
 			isDragging = true;
+			lastTapAt = null;
 			handlers.onDragStart(pressedAt);
 		}
 		handlers.onDrag(point);
 	}
 
-	function up(point: LayoutPoint, clickCount = 1) {
+	function up(point: LayoutPoint, nowMilliseconds = performance.now()) {
 		if (!pressedAt) return;
-		releaseHandlerFor(clickCount)?.(point);
+		if (isDragging) handlers.onDragEnd(point);
+		if (!isDragging) tap(point, nowMilliseconds);
 		pressedAt = null;
 		isDragging = false;
 	}
 
-	function releaseHandlerFor(clickCount: number) {
-		if (isDragging) return handlers.onDragEnd;
-		const isSecondClickOfADoubleClick = clickCount > 1;
-		return isSecondClickOfADoubleClick ? null : handlers.onClick;
+	function tap(point: LayoutPoint, nowMilliseconds: number) {
+		const isSecondTap = lastTapAt !== null && nowMilliseconds - lastTapMilliseconds <= DoubleTap.WithinMilliseconds && sceneDistance(lastTapAt, point) <= DoubleTap.WithinScenePixels;
+		lastTapAt = isSecondTap ? null : point;
+		lastTapMilliseconds = nowMilliseconds;
+		if (isSecondTap) return handlers.onDoubleClick(point);
+		handlers.onClick(point);
 	}
 
 	return {
@@ -51,8 +58,8 @@ export function createPointerGestures(handlers: PointerGestureHandlers) {
 		leave() {
 			pressedAt = null;
 			isDragging = false;
+			lastTapAt = null;
 			handlers.onHover(null);
-		},
-		doubleClick: handlers.onDoubleClick
+		}
 	};
 }
