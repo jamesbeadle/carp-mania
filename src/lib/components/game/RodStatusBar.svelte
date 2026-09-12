@@ -4,14 +4,15 @@
 	import { RigCatalogue } from '$lib/domain/tackle/rigs';
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
 	import type { RodOnBank } from '$lib/game/scene/rodState';
+	import { pointerWords } from '$lib/game/stage/pointerWords';
 
-	let { rods }: { rods: RodOnBank[] } = $props();
+	let { rods, isDocked = false }: { rods: RodOnBank[]; isDocked?: boolean } = $props();
 
-	const phaseLabels = { idle: 'Click water to cast', cast: 'Fishing', biting: 'Bite!', fighting: 'Fish on' } as const;
+	const phaseLabels = { idle: pointerWords('Click water to cast'), cast: 'Fishing', biting: 'Bite!', fighting: 'Fish on' } as const;
 	const phaseTone = { idle: 'text-mist-400', cast: 'text-surge-400', biting: 'text-danger-400', fighting: 'text-volt-400' } as const;
 </script>
 
-<div class="pointer-events-none absolute bottom-3 left-3 flex flex-wrap gap-2">
+<div class="pointer-events-none flex flex-wrap gap-2" class:absolute={!isDocked} class:bottom-3={!isDocked} class:left-3={!isDocked}>
 	{#each rods as rod (rod.index)}
 		<div class="rounded-lg border bg-carbon-950/80 px-3 py-1.5 backdrop-blur" class:border-carbon-700={rod.phase !== 'biting'} class:border-danger-500={rod.phase === 'biting'}>
 			<div class="font-display text-sm font-bold tracking-wide uppercase"><span class="text-mist-100">Rod {rod.index + 1}</span> <span class={phaseTone[rod.phase]}>· {phaseLabels[rod.phase]}</span></div>

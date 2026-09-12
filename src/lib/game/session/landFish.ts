@@ -59,11 +59,24 @@ export function catchReportFor(visitId: string, profile: Profile, landed: Landed
 	};
 }
 
-export async function reportLandedFish(lakeId: string, visitId: string, profile: Profile, landed: LandedFish) {
+export interface CatchReportOutcome {
+	isSaved: boolean;
+	reason: string | null;
+}
+
+const NoReasonGiven = 'the bailiff gave no reason';
+
+export async function reportLandedFish(lakeId: string, visitId: string, profile: Profile, landed: LandedFish): Promise<CatchReportOutcome> {
 	const response = await fetch(`/fish/${lakeId}/catch`, {
 		method: 'POST',
-		headers: { 'content-type': 'application/json' },
+		headers: { 'content-type': 'application/json', accept: 'application/json' },
 		body: JSON.stringify(catchReportFor(visitId, profile, landed))
 	});
-	return response.ok;
+	if (response.ok) return { isSaved: true, reason: null };
+	return { isSaved: false, reason: await reasonIn(response) };
+}
+
+async function reasonIn(response: Response) {
+	const body = (await response.json().catch(() => null)) as { message?: string } | null;
+	return body?.message ?? `${NoReasonGiven} (${response.status})`;
 }

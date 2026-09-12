@@ -6,7 +6,7 @@
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 	import { bringTheFishIn, castTheNextRod, strikeAtTheBite } from '$lib/game/session/anglerActions';
 	import { buzzForBite } from '$lib/game/session/haptics';
-	import { reportLandedFish } from '$lib/game/session/landFish';
+	import { reportLandedFish, type CatchReportOutcome } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { quarterHourOf, sessionConditionsFor } from '$lib/game/session/sessionConditions';
 	import { chooseSwim, returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
@@ -36,7 +36,7 @@
 	let { lake, swims, carp, profile, visit, bar, matchBoardHref = null }: Props = $props();
 
 	const session = new SessionState(lake, carp, profile, visit, bar);
-	let isCatchSaved = $state<boolean | null>(null);
+	let catchOutcome = $state<CatchReportOutcome | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
 	let showingAt = $state<LayoutPoint[]>([]);
@@ -63,8 +63,8 @@
 	async function handleFightFinished() {
 		const landed = bringTheFishIn(session);
 		if (!landed) return;
-		isCatchSaved = null;
-		isCatchSaved = await reportLandedFish(lake.id, visit.id, profile, landed);
+		catchOutcome = null;
+		catchOutcome = await reportLandedFish(lake.id, visit.id, profile, landed);
 	}
 </script>
 
@@ -81,7 +81,7 @@
 		{profile}
 		{conditions}
 		{showingAt}
-		{isCatchSaved}
+		{catchOutcome}
 		onSwimClick={(swim) => session.phase === 'choose_swim' && chooseSwim(session, swim)}
 		onWaterClick={(point) => castTheNextRod(session, point)}
 		onCastBlockedByIsland={() => (session.notice = "You can't cast through the island — pick a spot with a clear line from your swim.")}

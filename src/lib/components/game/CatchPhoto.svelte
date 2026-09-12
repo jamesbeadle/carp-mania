@@ -2,12 +2,12 @@
 	import { StrainCatalogue } from '$lib/domain/strains';
 	import { formatFishingHour } from '$lib/domain/fishing/sessionClock';
 	import { drawCarpPortrait } from '$lib/game/render/drawCarpPortrait';
-	import type { LandedFish } from '$lib/game/session/landFish';
+	import type { CatchReportOutcome, LandedFish } from '$lib/game/session/landFish';
 	import { SwimFeatureLabels } from '$lib/format/labels';
 	import HonourRibbons from './HonourRibbons.svelte';
 	import ScalesReadout from './ScalesReadout.svelte';
 
-	let { landed, anglerName, lakeName, isSaved, onContinue }: { landed: LandedFish; anglerName: string; lakeName: string; isSaved: boolean | null; onContinue: () => void } = $props();
+	let { landed, anglerName, lakeName, catchOutcome, onContinue }: { landed: LandedFish; anglerName: string; lakeName: string; catchOutcome: CatchReportOutcome | null; onContinue: () => void } = $props();
 
 	let canvas: HTMLCanvasElement;
 	let isWeighed = $state(false);
@@ -44,7 +44,7 @@
 			{#if landed.carp.fame > 0}<span class="text-volt-300">Fame {landed.carp.fame}.</span>{/if}
 		</p>
 		<p class="text-xs text-mist-400">
-			{#if isSaved === null}Saving the catch report…{:else if isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}The catch report could not be saved.{/if}
+			{#if catchOutcome === null}Saving the catch report…{:else if catchOutcome.isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}<span class="text-danger-400">The catch report could not be saved: {catchOutcome.reason}.</span>{/if}
 		</p>
 		<button class="button-primary" onclick={onContinue}>Back to the rods</button>
 	{/if}
