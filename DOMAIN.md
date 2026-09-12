@@ -113,12 +113,37 @@ Supabase → the Custom Domains panel → **Activate**. From this moment Supabas
 ### 12. Tidy up (a day or two later)
 
 - Google → the client → remove the old `https://egeaybjpzcaejfeuolpz.supabase.co/auth/v1/callback` redirect URI. Only do this after the redeploy in step 10 is live; nothing needs it after that.
-- If you'd rather players couldn't use `carp-mania.vercel.app` at all, ask for a redirect from it to `carp-mania.com` (a `vercel.json` rule — the cron route needs excluding if the Vercel cron is what closes auctions rather than pg_cron). Otherwise leave it; it's harmless.
+- If you'd rather players couldn't use `carp-mania.vercel.app` at all, ask for a redirect from it to `carp-mania.com` (a `vercel.json` rule — the cron routes need excluding if the Vercel crons are what close auctions and matches rather than pg_cron). Otherwise leave it; it's harmless.
 - `SETUP.md` §1 and §4 describe the same URLs for anyone setting the project up from scratch.
 
-## Part C — optional: "Carp Mania" on Google's screen
+## Part C — "Carp Mania" on Google's screen
 
-With Part B done, Google shows the domain. To show the name and logo instead, the app needs Google's **brand verification** (Google Auth Platform → **Verification Centre**). For an app that only asks for `openid`, `email` and `profile` there is no security assessment, but Google still wants: the logo uploaded under Branding (`static/brand/logo-120.png` — a 120 × 120 PNG made to Google's spec; `logo.svg` and `logo-512.png` sit beside it); a **privacy policy** and **terms of service** hosted on `carp-mania.com` and linked from Branding; `carp-mania.com` verified as yours in Google Search Console; and the app **published** (Audience → In production). The game has no privacy or terms pages yet — say the word and they get built at `/privacy` and `/terms`. Review takes a few days.
+With Part B done, Google shows the domain. To show the name and logo instead, the app needs Google's **brand verification** (Google Auth Platform → **Verification Centre**). For an app that only asks for `openid`, `email` and `profile` there is no security assessment, but Google still wants a privacy policy and terms of service on the app's own domain, the domain verified as yours, and the app published.
+
+The pages exist once branch `privacy-and-terms` is merged and deployed: `https://carp-mania.com/privacy` and `https://carp-mania.com/terms`, readable without signing in and linked from the sign-in screen. Their text is data in `src/lib/legal` (`privacyPolicy.ts`, `termsOfService.ts`; the contact address, minimum age and "last updated" date sit in `legalPages.ts`), so a change of wording is a change to one of those files and a new date.
+
+### 13. Branding
+
+Google Cloud Console → **APIs & Services** → **Google Auth Platform** → **Branding**:
+
+1. **App name**: `Carp Mania`. **User support email**: `consulting@yourbusiness.today` (it has to be an address you own on a Google account or Google Group in the project; if that address isn't one, use the account you're signed in with).
+2. **App logo**: upload `static/brand/logo-120.png` from the repo (Google wants a square PNG of at least 120×120, under 1 MB; `logo-512.png` also works). Uploading a logo is what triggers the verification requirement, so don't add it before the pages are live.
+3. **Application home page**: `https://carp-mania.com`. **Privacy policy link**: `https://carp-mania.com/privacy`. **Terms of service link**: `https://carp-mania.com/terms`. All three must be on an authorised domain.
+4. **Authorised domains**: `carp-mania.com` (added in step 8; check it's still there).
+5. **Developer contact information**: the same address. Save.
+
+### 14. Prove the domain is yours
+
+Google checks the home page, privacy and terms links against domains verified in **Google Search Console** by the same Google account:
+
+1. search.google.com/search-console → **Add property** → **Domain** → `carp-mania.com`.
+2. It gives a TXT record (`google-site-verification=…`). In 123 Reg's DNS editor add a TXT record, Name `@`, Value the token, and press **Verify** back in Search Console. Minutes usually; leave the record in place afterwards.
+
+### 15. Publish and submit
+
+1. Google Auth Platform → **Audience** → if the app is still **Testing**, press **Publish app** → **In production**. Until it is published only test users can sign in and there is nothing to verify.
+2. **Verification Centre** (or the **Prepare for verification** banner on Branding) → check the summary (the three links, the logo, the scopes `openid`, `email`, `profile`) → **Submit for verification**. Add a one-line explanation if it asks: a free browser game that uses Google only to sign players in.
+3. Google emails the developer contact. Reviews for non-sensitive scopes take a few days to a couple of weeks; the sign-in screen keeps working throughout, showing the domain until the review passes and the name and logo afterwards.
 
 ## If something goes wrong
 
@@ -128,4 +153,5 @@ With Part B done, Google shows the domain. To show the name and logo instead, th
 - **Sign-in bounces back to `/` with "Sign-in didn't complete — try again", or lands on `carp-mania.vercel.app`** — the address isn't on Supabase's Redirect URLs allow list (step 4).
 - **Supabase verification never passes** — TXT name doubled up (`…carp-mania.com.carp-mania.com`), a stray space in the token, or the CNAME missing its trailing dot. A CAA record on the domain would also block the certificate, but `carp-mania.com` has none.
 - **Everyone signed out after the redeploy** — expected once (step 10.3), not a fault.
+- **Google's verification asks for the privacy policy to "describe the use of Google user data"** — the privacy page's "What we hold about you" section says exactly what Google hands over (email, name, picture) and what it is used for; point the reviewer at it. If the reviewer wants the domain to match the home page and the links exactly, make sure all three use `https://carp-mania.com` (not `www`).
 - **Local development** — `.env.local` can use either hostname; both keep working.
