@@ -14,6 +14,7 @@
 	const carpNames = $derived(Object.fromEntries(data.water.carp.map((fish) => [fish.id, fish.name])));
 	const isOnTheGlobe = $derived(data.water.lake.latitude !== null);
 	const now = $derived(new Date(data.loadedAt));
+	const isOwnWater = $derived(data.water.lake.owner_id === data.user?.id);
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
@@ -27,7 +28,7 @@
 	</div>
 	<div class="ml-auto flex items-center gap-3">
 		<FavouriteStar lakeId={data.water.lake.id} isFavourite={data.isFavourite} isLabelled />
-		<FishHereButton lake={data.water.lake} runningMatch={data.runningMatch} />
+		<FishHereButton lake={data.water.lake} runningMatch={data.runningMatch} {isOwnWater} />
 	</div>
 </div>
 

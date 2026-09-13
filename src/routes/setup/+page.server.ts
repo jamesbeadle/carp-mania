@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { isActionFailure, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { clampedStep, WizardStep, type SetupProgress, type SetupStep } from '$lib/contracts/SetupProgress';
 import { hasChosenPlot } from '$lib/domain/sites/chosenPlot';
@@ -56,7 +56,11 @@ function regionToGuide(url: URL, homeRegion: RegionCode | null): RegionCode {
 export const actions: Actions = {
 	choosePlot: ({ locals, request }) => request.formData().then((formData) => ChoosePlot(locals, formData)),
 	buySite: ({ locals, request }) => request.formData().then((formData) => BuySite(locals, formData)),
-	rename: ({ locals, request }) => request.formData().then((formData) => RenameLake(locals, formData)),
+	rename: async ({ locals, request }) => {
+		const renamed = await RenameLake(locals, await request.formData());
+		if (isActionFailure(renamed)) return renamed;
+		redirect(303, `/setup?step=${WizardStep.Survey}`);
+	},
 	buyFromFarm: ({ locals, request }) => request.formData().then((formData) => BuyCarpFromFishFarm(locals, formData)),
 	open: ({ locals, request }) => request.formData().then((formData) => OpenTheGates(locals, formData))
 };

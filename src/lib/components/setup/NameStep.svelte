@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { WizardStep } from '$lib/contracts/SetupProgress';
 	import { WaterName } from '$lib/domain/sites/newLake';
 	import { SiteCatalogue } from '$lib/domain/sites/siteCatalogue';
 	import type { Lake } from '$lib/domain/types';
@@ -14,11 +13,10 @@
 	<p class="mb-4 text-sm text-mist-400">
 		{SiteCatalogue[lake.site_type].label}, {Number(lake.plot_acres)} acres in {RegionCatalogue[lake.region].label}. The name goes on the globe, the day tickets and every catch report.
 	</p>
-	<form method="POST" action="?/rename" class="flex gap-2">
+	<form method="POST" action="?/rename">
 		<input name="name" value={lake.name} minlength={WaterName.MinimumLength} maxlength={WaterName.MaximumLength} class="field font-display text-2xl" aria-label="Water name" />
-		<button class="button-secondary">Rename</button>
+		<footer class="mt-6 flex items-center gap-3">
+			<button class="button-primary ml-auto">Survey it →</button>
+		</footer>
 	</form>
-	<footer class="mt-6 flex items-center gap-3">
-		<a href="?step={WizardStep.Survey}" class="button-primary ml-auto">Survey it →</a>
-	</footer>
 </section>

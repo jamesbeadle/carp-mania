@@ -20,6 +20,12 @@ function isKnownRoute(href) {
 	return routePatterns.some((pattern) => pattern.test(path));
 }
 
+function routeDirectoryFor(actionPath) {
+	const wanted = actionPath.replace(/\{[^}]+\}/g, '*');
+	const matching = [...routeDirectories].find((directory) => directory.slice(RoutesRoot.length).replace(/\[[^\]]+\]/g, '*') === wanted);
+	return matching ?? join(RoutesRoot, actionPath);
+}
+
 function actionsDeclaredIn(directory) {
 	const serverFile = join(directory, '+page.server.ts');
 	try {
@@ -39,8 +45,7 @@ for (const path of walk(SourceRoot)) {
 		if (!isKnownRoute(match[1])) problems.push(`${path}: link to unknown route ${match[1]}`);
 	}
 	for (const match of source.matchAll(/action="(\/[^"?]*)\?\/(\w+)"/g)) {
-		const directory = join(RoutesRoot, match[1]);
-		if (!actionsDeclaredIn(directory).has(match[2])) problems.push(`${path}: posts to ${match[1]}?/${match[2]} which is not declared`);
+		if (!actionsDeclaredIn(routeDirectoryFor(match[1])).has(match[2])) problems.push(`${path}: posts to ${match[1]}?/${match[2]} which is not declared`);
 	}
 	if (!path.startsWith(RoutesRoot)) continue;
 	for (const match of source.matchAll(/action="\?\/(\w+)"/g)) {

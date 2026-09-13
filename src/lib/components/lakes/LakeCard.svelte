@@ -4,6 +4,7 @@
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 	import { worldUrlForLake } from '$lib/game/world/worldUrl';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 	import FavouriteStar from './FavouriteStar.svelte';
 
 	let { summary, isFavourite }: { summary: PublicLakeSummary; isFavourite: boolean } = $props();
@@ -31,6 +32,6 @@
 	<div class="mt-auto flex items-center gap-3">
 		<span class="text-lg text-volt-300">{formatMoney(summary.lake.day_ticket_fee)}<span class="text-xs text-mist-400"> / day</span></span>
 		<a href="/lakes/{summary.lake.id}" class="button-secondary ml-auto">Look around</a>
-		<a href="/fish/{summary.lake.id}" class="button-primary">Fish here</a>
+		<GoFishingButton lakeId={summary.lake.id} words="Fish here" />
 	</div>
 </article>

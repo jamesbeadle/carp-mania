@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { LakePostcard } from '$lib/contracts/LakePostcard';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
+	import { formatMoney } from '$lib/format/money';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 	import LakeCanvas from '../LakeCanvas.svelte';
 	import FavouriteStar from '../lakes/FavouriteStar.svelte';
 	import PostcardNumbers from './PostcardNumbers.svelte';
@@ -67,7 +69,7 @@
 		<PostcardNumbers numbers={postcard.numbers} />
 		<div class="grid grid-cols-2 gap-2">
 			<a href="/lakes/{lakeId}" class="button-secondary text-center text-base">Look around</a>
-			<a href="/fish/{lakeId}" class="button-primary text-center text-base">Fish</a>
+			<GoFishingButton {lakeId} words="Fish for {formatMoney(postcard.numbers.dayTicketFee)}" buttonClass="button-primary block w-full text-center text-base" />
 			<FavouriteStar {lakeId} {isFavourite} isLabelled />
 			<a href="/market?lake={lakeId}" class="button-secondary text-center text-base">Market</a>
 		</div>

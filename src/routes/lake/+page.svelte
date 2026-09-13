@@ -11,6 +11,7 @@
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
+	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import { PikeRules } from '$lib/domain/economy';
 	import { inProgressShapesFor } from '$lib/game/builder/draftShapes';
@@ -39,7 +40,7 @@
 	{#snippet actions()}
 		<a href="/lake/works" class="button-secondary text-base">Groundworks</a>
 		<a href="/lakes/{lake.id}/host-a-match" class="button-secondary text-base">Host a match</a>
-		<a href="/fish/{lake.id}" class="button-primary text-base">Go fishing</a>
+		<GoFishingButton lakeId={lake.id} words="Go fishing" buttonClass="button-primary text-base" />
 	{/snippet}
 </PlaceBanner>
 <WhileYouWereAway summary={data.whileAway} />

@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { StartFishingSession } from '$lib/server/commands/StartFishingSession';
 import { loadProfile } from '$lib/server/gates/requireMoney';
@@ -8,6 +8,7 @@ import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMat
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
 
 const VisitParam = 'visit';
+const HttpStatus = { BadRequest: 400 } as const;
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const visitId = url.searchParams.get(VisitParam);
@@ -24,7 +25,8 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 
 export const actions: Actions = {
 	buyTicket: async ({ locals, params }) => {
-		const visit = await StartFishingSession(locals, params.lakeId);
-		redirect(303, `/fish/${params.lakeId}?visit=${visit.id}`);
+		const started = await StartFishingSession(locals, params.lakeId);
+		if ('refusal' in started) return fail(HttpStatus.BadRequest, { message: started.refusal });
+		redirect(303, `/fish/${params.lakeId}?visit=${started.visit.id}`);
 	}
 };
