@@ -6,6 +6,7 @@
 	import Pager from '$lib/components/lists/Pager.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { listPathFor } from '$lib/domain/lists/listPath';
+	import { LegalPages } from '$lib/legal/legalPages';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 
@@ -44,6 +45,9 @@
 	<div class="lg:col-span-2"><TrophyCabinet trophies={data.angler.trophies} /></div>
 	<div class="lg:col-span-2"><FamilyLine line={data.angler.diary.line} currentId={data.angler.diary.current.id} /></div>
 </div>
-<form method="POST" action="/auth/signout" class="mt-8 text-center lg:hidden">
-	<button class="text-sm text-mist-400 hover:text-mist-100">Sign out</button>
-</form>
+<div class="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-mist-400">
+	{#each LegalPages as page (page.path)}<a href={page.path} class="hover:text-mist-100">{page.label}</a>{/each}
+	<form method="POST" action="/auth/signout" class="lg:hidden">
+		<button class="text-sm text-mist-400 hover:text-mist-100">Sign out</button>
+	</form>
+</div>
