@@ -5,7 +5,7 @@ import { FishingDay } from '$lib/domain/fishing/sessionClock';
 import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 import { seasonFor, type Season } from '$lib/domain/world/seasons';
-import { isCastOut, type RodOnBank } from '../scene/rodState';
+import { bringRodIn, isCastOut, type RodOnBank } from '../scene/rodState';
 import { BiteRoller, StrikeWindowSeconds, type RolledBite } from './biteRoller';
 import type { FightState } from './fightState.svelte';
 import type { LandedFish } from './landFish';
@@ -91,6 +91,8 @@ export class SessionState {
 
 	private endDay() {
 		this.hour = FishingDay.EndHour;
+		this.bite = null;
+		for (const rod of this.rods) bringRodIn(rod);
 		this.phase = 'day_over';
 	}
 }

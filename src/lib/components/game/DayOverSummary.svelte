@@ -25,9 +25,9 @@
 			</li>
 		{/each}
 	</ul>
-	<div class="flex gap-3">
+	<div class="flex flex-wrap gap-3">
 		<GoFishingButton {lakeId} words="Fish another day here" />
 		<a href="/lakes" class="button-secondary">Choose another water</a>
-		<a href="/angler" class="button-secondary">My profile</a>
+		<a href="/angler" class="button-secondary">My angler</a>
 	</div>
 </section>
