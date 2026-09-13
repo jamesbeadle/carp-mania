@@ -6,7 +6,7 @@ export interface WaterSummary {
 }
 
 const Totals = ['daysSimulated', 'anglersVisited', 'fishCaught', 'feesCollected', 'lodgeTakings', 'bailiffWages', 'aeratorRunning', 'heatwaveDays', 'frySpawned'] as const;
-const Lists = ['carpTakenByPike', 'carpDiedOfOldAge', 'carpArrived', 'recordsSet', 'worksCompleted'] as const;
+const Lists = ['carpTakenByPike', 'carpDiedOfOldAge', 'carpArrived', 'visitorsBigFish', 'worksCompleted'] as const;
 
 export function summariseEstate(waters: WaterSummary[]): WhileYouWereAway {
 	const busy = waters.filter((water) => water.summary.daysSimulated > 0);

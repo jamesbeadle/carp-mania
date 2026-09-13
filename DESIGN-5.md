@@ -45,16 +45,16 @@ No new routes. The hall of fame, the leaderboards rail, a water's page, the catc
 - Records are derived, never stored: the standing lake, region and world records are the heaviest *angler's* catch in each scope. Phase 2 adds a view of the standing record holders so "records held" and "still holds" are one read.
 - World events for an angler's catch or record carry `anglerId` in the payload, so the feed can link and filter; a visitor's carry only the name. Visitors no longer produce record events at all.
 - Phase 2: milestones are derived from catches and trophies; nothing stored.
-- Phase 3: two notification kinds, `record_lost` and `board_place_lost`, raised inside `record_catch` when the previous holder is a different angler.
+- Phase 3: two notification kinds, `record_lost` and `board_place_lost`, raised inside `record_catch` when the previous holder is a different angler. Nothing is stored for the board: who dropped a place is worked out from the catches before this one, so no nightly pass and no snapshot of the board are needed.
 
 ## 5. Backend
 
 - Phase 1: `records_broken_by` compares against anglers' catches only; `waters_of_legend` ranks by anglers' catches; `raise_catch_news` takes the angler and writes `anglerId` into the event; `GetStandingRecords` (the bar on the water and the simulation's copy) reads anglers' catches only; the simulation stops raising record events for visitors; `GetHallOfFame` and `GetLeaderboards` filter to anglers and carry the viewer's standing and the visitors' best; `GetLake` splits a water's recent catches into anglers' and visitors'; `GetWorldActivity` learns the `anglers` group.
 - Phase 2: `GetAnglerPublicProfile` gains catch cards with honours (a catch's honours are recomputed against the catches before it, so the cards are true to the day), records held, milestones and the comparison with the viewer; `standing_records` view.
-- Phase 3: `record_catch` raises `record_lost`; a nightly (fishery-day) pass raises `board_place_lost`; `GetMyRival` for the jetty.
+- Phase 3: `record_catch` raises `record_lost` (one note per beaten angler, at the widest scope they lost) and `board_place_lost` (to anglers on the world board who dropped a place and did not also lose a record); `board_neighbours` and `GetMyRival` for the jetty. The bailiff's note and the owner's inbox stop calling a visitor's big fish a record: the line is now "a visitor had 32 lb 8 oz — bigger than any angler has had here".
 
 ## 6. Phases
 
 1. **Anglers, not visitors** — records and boards among anglers, "you" on every board, visitors marked and moved behind everywhere they still show, the feed's *Anglers* pill. *(built: `anglers-not-visitors`)*
 2. **The trophy room** — catch cards with honours, records held, milestones, and how you measure up against another angler. *(built: `the-trophy-room`)*
-3. **Rivalry** — notes when your record or board place is taken, the next name to beat on the jetty.
+3. **Rivalry** — notes when your record or board place is taken, the next name to beat on the jetty. *(built: `rivalry`)*

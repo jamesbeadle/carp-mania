@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { MatchCard } from '$lib/contracts/MatchCard';
 	import type { MyMarketActivity } from '$lib/contracts/MyMarketActivity';
+	import type { MyRival } from '$lib/contracts/Rivalry';
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import type { MyFishery } from '$lib/server/queries/GetMyFishery';
 	import type { Lake, Profile } from '$lib/domain/types';
@@ -18,6 +19,7 @@
 	import Skeleton from '../loading/Skeleton.svelte';
 	import NextMatchCard from '../matches/NextMatchCard.svelte';
 	import PlaceSheet from '../stage/PlaceSheet.svelte';
+	import RivalCard from './RivalCard.svelte';
 
 	interface Props {
 		openPlace: PlaceId | null;
@@ -32,9 +34,10 @@
 		loadedAt: string;
 		waters: Lake[];
 		nextMatch: Promise<MatchCard | null>;
+		rival: Promise<MyRival>;
 	}
 
-	let { openPlace, onClose, fishery, profile, works, unreadNotifications, unreadCount, marketWatch, worldFeed, loadedAt, waters, nextMatch }: Props = $props();
+	let { openPlace, onClose, fishery, profile, works, unreadNotifications, unreadCount, marketWatch, worldFeed, loadedAt, waters, nextMatch, rival }: Props = $props();
 
 	const CouldNotLoad = 'That would not load. Close the sheet and open it again.';
 	const title = $derived(BankPlaces.find((place) => place.id === openPlace)?.label ?? '');
@@ -59,6 +62,13 @@
 		<InboxCard notifications={unreadNotifications} {unreadCount} />
 	{:else if openPlace === 'jetty'}
 		<AnglerSummaryCard {profile} />
+		{#await rival}
+			<Skeleton title="The one to beat" rows={2} />
+		{:then theRival}
+			<RivalCard rival={theRival} />
+		{:catch}
+			<p class="text-sm text-mist-400">{CouldNotLoad}</p>
+		{/await}
 		<GoFishingButton lakeId={fishery.lake.id} words="Fish my own water" buttonClass="button-secondary block w-full text-center" />
 		{#await nextMatch}
 			<Skeleton title="Matches" rows={2} />

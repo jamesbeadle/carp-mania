@@ -10,11 +10,11 @@ export interface WhileYouWereAway {
 	carpDiedOfOldAge: string[];
 	carpArrived: string[];
 	heatwaveDays: number;
-	recordsSet: string[];
+	visitorsBigFish: string[];
 	worksCompleted: string[];
 	frySpawned: number;
 }
 
 export function nothingHappened(): WhileYouWereAway {
-	return { daysSimulated: 0, anglersVisited: 0, fishCaught: 0, feesCollected: 0, lodgeTakings: 0, bailiffWages: 0, aeratorRunning: 0, carpTakenByPike: [], carpDiedOfOldAge: [], carpArrived: [], heatwaveDays: 0, recordsSet: [], worksCompleted: [], frySpawned: 0 };
+	return { daysSimulated: 0, anglersVisited: 0, fishCaught: 0, feesCollected: 0, lodgeTakings: 0, bailiffWages: 0, aeratorRunning: 0, carpTakenByPike: [], carpDiedOfOldAge: [], carpArrived: [], heatwaveDays: 0, visitorsBigFish: [], worksCompleted: [], frySpawned: 0 };
 }

@@ -26,7 +26,9 @@ export type NotificationKind =
 	| 'match_booked'
 	| 'match_cancelled'
 	| 'match_won'
-	| 'match_over';
+	| 'match_over'
+	| 'record_lost'
+	| 'board_place_lost';
 
 export interface Notification {
 	id: string;
