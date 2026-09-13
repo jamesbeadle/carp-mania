@@ -1,4 +1,6 @@
 <script lang="ts">
+	import YouPill from './YouPill.svelte';
+
 	interface Honour {
 		key: string;
 		label: string;
@@ -7,7 +9,15 @@
 		href: string;
 	}
 
-	let { title, blurb, honours, emptyWords }: { title: string; blurb: string; honours: Honour[]; emptyWords: string } = $props();
+	interface Props {
+		title: string;
+		blurb: string;
+		honours: Honour[];
+		emptyWords: string;
+		viewerId?: string | null;
+	}
+
+	let { title, blurb, honours, emptyWords, viewerId = null }: Props = $props();
 </script>
 
 <section class="panel">
@@ -18,10 +28,12 @@
 	{:else}
 		<ol class="divide-y divide-carbon-700/60">
 			{#each honours as honour, index (honour.key)}
-				<li class="flex items-baseline gap-3 py-2 text-sm">
+				{@const isViewers = viewerId !== null && honour.key === viewerId}
+				<li class={['flex items-baseline gap-3 py-2 text-sm', isViewers && '-mx-2 rounded-md bg-volt-500/10 px-2']}>
 					<span class="w-6 font-display text-2xl font-extrabold text-surge-500 italic tabular-nums">{index + 1}</span>
 					<span class="min-w-0">
 						<a href={honour.href} class="text-mist-100 hover:underline">{honour.label}</a>
+						{#if isViewers}<span class="ml-1"><YouPill /></span>{/if}
 						<span class="block text-xs text-mist-400">{honour.detail}</span>
 					</span>
 					<span class="ml-auto whitespace-nowrap text-volt-300">{honour.value}</span>

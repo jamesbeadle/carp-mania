@@ -4,7 +4,8 @@ import { inboxFiltersFrom, inboxParamsOf } from '../src/lib/domain/lists/inboxFi
 import { actionPathFor, listPathFor } from '../src/lib/domain/lists/listPath';
 import { clampedPage, hasMorePages, listPageOf, pageCountOf, pageNumberFrom, Paging, rangeOf } from '../src/lib/domain/lists/paging';
 import { waterFiltersFrom, waterParamsOf } from '../src/lib/domain/lists/waterFilters';
-import { feedGroupFrom, isActivityInGroup, kindsInGroup, oldestOf, olderFeedPathFor } from '../src/lib/domain/world/feedGroups';
+import { feedGroupFrom, isActivityInGroup, isAVisitorsCatch, isByAnAngler, kindsInGroup, oldestOf, olderFeedPathFor } from '../src/lib/domain/world/feedGroups';
+import { lastOnTheBoard, standingWords } from '../src/lib/domain/world/standingWords';
 import type { WorldActivity } from '../src/lib/contracts/WorldActivity';
 
 export function runListScenarios() {
@@ -49,5 +50,20 @@ export function runListScenarios() {
 	assert.equal(oldestOf([]), null);
 	assert.equal(olderFeedPathFor('2026-03-01T00:00:00Z', 'lines'), '/world/feed?before=2026-03-01T00%3A00%3A00Z&group=lines');
 	assert.equal(olderFeedPathFor('2026-03-01T00:00:00Z', null), '/world/feed?before=2026-03-01T00%3A00%3A00Z');
+
+	const visitorsCatch = { ...activity('big_catch', '2026-03-04T00:00:00Z'), payload: { anglerName: 'Ash "Night Owl"' } };
+	const anglersCatch = { ...activity('big_catch', '2026-03-05T00:00:00Z'), payload: { anglerName: 'Nigel', anglerId: 'p1' } };
+	assert.ok(!isByAnAngler(visitorsCatch) && isByAnAngler(anglersCatch) && isByAnAngler(feed[2]), 'an angler is known by an id on the catch, or by doing what only anglers do');
+	assert.ok(isAVisitorsCatch(visitorsCatch) && !isAVisitorsCatch(anglersCatch) && !isAVisitorsCatch(feed[0]), "only a catch without an angler is a visitor's");
+	assert.ok(isActivityInGroup(anglersCatch, 'anglers') && !isActivityInGroup(visitorsCatch, 'anglers') && isActivityInGroup(visitorsCatch, 'catches'), 'the anglers pill keeps visitors out');
+	assert.equal(kindsInGroup('anglers'), null, 'the anglers group is not a list of kinds');
+
+	const board = [{ weightLb: 40 }, { weightLb: 30 }, { weightLb: 20 }];
+	assert.equal(lastOnTheBoard(board, 3), 20);
+	assert.equal(lastOnTheBoard(board, 10), null, 'a board with room on it has no last place to beat');
+	assert.equal(standingWords({ rank: 0, bestLb: 0, anglers: 4 }, 20), 'Nothing on the bank here yet — the first fish you land puts you on the ladder.');
+	assert.equal(standingWords({ rank: 2, bestLb: 30, anglers: 4 }, 20), "You're No. 2 of 4 anglers, with 30 lb.");
+	assert.equal(standingWords({ rank: 4, bestLb: 12.5, anglers: 4 }, 20), "You're No. 4 of 4 anglers — your 12 lb 8 oz is 7 lb 8 oz short of the board.");
+	assert.equal(standingWords({ rank: 1, bestLb: 30, anglers: 1 }, null), "You're No. 1 of 1 angler, with 30 lb.");
 	console.log('lists:', { pages: page.count, feedGroups: kindsInGroup('waters') });
 }

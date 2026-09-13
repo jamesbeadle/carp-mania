@@ -1,13 +1,15 @@
-import type { HallOfFame, HallOfFameCatch, MatchWinner, ProlificAngler, WaterOfLegend } from '$lib/contracts/HallOfFame';
+import { HallBoard, type HallOfFame, type HallOfFameCatch, type MatchWinner, type ProlificAngler, type WaterOfLegend } from '$lib/contracts/HallOfFame';
 import { WorldScope, type LeaderboardScope } from '$lib/contracts/Leaderboards';
 import type { CarpMemorial } from '$lib/domain/memorialTypes';
 import { requireUser } from '../gates/requireUser';
 import { loadCarpNames } from './loadAnglerCatches';
 import { loadStillSwimming } from './loadStillSwimming';
+import { loadAnglerStanding, loadVisitorsBest } from './loadTheStanding';
 
-const BoardLength = 10;
+const BoardLength = HallBoard.Length;
 const Descending = { ascending: false } as const;
 const UnknownFish = 'A fish nobody named';
+const BiggestColumns = 'id, carp_id, weight_lb, angler_id, angler_name, owner_name, caught_at, lake_id, lakes!catches_lake_id_fkey!inner(name, region)';
 
 type BiggestRow = {
 	id: string;
@@ -26,19 +28,22 @@ type WinnerRow = { angler_id: string; angler_name: string; trophies: number; pri
 
 export async function GetHallOfFame(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFame> {
 	requireUser(locals);
-	const [biggestEver, legends, mostFishLanded, watersOfLegend, matchWinners] = await Promise.all([
-		loadBiggestEver(locals, scope),
+	const [biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners] = await Promise.all([
+		loadBiggestByAnAngler(locals, scope),
+		loadAnglerStanding(locals, scope),
+		loadVisitorsBest(locals, scope),
 		loadLegends(locals, scope),
 		loadMostFishLanded(locals, scope),
 		loadWatersOfLegend(locals, scope),
 		loadMatchWinners(locals, scope)
 	]);
-	return { scope, biggestEver, legends, mostFishLanded, watersOfLegend, matchWinners };
+	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners };
 }
 
-async function loadBiggestEver(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {
-	const catches = locals.supabase.from('catches').select('id, carp_id, weight_lb, angler_id, angler_name, owner_name, caught_at, lake_id, lakes!catches_lake_id_fkey!inner(name, region)');
-	const { data } = await withinScope(catches, 'lakes.region', scope).order('weight_lb', Descending).limit(BoardLength);
+async function loadBiggestByAnAngler(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {
+	let catches = locals.supabase.from('catches').select(BiggestColumns).not('angler_id', 'is', null);
+	if (scope !== WorldScope) catches = catches.eq('lakes.region', scope);
+	const { data } = await catches.order('weight_lb', Descending).order('caught_at').limit(BoardLength);
 	const rows = (data ?? []) as unknown as BiggestRow[];
 	const carpIds = rows.map((row) => row.carp_id);
 	const [names, stillSwimming] = await Promise.all([loadCarpNames(locals, carpIds), loadStillSwimming(locals, carpIds)]);

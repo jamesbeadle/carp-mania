@@ -1,15 +1,15 @@
 import { error } from '@sveltejs/kit';
-import type { Carp, Catch, Lake, Swim } from '$lib/domain/types';
+import type { RecentCatches } from '$lib/contracts/RecentCatches';
+import type { Carp, Lake, Swim } from '$lib/domain/types';
 import { requireUser } from '../gates/requireUser';
-
-const CatchReportLimit = 30;
+import { loadRecentCatches } from './loadRecentCatches';
 
 export interface LakeForAnglers {
 	lake: Lake;
 	ownerName: string;
 	swims: Swim[];
 	carp: Carp[];
-	catches: Catch[];
+	catches: RecentCatches;
 }
 
 export async function GetLake(locals: App.Locals, lakeId: string): Promise<LakeForAnglers> {
@@ -21,13 +21,13 @@ export async function GetLake(locals: App.Locals, lakeId: string): Promise<LakeF
 	const [swims, carp, catches] = await Promise.all([
 		locals.supabase.from('swims').select('*').eq('lake_id', lakeId).order('name'),
 		locals.supabase.from('carp').select('*').eq('lake_id', lakeId).order('weight_lb', { ascending: false }),
-		locals.supabase.from('catches').select('*').eq('lake_id', lakeId).order('caught_at', { ascending: false }).limit(CatchReportLimit)
+		loadRecentCatches(locals, lakeId, new Date())
 	]);
 	return {
 		lake: lake as Lake,
 		ownerName: profiles?.display_name ?? 'Unknown owner',
 		swims: (swims.data ?? []) as Swim[],
 		carp: (carp.data ?? []) as Carp[],
-		catches: (catches.data ?? []) as Catch[]
+		catches
 	};
 }

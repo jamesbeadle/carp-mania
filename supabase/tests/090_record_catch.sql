@@ -14,9 +14,10 @@ select test.give_carp(:'lake', 'Travelling', 'common', 18, 80, 0) as travelling 
 select test.give_carp(:'french_lake', 'Etranger', 'common', 18, 80, 0) as foreign_fish \gset
 update public.carp set is_catalogued = false where id = :'hidden';
 update public.carp set transit_until = now() + interval '1 hour' where id = :'travelling';
-insert into public.catches (lake_id, angler_name, weight_lb, swim_name, rig, bait, hook_size) values
-	(:'french_lake', 'Jean', 40, 'La Pointe', 'hair', 'boilie', 4),
-	(:'private_lake', 'Bob', 35, 'The Peg', 'hair', 'boilie', 4);
+insert into public.catches (lake_id, angler_id, angler_name, weight_lb, swim_name, rig, bait, hook_size) values
+	(:'french_lake', test.player(92), 'Jean', 40, 'La Pointe', 'hair', 'boilie', 4),
+	(:'private_lake', test.player(93), 'Bob', 35, 'The Peg', 'hair', 'boilie', 4),
+	(:'lake', null, 'A visitor', 45, 'The Peg', 'hair', 'boilie', 4);
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(91)::text, false);
@@ -36,7 +37,7 @@ set role service_role;
 select public.record_catch(test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie', 6, 1, 0.5, 3, 1) as first_catch \gset
 reset role;
 select test.assert_that((select angler_id = test.player(91) and weight_lb = 20 and angler_name = 'Player 91' from public.catches where id = :'first_catch'), 'the catch is the angler''s');
-select test.assert_that((select fame = 15 and times_caught = 1 from public.carp where id = :'twenty'), 'fame: 3 for a player, 10 for the lake record, 2 for a personal best');
+select test.assert_that((select fame = 15 and times_caught = 1 from public.carp where id = :'twenty'), 'fame: 3 for a player, 10 for the lake record (the visitor''s 45 does not count), 2 for a personal best');
 select test.assert_that(
 	(select line_selection = 26 and rig_selection = 25.5 and bait_selection = 27 and watercraft = 26 and experience = 1 from public.profiles where id = test.player(91)),
 	'skills grow by at most 2 a catch'

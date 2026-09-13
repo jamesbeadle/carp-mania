@@ -1,9 +1,9 @@
 <script lang="ts">
-	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import LakeCanvas from '$lib/components/LakeCanvas.svelte';
 	import StockTable from '$lib/components/StockTable.svelte';
 	import WaterQualityBars from '$lib/components/WaterQualityBars.svelte';
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
+	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
 	import FishHereButton from '$lib/components/matches/FishHereButton.svelte';
 	import MatchesAtWater from '$lib/components/matches/MatchesAtWater.svelte';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
@@ -45,9 +45,6 @@
 		<h2 class="mb-3 text-xl text-volt-300">The stock</h2>
 		<StockTable carp={data.water.carp} limit={15} />
 	</section>
-	<section class="panel">
-		<h2 class="mb-3 text-xl text-volt-300">Recent catches</h2>
-		<CatchReportList catches={data.water.catches} {carpNames} />
-	</section>
+	<RecentCatchesPanel catches={data.water.catches} {carpNames} />
 	<div class="lg:col-span-2"><MatchesAtWater lakeId={data.water.lake.id} matches={data.matches} {now} /></div>
 </div>

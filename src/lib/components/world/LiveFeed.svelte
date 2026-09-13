@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
-	import { FeedGroups, oldestOf, type FeedGroup } from '$lib/domain/world/feedGroups';
+	import { FeedGroups, isAVisitorsCatch, oldestOf, type FeedGroup } from '$lib/domain/world/feedGroups';
 	import { formatWhen } from '$lib/format/dates';
 	import { feedLineFor } from '$lib/game/world/feedLine';
 	import { FeedView } from '$lib/game/world/feedView.svelte';
@@ -41,7 +41,7 @@
 	{:else}
 		<ul class="mt-1 divide-y divide-carbon-700/60 text-sm">
 			{#each lines as activity (activity.id)}
-				<li class="flex items-baseline gap-3 py-1">
+				<li class={['flex items-baseline gap-3 py-1', isAVisitorsCatch(activity) && 'opacity-60']}>
 					<button class="min-w-0 truncate text-left text-mist-100 transition hover:text-volt-300" onclick={() => onPick(activity.lakeId)}>{feedLineFor(activity)}</button>
 					<span class="ml-auto text-xs whitespace-nowrap text-mist-400">{formatWhen(activity.createdAt)}</span>
 				</li>

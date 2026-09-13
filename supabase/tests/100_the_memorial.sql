@@ -30,7 +30,7 @@ select set_config('request.jwt.claim.sub', test.player(101)::text, false);
 select test.assert_that((select count(*) from public.carp_memorial where id = :'warrior') = 1, 'anyone can read the memorial');
 select test.assert_refused(format('insert into public.carp_memorial (id, lake_name, name, strain, weight_lb, age_years, origin, death_cause) values (%L, %L, %L, %L, 1, 1, %L, %L)', gen_random_uuid(), 'x', 'x', 'common', 'wild', 'pike'), 'row-level security');
 select test.assert_that(not exists (select 1 from public.most_fish_landed('world', 100) where angler_name = 'Ada'), 'unnamed visiting anglers do not make the board');
-select test.assert_that(exists (select 1 from public.waters_of_legend('uk_ireland', 50) where lake_name = 'Memorial Mere' and heaviest_lb = 38 and owner_name = 'Player 100'), 'the water of legend credits its owner');
+select test.assert_that(not exists (select 1 from public.waters_of_legend('uk_ireland', 50) where lake_name = 'Memorial Mere'), 'a visitor''s fish does not make a water of legend');
 reset role;
 
 select test.give_carp(:'lake', 'Ticket Fish', 'common', 18, 80, 0) as ticket_fish \gset
@@ -41,3 +41,4 @@ reset role;
 select public.record_catch(test.player(101), :'visit', :'ticket_fish', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0) as player_catch \gset
 select test.assert_that((select owner_name = 'Player 100' and angler_name = 'Player 101' from public.catches where id = :'player_catch'), 'a catch credits the owner of the water as well as the angler');
 select test.assert_that(exists (select 1 from public.most_fish_landed('world', 100) where angler_name = 'Player 101' and catches = 1 and heaviest_lb = 18), 'a signed-in angler makes the board');
+select test.assert_that(exists (select 1 from public.waters_of_legend('uk_ireland', 50) where lake_name = 'Memorial Mere' and heaviest_lb = 18 and owner_name = 'Player 100'), 'an angler''s fish makes the water one of legend, and credits its owner');

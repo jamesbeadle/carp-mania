@@ -10,10 +10,6 @@ export function bigCatchEvent(lakeId: string, fishName: string, weightLb: number
 	return event('big_catch', lakeId, { fishName, weightLb, anglerName });
 }
 
-export function recordEvent(lakeId: string, fishName: string, weightLb: number, scope: 'lake' | 'region' | 'world'): NewWorldEvent {
-	return event('record', lakeId, { fishName, weightLb, scope });
-}
-
 export function saleEvent(sellerLakeId: string, buyerLakeId: string, fishName: string, price: number): NewWorldEvent {
 	return { kind: 'sale', lake_id: sellerLakeId, other_lake_id: buyerLakeId, payload: { fishName, price } };
 }
