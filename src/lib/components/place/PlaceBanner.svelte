@@ -25,16 +25,16 @@
 
 	let { kind, title, blurb, skyOver = null, hasBailiff = false, noteCount = 3, words, actions, aside }: Props = $props();
 
-	const NightFrom = 0.35;
-	const NightDimming = 0.55;
+	const NightBelowDaylight = 0.5;
+	const NightDimming = 0.4;
 	const clock = new StageClock();
 	const ground = `linear-gradient(180deg, ${BankPalette.GrassFar}, ${BankPalette.GrassNear})`;
 
 	const over = $derived(skyOver ?? (page.data.hud?.skyOver as SkyOver | null | undefined) ?? SomewhereInTheWorld);
 	const conditions = $derived(stageConditionsFor(over, clock.now));
 	const lighting = $derived(lakeLightingFor(conditions));
-	const isNight = $derived(lighting.nightOpacity > NightFrom);
-	const vignetteFilter = $derived(`${lighting.seasonFilter} brightness(${1 - lighting.nightOpacity * NightDimming})`);
+	const isNight = $derived(lighting.daylight < NightBelowDaylight);
+	const vignetteFilter = $derived(`${lighting.seasonFilter} brightness(${1 - (1 - lighting.daylight) * NightDimming})`);
 
 	$effect(() => clock.start());
 </script>
@@ -44,7 +44,7 @@
 	<div class="absolute inset-x-0 bottom-0 h-14 sm:h-16" style="background: {ground}; filter: {lighting.seasonFilter}"><LightingOverlays {lighting} /></div>
 	<div class="relative flex flex-wrap items-end gap-x-3 gap-y-3 px-4 pt-5 pb-3 sm:gap-x-5 sm:px-6 sm:pt-6">
 		<div class="h-14 w-24 shrink-0 sm:h-24 sm:w-40" style="filter: {vignetteFilter}"><PlaceVignette {kind} {isNight} {hasBailiff} {noteCount} {words} /></div>
-		<div class="min-w-0 flex-1 pb-1">
+		<div class="min-w-48 flex-1 pb-1">
 			<h1 class="text-2xl leading-none break-words text-mist-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] sm:text-5xl">{title}</h1>
 			{#if blurb}<p class="mt-1 text-sm text-mist-100/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">{blurb}</p>{/if}
 			{#if aside}<div class="mt-2">{@render aside()}</div>{/if}

@@ -1,19 +1,21 @@
 <script lang="ts">
+	import { nextRodToCast } from '$lib/game/session/sessionFlow';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { pointerWords } from '$lib/game/stage/pointerWords';
 
 	let { session, isDocked = false }: { session: SessionState; isDocked?: boolean } = $props();
 
-	const uncastCount = $derived(session.rods.filter((rod) => rod.phase === 'idle').length);
-	const prompt = $derived(promptFor(session.phase, uncastCount, session.rods.length));
+	const prompt = $derived(promptFor(session));
 	const words = $derived(prompt ? pointerWords(prompt) : null);
 
-	function promptFor(phase: SessionState['phase'], uncast: number, rodCount: number) {
-		if (phase === 'choose_swim') return 'Pick a swim — click one of the pegs on the bank';
-		if (phase !== 'fishing') return null;
-		if (uncast === rodCount) return 'Click the water to cast your first rod';
-		if (uncast > 0) return `Click the water to cast rod ${rodCount - uncast + 1} of ${rodCount}`;
-		return 'Rods out — wait for the bite alarm, then strike';
+	function promptFor(current: SessionState) {
+		if (current.phase === 'choose_swim') return 'Pick a swim — click one of the pegs on the bank';
+		if (current.phase !== 'fishing') return null;
+		const next = nextRodToCast(current);
+		if (!next) return 'Rods out — wait for the bite alarm, then strike';
+		const isNothingOutYet = current.rods.every((rod) => rod.phase === 'idle');
+		if (isNothingOutYet) return 'Click the water to cast your first rod';
+		return `Click the water to cast rod ${next.index + 1}`;
 	}
 </script>
 

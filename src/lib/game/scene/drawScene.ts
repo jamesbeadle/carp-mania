@@ -3,18 +3,19 @@ import type { Lake, Swim } from '$lib/domain/types';
 import { drawAngler } from '../render/drawAngler';
 import { drawBank } from '../render/drawBank';
 import { drawBars } from '../render/drawBars';
-import { drawBedPatches } from '../render/drawBedPatches';
-import { drawDepthZones } from '../render/drawDepthZones';
+import { drawGravelSpeckles } from '../render/drawBedPatches';
 import { drawFishSchool } from '../render/drawFish';
 import { drawIslands } from '../render/drawIslands';
 import { drawLilies } from '../render/drawLilies';
 import { drawRods } from '../render/drawRods';
 import { drawShowingFish } from '../render/drawShowingFish';
 import { drawSnags } from '../render/drawSnags';
-import { drawSwims, swimScenePoint } from '../render/drawSwims';
+import { drawSoftBed, paintSoftBed } from '../render/softBed';
+import { drawPegs, drawSwimLabels, swimScenePoint } from '../render/drawSwims';
 import { drawDrafts, type DraftShape } from '../render/drawUnderConstruction';
 import { drawWater } from '../render/drawWater';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
+import { createFacingTheWater } from './facingTheWater';
 import { moveFishSchool, type SwimmingFish } from './fishSchool';
 import { islandPathsFrom, isInsideWater, isPointInScenePath, lakeCentreOf, lakePathFrom, type Point } from './lakeShape';
 import type { RodOnBank } from './rodState';
@@ -35,14 +36,17 @@ export function createSceneDrawer(layout: LakeLayout) {
 	const lakePath = lakePathFrom(layout);
 	const islandPaths = islandPathsFrom(layout);
 	const centre = lakeCentreOf(layout);
+	const softBed = paintSoftBed(layout);
+	let facingTheWaterFrom: ((peg: Point) => number) | null = null;
 
 	return function drawScene(context: CanvasRenderingContext2D, input: SceneInput, secondsElapsed: number, timeSeconds: number) {
 		const transparency = Number(input.lake.transparency);
+		facingTheWaterFrom ??= createFacingTheWater(context, { lakePath, islandPaths, centre });
 		moveFishSchool(input.school, context, lakePath, islandPaths, secondsElapsed, timeSeconds);
 		drawBank(context, lakePath);
 		drawWater(context, lakePath, centre, transparency, timeSeconds);
-		drawDepthZones(context, lakePath, layout);
-		drawBedPatches(context, lakePath, layout);
+		drawSoftBed(context, lakePath, softBed);
+		drawGravelSpeckles(context, lakePath, layout);
 		drawBars(context, lakePath, layout);
 		drawWeedBeds(context, lakePath, layout, Number(input.lake.weed), timeSeconds);
 		drawLilies(context, lakePath, layout, timeSeconds);
@@ -50,18 +54,20 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawIslands(context, islandPaths);
 		drawSnags(context, layout);
 		drawReeds(context, layout, timeSeconds);
-		drawSwims(context, input.swims, input.selectedSwimId, input.hoveredSwimId);
-		drawAnglerAndRods(context, input, timeSeconds);
+		drawPegs(context, input.swims, input.selectedSwimId, input.hoveredSwimId);
+		drawAnglerAndRods(context, input, timeSeconds, facingTheWaterFrom);
+		drawSwimLabels(context, input.swims, input.selectedSwimId, facingTheWaterFrom);
 		drawDrafts(context, input.drafts ?? []);
 		drawShowingFish(context, input.showingAt ?? [], timeSeconds);
 	};
 
-	function drawAnglerAndRods(context: CanvasRenderingContext2D, input: SceneInput, timeSeconds: number) {
+	function drawAnglerAndRods(context: CanvasRenderingContext2D, input: SceneInput, timeSeconds: number, facingTheWaterFrom: (peg: Point) => number) {
 		const swim = input.swims.find((candidate) => candidate.id === input.selectedSwimId);
 		if (!swim || !input.isAnglerOnBank) return;
 		const position = swimScenePoint(swim);
-		drawRods(context, position, input.rods, timeSeconds);
-		drawAngler(context, position, Math.atan2(centre.y - position.y, centre.x - position.x));
+		const facing = facingTheWaterFrom(position);
+		drawAngler(context, position, facing);
+		drawRods(context, position, facing, input.rods, timeSeconds);
 	}
 }
 

@@ -17,9 +17,10 @@
 		onStrike: () => void;
 		onFightFinished: () => void;
 		onContinue: () => void;
+		onReelIn: (rodIndex: number) => void;
 	}
 
-	let { session, lake, profile, catchOutcome, onStrike, onFightFinished, onContinue }: Props = $props();
+	let { session, lake, profile, catchOutcome, onStrike, onFightFinished, onContinue, onReelIn }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-3 px-3 py-3">
@@ -31,6 +32,6 @@
 		{#if session.bite}<StrikeButton bite={session.bite} {onStrike} isDocked />{/if}
 		<NextStepPrompt {session} isDocked />
 		{#if session.notice && !session.bite}<SessionNotice notice={session.notice} isDocked />{/if}
-		{#if session.rods.length > 0}<RodStatusBar rods={session.rods} isDocked />{/if}
+		{#if session.rods.length > 0}<RodStatusBar rods={session.rods} isDocked {onReelIn} />{/if}
 	{/if}
 </div>

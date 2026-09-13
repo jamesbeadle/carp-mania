@@ -23,7 +23,7 @@ export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot): Dra
 function currentDraftShapes(builder: BuilderState, failures: string[], lake: Plot): DraftShape[] {
 	const draft = builder.draft;
 	if (!draft) return [];
-	if (builder.isDrawing) return shapeWhileDrawing(draft, builder.hover, workLabelFor(draft), failures.length === 0);
+	if (builder.isDrawing) return shapeWhileDrawing(draft, builder.hover, workLabelFor(draft), failures);
 	const footprint = footprintOf(draft, lake.layout, Number(lake.plot_acres));
 	if (footprint.points.length === 0) return [];
 	return [{ kind: footprint.shape, points: footprint.points, label: workLabelFor(draft), isValid: failures.length === 0 }];

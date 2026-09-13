@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
 	import { drawnShapeOf, finishDrawing, isPointsDraft, pointsStillNeeded, type PointsDraft } from '$lib/game/builder/finishDrawing';
+	import { ruleBrokenWhileDrawing } from '$lib/game/builder/shapeWhileDrawing';
+	import { pointerWords } from '$lib/game/stage/pointerWords';
 
-	let { builder }: { builder: BuilderState } = $props();
+	let { builder, failures }: { builder: BuilderState; failures: string[] } = $props();
 
 	const FinishHints = {
 		polygon: 'Click the ringed first point to close it, or double-click, press Enter or tap Finish.',
@@ -12,7 +14,8 @@
 	const draft = $derived(builder.draft && isPointsDraft(builder.draft) ? builder.draft : null);
 	const placedCount = $derived(draft?.points.length ?? 0);
 	const canFinish = $derived(draft !== null && pointsStillNeeded(draft) === 0);
-	const guidance = $derived(guidanceFor(draft));
+	const ruleBroken = $derived(builder.draft ? ruleBrokenWhileDrawing(builder.draft, failures) : null);
+	const words = $derived(ruleBroken ?? pointerWords(guidanceFor(draft)));
 
 	function guidanceFor(current: PointsDraft | null) {
 		if (!current) return '';
@@ -23,13 +26,14 @@
 </script>
 
 {#if draft}
-	<div class="space-y-2 border-t border-carbon-700 pt-3">
-		<p class="text-sm text-mist-100">{placedCount} {placedCount === 1 ? 'point' : 'points'} placed</p>
-		<p class="text-xs text-mist-400">{guidance}</p>
-		<div class="flex gap-2">
-			<button class="button-primary flex-1 px-2 text-base" disabled={!canFinish} onclick={() => finishDrawing(builder)}>Finish shape</button>
+	<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+		<p class="min-w-0 flex-1 text-sm" class:text-danger-400={ruleBroken !== null} class:text-mist-200={ruleBroken === null}>
+			<span class="font-display font-bold tracking-wide text-volt-300 uppercase">{placedCount} {placedCount === 1 ? 'point' : 'points'}</span> · {words}
+		</p>
+		<div class="flex flex-wrap gap-2">
 			<button class="button-secondary px-3 text-base" onclick={() => builder.undoLastPoint()}>Undo point</button>
+			<button class="button-secondary px-3 text-base" onclick={() => builder.clear()}>Start again</button>
+			<button class="button-primary px-3 text-base" disabled={!canFinish} onclick={() => finishDrawing(builder)}>Finish</button>
 		</div>
-		<p class="text-xs text-mist-400">Backspace undoes the last point · Escape starts over</p>
 	</div>
 {/if}

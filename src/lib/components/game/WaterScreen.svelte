@@ -35,9 +35,10 @@
 		onStrike: () => void;
 		onFightFinished: () => void;
 		onContinue: () => void;
+		onReelIn: (rodIndex: number) => void;
 	}
 
-	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue }: Props = $props();
+	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn }: Props = $props();
 
 	const orientation = new Orientation();
 	const canReadTheWater = $derived(Number(profile.watercraft) >= WatercraftShowsFishFrom);
@@ -52,7 +53,7 @@
 
 {#snippet overTheLake()}
 	<NextStepPrompt {session} />
-	{#if session.rods.length > 0}<RodStatusBar rods={session.rods} />{/if}
+	{#if session.rods.length > 0}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
 	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
 	{#if session.phase === 'fighting' && session.fight}
@@ -64,7 +65,7 @@
 {/snippet}
 
 {#snippet deck()}
-	<SessionDeck {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} />
+	<SessionDeck {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} {onReelIn} />
 {/snippet}
 
 {#if orientation.deckPlacement === 'none'}

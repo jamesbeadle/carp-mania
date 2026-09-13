@@ -9,8 +9,13 @@ export const BankPalette = {
 	Shore: 'hsl(40 30% 46%)',
 	Reed: 'hsl(70 45% 32%)',
 	ReedTip: 'hsl(40 55% 60%)',
-	Peg: 'hsl(30 35% 35%)',
-	PegSelected: 'hsl(119 79% 57%)',
+	Peg: 'hsl(30 32% 36%)',
+	PegPlank: 'hsla(28 40% 14% / 0.45)',
+	PegEdge: 'hsl(34 38% 50%)',
+	PegShadow: 'hsla(0 0% 0% / 0.28)',
+	PegLift: 'hsla(42 60% 92% / 0.55)',
+	PegChosenRing: 'hsla(42 90% 68% / 0.55)',
+	PegChosenGlow: 'hsla(42 90% 68% / 0.22)',
 	Label: 'hsl(42 40% 92%)',
 	LabelBackdrop: 'hsla(0 0% 0% / 0.45)'
 } as const;
@@ -19,9 +24,19 @@ export const AnglerPalette = {
 	Skin: 'hsl(28 45% 70%)',
 	Jacket: 'hsl(90 20% 30%)',
 	Hat: 'hsl(40 30% 25%)',
+	Chair: 'hsl(120 12% 22%)',
+	Shadow: 'hsla(0 0% 0% / 0.25)',
 	Rod: 'hsl(30 20% 20%)',
-	Line: 'hsla(192 100% 70% / 0.55)',
-	Bivvy: 'hsl(95 22% 34%)'
+	Pod: 'hsl(0 0% 18%)',
+	Line: 'hsla(200 60% 88% / 0.5)',
+	LineTight: 'hsla(200 60% 92% / 0.8)',
+	Float: 'hsl(40 30% 92%)',
+	FloatEdge: 'hsla(0 0% 0% / 0.5)',
+	Ripple: 'hsla(190 30% 95% / 0.5)',
+	BiteTag: 'hsl(2 78% 62%)',
+	Bivvy: 'hsl(95 22% 34%)',
+	BivvyLight: 'hsla(95 30% 60% / 0.35)',
+	BivvyDoor: 'hsla(90 20% 10% / 0.6)'
 } as const;
 
 const bedTints: Record<BedType, string> = {
@@ -38,7 +53,7 @@ export const BedPalette = {
 	BarRidge: 'hsla(46 60% 96% / 0.5)'
 } as const;
 
-export const DepthShade = { AlphaPerFoot: 0.06, MaximumAlpha: 0.5 } as const;
+export const DepthShade = { AlphaPerFoot: 0.06, MaximumAlpha: 0.5, SoftEdgePixels: 16 } as const;
 
 export const LilyPalette = {
 	Pad: 'hsl(104 38% 30%)',
