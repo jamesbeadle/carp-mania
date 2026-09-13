@@ -19,6 +19,7 @@ import { runListScenarios } from './testLists';
 import { runMarketScenarios } from './testMarket';
 import { runMatchScenarios } from './testMatches';
 import { runSiteScenarios } from './testSites';
+import { runTrophyScenarios } from './testTrophies';
 import { runSpawningScenarios, runWorldScenarios } from './testWorld';
 
 const random = seededRandom(42);
@@ -80,4 +81,5 @@ runMatchScenarios();
 runGroundworksScenarios();
 runSiteScenarios();
 runListScenarios();
+runTrophyScenarios();
 console.log('domain tests passed');

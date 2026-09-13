@@ -56,5 +56,5 @@ No new routes. The hall of fame, the leaderboards rail, a water's page, the catc
 ## 6. Phases
 
 1. **Anglers, not visitors** — records and boards among anglers, "you" on every board, visitors marked and moved behind everywhere they still show, the feed's *Anglers* pill. *(built: `anglers-not-visitors`)*
-2. **The trophy room** — catch cards with honours, records held, milestones, and how you measure up against another angler.
+2. **The trophy room** — catch cards with honours, records held, milestones, and how you measure up against another angler. *(built: `the-trophy-room`)*
 3. **Rivalry** — notes when your record or board place is taken, the next name to beat on the jetty.

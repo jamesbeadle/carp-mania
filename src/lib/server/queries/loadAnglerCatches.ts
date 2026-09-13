@@ -11,11 +11,6 @@ export type CaughtBy = { angler_id: string } | { fisherman_id: string };
 type FamousFishRow = { id: string; name: string; strain: CarpStrain; weight_lb: number; fame: number; lake_id: string; lake_name: string | null };
 type NamedRow = { id: string; name: string };
 
-export async function loadHeaviestCatchesBy(locals: App.Locals, anglerId: string, limit: number): Promise<Catch[]> {
-	const { data: catches } = await locals.supabase.from('catches').select('*').eq('angler_id', anglerId).order('weight_lb', { ascending: false }).limit(limit);
-	return (catches ?? []) as Catch[];
-}
-
 export async function loadCatchHistoryOf(locals: App.Locals, caughtBy: CaughtBy, pageNumber: number): Promise<ListPage<Catch>> {
 	const page = { number: pageNumber, size: CatchHistoryPageSize };
 	const { from, to } = rangeOf(page);
