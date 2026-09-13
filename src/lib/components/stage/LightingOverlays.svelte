@@ -1,9 +1,17 @@
 <script lang="ts">
-	import { NightColour, type LakeLighting } from '$lib/game/stage/lakeLighting';
+	import type { LakeLighting } from '$lib/game/stage/lakeLighting';
 
 	let { lighting }: { lighting: LakeLighting } = $props();
 </script>
 
-<div class="pointer-events-none absolute inset-0 mix-blend-soft-light" style="background: {lighting.seasonTint}"></div>
-<div class="pointer-events-none absolute inset-0 mix-blend-soft-light" style="background: {lighting.glowColour}; opacity: {lighting.glowOpacity}"></div>
-<div class="pointer-events-none absolute inset-0 mix-blend-multiply" style="background: {NightColour}; opacity: {lighting.nightOpacity}"></div>
+<div class="light pointer-events-none absolute inset-0 mix-blend-soft-light" style="background-color: {lighting.seasonTint}"></div>
+<div class="light pointer-events-none absolute inset-0 mix-blend-soft-light" style="background-color: {lighting.glowColour}; opacity: {lighting.glowOpacity}"></div>
+<div class="light pointer-events-none absolute inset-0 mix-blend-multiply" style="background-color: {lighting.shadeColour}; opacity: {lighting.shadeOpacity}"></div>
+
+<style>
+	.light {
+		transition:
+			opacity 6s linear,
+			background-color 6s linear;
+	}
+</style>

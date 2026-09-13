@@ -15,7 +15,11 @@ export function isNightAt(hour: number) {
 
 export function daylightAt(hour: number) {
 	if (hour < Daylight.DawnStartsAt || hour >= Daylight.DuskEndsAt) return 0;
-	if (hour < Daylight.SunriseAt) return (hour - Daylight.DawnStartsAt) / (Daylight.SunriseAt - Daylight.DawnStartsAt);
+	if (hour < Daylight.SunriseAt) return eased((hour - Daylight.DawnStartsAt) / (Daylight.SunriseAt - Daylight.DawnStartsAt));
 	if (hour < Daylight.SunsetAt) return 1;
-	return (Daylight.DuskEndsAt - hour) / (Daylight.DuskEndsAt - Daylight.SunsetAt);
+	return eased((Daylight.DuskEndsAt - hour) / (Daylight.DuskEndsAt - Daylight.SunsetAt));
+}
+
+function eased(fraction: number) {
+	return fraction * fraction * (3 - 2 * fraction);
 }

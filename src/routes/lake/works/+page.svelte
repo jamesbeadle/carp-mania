@@ -1,9 +1,9 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
+	import Bench from '$lib/components/builder/Bench.svelte';
 	import BuilderCanvas from '$lib/components/builder/BuilderCanvas.svelte';
 	import LayerToggles from '$lib/components/builder/LayerToggles.svelte';
 	import PropertiesPanel from '$lib/components/builder/PropertiesPanel.svelte';
-	import ToolHint from '$lib/components/builder/ToolHint.svelte';
 	import ToolRail from '$lib/components/builder/ToolRail.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
@@ -57,15 +57,15 @@
 	<ToolRail {builder} />
 	<div>
 		<BuilderCanvas {builder} {lake} {sceneLake} swims={data.fishery.swims} {sceneSwims} carp={data.fishery.carp} {drafts} />
-		<ToolHint {builder} onDetails={() => (isSheetOpen = true)} />
+		<Bench {builder} failures={quote?.failures ?? []} {lake} swims={data.fishery.swims} onDetails={() => (isSheetOpen = true)} />
 		<LayerToggles bind:layers />
 	</div>
-	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} swims={data.fishery.swims} profile={data.profile} {hasEarthworksInProgress} /></div>
+	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} /></div>
 </div>
 
 {#if screen.isPhone}
 	<PlaceSheet title={SheetTitle} isOpen={isSheetOpen} onClose={() => (isSheetOpen = false)}>
-		<PropertiesPanel {builder} {quote} {lake} swims={data.fishery.swims} profile={data.profile} {hasEarthworksInProgress} />
+		<PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} />
 	</PlaceSheet>
 {/if}
 

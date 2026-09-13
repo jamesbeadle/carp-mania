@@ -4,7 +4,7 @@
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
-	import { bringTheFishIn, castTheNextRod, strikeAtTheBite } from '$lib/game/session/anglerActions';
+	import { bringTheFishIn, castTheNextRod, reelTheRodIn, strikeAtTheBite } from '$lib/game/session/anglerActions';
 	import { buzzForBite } from '$lib/game/session/haptics';
 	import { reportLandedFish, type CatchReportOutcome } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
@@ -40,13 +40,14 @@
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
 	let showingAt = $state<LayoutPoint[]>([]);
-	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
+	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, session.hour));
+	const ambience = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 
 	$effect(() => startTicking(session));
 	$effect(() => watchFishShowing(lake, session.carp, session.season, showFish));
 	$effect(() => followTheBiteAlarm(session.bite !== null, isAlarmMuted));
 	$effect(() => void (session.bite && buzzForBite()));
-	$effect(() => sound.startAmbience(ambientSceneFor(conditions)));
+	$effect(() => sound.startAmbience(ambientSceneFor(ambience)));
 	$effect(() => () => sound.stopAmbience());
 	$effect(() => quietTheBank);
 
@@ -88,6 +89,7 @@
 		onStrike={() => strikeAtTheBite(session)}
 		onFightFinished={handleFightFinished}
 		onContinue={() => returnToFishing(session)}
+		onReelIn={(rodIndex) => reelTheRodIn(session, rodIndex)}
 	>
 		{#snippet overTheSky()}
 			<SessionChrome {lake} {session} {matchBoardHref} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />

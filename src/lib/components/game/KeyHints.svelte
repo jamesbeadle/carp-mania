@@ -2,6 +2,7 @@
 	const hints = [
 		{ key: 'Click peg', action: 'choose swim' },
 		{ key: 'Click water', action: 'cast next rod' },
+		{ key: '1 2 3', action: 'reel a rod in' },
 		{ key: 'Enter', action: 'strike' },
 		{ key: 'Hold Space', action: 'reel' },
 		{ key: 'Release', action: 'give line on a run' }

@@ -3,6 +3,7 @@ import type { SoundName } from '../sound/soundLibrary';
 import type { FightOutcome } from './fightState.svelte';
 
 const OutcomeSounds: Record<FightOutcome, SoundName> = { landed: 'net', snapped: 'snap', hook_pulled: 'hook_pulled' };
+const ReelInMilliseconds = 900;
 
 export function followTheBiteAlarm(hasBite: boolean, isAlarmMuted: boolean) {
 	if (!hasBite || isAlarmMuted) return sound.stopLoop('alarm');
@@ -18,6 +19,11 @@ export function followTheFight(isReeling: boolean, isRunning: boolean) {
 	else sound.stopLoop('reel');
 	if (isRunning) sound.startLoop('clutch');
 	else sound.stopLoop('clutch');
+}
+
+export function soundTheReelIn() {
+	sound.startLoop('reel');
+	setTimeout(() => sound.stopLoop('reel'), ReelInMilliseconds);
 }
 
 export function quietTheBank() {
