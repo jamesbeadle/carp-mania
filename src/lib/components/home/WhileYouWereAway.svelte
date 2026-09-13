@@ -31,8 +31,8 @@
 				<div><dt class="stat-label">{line.label}</dt><dd class:text-volt-300={line.amount > 0} class:text-mist-200={line.amount < 0}>{formatMoney(line.amount)}</dd></div>
 			{/each}
 		</dl>
-		{#each summary.recordsSet as record (record)}
-			<p class="mt-2 text-sm text-volt-300">{record}</p>
+		{#each summary.visitorsBigFish as line (line)}
+			<p class="mt-2 text-sm text-volt-300">{line}</p>
 		{/each}
 		{#if summary.worksCompleted.length > 0}
 			<p class="mt-2 text-sm text-mist-200">Works finished: {summary.worksCompleted.join(', ')}.</p>

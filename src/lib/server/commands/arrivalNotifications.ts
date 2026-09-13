@@ -1,5 +1,6 @@
 import type { DayOutcome } from '$lib/domain/simulation/simulateOneDay';
 import type { Notification } from '$lib/domain/worldTypes';
+import { formatWeight } from '$lib/format/weight';
 
 export type NewNotification = Omit<Notification, 'id' | 'created_at' | 'read_at'>;
 
@@ -18,13 +19,13 @@ export function arrivalNotifications(profileId: string, outcomes: DayOutcome[]):
 		body: `${fish.name} can be fished for and listed again.`,
 		link: `/carp/${fish.id}`
 	}));
-	const records = recordNotifications(profileId, outcomes);
-	return [...arrived, ...released, ...records];
+	const bigFish = visitorsBigFishNotifications(profileId, outcomes);
+	return [...arrived, ...released, ...bigFish];
 }
 
-function recordNotifications(profileId: string, outcomes: DayOutcome[]): NewNotification[] {
-	const first = outcomes[0].records;
-	const last = outcomes[outcomes.length - 1].records;
-	if (last.lakeRecordLb <= first.lakeRecordLb) return [];
-	return [{ profile_id: profileId, kind: 'record_set', title: `New lake record: ${last.lakeRecordLb} lb`, body: 'A visiting angler set a new record on your water while you were away.', link: '/lake' }];
+function visitorsBigFishNotifications(profileId: string, outcomes: DayOutcome[]): NewNotification[] {
+	const anglersBestLb = outcomes[0].records.lakeRecordLb;
+	const biggestLb = outcomes[outcomes.length - 1].records.lakeRecordLb;
+	if (biggestLb <= anglersBestLb) return [];
+	return [{ profile_id: profileId, kind: 'big_catch_on_your_water', title: `A visitor had ${formatWeight(biggestLb)} from your water`, body: 'Bigger than any angler has had here — the lake record is there for the taking.', link: '/lake' }];
 }

@@ -9,6 +9,7 @@ import { GetHomeHub } from '$lib/server/queries/GetHomeHub';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
 import { GetMyNextMatch } from '$lib/server/queries/GetMyNextMatch';
+import { GetMyRival } from '$lib/server/queries/GetMyRival';
 import { GetWorldActivity, WorldActivityLimit } from '$lib/server/queries/GetWorldActivity';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
@@ -21,7 +22,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const behindTheSheets = {
 		worldFeed: GetWorldActivity(locals, { limit: WorldActivityLimit.HomeHub }),
 		marketWatch: GetMyMarketActivity(locals),
-		nextMatch: GetMyNextMatch(locals)
+		nextMatch: GetMyNextMatch(locals),
+		rival: GetMyRival(locals)
 	};
 	return { profile, fishery, whileAway, diary, waters, ...behindTheSheets, loadedAt: new Date().toISOString(), isStage: true, ...hub };
 };

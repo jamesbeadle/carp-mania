@@ -14,7 +14,7 @@ export function runEstateScenarios() {
 	assert.equal(currentWaterOf([], null), null, 'no waters, no current water');
 
 	const quiet = { waterName: 'Quiet Pool', summary: nothingHappened() };
-	const busy = { waterName: 'Busy Pit', summary: { ...nothingHappened(), daysSimulated: 3, anglersVisited: 9, feesCollected: 180, recordsSet: ['Lake record now 28 lb'] } };
+	const busy = { waterName: 'Busy Pit', summary: { ...nothingHappened(), daysSimulated: 3, anglersVisited: 9, feesCollected: 180, visitorsBigFish: ['A visitor had 28 lb — bigger than any angler has had here.'] } };
 	const busier = { waterName: 'Mere', summary: { ...nothingHappened(), daysSimulated: 2, anglersVisited: 4, feesCollected: 80, carpTakenByPike: ['Poorly Pete'] } };
 	assert.equal(summariseEstate([quiet]).daysSimulated, 0, 'a quiet estate has nothing to report');
 	assert.deepEqual(summariseEstate([quiet, busy]), busy.summary, 'one busy water reports as itself');
@@ -22,7 +22,7 @@ export function runEstateScenarios() {
 	assert.equal(combined.anglersVisited, 13, 'anglers are added up across the estate');
 	assert.equal(combined.feesCollected, 260, 'so is the money');
 	assert.equal(combined.daysSimulated, 3, 'the days are the longest any water ran');
-	assert.deepEqual(combined.recordsSet, ['Busy Pit: Lake record now 28 lb'], 'lines name their water');
+	assert.deepEqual(combined.visitorsBigFish, ['Busy Pit: A visitor had 28 lb — bigger than any angler has had here.'], 'lines name their water');
 	assert.deepEqual(combined.carpTakenByPike, ['Mere: Poorly Pete']);
 	console.log('estate:', { mostWaters: Estate.MostWaters });
 }

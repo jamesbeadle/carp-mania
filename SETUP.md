@@ -17,7 +17,8 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0014_the_matches.sql`, `0014a_fishing_the_match.sql`, `0014b_booking_a_match.sql`, `0014c_the_prizes.sql`, `0014d_closing_a_match.sql`,
    `0015_the_lists.sql`,
    `0016_records_among_anglers.sql`, `0016b_the_angler_on_the_news.sql`,
-   `0017_the_trophy_room.sql`, `0017b_milestones_and_ranks.sql`.
+   `0017_the_trophy_room.sql`, `0017b_milestones_and_ranks.sql`,
+   `0018_rivalry.sql`, `0018b_the_catch_tells_the_beaten.sql`, `0018c_the_next_name_to_beat.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to the live domain after deploying — `https://carp-mania.com` for the real game).

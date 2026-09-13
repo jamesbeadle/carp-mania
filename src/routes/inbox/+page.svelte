@@ -27,7 +27,7 @@
 	</form>
 {/snippet}
 
-<PlaceBanner kind="noticeboard" title="The noticeboard" blurb="{unreadLine} Outbids, sales, arrivals, finished works, matches and records set on your water." noteCount={Math.max(1, unreadCount)} actions={unreadCount > 0 ? takeThemAllDown : undefined} />
+<PlaceBanner kind="noticeboard" title="The noticeboard" blurb="{unreadLine} Outbids, sales, arrivals, finished works, matches, records set on your water and records taken from you." noteCount={Math.max(1, unreadCount)} actions={unreadCount > 0 ? takeThemAllDown : undefined} />
 
 <ActionMessage {form} />
 <InboxFilterBar filters={inbox.filters} {unreadCount} total={inbox.notes.total} />

@@ -12,7 +12,7 @@
 	<p class="stat-label">Inbox</p>
 	<h2 class="mb-4 text-3xl text-volt-300">{headline}</h2>
 	{#if unreadCount === 0}
-		<p class="text-sm text-mist-400">Outbids, sales, arrivals, finished works and records set on your water land here.</p>
+		<p class="text-sm text-mist-400">Outbids, sales, arrivals, finished works, records set on your water and records taken from you land here.</p>
 	{:else}
 		<ul class="divide-y divide-carbon-700/60 text-sm">
 			{#each notifications as notification (notification.id)}
