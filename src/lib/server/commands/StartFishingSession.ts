@@ -1,15 +1,17 @@
-import { error } from '@sveltejs/kit';
 import type { FishingVisit } from '$lib/contracts/FishingVisit';
 import { requireUser } from '../gates/requireUser';
 import { GetFishingVisit } from '../queries/GetFishingVisit';
 
-const HttpStatus = { BadRequest: 400, ServerError: 500 } as const;
+const CouldNotBuy = 'Could not buy a day ticket';
+const NoSeed = 'The day ticket came without a seed — the session cannot start';
 
-export async function StartFishingSession(locals: App.Locals, lakeId: string): Promise<FishingVisit> {
+export type SessionStart = { visit: FishingVisit } | { refusal: string };
+
+export async function StartFishingSession(locals: App.Locals, lakeId: string): Promise<SessionStart> {
 	requireUser(locals);
 	const { data: visitId, error: ticketError } = await locals.supabase.rpc('pay_day_ticket', { lake: lakeId });
-	if (ticketError || !visitId) error(HttpStatus.BadRequest, ticketError?.message ?? 'Could not buy a day ticket');
+	if (ticketError || !visitId) return { refusal: ticketError?.message ?? CouldNotBuy };
 	const visit = await GetFishingVisit(locals, lakeId, visitId as string);
-	if (!visit) error(HttpStatus.ServerError, 'The day ticket came without a seed — the session cannot start');
-	return visit;
+	if (!visit) return { refusal: NoSeed };
+	return { visit };
 }

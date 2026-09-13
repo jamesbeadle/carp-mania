@@ -7,6 +7,7 @@
 	import type { LakeWork, Notification } from '$lib/domain/worldTypes';
 	import { BankPlaces, type PlaceId } from '$lib/game/stage/bankPlaces';
 	import EstateSwitcher from '../estate/EstateSwitcher.svelte';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 	import AnglerSummaryCard from '../home/AnglerSummaryCard.svelte';
 	import FisherySummaryCard from '../home/FisherySummaryCard.svelte';
 	import InboxCard from '../home/InboxCard.svelte';
@@ -58,7 +59,7 @@
 		<InboxCard notifications={unreadNotifications} {unreadCount} />
 	{:else if openPlace === 'jetty'}
 		<AnglerSummaryCard {profile} />
-		<a href="/fish/{fishery.lake.id}" class="button-secondary block text-center">Fish my own water</a>
+		<GoFishingButton lakeId={fishery.lake.id} words="Fish my own water" buttonClass="button-secondary block w-full text-center" />
 		{#await nextMatch}
 			<Skeleton title="Matches" rows={2} />
 		{:then match}

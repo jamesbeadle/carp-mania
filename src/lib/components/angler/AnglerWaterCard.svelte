@@ -2,6 +2,7 @@
 	import type { AnglerWater } from '$lib/contracts/AnglerPublicProfile';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 
 	let { waters, anglerName }: { waters: AnglerWater[]; anglerName: string } = $props();
 
@@ -21,7 +22,7 @@
 		<div class="mt-5 flex items-center gap-3">
 			<span class="text-lg text-volt-300">{formatMoney(water.day_ticket_fee)}<span class="text-xs text-mist-400"> / day</span></span>
 			<a href="/lakes/{water.id}" class="button-secondary ml-auto">Look around</a>
-			<a href="/fish/{water.id}" class="button-primary">Fish here</a>
+			<GoFishingButton lakeId={water.id} words="Fish here" />
 		</div>
 		</div>
 	{/each}

@@ -2,6 +2,7 @@
 	import type { MatchPage } from '$lib/contracts/MatchPage';
 	import { formatMoney } from '$lib/format/money';
 	import { pegsWords } from '$lib/game/matches/matchWords';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 
 	let { page }: { page: MatchPage } = $props();
 
@@ -29,7 +30,7 @@
 	{#if isOpen}<p class="mt-3 text-xs text-mist-400">{entryWords}. Every entry fee goes in the pot; ties share the prize. The water is closed to everyone else while the match runs, and entrants fish it without a day ticket.</p>{/if}
 
 	{#if canFishNow}
-		<a href="/fish/{match.lake_id}" class="button-primary mt-4 block text-center">Fish the match</a>
+		<div class="mt-4"><GoFishingButton lakeId={match.lake_id} words="Fish the match" buttonClass="button-primary block w-full text-center" /></div>
 	{:else if card.isEntered && card.phase === 'upcoming'}
 		<p class="mt-4 text-sm text-volt-300">You're in. Come back when it starts and fish from the water's page.</p>
 	{:else if isOpen && page.whyCannotEnter === null}

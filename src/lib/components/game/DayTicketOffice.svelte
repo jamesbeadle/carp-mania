@@ -3,6 +3,7 @@
 	import type { Profile } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 	import type { LakeForAnglers } from '$lib/server/queries/GetLake';
+	import GoFishingButton from './GoFishingButton.svelte';
 
 	interface Props {
 		water: LakeForAnglers;
@@ -33,8 +34,6 @@
 			{:else if isOwnWater}It's your own water — no ticket needed.
 			{:else}A day here costs {formatMoney(water.lake.day_ticket_fee)}. You have {formatMoney(profile.money)}.{/if}
 		</p>
-		<form method="POST" action="?/buyTicket">
-			<button class="button-primary px-8 py-3 text-lg">{buttonWords}</button>
-		</form>
+		<GoFishingButton lakeId={water.lake.id} words={buttonWords} buttonClass="button-primary px-8 py-3 text-lg" />
 	{/if}
 </section>

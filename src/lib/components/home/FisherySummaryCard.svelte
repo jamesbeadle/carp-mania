@@ -2,6 +2,7 @@
 	import type { Carp, Lake } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
+	import GoFishingButton from '../game/GoFishingButton.svelte';
 
 	let { lake, carp }: { lake: Lake; carp: Carp[] } = $props();
 
@@ -23,6 +24,6 @@
 	{/if}
 	<div class="mt-5 flex gap-3">
 		<a href="/lake" class="button-primary">Run the fishery</a>
-		<a href="/fish/{lake.id}" class="button-secondary">Fish my own water</a>
+		<GoFishingButton lakeId={lake.id} words="Fish my own water" buttonClass="button-secondary" />
 	</div>
 </section>

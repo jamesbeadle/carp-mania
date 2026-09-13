@@ -2,6 +2,7 @@
 	import { honourKindsOf, HonourWords } from '$lib/domain/fishing/honours';
 	import type { LandedFish } from '$lib/game/session/landFish';
 	import { formatWeight } from '$lib/format/weight';
+	import GoFishingButton from './GoFishingButton.svelte';
 
 	let { landed, lost, lakeId }: { landed: LandedFish[]; lost: number; lakeId: string } = $props();
 
@@ -25,7 +26,7 @@
 		{/each}
 	</ul>
 	<div class="flex gap-3">
-		<a href="/fish/{lakeId}" class="button-primary" data-sveltekit-reload>Fish another day here</a>
+		<GoFishingButton {lakeId} words="Fish another day here" />
 		<a href="/lakes" class="button-secondary">Choose another water</a>
 		<a href="/angler" class="button-secondary">My profile</a>
 	</div>
