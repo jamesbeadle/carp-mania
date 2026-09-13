@@ -15,7 +15,8 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0012_the_generations.sql`, `0012b_the_handover.sql`, `0012c_the_fisherman_on_the_catch.sql`,
    `0013_the_estate.sql`, `0013b_the_current_water_in_the_market.sql`,
    `0014_the_matches.sql`, `0014a_fishing_the_match.sql`, `0014b_booking_a_match.sql`, `0014c_the_prizes.sql`, `0014d_closing_a_match.sql`,
-   `0015_the_lists.sql`.
+   `0015_the_lists.sql`,
+   `0016_records_among_anglers.sql`, `0016b_the_angler_on_the_news.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to the live domain after deploying — `https://carp-mania.com` for the real game).

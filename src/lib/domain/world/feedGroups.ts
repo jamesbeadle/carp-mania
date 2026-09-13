@@ -1,7 +1,7 @@
 import type { WorldActivity } from '../../contracts/WorldActivity';
 import type { WorldEventKind } from '../worldTypes';
 
-export type FeedGroup = 'catches' | 'market' | 'waters' | 'matches' | 'lines';
+export type FeedGroup = 'anglers' | 'catches' | 'market' | 'waters' | 'matches' | 'lines';
 
 export interface FeedGroupChoice {
 	group: FeedGroup;
@@ -9,7 +9,11 @@ export interface FeedGroupChoice {
 	kinds: WorldEventKind[];
 }
 
+export const AnglersGroup: FeedGroup = 'anglers';
+export const AnglersDoings: WorldEventKind[] = ['handover', 'match_announced', 'match_won'];
+
 export const FeedGroups: FeedGroupChoice[] = [
+	{ group: AnglersGroup, label: 'Anglers', kinds: [] },
 	{ group: 'catches', label: 'Catches', kinds: ['big_catch', 'record'] },
 	{ group: 'market', label: 'Sales', kinds: ['sale'] },
 	{ group: 'waters', label: 'Waters', kinds: ['new_water', 'island_built'] },
@@ -25,11 +29,20 @@ export function feedGroupFrom(param: string | null): FeedGroup | null {
 }
 
 export function kindsInGroup(group: FeedGroup | null): WorldEventKind[] | null {
-	if (group === null) return null;
+	if (group === null || group === AnglersGroup) return null;
 	return FeedGroups.find((choice) => choice.group === group)?.kinds ?? null;
 }
 
+export function isByAnAngler(activity: Pick<WorldActivity, 'kind' | 'payload'>) {
+	return typeof activity.payload.anglerId === 'string' || AnglersDoings.includes(activity.kind);
+}
+
+export function isAVisitorsCatch(activity: Pick<WorldActivity, 'kind' | 'payload'>) {
+	return activity.kind === 'big_catch' && !isByAnAngler(activity);
+}
+
 export function isActivityInGroup(activity: WorldActivity, group: FeedGroup | null) {
+	if (group === AnglersGroup) return isByAnAngler(activity);
 	const kinds = kindsInGroup(group);
 	return kinds === null || kinds.includes(activity.kind);
 }

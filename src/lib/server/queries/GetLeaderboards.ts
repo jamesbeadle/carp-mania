@@ -31,8 +31,9 @@ async function loadBiggestAlive(locals: App.Locals, scope: LeaderboardScope, top
 }
 
 async function loadBiggestEver(locals: App.Locals, scope: LeaderboardScope, top: BoardLength) {
-	const catches = locals.supabase.from('catches').select('id, weight_lb, angler_name, caught_at, lakes!catches_lake_id_fkey!inner(name, region)');
-	const { data } = await withinScope(catches, 'lakes.region', scope).order('weight_lb', Descending).limit(top);
+	let catches = locals.supabase.from('catches').select('id, weight_lb, angler_id, angler_name, caught_at, lakes!catches_lake_id_fkey!inner(name, region)').not('angler_id', 'is', null);
+	if (scope !== WorldScope) catches = catches.eq('lakes.region', scope);
+	const { data } = await catches.order('weight_lb', Descending).order('caught_at').limit(top);
 	return rowsOf<BiggestEverRow>(data).map(biggestEverEntry);
 }
 

@@ -1,6 +1,8 @@
 import type { CarpMemorial } from '$lib/domain/memorialTypes';
 import type { LeaderboardScope } from './Leaderboards';
 
+export const HallBoard = { Length: 10 } as const;
+
 export interface HallOfFameCatch {
 	catchId: string;
 	carpId: string | null;
@@ -38,9 +40,26 @@ export interface MatchWinner {
 	latestTitle: string;
 }
 
+export interface AnglerStanding {
+	rank: number;
+	bestLb: number;
+	anglers: number;
+}
+
+export interface VisitorsBest {
+	weightLb: number;
+	carpId: string | null;
+	lakeId: string;
+	lakeName: string;
+	anglerName: string;
+	caughtAt: string;
+}
+
 export interface HallOfFame {
 	scope: LeaderboardScope;
 	biggestEver: HallOfFameCatch[];
+	standing: AnglerStanding;
+	visitorsBest: VisitorsBest | null;
 	legends: CarpMemorial[];
 	mostFishLanded: ProlificAngler[];
 	watersOfLegend: WaterOfLegend[];

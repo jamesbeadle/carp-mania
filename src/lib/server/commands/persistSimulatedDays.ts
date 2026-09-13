@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { netMoneyFor, type DayOutcome } from '$lib/domain/simulation/simulateOneDay';
-import { bigCatchEvent, isBigNpcCatch, recordEvent } from '$lib/domain/simulation/worldEvents';
+import { bigCatchEvent, isBigNpcCatch } from '$lib/domain/simulation/worldEvents';
 import type { Lake, Profile } from '$lib/domain/types';
 import { settleDayTakings } from '../gates/requireMoney';
 import { arrivalNotifications } from './arrivalNotifications';
@@ -45,17 +45,5 @@ async function insertNews(trusted: SupabaseClient, lake: Lake, outcomes: DayOutc
 function worldEventsFor(lake: Lake, outcomes: DayOutcome[]) {
 	const bigCatches = outcomes.flatMap((day) => day.catches.filter((caught) => isBigNpcCatch(caught.weight_lb)));
 	const carpNames = new Map(outcomes[outcomes.length - 1].carp.map((fish) => [fish.id, fish.name]));
-	const events = bigCatches.map((caught) => bigCatchEvent(lake.id, carpNames.get(caught.carp_id) ?? 'an unknown fish', caught.weight_lb, caught.angler_name));
-	const first = outcomes[0].records;
-	const last = outcomes[outcomes.length - 1].records;
-	if (last.worldRecordLb > first.worldRecordLb) events.push(recordEvent(lake.id, heaviestName(outcomes, last.worldRecordLb), last.worldRecordLb, 'world'));
-	else if (last.regionRecordLb > first.regionRecordLb) events.push(recordEvent(lake.id, heaviestName(outcomes, last.regionRecordLb), last.regionRecordLb, 'region'));
-	else if (last.lakeRecordLb > first.lakeRecordLb) events.push(recordEvent(lake.id, heaviestName(outcomes, last.lakeRecordLb), last.lakeRecordLb, 'lake'));
-	return events;
-}
-
-function heaviestName(outcomes: DayOutcome[], weightLb: number) {
-	const carpNames = new Map(outcomes[outcomes.length - 1].carp.map((fish) => [fish.id, fish.name]));
-	const caught = outcomes.flatMap((day) => day.catches).find((candidate) => Number(candidate.weight_lb) === weightLb);
-	return caught ? (carpNames.get(caught.carp_id) ?? 'an unknown fish') : 'an unknown fish';
+	return bigCatches.map((caught) => bigCatchEvent(lake.id, carpNames.get(caught.carp_id) ?? 'an unknown fish', caught.weight_lb, caught.angler_name));
 }

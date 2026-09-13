@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { BoardLengths, leaderboardsPathFor, WorldScope, type BoardLength, type Leaderboards } from '$lib/contracts/Leaderboards';
 	import type { RegionCode } from '$lib/domain/world/regionCodes';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
@@ -15,7 +16,8 @@
 
 	const scope = $derived(region ?? WorldScope);
 	const scopeLabel = $derived(region ? RegionCatalogue[region].label : 'The whole world');
-	const boards = $derived(leaderboards ? boardsFrom(leaderboards) : []);
+	const viewerId = $derived(page.data.user?.id ?? null);
+	const boards = $derived(leaderboards ? boardsFrom(leaderboards, viewerId) : []);
 
 	$effect(() => {
 		loadLeaderboards(leaderboardsPathFor(scope, top));

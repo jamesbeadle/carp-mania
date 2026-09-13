@@ -17,6 +17,7 @@ export interface BiggestAliveEntry {
 export interface BiggestEverEntry {
 	catchId: string;
 	weightLb: number;
+	anglerId: string | null;
 	anglerName: string;
 	lakeName: string;
 	caughtAt: string;

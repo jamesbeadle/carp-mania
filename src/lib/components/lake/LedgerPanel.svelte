@@ -22,7 +22,11 @@
 			<ul class="divide-y divide-carbon-700/60 text-sm">
 				{#each visits as visit (visit.id)}
 					<li class="flex items-baseline gap-3 py-2">
-						<span class="text-mist-100">{visit.angler_name}</span>
+						{#if visit.angler_id}
+							<a href="/anglers/{visit.angler_id}" class="text-mist-100 hover:underline">{visit.angler_name}</a>
+						{:else}
+							<span class="text-mist-200">{visit.angler_name} <span class="text-xs text-mist-400 italic">visitor</span></span>
+						{/if}
 						<span class="text-mist-400">{visit.fish_caught} fish</span>
 						<span class="ml-auto" class:text-volt-300={Number(visit.fee_paid) > 0} class:text-danger-400={Number(visit.fee_paid) === 0}>
 							{Number(visit.fee_paid) > 0 ? formatMoney(visit.fee_paid) : 'fished free'}

@@ -8,6 +8,7 @@ export interface LeaderboardRow {
 	detail: string;
 	value: string;
 	href: string | null;
+	isViewers: boolean;
 }
 
 export interface LeaderboardBoard {
@@ -15,27 +16,28 @@ export interface LeaderboardBoard {
 	rows: LeaderboardRow[];
 }
 
-export function boardsFrom(leaderboards: Leaderboards): LeaderboardBoard[] {
+export function boardsFrom(leaderboards: Leaderboards, viewerId: string | null): LeaderboardBoard[] {
 	return [
 		{ title: 'Biggest fish alive', rows: leaderboards.biggestAlive.map(biggestAliveRow) },
-		{ title: 'Biggest ever caught', rows: leaderboards.biggestEver.map(biggestEverRow) },
+		{ title: 'Biggest by an angler', rows: leaderboards.biggestEver.map((entry) => biggestEverRow(entry, viewerId)) },
 		{ title: 'Top reputation', rows: leaderboards.topReputation.map(topReputationRow) },
-		{ title: 'Best anglers', rows: leaderboards.bestAnglers.map(bestAnglerRow) }
+		{ title: 'Best anglers', rows: leaderboards.bestAnglers.map((entry) => bestAnglerRow(entry, viewerId)) }
 	];
 }
 
 function biggestAliveRow(entry: BiggestAliveEntry): LeaderboardRow {
-	return { key: entry.carpId, label: entry.name, detail: entry.lakeName, value: formatWeight(entry.weightLb), href: `/carp/${entry.carpId}` };
+	return { key: entry.carpId, label: entry.name, detail: entry.lakeName, value: formatWeight(entry.weightLb), href: `/carp/${entry.carpId}`, isViewers: false };
 }
 
-function biggestEverRow(entry: BiggestEverEntry): LeaderboardRow {
-	return { key: entry.catchId, label: entry.anglerName, detail: `${entry.lakeName} · ${formatWhen(entry.caughtAt)}`, value: formatWeight(entry.weightLb), href: null };
+function biggestEverRow(entry: BiggestEverEntry, viewerId: string | null): LeaderboardRow {
+	const href = entry.anglerId ? `/anglers/${entry.anglerId}` : null;
+	return { key: entry.catchId, label: entry.anglerName, detail: `${entry.lakeName} · ${formatWhen(entry.caughtAt)}`, value: formatWeight(entry.weightLb), href, isViewers: entry.anglerId === viewerId };
 }
 
 function topReputationRow(entry: TopReputationEntry): LeaderboardRow {
-	return { key: entry.lakeId, label: entry.name, detail: `${entry.ownerName}'s water`, value: String(Math.round(entry.reputation)), href: `/lakes/${entry.lakeId}` };
+	return { key: entry.lakeId, label: entry.name, detail: `${entry.ownerName}'s water`, value: String(Math.round(entry.reputation)), href: `/lakes/${entry.lakeId}`, isViewers: false };
 }
 
-function bestAnglerRow(entry: BestAnglerEntry): LeaderboardRow {
-	return { key: entry.profileId, label: entry.displayName, detail: 'overall skill', value: String(Math.round(entry.overallSkill)), href: `/anglers/${entry.profileId}` };
+function bestAnglerRow(entry: BestAnglerEntry, viewerId: string | null): LeaderboardRow {
+	return { key: entry.profileId, label: entry.displayName, detail: 'overall skill', value: String(Math.round(entry.overallSkill)), href: `/anglers/${entry.profileId}`, isViewers: entry.profileId === viewerId };
 }

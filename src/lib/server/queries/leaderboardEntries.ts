@@ -18,6 +18,7 @@ export interface BiggestAliveRow {
 export interface BiggestEverRow {
 	id: string;
 	weight_lb: number;
+	angler_id: string | null;
 	angler_name: string;
 	caught_at: string;
 	lakes: LakeNameEmbed | null;
@@ -41,7 +42,7 @@ export function biggestAliveEntry(row: BiggestAliveRow): BiggestAliveEntry {
 }
 
 export function biggestEverEntry(row: BiggestEverRow): BiggestEverEntry {
-	return { catchId: row.id, weightLb: Number(row.weight_lb), anglerName: row.angler_name, lakeName: row.lakes?.name ?? UnknownWater, caughtAt: row.caught_at };
+	return { catchId: row.id, weightLb: Number(row.weight_lb), anglerId: row.angler_id, anglerName: row.angler_name, lakeName: row.lakes?.name ?? UnknownWater, caughtAt: row.caught_at };
 }
 
 export function topReputationEntry(row: TopReputationRow): TopReputationEntry {

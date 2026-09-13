@@ -17,7 +17,7 @@
 				{#if caught.angler_id}
 					<a href="/anglers/{caught.angler_id}" class="text-mist-100 hover:underline">{caught.angler_name}</a>
 				{:else}
-					<span class="text-mist-100">{caught.angler_name}</span>
+					<span class="text-mist-400 italic">{caught.angler_name} · visitor</span>
 				{/if}
 				<span class="text-mist-400">· {caught.swim_name} · {humanise(caught.rig)} · {humanise(caught.bait)}</span>
 				<span class="ml-auto text-xs text-mist-400">{formatWhen(caught.caught_at)}</span>

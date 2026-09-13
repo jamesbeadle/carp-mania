@@ -22,9 +22,9 @@
 					<span class="text-mist-100">{UnnamedCarp}</span>
 				{/if}
 				{#if caught.angler_id}
-					<a href="/anglers/{caught.angler_id}" class="text-mist-400 hover:underline">by {caught.angler_name}</a>
+					<a href="/anglers/{caught.angler_id}" class="text-mist-100 hover:underline">by {caught.angler_name}</a>
 				{:else}
-					<span class="text-mist-400">by {caught.angler_name}</span>
+					<span class="text-mist-400 italic">by {caught.angler_name} · visitor</span>
 				{/if}
 				{#if lakeNames[caught.lake_id]}
 					<a href="/lakes/{caught.lake_id}" class="text-surge-400 hover:underline">at {lakeNames[caught.lake_id]}</a>

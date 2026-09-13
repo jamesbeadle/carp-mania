@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { LeaderboardBoard } from '$lib/game/world/leaderboardRows';
+	import YouPill from '../hall/YouPill.svelte';
 
 	let { board }: { board: LeaderboardBoard } = $props();
 </script>
@@ -11,7 +12,7 @@
 	{:else}
 		<ol class="divide-y divide-carbon-700/60 text-sm">
 			{#each board.rows as row, index (row.key)}
-				<li class="flex items-baseline gap-2 py-1">
+				<li class={['flex items-baseline gap-2 py-1', row.isViewers && '-mx-1 rounded-md bg-volt-500/10 px-1']}>
 					<span class="w-5 shrink-0 text-xs text-mist-400">{index + 1}.</span>
 					<span class="min-w-0 truncate">
 						{#if row.href}
@@ -19,6 +20,7 @@
 						{:else}
 							<span class="text-mist-100">{row.label}</span>
 						{/if}
+						{#if row.isViewers}<span class="ml-1"><YouPill /></span>{/if}
 						<span class="block truncate text-xs text-mist-400">{row.detail}</span>
 					</span>
 					<span class="ml-auto whitespace-nowrap text-volt-300">{row.value}</span>
