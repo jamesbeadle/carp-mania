@@ -26,10 +26,9 @@
 <p class="mb-4"><a href="/market" class="text-sm text-surge-400 hover:underline">← Back to the tackle shop</a></p>
 <ActionMessage {form} />
 
-<div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<Dossier dossier={data.listingPage.dossier} hasListingLink={false} />
-	<div class="flex flex-col gap-6">
+<Dossier dossier={data.listingPage.dossier} hasListingLink={false}>
+	{#snippet aside()}
 		<BidBox page={data.listingPage} {now} />
 		<BidHistory bids={data.listingPage.bids} />
-	</div>
-</div>
+	{/snippet}
+</Dossier>
