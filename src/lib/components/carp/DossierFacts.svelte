@@ -19,10 +19,10 @@
 </script>
 
 <dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-	<div><dt class="stat-label">Best ever</dt><dd class="text-2xl text-volt-300">{formatWeight(dossier.bestEverLb)}</dd></div>
-	<div><dt class="stat-label">Age</dt><dd class="text-2xl">{dossier.carp.age_years} <span class="text-sm text-mist-400">yrs</span></dd></div>
-	<div><dt class="stat-label">Condition</dt><dd class="text-2xl {conditionTone(Number(dossier.carp.condition))}">{Math.round(Number(dossier.carp.condition))}<span class="text-sm text-mist-400">/100</span></dd></div>
-	<div><dt class="stat-label">Guide price</dt><dd class="text-2xl">{formatMoney(dossier.guidePrice)}</dd></div>
+	<div><dt class="stat-label">Best ever</dt><dd class="text-xl text-volt-300">{formatWeight(dossier.bestEverLb)}</dd></div>
+	<div><dt class="stat-label">Age</dt><dd class="text-xl">{dossier.carp.age_years} <span class="text-sm text-mist-400">yrs</span></dd></div>
+	<div><dt class="stat-label">Condition</dt><dd class="text-xl {conditionTone(Number(dossier.carp.condition))}">{Math.round(Number(dossier.carp.condition))}<span class="text-sm text-mist-400">/100</span></dd></div>
+	<div><dt class="stat-label">Guide price</dt><dd class="text-xl">{formatMoney(dossier.guidePrice)}</dd></div>
 </dl>
 <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-mist-200">
 	<FameBadge fame={dossier.carp.fame} />
