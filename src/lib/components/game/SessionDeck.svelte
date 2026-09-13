@@ -3,6 +3,7 @@
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import CatchPhoto from './CatchPhoto.svelte';
+	import DayOverSummary from './DayOverSummary.svelte';
 	import FightMeter from './FightMeter.svelte';
 	import NextStepPrompt from './NextStepPrompt.svelte';
 	import RodStatusBar from './RodStatusBar.svelte';
@@ -28,6 +29,8 @@
 		<FightMeter fight={session.fight} onFinished={onFightFinished} />
 	{:else if session.phase === 'landed' && session.lastLanded}
 		<CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} {onContinue} />
+	{:else if session.phase === 'day_over'}
+		<DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} />
 	{:else}
 		{#if session.bite}<StrikeButton bite={session.bite} {onStrike} isDocked />{/if}
 		<NextStepPrompt {session} isDocked />

@@ -12,6 +12,7 @@
 	import SceneStage from '../stage/SceneStage.svelte';
 	import CanvasOverlay from './CanvasOverlay.svelte';
 	import CatchPhoto from './CatchPhoto.svelte';
+	import DayOverSummary from './DayOverSummary.svelte';
 	import FightMeter from './FightMeter.svelte';
 	import NextStepPrompt from './NextStepPrompt.svelte';
 	import RodStatusBar from './RodStatusBar.svelte';
@@ -53,7 +54,7 @@
 
 {#snippet overTheLake()}
 	<NextStepPrompt {session} />
-	{#if session.rods.length > 0}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
+	{#if session.rods.length > 0 && session.phase !== 'day_over'}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
 	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
 	{#if session.phase === 'fighting' && session.fight}
@@ -61,6 +62,9 @@
 	{/if}
 	{#if session.phase === 'landed' && session.lastLanded}
 		<CanvasOverlay><CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} {onContinue} /></CanvasOverlay>
+	{/if}
+	{#if session.phase === 'day_over'}
+		<CanvasOverlay><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} /></CanvasOverlay>
 	{/if}
 {/snippet}
 

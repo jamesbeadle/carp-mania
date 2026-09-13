@@ -16,7 +16,6 @@
 	import { startTicking } from '$lib/game/session/tickSession';
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
-	import DayOverSummary from './DayOverSummary.svelte';
 	import HowToPlay from './HowToPlay.svelte';
 	import KeyHints from './KeyHints.svelte';
 	import SessionChrome from './SessionChrome.svelte';
@@ -71,8 +70,6 @@
 
 {#if session.phase === 'tackle_up' && session.swim}
 	<div class="h-full overflow-y-auto px-4 py-6"><div class="mx-auto max-w-5xl"><TackleBuilder {lake} swim={session.swim} season={session.season} overallSkill={session.overallSkill} savedRods={profile.saved_rods ?? []} onReady={handleTackleUp} /></div></div>
-{:else if session.phase === 'day_over'}
-	<div class="h-full overflow-y-auto px-4 py-6"><div class="mx-auto max-w-3xl"><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} /></div></div>
 {:else}
 	<WaterScreen
 		{session}
