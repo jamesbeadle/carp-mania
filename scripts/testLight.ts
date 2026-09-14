@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { blendHsl, blendHue, hslWords, surroundingKeyframes } from '../src/lib/game/sky/keyframes';
 import { lightAt, LightKeyframes } from '../src/lib/game/sky/lightPalette';
+import { mistStrengthAt } from '../src/lib/game/sky/weatherEffects';
 
 export function runLightScenarios() {
 	assert.equal(blendHue(30, 262, 0.5), 326, 'a blend from amber to violet goes the short way round, through red, never through green');
@@ -25,5 +26,10 @@ export function runLightScenarios() {
 	assert.match(lightAt(19.5).glowColour, /^hsl\(14\.0 /, 'sunset glows coral');
 	const duskHue = Number(lightAt(18.5).shadeColour.match(/hsl\(([\d.]+)/)?.[1]);
 	assert.ok(duskHue < 30 || duskHue > 262, `the shade between golden hour and sunset passes through red, not green (${duskHue})`);
-	console.log('light:', { sunrise: lightAt(6).glowColour, dusk: lightAt(18.5).shadeColour });
+	assert.equal(mistStrengthAt(5), 1, 'mist lies thick at dawn');
+	assert.equal(mistStrengthAt(8.5), 0.5, 'mist is half lifted by half past eight');
+	assert.equal(mistStrengthAt(13), 0, 'mist is gone by midday');
+	assert.equal(mistStrengthAt(23), 1, 'mist gathers again after dark');
+	assert.ok(lightAt(6).glowOpacity < 0.3, 'the sunrise glow no longer washes the water out');
+	console.log('light:', { sunrise: lightAt(6).glowColour, dusk: lightAt(18.5).shadeColour, mistAtNine: mistStrengthAt(9).toFixed(2) });
 }

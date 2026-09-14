@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { PikeRules, Prices } from '$lib/domain/economy';
-	import { PikeFoodOrder, sensiblePikeMaximumFor } from '$lib/domain/pikeStocking';
+	import { PikeFoodOrder, roomForMorePike, whyNoRoomForPike } from '$lib/domain/pikeStocking';
 	import type { Lake } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 
 	let { lake, sickCarpCount }: { lake: Lake; sickCarpCount: number } = $props();
 
-	let pikeCount = $state(2);
+	const UsualPikeOrder = 2;
 	let foodUnits = $state(10);
-	const mostPike = $derived(sensiblePikeMaximumFor(lake.acres));
+	const room = $derived(roomForMorePike(lake));
+	const noRoom = $derived(whyNoRoomForPike(lake));
+	const usualOrder = $derived(Math.min(UsualPikeOrder, room));
 	const daysOfPikeFood = $derived(lake.pike_count === 0 ? 0 : Math.floor(Number(lake.pike_food) / (lake.pike_count * PikeRules.FoodEatenPerPikePerDay)));
 </script>
 
@@ -24,13 +26,17 @@
 		<div><dt class="stat-label">Sick carp</dt><dd class="text-2xl" class:text-danger-400={sickCarpCount > 0}>{sickCarpCount}</dd></div>
 	</dl>
 	<div class="grid gap-3 sm:grid-cols-2">
-		<form method="POST" action="?/stockPike" class="flex items-end gap-2">
-			<label class="flex-1">
-				<span class="stat-label">Pike ({formatMoney(Prices.Pike)} each, up to {mostPike} for this water)</span>
-				<input name="count" type="number" min="1" max={mostPike} step="1" bind:value={pikeCount} class="field" />
-			</label>
-			<button class="button-primary">Introduce</button>
-		</form>
+		{#if noRoom}
+			<p class="self-end text-sm text-mist-400">{noRoom}</p>
+		{:else}
+			<form method="POST" action="?/stockPike" class="flex items-end gap-2">
+				<label class="flex-1">
+					<span class="stat-label">Pike ({formatMoney(Prices.Pike)} each, room for {room} more)</span>
+					<input name="count" type="number" min="1" max={room} step="1" value={usualOrder} class="field" />
+				</label>
+				<button class="button-primary">Introduce</button>
+			</form>
+		{/if}
 		<form method="POST" action="?/stockPikeFood" class="flex items-end gap-2">
 			<label class="flex-1">
 				<span class="stat-label">Pike food units ({formatMoney(Prices.PikeFoodPerUnit)} each)</span>

@@ -39,10 +39,10 @@
 				<div class="lake-frame relative" class:shortened={isLakeShortened}>{@render overTheLake?.()}</div>
 			</div>
 		</div>
-		{#if isDeckBeside}<div class="deck relative min-w-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+		{#if isDeckBeside}<div class="deck relative z-10 min-w-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
 	</div>
-	{#if isDeckBelow}<div class="deck relative min-h-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
-	{#if hasBar}<div class="relative shrink-0 border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render belowTheBank?.()}</div>{/if}
+	{#if isDeckBelow}<div class="deck relative z-10 min-h-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+	{#if hasBar}<div class="relative z-10 shrink-0 border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render belowTheBank?.()}</div>{/if}
 	<SkyCanvas {conditions} layer="overhead" />
 </div>
 
