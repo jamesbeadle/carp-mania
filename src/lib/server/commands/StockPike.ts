@@ -1,6 +1,7 @@
+import { fail } from '@sveltejs/kit';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { PikeRules, Prices } from '$lib/domain/economy';
-import { PikeFoodOrder, sensiblePikeMaximumFor } from '$lib/domain/pikeStocking';
+import { PikeFoodOrder, roomForMorePike, whyNoRoomForPike } from '$lib/domain/pikeStocking';
 import { loadProfile, moneyShortfall, spendMoney } from '../gates/requireMoney';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
 import { readFormNumber } from '../gates/readFormNumber';
@@ -9,7 +10,9 @@ const FewestPikePerOrder = 1;
 
 export async function StockPike(locals: App.Locals, formData: FormData) {
 	const lake = await requireOwnedLake(locals);
-	const count = readFormNumber(formData, 'count', FewestPikePerOrder, sensiblePikeMaximumFor(lake.acres));
+	const noRoom = whyNoRoomForPike(lake);
+	if (noRoom) return fail(400, { message: noRoom });
+	const count = readFormNumber(formData, 'count', FewestPikePerOrder, roomForMorePike(lake));
 	if (count.failure) return count.failure;
 
 	const pikeCount = Math.floor(count.value);

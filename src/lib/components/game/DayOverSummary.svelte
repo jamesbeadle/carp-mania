@@ -11,7 +11,7 @@
 </script>
 
 <section class="panel space-y-4">
-	<p class="stat-label">Dusk</p>
+	<p class="stat-label">Midnight</p>
 	<h2 class="text-3xl text-volt-300">Rods in — {landed.length} carp landed</h2>
 	<p class="text-mist-200">
 		{#if landed.length === 0}A blank. It happens to everyone — try a different swim or bait tomorrow.{:else}Best of the day {formatWeight(heaviest)}. {lost} lost.{/if}

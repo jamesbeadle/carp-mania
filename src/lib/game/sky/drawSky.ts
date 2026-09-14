@@ -35,7 +35,7 @@ export function drawOverhead(frame: SkyFrame, conditions: StageConditions, scene
 	context.clearRect(0, 0, width, height);
 	const look = skyLookFor(conditions.hour, conditions.season);
 	if (conditions.weather.kind === 'rain') fallRain(scene.rain, conditions.weather.windStrength, frame.secondsElapsed);
-	drawWeather(context, width, height, conditions.weather, scene.rain);
+	drawWeather(context, width, height, conditions, scene.rain);
 	moveBirds(scene.birdlife, width, height, look.daylight, frame.secondsElapsed);
 	drawBirds(context, scene.birdlife, frame.timeSeconds);
 }

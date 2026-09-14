@@ -1,4 +1,4 @@
-import type { Weather } from '$lib/domain/world/weather';
+import type { StageConditions } from './stageConditions';
 
 interface Raindrop {
 	across: number;
@@ -8,7 +8,7 @@ interface Raindrop {
 }
 
 const Rain = { DropCount: 140, SlowestPerSecond: 1.1, FastestPerSecond: 1.7, ShortestLength: 10, LongestLength: 20, Slant: 0.18, Colour: 'hsla(210 40% 85% / 0.35)', LineWidth: 1 } as const;
-const Mist = { Colour: 'hsla(210 20% 92% / 0.55)', Faded: 'hsla(210 20% 92% / 0)', FromFraction: 0.45 } as const;
+const Mist = { Colour: 'hsla(210 20% 92% / 0.42)', Faded: 'hsla(210 20% 92% / 0)', FromFraction: 0.45, LiftsFrom: 7, GoneBy: 10, GathersFrom: 19.5, BackBy: 21.5 } as const;
 const Heat = { Colour: 'hsla(36 90% 70% / 0.14)', Faded: 'hsla(36 90% 70% / 0)' } as const;
 const Overcast = { Veil: 'hsla(215 15% 70% / 0.28)' } as const;
 
@@ -28,11 +28,19 @@ export function fallRain(drops: Raindrop[], windStrength: number, secondsElapsed
 	}
 }
 
-export function drawWeather(context: CanvasRenderingContext2D, width: number, height: number, weather: Weather, drops: Raindrop[]) {
+export function drawWeather(context: CanvasRenderingContext2D, width: number, height: number, conditions: StageConditions, drops: Raindrop[]) {
+	const { weather, hour } = conditions;
 	if (weather.kind === 'rain') return drawRain(context, width, height, weather.windStrength, drops);
-	if (weather.kind === 'mist') return drawMist(context, width, height);
+	if (weather.kind === 'mist') return drawMist(context, width, height, mistStrengthAt(hour));
 	if (weather.kind === 'heat') return drawHeatHaze(context, width, height);
 	if (weather.kind === 'overcast') return drawOvercastVeil(context, width, height);
+}
+
+export function mistStrengthAt(hour: number) {
+	if (hour < Mist.LiftsFrom || hour >= Mist.BackBy) return 1;
+	if (hour < Mist.GoneBy) return 1 - (hour - Mist.LiftsFrom) / (Mist.GoneBy - Mist.LiftsFrom);
+	if (hour < Mist.GathersFrom) return 0;
+	return (hour - Mist.GathersFrom) / (Mist.BackBy - Mist.GathersFrom);
 }
 
 function drawRain(context: CanvasRenderingContext2D, width: number, height: number, windStrength: number, drops: Raindrop[]) {
@@ -51,12 +59,16 @@ function drawRain(context: CanvasRenderingContext2D, width: number, height: numb
 	context.restore();
 }
 
-function drawMist(context: CanvasRenderingContext2D, width: number, height: number) {
+function drawMist(context: CanvasRenderingContext2D, width: number, height: number, strength: number) {
+	if (strength <= 0) return;
 	const fog = context.createLinearGradient(0, height * Mist.FromFraction, 0, height);
 	fog.addColorStop(0, Mist.Faded);
 	fog.addColorStop(1, Mist.Colour);
+	context.save();
+	context.globalAlpha = strength;
 	context.fillStyle = fog;
 	context.fillRect(0, 0, width, height);
+	context.restore();
 }
 
 function drawHeatHaze(context: CanvasRenderingContext2D, width: number, height: number) {

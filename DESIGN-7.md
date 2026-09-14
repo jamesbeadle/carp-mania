@@ -35,3 +35,11 @@ No new commands. `GetHomeHub` shrinks to the works count the badge needs; the hu
 ## 6. Phases
 
 One branch, `first-feedback`, in this order: the hub and the header, the strike on a phone, moving swims.
+
+## 7. The second round
+
+Three more things came back once the first round was live, and they are built on `second-feedback`.
+
+- **Pike.** The predators panel said *up to 3 for this water* while the water held 4. The 3 was only ever the size of one order — the command never counted the pike already in the water, so two orders of 3 put 6 pike on a 5-acre water. The sensible maximum is now the water's total: the panel says *room for N more*, a full water says so and offers no form, and an overstocked one says *4 pike is more than the 3 this water sensibly holds — stop feeding them and they will thin out* (unfed pike die back). `StockPike` refuses an order past the room left. Nothing stored changes; a water already over the line stays over it until the pike thin out.
+- **The day runs to midnight.** As an angler, I want to fish into the dark, because carp feed at night and a day that ends at nine is short. `FishingDay.EndHour` is 24; at 22 real seconds an hour a session is now about seven minutes rather than six. The clock's bar runs *Dawn → Midnight*, the day-over card is headed *Midnight*, and the bite factor after 18:00 (1.3, the same as dusk) carries through the dark. The sky and the light already know the night; nothing else moved.
+- **Washed out at dawn.** The sunrise glow (a soft-light apricot at 42%) and the morning glow flattened the water on a phone. The glow is halved through the day — sunrise 24%, morning 8%, golden hour 18%, sunset 28% — so the warmth stays and the contrast comes back. Mist used to lie at full strength all day: it now lies thick before seven, lifts by ten, and gathers again after half past seven in the evening; and no weather is drawn over the deck or the hub's button bar any more, which had been fogging the controls.
