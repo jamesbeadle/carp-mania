@@ -1,7 +1,7 @@
 import { currentWaterOf } from '$lib/domain/estate/estateRules';
 import { loadCurrentLakeId, loadMyWaters } from '../queries/loadMyWaters';
 
-const OpenDuringSetup = ['/setup', '/auth', '/inbox', '/world', '/lakes', '/carp', '/anglers'];
+const OpenDuringSetup = ['/setup', '/auth', '/inbox', '/news', '/world', '/lakes', '/carp', '/anglers'];
 const OpenOnceTheWaterExists = ['/lake/works'];
 const RunTheWaterPaths = ['/lake'];
 const SetupPath = '/setup';

@@ -2,7 +2,7 @@
 	import type { MyRival } from '$lib/contracts/Rivalry';
 	import { chaserLine, NobodyAbove, placeLine, toBeatLine } from '$lib/domain/world/rivalWords';
 	import { standingWords } from '$lib/domain/world/standingWords';
-	import AnglerAvatar from '../angler/AnglerAvatar.svelte';
+	import AnglerAvatar from './AnglerAvatar.svelte';
 
 	let { rival }: { rival: MyRival } = $props();
 

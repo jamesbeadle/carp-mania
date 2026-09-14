@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PickASwimPrompt } from '$lib/game/session/movingSwim';
 	import { nextRodToCast } from '$lib/game/session/sessionFlow';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { pointerWords } from '$lib/game/stage/pointerWords';
@@ -10,7 +11,8 @@
 
 	function promptFor(current: SessionState) {
 		if (current.phase === 'choose_swim') return 'Pick a swim — click one of the pegs on the bank';
-		if (current.phase !== 'fishing') return null;
+		if (current.phase !== 'fishing' || current.bite) return null;
+		if (current.isPickingASwimToMoveTo) return PickASwimPrompt;
 		const next = nextRodToCast(current);
 		if (!next) return 'Rods out — wait for the bite alarm, then strike';
 		const isNothingOutYet = current.rods.every((rod) => rod.phase === 'idle');

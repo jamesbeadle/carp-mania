@@ -2,17 +2,24 @@
 	import { enhance } from '$app/forms';
 	import { Estate, whyCannotBuyAnotherWater } from '$lib/domain/estate/estateRules';
 	import type { Lake } from '$lib/domain/types';
+	import BuyAnotherWaterLink from './BuyAnotherWaterLink.svelte';
 
 	type Water = Pick<Lake, 'id' | 'name' | 'is_setup_complete'>;
 
-	let { waters, currentId, returnTo }: { waters: Water[]; currentId: string; returnTo: '/home' | '/lake' } = $props();
+	interface Props {
+		waters: Water[];
+		currentId: string;
+		returnTo: '/home' | '/lake';
+		isCompact?: boolean;
+	}
 
-	const BuyAnotherPath = '/setup?another=1';
+	let { waters, currentId, returnTo, isCompact = false }: Props = $props();
+
 	const refusal = $derived(whyCannotBuyAnotherWater(waters));
 </script>
 
 <section class="flex flex-wrap items-center gap-2">
-	<span class="stat-label mr-1">{waters.length === 1 ? 'Your water' : `Your estate · ${waters.length} of ${Estate.MostWaters}`}</span>
+	{#if !isCompact}<span class="stat-label mr-1">{waters.length === 1 ? 'Your water' : `Your estate · ${waters.length} of ${Estate.MostWaters}`}</span>{/if}
 	{#each waters as water (water.id)}
 		{@const isCurrent = water.id === currentId}
 		<form method="POST" action="{returnTo}?/switchWater" use:enhance>
@@ -33,9 +40,5 @@
 			</button>
 		</form>
 	{/each}
-	{#if refusal === null}
-		<a href={BuyAnotherPath} class="rounded-full border border-dashed border-surge-500/70 px-3 py-1 font-display text-sm font-bold tracking-wide text-surge-400 uppercase transition hover:bg-surge-500/10 active:scale-95">+ Buy another water</a>
-	{:else}
-		<span class="text-xs text-mist-400">{refusal}</span>
-	{/if}
+	{#if !isCompact}<BuyAnotherWaterLink {refusal} />{/if}
 </section>

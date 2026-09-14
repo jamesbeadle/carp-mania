@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { honourKindsOf, honoursFor, isARecord, raiseTheBar } from '../src/lib/domain/fishing/honours';
+import { hourAfterMovingSwim, SwimMove } from '../src/lib/domain/fishing/movingSwims';
+import { FishingDay } from '../src/lib/domain/fishing/sessionClock';
 import { pickCarpThatTookTheBait, sameChanceForEveryFish } from '../src/lib/domain/fishing/pickCarp';
 import { favouriteSpotOf, FavouriteSpotBiteBonus } from '../src/lib/domain/layout/favouriteFeature';
 import { seededRandom } from '../src/lib/domain/random';
@@ -11,6 +13,7 @@ const TakesToSample = 4000;
 
 export function runFishingScenarios() {
 	runHonourScenarios();
+	runSwimMoveScenarios();
 	const random = seededRandom(11);
 	const lake: Lake = { id: 'lake-fishing', ...classicLake('owner-1', 'Bonus Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, random).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
@@ -49,4 +52,11 @@ function runHonourScenarios() {
 	const raised = raiseTheBar(31, bar);
 	assert.deepEqual(raised, { standing: { lakeRecordLb: 31, regionRecordLb: 31, worldRecordLb: 50 }, personalBestLb: 31 }, 'the bar rises to the fish');
 	assert.deepEqual(honourKindsOf(honoursFor(31, raised)), [], 'the same weight again is no longer an honour');
+}
+
+function runSwimMoveScenarios() {
+	assert.equal(hourAfterMovingSwim(9), 9 + SwimMove.HoursToPackUpAndWalk, 'a move costs the pack-up-and-walk time');
+	assert.equal(hourAfterMovingSwim(FishingDay.EndHour - 0.25), FishingDay.EndHour, 'a move late in the day ends at dusk, not after it');
+	assert.equal(hourAfterMovingSwim(FishingDay.EndHour), FishingDay.EndHour, 'no move goes past the end of the day');
+	console.log('swim moves:', { cost: SwimMove.HoursToPackUpAndWalk });
 }

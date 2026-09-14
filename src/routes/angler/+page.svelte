@@ -1,9 +1,11 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
+	import RivalCard from '$lib/components/angler/RivalCard.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
 	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
+	import Skeleton from '$lib/components/loading/Skeleton.svelte';
 	import AnglerRanksLine from '$lib/components/trophy/AnglerRanksLine.svelte';
 	import CatchCards from '$lib/components/trophy/CatchCards.svelte';
 	import Milestones from '$lib/components/trophy/Milestones.svelte';
@@ -41,16 +43,25 @@
 		<Milestones milestones={room.milestones} />
 	</div>
 	<div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
-		<section class="panel">
-			<dl class="mb-6 grid grid-cols-3 gap-3 text-sm">
-				<div><dt class="stat-label">Money</dt><dd class="text-xl">{formatMoney(angler.profile.money)}</dd></div>
-				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.catches.total}</dd></div>
-				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(angler.personalBestLb)}</dd></div>
-			</dl>
-			<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
-			<SkillBars profile={angler.profile} />
-			<p class="mt-4 text-xs text-mist-400">Skills rise with every fish, and faster when the tackle suited the water. Match readouts unlock at 40.</p>
-		</section>
+		<div class="space-y-6">
+			{#await data.rival}
+				<Skeleton title="The one to beat" rows={2} />
+			{:then rival}
+				<RivalCard {rival} />
+			{:catch}
+				<p class="text-sm text-mist-400">The world board would not load.</p>
+			{/await}
+			<section class="panel">
+				<dl class="mb-6 grid grid-cols-3 gap-3 text-sm">
+					<div><dt class="stat-label">Money</dt><dd class="text-xl">{formatMoney(angler.profile.money)}</dd></div>
+					<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.catches.total}</dd></div>
+					<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(angler.personalBestLb)}</dd></div>
+				</dl>
+				<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
+				<SkillBars profile={angler.profile} />
+				<p class="mt-4 text-xs text-mist-400">Skills rise with every fish, and faster when the tackle suited the water. Match readouts unlock at 40.</p>
+			</section>
+		</div>
 		<section class="panel">
 			<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>
 			<CatchReportList catches={angler.catches.items} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />

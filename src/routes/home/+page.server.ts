@@ -5,27 +5,17 @@ import { SwitchWater } from '$lib/server/commands/SwitchWater';
 import { loadProfile } from '$lib/server/gates/requireMoney';
 import { requireUser } from '$lib/server/gates/requireUser';
 import { GetFishermanDiary } from '$lib/server/queries/GetFishermanDiary';
-import { GetHomeHub } from '$lib/server/queries/GetHomeHub';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
-import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
-import { GetMyNextMatch } from '$lib/server/queries/GetMyNextMatch';
-import { GetMyRival } from '$lib/server/queries/GetMyRival';
-import { GetWorldActivity, WorldActivityLimit } from '$lib/server/queries/GetWorldActivity';
+import { GetWorksInProgressCount } from '$lib/server/queries/GetWorksInProgressCount';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireUser(locals);
 	const whileAway = await SimulateElapsedTime(locals);
-	const [fishery, profile, hub, diary, waters] = await Promise.all([
-		GetMyFishery(locals), loadProfile(locals), GetHomeHub(locals), GetFishermanDiary(locals), loadMyWaters(locals, user.id)
+	const [fishery, profile, worksInProgress, diary, waters] = await Promise.all([
+		GetMyFishery(locals), loadProfile(locals), GetWorksInProgressCount(locals), GetFishermanDiary(locals), loadMyWaters(locals, user.id)
 	]);
-	const behindTheSheets = {
-		worldFeed: GetWorldActivity(locals, { limit: WorldActivityLimit.HomeHub }),
-		marketWatch: GetMyMarketActivity(locals),
-		nextMatch: GetMyNextMatch(locals),
-		rival: GetMyRival(locals)
-	};
-	return { profile, fishery, whileAway, diary, waters, ...behindTheSheets, loadedAt: new Date().toISOString(), isStage: true, ...hub };
+	return { profile, fishery, whileAway, diary, waters, worksInProgress, isStage: true };
 };
 
 export const actions: Actions = {

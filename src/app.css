@@ -76,6 +76,15 @@
 	.button-secondary {
 		@apply rounded-xl border border-surge-500/70 px-4 py-2.5 font-display text-lg font-bold tracking-wide text-surge-400 uppercase italic transition hover:bg-surge-500/10 hover:shadow-surge active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
 	}
+	.hub-door {
+		@apply short:h-9 short:text-sm flex h-11 items-center justify-center gap-2 rounded-xl border border-surge-500/60 bg-carbon-900/70 px-3 text-center font-display text-sm leading-tight font-bold tracking-wide text-surge-300 uppercase italic transition hover:bg-surge-500/10 hover:shadow-surge active:scale-95 sm:h-14 sm:text-lg;
+	}
+	.hub-door-primary {
+		@apply border-volt-500 bg-volt-500 text-carbon-950 hover:bg-volt-400 hover:shadow-volt disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.35),
+			inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+	}
 	.field {
 		@apply w-full rounded-md border border-carbon-600 bg-carbon-900 px-3 py-2 text-mist-100 outline-none focus:border-volt-500;
 	}

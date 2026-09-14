@@ -4,7 +4,7 @@ import { activityFrom, type LakeIdentity } from '$lib/domain/world/worldActivity
 import type { WorldEvent } from '$lib/domain/worldTypes';
 import { requireUser } from '../gates/requireUser';
 
-export const WorldActivityLimit = { LiveFeed: 50, HomeHub: 5 } as const;
+export const WorldActivityLimit = { LiveFeed: 50 } as const;
 
 export interface FeedSlice {
 	limit: number;
