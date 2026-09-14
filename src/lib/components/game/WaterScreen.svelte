@@ -73,7 +73,7 @@
 {/snippet}
 
 {#snippet deck()}
-	<SessionDeck {session} {lake} {profile} {catchOutcome} {onFightFinished} {onContinue} {onReelIn} {onSetOff} {onStayPut} />
+	<SessionDeck {session} {lake} {profile} {catchOutcome} {onContinue} {onReelIn} {onSetOff} {onStayPut} />
 {/snippet}
 
 {#if orientation.deckPlacement === 'none'}
@@ -81,4 +81,7 @@
 {:else}
 	<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} placement="over_the_screen" />{/if}
+	{#if session.phase === 'fighting' && session.fight}
+		<CanvasOverlay placement="over_the_screen"><FightMeter fight={session.fight} onFinished={onFightFinished} /></CanvasOverlay>
+	{/if}
 {/if}
