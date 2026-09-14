@@ -4,12 +4,12 @@
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
-	import { bringTheFishIn, castTheNextRod, reelTheRodIn, strikeAtTheBite } from '$lib/game/session/anglerActions';
+	import { bringTheFishIn, castTheNextRod, reelTheRodIn, setOffToAnotherSwim, stayOnThisSwim, strikeAtTheBite, takeThePeg } from '$lib/game/session/anglerActions';
 	import { buzzForBite } from '$lib/game/session/haptics';
 	import { reportLandedFish, type CatchReportOutcome } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { quarterHourOf, sessionConditionsFor } from '$lib/game/session/sessionConditions';
-	import { chooseSwim, returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
+	import { returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
 	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { watchFishShowing } from '$lib/game/session/showingFish';
@@ -80,13 +80,15 @@
 		{conditions}
 		{showingAt}
 		{catchOutcome}
-		onSwimClick={(swim) => session.phase === 'choose_swim' && chooseSwim(session, swim)}
+		onSwimClick={(swim) => takeThePeg(session, swim)}
 		onWaterClick={(point) => castTheNextRod(session, point)}
 		onCastBlockedByIsland={() => (session.notice = "You can't cast through the island — pick a spot with a clear line from your swim.")}
 		onStrike={() => strikeAtTheBite(session)}
 		onFightFinished={handleFightFinished}
 		onContinue={() => returnToFishing(session)}
 		onReelIn={(rodIndex) => reelTheRodIn(session, rodIndex)}
+		onSetOff={() => setOffToAnotherSwim(session)}
+		onStayPut={() => stayOnThisSwim(session)}
 	>
 		{#snippet overTheSky()}
 			<SessionChrome {lake} {session} {matchBoardHref} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />

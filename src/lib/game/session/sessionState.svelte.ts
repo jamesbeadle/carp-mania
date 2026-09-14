@@ -28,6 +28,7 @@ export class SessionState {
 	landedToday = $state<LandedFish[]>([]);
 	lostToday = $state(0);
 	notice = $state<string | null>(null);
+	isPickingASwimToMoveTo = $state(false);
 	bar: TheBar;
 	readonly lake: Lake;
 	readonly carp: Carp[];

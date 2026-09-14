@@ -1,17 +1,19 @@
+import type { Swim } from '$lib/domain/types';
 import type { Point } from '../scene/lakeShape';
 import { bringRodIn } from '../scene/rodState';
 import { sound } from '../sound/soundEngine.svelte';
 import { pointerWords } from '../stage/pointerWords';
 import { buzzForTheNet } from './haptics';
 import type { LandedFish } from './landFish';
-import { castRod, finishFight, nextRodToCast, strike } from './sessionFlow';
+import { moveToSwim, startPickingASwim, stayPut } from './movingSwim';
+import { castRod, chooseSwim, finishFight, nextRodToCast, strike } from './sessionFlow';
 import { soundTheOutcome, soundTheReelIn } from './sessionSounds';
 import type { SessionState } from './sessionState.svelte';
 
 const AllRodsOut = 'All rods are out. Wait for a bite.';
 
 export function castTheNextRod(session: SessionState, point: Point) {
-	if (session.phase !== 'fishing') return;
+	if (session.phase !== 'fishing' || session.isPickingASwimToMoveTo) return;
 	const rod = nextRodToCast(session);
 	if (!rod) return void (session.notice = AllRodsOut);
 	castRod(session, rod.index, point);
@@ -38,4 +40,22 @@ export function bringTheFishIn(session: SessionState): LandedFish | null {
 	finishFight(session);
 	if (session.lastLanded) buzzForTheNet();
 	return session.lastLanded;
+}
+
+export function setOffToAnotherSwim(session: SessionState) {
+	startPickingASwim(session);
+	sound.play('open');
+}
+
+export function stayOnThisSwim(session: SessionState) {
+	stayPut(session);
+	sound.play('cancel');
+}
+
+export function takeThePeg(session: SessionState, swim: Swim) {
+	if (session.phase === 'choose_swim') return chooseSwim(session, swim);
+	const hasMoved = moveToSwim(session, swim);
+	if (!hasMoved) return;
+	soundTheReelIn();
+	sound.play('confirm');
 }

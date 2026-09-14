@@ -9,9 +9,9 @@ export interface MainTab {
 
 export const MainTabs: MainTab[] = [
 	{ id: 'lake', label: 'My lake', href: '/home', paths: ['/home', '/lake'] },
-	{ id: 'fish', label: 'Go fishing', href: '/lakes', paths: ['/lakes', '/fish', '/matches'] },
-	{ id: 'world', label: 'The world', href: '/world', paths: ['/world', '/anglers', '/carp'] },
-	{ id: 'market', label: 'Market', href: '/market', paths: ['/market'] },
+	{ id: 'fish', label: 'Find water', href: '/lakes', paths: ['/lakes', '/fish', '/matches'] },
+	{ id: 'world', label: 'The world', href: '/world', paths: ['/world', '/news', '/anglers', '/carp'] },
+	{ id: 'market', label: 'Tackle shop', href: '/market', paths: ['/market'] },
 	{ id: 'me', label: 'My angler', href: '/angler', paths: ['/angler'] }
 ];
 

@@ -12,14 +12,14 @@
 		carp: Carp[];
 		conditions: StageConditions;
 		showingAt?: LayoutPoint[];
-		overTheLake?: Snippet;
 		overTheSky?: Snippet;
+		belowTheBank?: Snippet;
 	}
 
-	let { lake, swims, carp, conditions, showingAt = [], overTheLake, overTheSky }: Props = $props();
+	let { lake, swims, carp, conditions, showingAt = [], overTheSky, belowTheBank }: Props = $props();
 </script>
 
-<SceneStage {conditions} {overTheLake} {overTheSky}>
+<SceneStage {conditions} {overTheSky} {belowTheBank}>
 	{#snippet water()}
 		<LakeCanvas {lake} {swims} {carp} {showingAt} />
 	{/snippet}

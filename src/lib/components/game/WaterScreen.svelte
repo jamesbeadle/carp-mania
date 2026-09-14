@@ -14,6 +14,7 @@
 	import CatchPhoto from './CatchPhoto.svelte';
 	import DayOverSummary from './DayOverSummary.svelte';
 	import FightMeter from './FightMeter.svelte';
+	import MoveSwimButton from './MoveSwimButton.svelte';
 	import NextStepPrompt from './NextStepPrompt.svelte';
 	import RodStatusBar from './RodStatusBar.svelte';
 	import SessionDeck from './SessionDeck.svelte';
@@ -37,9 +38,11 @@
 		onFightFinished: () => void;
 		onContinue: () => void;
 		onReelIn: (rodIndex: number) => void;
+		onSetOff: () => void;
+		onStayPut: () => void;
 	}
 
-	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn }: Props = $props();
+	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 
 	const orientation = new Orientation();
 	const canReadTheWater = $derived(Number(profile.watercraft) >= WatercraftShowsFishFrom);
@@ -55,6 +58,7 @@
 {#snippet overTheLake()}
 	<NextStepPrompt {session} />
 	{#if session.rods.length > 0 && session.phase !== 'day_over'}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
+	<MoveSwimButton {session} {onSetOff} {onStayPut} />
 	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
 	{#if session.phase === 'fighting' && session.fight}
@@ -69,11 +73,12 @@
 {/snippet}
 
 {#snippet deck()}
-	<SessionDeck {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} {onReelIn} />
+	<SessionDeck {session} {lake} {profile} {catchOutcome} {onFightFinished} {onContinue} {onReelIn} {onSetOff} {onStayPut} />
 {/snippet}
 
 {#if orientation.deckPlacement === 'none'}
 	<SceneStage {conditions} {overTheSky} {water} {overTheLake} />
 {:else}
 	<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
+	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} placement="over_the_screen" />{/if}
 {/if}

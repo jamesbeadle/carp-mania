@@ -5,23 +5,24 @@
 	import CatchPhoto from './CatchPhoto.svelte';
 	import DayOverSummary from './DayOverSummary.svelte';
 	import FightMeter from './FightMeter.svelte';
+	import MoveSwimButton from './MoveSwimButton.svelte';
 	import NextStepPrompt from './NextStepPrompt.svelte';
 	import RodStatusBar from './RodStatusBar.svelte';
 	import SessionNotice from './SessionNotice.svelte';
-	import StrikeButton from './StrikeButton.svelte';
 
 	interface Props {
 		session: SessionState;
 		lake: Lake;
 		profile: Profile;
 		catchOutcome: CatchReportOutcome | null;
-		onStrike: () => void;
 		onFightFinished: () => void;
 		onContinue: () => void;
 		onReelIn: (rodIndex: number) => void;
+		onSetOff: () => void;
+		onStayPut: () => void;
 	}
 
-	let { session, lake, profile, catchOutcome, onStrike, onFightFinished, onContinue, onReelIn }: Props = $props();
+	let { session, lake, profile, catchOutcome, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-3 px-3 py-3">
@@ -32,9 +33,9 @@
 	{:else if session.phase === 'day_over'}
 		<DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} />
 	{:else}
-		{#if session.bite}<StrikeButton bite={session.bite} {onStrike} isDocked />{/if}
 		<NextStepPrompt {session} isDocked />
 		{#if session.notice && !session.bite}<SessionNotice notice={session.notice} isDocked />{/if}
 		{#if session.rods.length > 0}<RodStatusBar rods={session.rods} isDocked {onReelIn} />{/if}
+		<MoveSwimButton {session} isDocked {onSetOff} {onStayPut} />
 	{/if}
 </div>
