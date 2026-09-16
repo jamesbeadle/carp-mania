@@ -1,0 +1,1956 @@
+{
+  "generatedAt": "2026-09-16T06:48:02+00:00",
+  "summaries": {
+    "fileLength": {
+      "limit": 100,
+      "filesOverLimit": 0,
+      "totalFiles": 706,
+      "worstFileLines": 0
+    },
+    "functionShape": {
+      "limit": 30,
+      "functionsOverLimit": 7,
+      "elseBlocks": 2,
+      "measurementIsHeuristic": true
+    },
+    "functionNames": {
+      "overlongFunctionNames": 4,
+      "maxWords": 5,
+      "maxLength": 40
+    },
+    "duplication": {
+      "skipped": "jscpd is not installed (npm install -g jscpd)"
+    },
+    "naming": {
+      "bannedAbbreviationHits": 0,
+      "unprefixedBooleans": 10
+    },
+    "comments": {
+      "explanatoryCommentLines": 0,
+      "filesWithComments": 0,
+      "taskMarkers": 0
+    },
+    "magicValues": {
+      "inlineHexColours": 0,
+      "inlineStyleAttributes": 20,
+      "repeatedStringLiterals": 30
+    },
+    "prose": {
+      "longMemberChainLines": 603,
+      "deeplyIndentedLines": 59,
+      "overlongLines": 388,
+      "measurementIsHeuristic": true
+    },
+    "inventory": {
+      "pages": 25,
+      "components": 188,
+      "orphanComponents": 1,
+      "averagePageLines": 45
+    }
+  },
+  "details": {
+    "fileLength": {
+      "name": "fileLength",
+      "summary": {
+        "limit": 100,
+        "filesOverLimit": 0,
+        "totalFiles": 706,
+        "worstFileLines": 0
+      },
+      "offenders": []
+    },
+    "functionShape": {
+      "name": "functionShape",
+      "summary": {
+        "limit": 30,
+        "functionsOverLimit": 7,
+        "elseBlocks": 2,
+        "measurementIsHeuristic": true
+      },
+      "offenders": [
+        {
+          "file": "src/lib/game/builder/builderInput.ts",
+          "lines": 50
+        },
+        {
+          "file": "src/lib/game/render/drawPike.ts",
+          "lines": 41
+        },
+        {
+          "file": "src/lib/game/scene/drawScene.ts",
+          "lines": 38
+        },
+        {
+          "file": "src/lib/game/sound/ambience/birdsong.ts",
+          "lines": 35
+        },
+        {
+          "file": "src/lib/domain/simulation/simulateOneDay.ts",
+          "lines": 33
+        },
+        {
+          "file": "src/lib/domain/sites/newLake.ts",
+          "lines": 33
+        },
+        {
+          "file": "src/lib/game/sound/synth/loops.ts",
+          "lines": 33
+        }
+      ]
+    },
+    "functionNames": {
+      "name": "functionNames",
+      "summary": {
+        "overlongFunctionNames": 4,
+        "maxWords": 5,
+        "maxLength": 40
+      },
+      "offenders": [
+        {
+          "file": "src/lib/domain/fishing/pickCarp.ts",
+          "line": 11,
+          "name": "pickCarpThatTookTheBait"
+        },
+        {
+          "file": "src/lib/domain/simulation/feedTheLake.ts",
+          "line": 9,
+          "name": "feedTheLakeForOneDay"
+        },
+        {
+          "file": "src/lib/domain/simulation/pikePredation.ts",
+          "line": 11,
+          "name": "letPikeHuntForOneDay"
+        },
+        {
+          "file": "src/routes/setup/+page.server.ts",
+          "line": 34,
+          "name": "isNothingLeftToSetUp"
+        }
+      ]
+    },
+    "naming": {
+      "name": "naming",
+      "summary": {
+        "bannedAbbreviationHits": 0,
+        "unprefixedBooleans": 10
+      },
+      "offenders": {
+        "abbreviations": [],
+        "booleans": [
+          {
+            "file": "src/lib/game/builder/layerVisibility.ts",
+            "line": 4,
+            "name": "depth"
+          },
+          {
+            "file": "src/lib/game/builder/layerVisibility.ts",
+            "line": 5,
+            "name": "bed"
+          },
+          {
+            "file": "src/lib/game/builder/layerVisibility.ts",
+            "line": 6,
+            "name": "features"
+          },
+          {
+            "file": "src/lib/game/builder/layerVisibility.ts",
+            "line": 7,
+            "name": "swims"
+          },
+          {
+            "file": "src/lib/server/queries/GetPublicLakes.ts",
+            "line": 9,
+            "name": "ascending"
+          },
+          {
+            "file": "src/lib/server/queries/loadTrophyRoom.ts",
+            "line": 12,
+            "name": "holds_lake_record"
+          },
+          {
+            "file": "src/lib/server/queries/loadTrophyRoom.ts",
+            "line": 12,
+            "name": "holds_region_record"
+          },
+          {
+            "file": "src/lib/server/queries/loadTrophyRoom.ts",
+            "line": 12,
+            "name": "holds_world_record"
+          },
+          {
+            "file": "src/lib/server/queries/marketListingFilters.ts",
+            "line": 8,
+            "name": "ascending"
+          },
+          {
+            "file": "src/lib/server/queries/marketListingFilters.ts",
+            "line": 16,
+            "name": "ascending"
+          }
+        ]
+      }
+    },
+    "comments": {
+      "name": "comments",
+      "summary": {
+        "explanatoryCommentLines": 0,
+        "filesWithComments": 0,
+        "taskMarkers": 0
+      },
+      "offenders": []
+    },
+    "magicValues": {
+      "name": "magicValues",
+      "summary": {
+        "inlineHexColours": 0,
+        "inlineStyleAttributes": 20,
+        "repeatedStringLiterals": 30
+      },
+      "offenders": {
+        "hexColours": [],
+        "inlineStyles": [
+          {
+            "file": "src/lib/components/WaterQualityBars.svelte",
+            "line": 27
+          },
+          {
+            "file": "src/lib/components/angler/SkillBars.svelte",
+            "line": 17
+          },
+          {
+            "file": "src/lib/components/brand/MeshBackdrop.svelte",
+            "line": 23
+          },
+          {
+            "file": "src/lib/components/game/FightMeter.svelte",
+            "line": 45
+          },
+          {
+            "file": "src/lib/components/game/FightMeter.svelte",
+            "line": 46
+          },
+          {
+            "file": "src/lib/components/game/HonourRibbons.svelte",
+            "line": 20
+          },
+          {
+            "file": "src/lib/components/game/SegmentedChoice.svelte",
+            "line": 13
+          },
+          {
+            "file": "src/lib/components/game/SessionClock.svelte",
+            "line": 16
+          },
+          {
+            "file": "src/lib/components/inbox/NotificationList.svelte",
+            "line": 18
+          },
+          {
+            "file": "src/lib/components/inbox/NotificationList.svelte",
+            "line": 20
+          },
+          {
+            "file": "src/lib/components/inbox/PinnedNote.svelte",
+            "line": 13
+          },
+          {
+            "file": "src/lib/components/inbox/PinnedNote.svelte",
+            "line": 14
+          },
+          {
+            "file": "src/lib/components/place/PlaceBanner.svelte",
+            "line": 44
+          },
+          {
+            "file": "src/lib/components/place/PlaceBanner.svelte",
+            "line": 46
+          },
+          {
+            "file": "src/lib/components/setup/BudgetBar.svelte",
+            "line": 17
+          },
+          {
+            "file": "src/lib/components/stage/LightingOverlays.svelte",
+            "line": 7
+          },
+          {
+            "file": "src/lib/components/stage/LightingOverlays.svelte",
+            "line": 8
+          },
+          {
+            "file": "src/lib/components/stage/LightingOverlays.svelte",
+            "line": 9
+          },
+          {
+            "file": "src/lib/components/stage/SceneStage.svelte",
+            "line": 34
+          },
+          {
+            "file": "src/lib/components/world/PinCard.svelte",
+            "line": 23
+          }
+        ],
+        "repeatedLiterals": [
+          {
+            "literal": "stat-label",
+            "occurrences": 138
+          },
+          {
+            "literal": "text-sm text-mist-400",
+            "occurrences": 59
+          },
+          {
+            "literal": "text-mist-400",
+            "occurrences": 58
+          },
+          {
+            "literal": "text-xl",
+            "occurrences": 33
+          },
+          {
+            "literal": "hidden",
+            "occurrences": 27
+          },
+          {
+            "literal": "text-xs text-mist-400",
+            "occurrences": 25
+          },
+          {
+            "literal": "text-volt-300",
+            "occurrences": 22
+          },
+          {
+            "literal": "text-mist-100",
+            "occurrences": 20
+          },
+          {
+            "literal": "mb-3 text-xl text-volt-300",
+            "occurrences": 18
+          },
+          {
+            "literal": "divide-y divide-carbon-700/60",
+            "occurrences": 17
+          },
+          {
+            "literal": "field mt-1",
+            "occurrences": 17
+          },
+          {
+            "literal": "button-secondary",
+            "occurrences": 17
+          },
+          {
+            "literal": "number",
+            "occurrences": 17
+          },
+          {
+            "literal": "text-right text-mist-100",
+            "occurrences": 15
+          },
+          {
+            "literal": "button-secondary text-base",
+            "occurrences": 15
+          },
+          {
+            "literal": "mb-4 text-sm text-mist-400",
+            "occurrences": 14
+          },
+          {
+            "literal": "text-2xl",
+            "occurrences": 13
+          },
+          {
+            "literal": "currentColor",
+            "occurrences": 13
+          },
+          {
+            "literal": "text-2xl text-volt-300",
+            "occurrences": 13
+          },
+          {
+            "literal": "mb-1 text-xl text-volt-300",
+            "occurrences": 13
+          },
+          {
+            "literal": "divide-y divide-carbon-700/60 text-sm",
+            "occurrences": 12
+          },
+          {
+            "literal": "button-primary ml-auto",
+            "occurrences": 10
+          },
+          {
+            "literal": "button-primary",
+            "occurrences": 10
+          },
+          {
+            "literal": "text-mist-200",
+            "occurrences": 10
+          },
+          {
+            "literal": "text-sm text-danger-400",
+            "occurrences": 9
+          },
+          {
+            "literal": "mb-3 text-xs text-mist-400",
+            "occurrences": 9
+          },
+          {
+            "literal": "text-4xl text-volt-300",
+            "occurrences": 9
+          },
+          {
+            "literal": "ml-auto text-xs text-mist-400",
+            "occurrences": 8
+          },
+          {
+            "literal": "ml-auto",
+            "occurrences": 8
+          },
+          {
+            "literal": "button-secondary px-3 py-1 text-base",
+            "occurrences": 8
+          }
+        ]
+      }
+    },
+    "prose": {
+      "name": "prose",
+      "summary": {
+        "longMemberChainLines": 603,
+        "deeplyIndentedLines": 59,
+        "overlongLines": 388,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "memberChains": [
+          {
+            "file": "src/lib/contracts/SetupProgress.ts",
+            "line": 25
+          },
+          {
+            "file": "src/lib/domain/anglerSkills.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/carpGrowth.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/estate/summariseEstate.ts",
+            "line": 18
+          },
+          {
+            "file": "src/lib/domain/fishing/baitTrust.ts",
+            "line": 13
+          },
+          {
+            "file": "src/lib/domain/fishing/biteChance.ts",
+            "line": 18
+          },
+          {
+            "file": "src/lib/domain/fishing/biteChance.ts",
+            "line": 20
+          },
+          {
+            "file": "src/lib/domain/fishing/biteChance.ts",
+            "line": 24
+          },
+          {
+            "file": "src/lib/domain/fishing/biteRoll.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/domain/fishing/fight.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/fishing/rigMatch.ts",
+            "line": 12
+          },
+          {
+            "file": "src/lib/domain/fishing/tackleMatch.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/fishing/tubingMatch.ts",
+            "line": 9
+          },
+          {
+            "file": "src/lib/domain/fishing/whoTookTheBait.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 62
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 65
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/dredging.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 24
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/groundworks/islandTemplates.ts",
+            "line": 7
+          },
+          {
+            "file": "src/lib/domain/groundworks/islandTemplates.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/groundworks/islandTemplates.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceMeasuredWorks.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/domain/groundworks/rescaleForPlot.ts",
+            "line": 8
+          },
+          {
+            "file": "src/lib/domain/groundworks/rescaleForPlot.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/groundworks/shelfStrip.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/groundworks/shorelineChange.ts",
+            "line": 22
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 22
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 43
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateBank.ts",
+            "line": 18
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateBank.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateBank.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateBank.ts",
+            "line": 42
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateIsland.ts",
+            "line": 12
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateIsland.ts",
+            "line": 20
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateIsland.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateIsland.ts",
+            "line": 33
+          }
+        ],
+        "deepIndentation": [
+          {
+            "file": "src/lib/components/StockTable.svelte",
+            "line": 35
+          },
+          {
+            "file": "src/lib/components/StockTable.svelte",
+            "line": 36
+          },
+          {
+            "file": "src/lib/components/hall/HonourRoll.svelte",
+            "line": 35
+          },
+          {
+            "file": "src/lib/components/hall/HonourRoll.svelte",
+            "line": 36
+          },
+          {
+            "file": "src/lib/components/hall/HonourRoll.svelte",
+            "line": 37
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 25
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 26
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 27
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 28
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 29
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 30
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 31
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 32
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 33
+          },
+          {
+            "file": "src/lib/components/lake/LedgerPanel.svelte",
+            "line": 34
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 20
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 21
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 22
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 23
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 24
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 25
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 26
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 27
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 28
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 42
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 43
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 44
+          },
+          {
+            "file": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "line": 45
+          },
+          {
+            "file": "src/lib/components/legacy/TrophyCabinet.svelte",
+            "line": 23
+          },
+          {
+            "file": "src/lib/components/market/ListingForm.svelte",
+            "line": 45
+          },
+          {
+            "file": "src/lib/components/market/ListingForm.svelte",
+            "line": 63
+          },
+          {
+            "file": "src/lib/components/market/MyListingsPanel.svelte",
+            "line": 31
+          },
+          {
+            "file": "src/lib/components/market/MyListingsPanel.svelte",
+            "line": 32
+          },
+          {
+            "file": "src/lib/components/market/MyListingsPanel.svelte",
+            "line": 33
+          },
+          {
+            "file": "src/lib/components/market/MyListingsPanel.svelte",
+            "line": 34
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 23
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 24
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 25
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 26
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 27
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 41
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 42
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 43
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 44
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 45
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 46
+          },
+          {
+            "file": "src/lib/components/market/SalesLedger.svelte",
+            "line": 47
+          },
+          {
+            "file": "src/lib/components/matches/MatchBoard.svelte",
+            "line": 32
+          },
+          {
+            "file": "src/lib/components/matches/MatchBoard.svelte",
+            "line": 33
+          },
+          {
+            "file": "src/lib/components/matches/MatchBoard.svelte",
+            "line": 34
+          }
+        ],
+        "overlongLines": [
+          {
+            "file": "src/lib/components/world/theGameHasGrown.ts",
+            "line": 4
+          },
+          {
+            "file": "src/lib/contracts/WhileYouWereAway.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/estate/summariseEstate.ts",
+            "line": 8
+          },
+          {
+            "file": "src/lib/domain/fishing/biteChance.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/rescaleForPlot.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/groundworks/swimPlacement.ts",
+            "line": 9
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateIsland.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/groundworks/workKinds.ts",
+            "line": 23
+          },
+          {
+            "file": "src/lib/domain/layout/classicLayout.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/layout/classicLayout.ts",
+            "line": 50
+          },
+          {
+            "file": "src/lib/domain/market/fame.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/matches/matchRules.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/matches/matchRules.ts",
+            "line": 53
+          },
+          {
+            "file": "src/lib/domain/simulation/driftWater.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/sites/estateHistory.ts",
+            "line": 20
+          },
+          {
+            "file": "src/lib/domain/sites/gravelPitSite.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 37
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 38
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 39
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 40
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 41
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 42
+          },
+          {
+            "file": "src/lib/domain/sites/siteCatalogue.ts",
+            "line": 43
+          },
+          {
+            "file": "src/lib/domain/tackle/rigs.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 25
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/world/regions.ts",
+            "line": 35
+          },
+          {
+            "file": "src/lib/domain/world/rivalWords.ts",
+            "line": 9
+          },
+          {
+            "file": "src/lib/game/builder/builderInput.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/game/builder/draftShapes.ts",
+            "line": 20
+          },
+          {
+            "file": "src/lib/game/builder/toolCatalogue.ts",
+            "line": 3
+          },
+          {
+            "file": "src/lib/game/builder/tools/outlineDrag.ts",
+            "line": 21
+          },
+          {
+            "file": "src/lib/game/globe/clusterPins.ts",
+            "line": 46
+          }
+        ]
+      }
+    },
+    "inventory": {
+      "name": "inventory",
+      "summary": {
+        "pages": 25,
+        "components": 188,
+        "orphanComponents": 1,
+        "averagePageLines": 45
+      },
+      "offenders": {
+        "pages": [
+          {
+            "page": "src/routes/world/+page.svelte",
+            "lines": 98,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/angler/+page.svelte",
+            "lines": 80,
+            "widgets": [
+              "form",
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/lake/works/+page.svelte",
+            "lines": 74,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/lake/+page.svelte",
+            "lines": 72,
+            "widgets": [
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/anglers/[anglerId]/+page.svelte",
+            "lines": 67,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/matches/+page.svelte",
+            "lines": 56,
+            "widgets": [
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/angler/scrapbook/[fishermanId]/+page.svelte",
+            "lines": 55,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/lakes/[lakeId]/+page.svelte",
+            "lines": 50,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/world/hall-of-fame/+page.svelte",
+            "lines": 50,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/home/+page.svelte",
+            "lines": 49,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/matches/[matchId]/+page.svelte",
+            "lines": 49,
+            "widgets": [
+              "badge"
+            ]
+          },
+          {
+            "page": "src/routes/lake/pin/+page.svelte",
+            "lines": 48,
+            "widgets": [
+              "form"
+            ]
+          },
+          {
+            "page": "src/routes/setup/+page.svelte",
+            "lines": 47,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/lakes/[lakeId]/host-a-match/+page.svelte",
+            "lines": 41,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/market/+page.svelte",
+            "lines": 40,
+            "widgets": [
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/news/+page.svelte",
+            "lines": 40,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/lakes/+page.svelte",
+            "lines": 38,
+            "widgets": [
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/inbox/+page.svelte",
+            "lines": 35,
+            "widgets": [
+              "form"
+            ]
+          },
+          {
+            "page": "src/routes/anglers/+page.svelte",
+            "lines": 34,
+            "widgets": [
+              "list"
+            ]
+          },
+          {
+            "page": "src/routes/market/[listingId]/+page.svelte",
+            "lines": 34,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/carp/[carpId]/+page.svelte",
+            "lines": 20,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/fish/[lakeId]/+page.svelte",
+            "lines": 20,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/privacy/+page.svelte",
+            "lines": 8,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/terms/+page.svelte",
+            "lines": 8,
+            "widgets": []
+          },
+          {
+            "page": "src/routes/+page.svelte",
+            "lines": 7,
+            "widgets": []
+          }
+        ],
+        "componentReuse": [
+          {
+            "component": "src/lib/components/ActionMessage.svelte",
+            "reusedBy": 9
+          },
+          {
+            "component": "src/lib/components/game/GoFishingButton.svelte",
+            "reusedBy": 8
+          },
+          {
+            "component": "src/lib/components/place/PlaceBanner.svelte",
+            "reusedBy": 8
+          },
+          {
+            "component": "src/lib/components/LakeCanvas.svelte",
+            "reusedBy": 7
+          },
+          {
+            "component": "src/lib/components/lists/Pager.svelte",
+            "reusedBy": 6
+          },
+          {
+            "component": "src/lib/components/CatchReportList.svelte",
+            "reusedBy": 5
+          },
+          {
+            "component": "src/lib/components/stage/PlaceSheet.svelte",
+            "reusedBy": 4
+          },
+          {
+            "component": "src/lib/components/world/Globe.svelte",
+            "reusedBy": 4
+          },
+          {
+            "component": "src/lib/components/StockTable.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/angler/AnglerAvatar.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/angler/SkillBars.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/carp/CarpPortrait.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/carp/Dossier.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/carp/FameBadge.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/carp/TransitBadge.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/hall/YouPill.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/home/WhileYouWereAway.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/lakes/FavouriteStar.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/loading/Skeleton.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/matches/MatchRow.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/matches/PhaseBadge.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/setup/RegionGuide.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/trophy/CatchCard.svelte",
+            "reusedBy": 3
+          },
+          {
+            "component": "src/lib/components/WaterQualityBars.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/angler/FamousFish.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/brand/Wordmark.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/carp/CatchHistory.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/carp/MemorialDossier.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/carp/SaleHistory.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/estate/EstateSwitcher.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/CatchPhoto.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/DayOverSummary.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/MoveSwimButton.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/NextStepPrompt.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/RodStatusBar.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/game/SessionNotice.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/hub/DoorGlyph.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/hud/SoundToggle.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/hud/TabGlyph.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/lake/WorksLedgerPanel.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/legacy/TrophyCabinet.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/legal/LegalPage.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/market/FishFarmPanel.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/market/LandedCost.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/matches/MatchCard.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/stage/LightingOverlays.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/stage/SceneStage.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/stage/SkyCanvas.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/trophy/AnglerRanksLine.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/trophy/CatchCards.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/trophy/MeasureUp.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/trophy/Milestones.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/trophy/RecordsHeld.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/world/Leaderboards.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/world/LiveFeed.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/world/PlotPicker.svelte",
+            "reusedBy": 2
+          },
+          {
+            "component": "src/lib/components/LandingHero.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/angler/AnglerCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/angler/AnglerFilterBar.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/angler/AnglerWaterCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/angler/RivalCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/brand/MeshBackdrop.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/Bench.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/BuilderCanvas.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/DraftControls.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/DrawingControls.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/FacilityPicker.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/LandPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/LayerToggles.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/NewSwimPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/PropertiesPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/QuotePanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/SelectedSwimPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/ToolGlyph.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/ToolHint.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/builder/ToolRail.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/carp/DossierCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/carp/DossierFacts.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/carp/DossierRecord.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/carp/GrowthChart.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/carp/OwnerActions.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/estate/BuyAnotherWaterLink.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/AlarmToggle.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/CanvasOverlay.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/DayTicketOffice.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/FightMeter.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/FishingGame.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/FullscreenToggle.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/HonourRibbons.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/HowToPlay.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/KeyHints.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/RodCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/RodSetupCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/ScalesReadout.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/SegmentedChoice.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/SessionChrome.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/SessionClock.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/SessionDeck.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/StrikeButton.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/TackleBuilder.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/game/WaterScreen.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hall/BiggestEverBoard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hall/HonourRoll.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hall/LegendsBoard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hall/ScopeTabs.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/BailiffNote.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/HubCaption.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/HubDoorLink.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/HubNav.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/LastCastSheet.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hub/PinYourWaterLine.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/BottomTabBar.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/GameHud.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/HudTabs.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/InboxBell.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/MoneyCounter.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/hud/NewsLink.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/inbox/InboxBadge.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/inbox/InboxFilterBar.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/inbox/NotificationList.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/inbox/PinnedNote.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/BailiffPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/FeedPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/LakeOverview.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/LedgerPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/PredatorPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lake/StockPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lakes/LakeCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lakes/RecentCatchesPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/lakes/WaterFilterBar.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/legacy/FamilyLine.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/legacy/KnownFishList.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/legal/LegalParagraph.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/BidBox.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/BidForms.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/BidHistory.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/DealerPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/DealerRow.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/FacetSelect.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/Facets.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/FarmBandRow.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/ListingCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/ListingForm.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/ListingOutcome.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/MarketIndex.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/MarketPagination.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/MarketPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/MyBidsPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/MyListingsPanel.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/SalesLedger.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/market/SellerNotice.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/FishHereButton.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/HostMatchForm.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/MatchBoard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/MatchPot.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/MatchResult.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/matches/MatchesAtWater.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/PlaceVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/JettyVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/LodgeVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/NoticeboardVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/OfficeVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/ShopVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/SignpostVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/place/vignettes/YardVignette.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/BudgetBar.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/NameStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/OpenTheGatesStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/PlotSizePicker.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/SiteCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/SiteStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/StepRail.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/StockStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/SurveyStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/setup/WhereStep.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/stage/LakeStage.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/FeedGroupPills.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/FilterFields.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/FilterRail.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/FilterToggles.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/FlyToButtons.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/LeaderboardTable.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/MatchList.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/PinCard.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/PostcardDrawer.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/PostcardNumbers.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/world/WorldStage.svelte",
+            "reusedBy": 1
+          },
+          {
+            "component": "src/lib/components/inbox/NotificationRow.svelte",
+            "reusedBy": 0
+          }
+        ],
+        "orphans": [
+          "src/lib/components/inbox/NotificationRow.svelte"
+        ]
+      }
+    },
+    "duplication": {
+      "name": "duplication",
+      "summary": {
+        "skipped": "jscpd is not installed (npm install -g jscpd)"
+      },
+      "offenders": []
+    }
+  }
+}
