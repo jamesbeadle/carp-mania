@@ -1,0 +1,480 @@
+{
+  "score": 78.9,
+  "steps": [
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `frame` one home",
+      "detail": "Declared in 4 files: src/lib/components/carp/CarpPortrait.svelte, src/lib/components/game/CatchPhoto.svelte, src/lib/components/game/FightMeter.svelte, src/lib/components/game/ScalesReadout.svelte."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `round` one home",
+      "detail": "Declared in 3 files: src/lib/domain/anglerSkills.ts, src/lib/domain/carpGrowth.ts, src/lib/domain/simulation/pikePredation.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `roundToQuarterPound` one home",
+      "detail": "Declared in 3 files: src/lib/domain/market/farmDelivery.ts, src/lib/domain/sites/classicSite.ts, src/lib/domain/sites/startingStock.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `fitToDisplay` one home",
+      "detail": "Declared in 3 files: src/lib/game/globe/globeRenderLoop.ts, src/lib/game/scene/renderLoop.ts, src/lib/game/sky/skyLoop.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `flyTo` one home",
+      "detail": "Declared in 3 files: src/lib/components/world/Globe.svelte, src/lib/components/world/WorldStage.svelte, src/routes/world/+page.svelte."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `capacityFailures` one home",
+      "detail": "Declared in 2 files: src/lib/domain/groundworks/validateDraft.ts, src/lib/domain/groundworks/validateIsland.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `pageNumberFrom` one home",
+      "detail": "Declared in 2 files: src/lib/domain/lists/paging.ts, src/lib/domain/market/readMarketFilters.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `hasEnded` one home",
+      "detail": "Declared in 2 files: src/lib/domain/market/listingGates.ts, src/lib/format/timeLeft.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `drawHead` one home",
+      "detail": "Declared in 2 files: src/lib/game/globe/drawArcs.ts, src/lib/game/render/carpFins.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `drawPeg` one home",
+      "detail": "Declared in 2 files: src/lib/game/globe/drawPins.ts, src/lib/game/render/drawSwims.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `drawPlanks` one home",
+      "detail": "Declared in 2 files: src/lib/game/globe/drawPins.ts, src/lib/game/render/drawSwims.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `drawShadow` one home",
+      "detail": "Declared in 2 files: src/lib/game/render/drawAngler.ts, src/lib/game/render/drawCarp.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `pointOf` one home",
+      "detail": "Declared in 2 files: src/lib/components/builder/BuilderCanvas.svelte, src/lib/game/world/realtimeFeed.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `loadCarpInLake` one home",
+      "detail": "Declared in 2 files: src/lib/server/commands/ListCarpForSale.ts, src/lib/server/commands/SellCarpToDealer.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Give `loadSwimsOf` one home",
+      "detail": "Declared in 2 files: src/lib/server/commands/OrderGroundworks.ts, src/lib/server/commands/swimGates.ts."
+    },
+    {
+      "pass": "Pass 2 \u2014 Utility function identification",
+      "title": "Remove the 21 components and functions nothing calls",
+      "detail": "Listed in audit.json under details.orphans and details.inventory.offenders.orphans; confirm each has no caller before it goes."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Complete the pattern: every +page.svelte has a +page.server.ts",
+      "detail": "2 of 25 lack it. Predicted: src/routes/privacy/+page.server.ts; src/routes/terms/+page.server.ts. Find the code doing that job now and move it there; a subject that truly has no such job goes in acceptedGaps."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `AreaFeature` into range",
+      "detail": "3 properties, 0 file(s) named for it, about 1 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Bid` into range",
+      "detail": "7 properties, 9 file(s) named for it, about 3 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `BoardPlacing` into range",
+      "detail": "6 properties, 0 file(s) named for it, about 2 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Carp` into range",
+      "detail": "14 properties, 27 file(s) named for it, about 6 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `CarpMemorial` into range",
+      "detail": "13 properties, 1 file(s) named for it, about 5 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `CarpTransfer` into range",
+      "detail": "15 properties, 0 file(s) named for it, about 6 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Catch` into range",
+      "detail": "12 properties, 14 file(s) named for it, about 5 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Island` into range",
+      "detail": "3 properties, 4 file(s) named for it, about 1 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Lake` into range",
+      "detail": "26 properties, 39 file(s) named for it, about 11 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `LakeLayout` into range",
+      "detail": "9 properties, 0 file(s) named for it, about 4 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `LakeVisit` into range",
+      "detail": "7 properties, 0 file(s) named for it, about 3 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Listing` into range",
+      "detail": "16 properties, 19 file(s) named for it, about 7 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Match` into range",
+      "detail": "14 properties, 39 file(s) named for it, about 6 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `MatchEntry` into range",
+      "detail": "5 properties, 0 file(s) named for it, about 2 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `ReedLine` into range",
+      "detail": "3 properties, 0 file(s) named for it, about 1 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Swim` into range",
+      "detail": "5 properties, 14 file(s) named for it, about 2 expected."
+    },
+    {
+      "pass": "Pass 3 \u2014 Design pattern identification",
+      "title": "Bring `Trophy` into range",
+      "detail": "13 properties, 12 file(s) named for it, about 5 expected."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Long member chain lines: 603 to zero",
+      "detail": "Scores 15.4% at weight 4; the offenders are in audit.json under details.prose, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Conditions compared to a raw literal: 207 to zero",
+      "detail": "Scores 25.3% at weight 6; the offenders are in audit.json under details.conditions, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Conditions with calls tangled inside calls: 46 to zero",
+      "detail": "Scores 83.4% at weight 8; the offenders are in audit.json under details.conditions, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Inline magic values: 50 to zero",
+      "detail": "Scores 89.5% at weight 4; the offenders are in audit.json under details.magicValues, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Deeply indented lines: 59 to zero",
+      "detail": "Scores 91.7% at weight 4; the offenders are in audit.json under details.prose, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Overlong function names: 4 to zero",
+      "detail": "Scores 96.9% at weight 4; the offenders are in audit.json under details.functionNames, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Accessor names that want to be a property: 4 to zero",
+      "detail": "Scores 96.9% at weight 6; the offenders are in audit.json under details.accessorNames, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Functions over the line limit: 7 to zero",
+      "detail": "Scores 97.8% at weight 8; the offenders are in audit.json under details.functionShape, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Duplication %: 0.14 to zero",
+      "detail": "Scores 99.3% at weight 8; the offenders are in audit.json under details.duplication, fifty at a time."
+    },
+    {
+      "pass": "Pass 4 \u2014 The sweep to zero",
+      "title": "Else blocks: 2 to zero",
+      "detail": "Scores 99.6% at weight 5; the offenders are in audit.json under details.functionShape, fifty at a time."
+    }
+  ],
+  "targets": [],
+  "designPatterns": {
+    "name": "designPatterns",
+    "summary": {
+      "roleFamilies": 32,
+      "predictedFiles": 48,
+      "predictedFilesMissing": 0,
+      "entities": 27,
+      "entitiesOutOfRange": 17,
+      "measurementIsHeuristic": true
+    },
+    "offenders": {
+      "roleFamilies": {
+        "+page.server.ts": 23,
+        "+page.svelte": 25,
+        "+server.ts": 10,
+        "activity": 4,
+        "badge": 4,
+        "bar": 7,
+        "button": 4,
+        "card": 13,
+        "dossier": 4,
+        "filters": 7,
+        "fish": 5,
+        "gates": 4,
+        "groundworks": 4,
+        "history": 5,
+        "lake": 8,
+        "line": 4,
+        "list": 4,
+        "match": 9,
+        "palette": 6,
+        "panel": 17,
+        "row": 4,
+        "rules": 6,
+        "site": 8,
+        "step": 6,
+        "summary": 4,
+        "svelte": 13,
+        "swim": 5,
+        "types": 7,
+        "vignette": 8,
+        "water": 8,
+        "words": 4,
+        "works": 5
+      },
+      "patterns": [
+        {
+          "pattern": "every +page.server.ts has a +page.svelte",
+          "predicted": 23,
+          "missing": []
+        },
+        {
+          "pattern": "every +page.svelte has a +page.server.ts",
+          "predicted": 25,
+          "missing": [
+            "src/routes/privacy/+page.server.ts",
+            "src/routes/terms/+page.server.ts"
+          ]
+        }
+      ],
+      "missingPredictedFiles": [],
+      "entityFileCounts": [
+        {
+          "entity": "AreaFeature",
+          "properties": 3,
+          "files": 0,
+          "expectedFiles": 1,
+          "isInRange": false
+        },
+        {
+          "entity": "BedPatch",
+          "properties": 3,
+          "files": 1,
+          "expectedFiles": 1,
+          "isInRange": true
+        },
+        {
+          "entity": "Bid",
+          "properties": 7,
+          "files": 9,
+          "expectedFiles": 3,
+          "isInRange": false
+        },
+        {
+          "entity": "BoardPlacing",
+          "properties": 6,
+          "files": 0,
+          "expectedFiles": 2,
+          "isInRange": false
+        },
+        {
+          "entity": "Carp",
+          "properties": 14,
+          "files": 27,
+          "expectedFiles": 6,
+          "isInRange": false
+        },
+        {
+          "entity": "CarpMemorial",
+          "properties": 13,
+          "files": 1,
+          "expectedFiles": 5,
+          "isInRange": false
+        },
+        {
+          "entity": "CarpTransfer",
+          "properties": 15,
+          "files": 0,
+          "expectedFiles": 6,
+          "isInRange": false
+        },
+        {
+          "entity": "Catch",
+          "properties": 12,
+          "files": 14,
+          "expectedFiles": 5,
+          "isInRange": false
+        },
+        {
+          "entity": "DepthZone",
+          "properties": 3,
+          "files": 1,
+          "expectedFiles": 1,
+          "isInRange": true
+        },
+        {
+          "entity": "FavouriteLake",
+          "properties": 3,
+          "files": 1,
+          "expectedFiles": 1,
+          "isInRange": true
+        },
+        {
+          "entity": "Fisherman",
+          "properties": 12,
+          "files": 5,
+          "expectedFiles": 5,
+          "isInRange": true
+        },
+        {
+          "entity": "Island",
+          "properties": 3,
+          "files": 4,
+          "expectedFiles": 1,
+          "isInRange": false
+        },
+        {
+          "entity": "Lake",
+          "properties": 26,
+          "files": 39,
+          "expectedFiles": 11,
+          "isInRange": false
+        },
+        {
+          "entity": "LakeLayout",
+          "properties": 9,
+          "files": 0,
+          "expectedFiles": 4,
+          "isInRange": false
+        },
+        {
+          "entity": "LakeVisit",
+          "properties": 7,
+          "files": 0,
+          "expectedFiles": 3,
+          "isInRange": false
+        },
+        {
+          "entity": "LakeWork",
+          "properties": 9,
+          "files": 4,
+          "expectedFiles": 4,
+          "isInRange": true
+        },
+        {
+          "entity": "LayoutPoint",
+          "properties": 2,
+          "files": 1,
+          "expectedFiles": 1,
+          "isInRange": true
+        },
+        {
+          "entity": "Listing",
+          "properties": 16,
+          "files": 19,
+          "expectedFiles": 7,
+          "isInRange": false
+        },
+        {
+          "entity": "Match",
+          "properties": 14,
+          "files": 39,
+          "expectedFiles": 6,
+          "isInRange": false
+        },
+        {
+          "entity": "MatchEntry",
+          "properties": 5,
+          "files": 0,
+          "expectedFiles": 2,
+          "isInRange": false
+        },
+        {
+          "entity": "Notification",
+          "properties": 8,
+          "files": 4,
+          "expectedFiles": 3,
+          "isInRange": true
+        },
+        {
+          "entity": "Profile",
+          "properties": 15,
+          "files": 3,
+          "expectedFiles": 6,
+          "isInRange": true
+        },
+        {
+          "entity": "ReedLine",
+          "properties": 3,
+          "files": 0,
+          "expectedFiles": 1,
+          "isInRange": false
+        },
+        {
+          "entity": "Snag",
+          "properties": 4,
+          "files": 2,
+          "expectedFiles": 2,
+          "isInRange": true
+        },
+        {
+          "entity": "Swim",
+          "properties": 5,
+          "files": 14,
+          "expectedFiles": 2,
+          "isInRange": false
+        },
+        {
+          "entity": "Trophy",
+          "properties": 13,
+          "files": 12,
+          "expectedFiles": 5,
+          "isInRange": false
+        },
+        {
+          "entity": "WorldEvent",
+          "properties": 6,
+          "files": 1,
+          "expectedFiles": 2,
+          "isInRange": true
+        }
+      ]
+    }
+  }
+}

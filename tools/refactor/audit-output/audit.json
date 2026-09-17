@@ -1,16 +1,235 @@
 {
-  "generatedAt": "2026-09-16T06:48:02+00:00",
+  "generatedAt": "2026-09-17T11:23:56+00:00",
+  "kitVersion": "1.3.0",
+  "score": {
+    "overall": 78.9,
+    "groups": [
+      {
+        "group": "Standard baseline checks",
+        "score": 91.5,
+        "weight": 60
+      },
+      {
+        "group": "Design pattern file count",
+        "score": 50.0,
+        "weight": 20
+      },
+      {
+        "group": "Prose",
+        "score": 70.0,
+        "weight": 20
+      }
+    ],
+    "elements": [
+      {
+        "key": "filesOverLimit",
+        "label": "Files over the line limit",
+        "group": "Standard baseline checks",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "files",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 706,
+        "score": 100.0
+      },
+      {
+        "key": "worstFile",
+        "label": "Worst file, in limits over",
+        "group": "Standard baseline checks",
+        "weight": 5,
+        "zeroAt": 9,
+        "unit": "",
+        "isMeasured": true,
+        "offenders": 0.0,
+        "measuredAgainst": 1,
+        "score": 100.0
+      },
+      {
+        "key": "functionsOverLimit",
+        "label": "Functions over the line limit",
+        "group": "Standard baseline checks",
+        "weight": 8,
+        "zeroAt": 0.25,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 7,
+        "measuredAgainst": 1287,
+        "score": 97.8
+      },
+      {
+        "key": "elseBlocks",
+        "label": "Else blocks",
+        "group": "Standard baseline checks",
+        "weight": 5,
+        "zeroAt": 0.5,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 2,
+        "measuredAgainst": 1109,
+        "score": 99.6
+      },
+      {
+        "key": "duplication",
+        "label": "Duplication %",
+        "group": "Standard baseline checks",
+        "weight": 8,
+        "zeroAt": 20,
+        "unit": "",
+        "isMeasured": true,
+        "offenders": 0.14,
+        "measuredAgainst": 1,
+        "score": 99.3
+      },
+      {
+        "key": "comments",
+        "label": "Explanatory comment lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 50,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 23.75,
+        "score": 100.0
+      },
+      {
+        "key": "magicValues",
+        "label": "Inline magic values",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 20,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 50,
+        "measuredAgainst": 23.75,
+        "score": 89.5
+      },
+      {
+        "key": "orphans",
+        "label": "Orphan components and functions",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 0.1,
+        "unit": "components and functions",
+        "isMeasured": true,
+        "offenders": 21,
+        "measuredAgainst": 1475,
+        "score": 85.8
+      },
+      {
+        "key": "memberChains",
+        "label": "Long member chain lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 30,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 603,
+        "measuredAgainst": 23.75,
+        "score": 15.4
+      },
+      {
+        "key": "deepIndentation",
+        "label": "Deeply indented lines",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 30,
+        "unit": "thousand lines",
+        "isMeasured": true,
+        "offenders": 59,
+        "measuredAgainst": 23.75,
+        "score": 91.7
+      },
+      {
+        "key": "functionNames",
+        "label": "Overlong function names",
+        "group": "Standard baseline checks",
+        "weight": 4,
+        "zeroAt": 0.1,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 4,
+        "measuredAgainst": 1287,
+        "score": 96.9
+      },
+      {
+        "key": "predictedFiles",
+        "label": "Files the patterns predict but are missing",
+        "group": "Design pattern file count",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "predicted files",
+        "isMeasured": true,
+        "offenders": 0,
+        "measuredAgainst": 48,
+        "score": 100.0
+      },
+      {
+        "key": "entityFileCounts",
+        "label": "Entities outside their expected file count",
+        "group": "Design pattern file count",
+        "weight": 10,
+        "zeroAt": 0.5,
+        "unit": "entities",
+        "isMeasured": true,
+        "offenders": 17,
+        "measuredAgainst": 27,
+        "score": 0.0
+      },
+      {
+        "key": "tangledConditions",
+        "label": "Conditions with calls tangled inside calls",
+        "group": "Prose",
+        "weight": 8,
+        "zeroAt": 0.25,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 46,
+        "measuredAgainst": 1109,
+        "score": 83.4
+      },
+      {
+        "key": "literalComparisons",
+        "label": "Conditions compared to a raw literal",
+        "group": "Prose",
+        "weight": 6,
+        "zeroAt": 0.25,
+        "unit": "branches",
+        "isMeasured": true,
+        "offenders": 207,
+        "measuredAgainst": 1109,
+        "score": 25.3
+      },
+      {
+        "key": "gluedAccessors",
+        "label": "Accessor names that want to be a property",
+        "group": "Prose",
+        "weight": 6,
+        "zeroAt": 0.1,
+        "unit": "functions",
+        "isMeasured": true,
+        "offenders": 4,
+        "measuredAgainst": 1287,
+        "score": 96.9
+      }
+    ]
+  },
   "summaries": {
     "fileLength": {
       "limit": 100,
       "filesOverLimit": 0,
       "totalFiles": 706,
-      "worstFileLines": 0
+      "totalLines": 23752,
+      "worstFileLines": 0,
+      "worstFileTimesOverLimit": 0.0
     },
     "functionShape": {
       "limit": 30,
       "functionsOverLimit": 7,
+      "totalFunctions": 1287,
       "elseBlocks": 2,
+      "ifBlocks": 1109,
       "measurementIsHeuristic": true
     },
     "functionNames": {
@@ -18,8 +237,15 @@
       "maxWords": 5,
       "maxLength": 40
     },
+    "accessorNames": {
+      "gluedAccessorNames": 4,
+      "measurementIsHeuristic": true
+    },
     "duplication": {
-      "skipped": "jscpd is not installed (npm install -g jscpd)"
+      "clones": 6,
+      "duplicatedLines": 39,
+      "totalLines": 28425,
+      "duplicatedPercentage": 0.14
     },
     "naming": {
       "bannedAbbreviationHits": 0,
@@ -41,11 +267,43 @@
       "overlongLines": 388,
       "measurementIsHeuristic": true
     },
+    "conditions": {
+      "tangledConditionLines": 46,
+      "literalComparisonLines": 207,
+      "measurementIsHeuristic": true
+    },
+    "orphans": {
+      "orphanFunctions": 20,
+      "functionsExamined": 1287
+    },
+    "designPatterns": {
+      "roleFamilies": 32,
+      "predictedFiles": 48,
+      "predictedFilesMissing": 0,
+      "entities": 27,
+      "entitiesOutOfRange": 17,
+      "measurementIsHeuristic": true
+    },
     "inventory": {
       "pages": 25,
       "components": 188,
       "orphanComponents": 1,
       "averagePageLines": 45
+    },
+    "fileAreas": {
+      "totalFiles": 890,
+      "frontend": 227,
+      "game": 152,
+      "domain": 149,
+      "backend": 136,
+      "tooling": 76,
+      "database": 46,
+      "shared": 45,
+      "docs": 21,
+      "tests": 19,
+      "api": 10,
+      "infrastructure": 8,
+      "other": 1
     }
   },
   "details": {
@@ -55,7 +313,9 @@
         "limit": 100,
         "filesOverLimit": 0,
         "totalFiles": 706,
-        "worstFileLines": 0
+        "totalLines": 23752,
+        "worstFileLines": 0,
+        "worstFileTimesOverLimit": 0.0
       },
       "offenders": []
     },
@@ -64,37 +324,53 @@
       "summary": {
         "limit": 30,
         "functionsOverLimit": 7,
+        "totalFunctions": 1287,
         "elseBlocks": 2,
+        "ifBlocks": 1109,
         "measurementIsHeuristic": true
       },
       "offenders": [
         {
           "file": "src/lib/game/builder/builderInput.ts",
-          "lines": 50
+          "lines": 50,
+          "name": "createPointerGestures",
+          "line": 16
         },
         {
           "file": "src/lib/game/render/drawPike.ts",
-          "lines": 41
+          "lines": 41,
+          "name": "drawPike",
+          "line": 3
         },
         {
           "file": "src/lib/game/scene/drawScene.ts",
-          "lines": 38
+          "lines": 38,
+          "name": "createSceneDrawer",
+          "line": 35
         },
         {
           "file": "src/lib/game/sound/ambience/birdsong.ts",
-          "lines": 35
+          "lines": 35,
+          "name": "startBirdsong",
+          "line": 12
         },
         {
           "file": "src/lib/domain/simulation/simulateOneDay.ts",
-          "lines": 33
+          "lines": 33,
+          "name": "simulateOneDay",
+          "line": 49
         },
         {
           "file": "src/lib/domain/sites/newLake.ts",
-          "lines": 33
+          "lines": 33,
+          "name": "newLakeFor",
+          "line": 12
         },
         {
           "file": "src/lib/game/sound/synth/loops.ts",
-          "lines": 33
+          "lines": 33,
+          "name": "startClutch",
+          "line": 43
         }
       ]
     },
@@ -125,6 +401,35 @@
           "file": "src/routes/setup/+page.server.ts",
           "line": 34,
           "name": "isNothingLeftToSetUp"
+        }
+      ]
+    },
+    "accessorNames": {
+      "name": "accessorNames",
+      "summary": {
+        "gluedAccessorNames": 4,
+        "measurementIsHeuristic": true
+      },
+      "offenders": [
+        {
+          "file": "src/lib/server/commands/swimGates.ts",
+          "line": 9,
+          "name": "readSwimPoint"
+        },
+        {
+          "file": "src/lib/server/commands/swimGates.ts",
+          "line": 18,
+          "name": "readSwimName"
+        },
+        {
+          "file": "src/lib/server/gates/readSiteOrder.ts",
+          "line": 23,
+          "name": "readPlotAcres"
+        },
+        {
+          "file": "src/lib/server/gates/readSiteOrder.ts",
+          "line": 32,
+          "name": "readWaterName"
         }
       ]
     },
@@ -1027,6 +1332,767 @@
           {
             "file": "src/lib/game/globe/clusterPins.ts",
             "line": 46
+          }
+        ]
+      }
+    },
+    "conditions": {
+      "name": "conditions",
+      "summary": {
+        "tangledConditionLines": 46,
+        "literalComparisonLines": 207,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "tangled": [
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 62
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 17
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateBank.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/layout/favouriteFeature.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/lists/listPath.ts",
+            "line": 23
+          },
+          {
+            "file": "src/lib/domain/market/readMarketFilters.ts",
+            "line": 35
+          },
+          {
+            "file": "src/lib/domain/market/readMarketFilters.ts",
+            "line": 40
+          },
+          {
+            "file": "src/lib/game/builder/draftShapes.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/game/builder/tools/drawnShapeTool.ts",
+            "line": 10
+          },
+          {
+            "file": "src/lib/game/builder/tools/drawnShapeTool.ts",
+            "line": 11
+          },
+          {
+            "file": "src/lib/game/globe/drawPins.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/game/globe/globeInteraction.ts",
+            "line": 63
+          },
+          {
+            "file": "src/lib/game/globe/globeInteraction.ts",
+            "line": 88
+          },
+          {
+            "file": "src/lib/game/globe/globeInteraction.ts",
+            "line": 89
+          },
+          {
+            "file": "src/lib/game/globe/globeInteraction.ts",
+            "line": 91
+          },
+          {
+            "file": "src/lib/game/globe/randomDestination.ts",
+            "line": 11
+          },
+          {
+            "file": "src/lib/game/render/drawFish.ts",
+            "line": 22
+          },
+          {
+            "file": "src/lib/game/scene/drawScene.ts",
+            "line": 85
+          },
+          {
+            "file": "src/lib/game/session/biteRoller.ts",
+            "line": 36
+          },
+          {
+            "file": "src/lib/game/session/showingFish.ts",
+            "line": 75
+          },
+          {
+            "file": "src/lib/game/sky/skyBodies.ts",
+            "line": 38
+          },
+          {
+            "file": "src/lib/game/sky/skyBodies.ts",
+            "line": 40
+          },
+          {
+            "file": "src/lib/game/sky/weatherEffects.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/server/commands/BuySite.ts",
+            "line": 43
+          },
+          {
+            "file": "src/lib/server/commands/BuySite.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/server/commands/OrderGroundworks.ts",
+            "line": 21
+          },
+          {
+            "file": "src/lib/server/commands/PlaceBid.ts",
+            "line": 25
+          },
+          {
+            "file": "src/lib/server/commands/RecordCatch.ts",
+            "line": 24
+          },
+          {
+            "file": "src/lib/server/commands/persistCompletedWorks.ts",
+            "line": 18
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 40
+          },
+          {
+            "file": "src/lib/server/commands/persistSimulatedDays.ts",
+            "line": 42
+          },
+          {
+            "file": "src/lib/server/gates/readSiteOrder.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/server/queries/GetFishingVisit.ts",
+            "line": 21
+          },
+          {
+            "file": "src/lib/server/queries/GetWorldActivity.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/components/market/ListingOutcome.svelte",
+            "line": 25
+          }
+        ],
+        "literalComparisons": [
+          {
+            "file": "src/lib/domain/fishing/hookMatch.ts",
+            "line": 6
+          },
+          {
+            "file": "src/lib/domain/fishing/lineMatch.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/fishing/lineMatch.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/fishing/spotFactor.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/fishing/tubingMatch.ts",
+            "line": 7
+          },
+          {
+            "file": "src/lib/domain/fishing/tubingMatch.ts",
+            "line": 8
+          },
+          {
+            "file": "src/lib/domain/fishing/tubingMatch.ts",
+            "line": 9
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 62
+          },
+          {
+            "file": "src/lib/domain/groundworks/applyCompletedWorks.ts",
+            "line": 63
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 35
+          },
+          {
+            "file": "src/lib/domain/groundworks/draftFootprint.ts",
+            "line": 51
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 17
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 18
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 19
+          },
+          {
+            "file": "src/lib/domain/groundworks/isWorkDraft.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 25
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 26
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 27
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 28
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 29
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 30
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 31
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 44
+          },
+          {
+            "file": "src/lib/domain/groundworks/priceDraft.ts",
+            "line": 45
+          },
+          {
+            "file": "src/lib/domain/groundworks/swimPlacement.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 14
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 15
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateArea.ts",
+            "line": 16
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 32
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 33
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 34
+          },
+          {
+            "file": "src/lib/domain/groundworks/validateDraft.ts",
+            "line": 41
+          }
+        ]
+      }
+    },
+    "orphans": {
+      "name": "orphans",
+      "summary": {
+        "orphanFunctions": 20,
+        "functionsExamined": 1287
+      },
+      "offenders": [
+        {
+          "file": "src/lib/domain/anglerSkills.ts",
+          "line": 27,
+          "name": "clampSkill"
+        },
+        {
+          "file": "src/lib/domain/estate/estateRules.ts",
+          "line": 14,
+          "name": "isAnEstate"
+        },
+        {
+          "file": "src/lib/domain/layout/layoutScale.ts",
+          "line": 22,
+          "name": "fractionAcrossForFeet"
+        },
+        {
+          "file": "src/lib/domain/layout/layoutScale.ts",
+          "line": 26,
+          "name": "fractionDownForFeet"
+        },
+        {
+          "file": "src/lib/domain/layout/layoutScale.ts",
+          "line": 30,
+          "name": "acresOfFraction"
+        },
+        {
+          "file": "src/lib/domain/layout/layoutTypes.ts",
+          "line": 77,
+          "name": "emptyLayout"
+        },
+        {
+          "file": "src/lib/domain/market/bidRules.ts",
+          "line": 3,
+          "name": "nextBidAfter"
+        },
+        {
+          "file": "src/lib/domain/market/fame.ts",
+          "line": 22,
+          "name": "fameForPlayerCatch"
+        },
+        {
+          "file": "src/lib/domain/market/fishFarm.ts",
+          "line": 30,
+          "name": "farmBand"
+        },
+        {
+          "file": "src/lib/domain/market/listingRules.ts",
+          "line": 39,
+          "name": "listingEndsAt"
+        },
+        {
+          "file": "src/lib/domain/market/records.ts",
+          "line": 25,
+          "name": "noRecordsYet"
+        },
+        {
+          "file": "src/lib/domain/market/transport.ts",
+          "line": 38,
+          "name": "conditionAfterTransport"
+        },
+        {
+          "file": "src/lib/domain/market/transport.ts",
+          "line": 42,
+          "name": "arrivalTimes"
+        },
+        {
+          "file": "src/lib/domain/matches/matchBoard.ts",
+          "line": 18,
+          "name": "placingOf"
+        },
+        {
+          "file": "src/lib/domain/simulation/worldEvents.ts",
+          "line": 13,
+          "name": "saleEvent"
+        },
+        {
+          "file": "src/lib/domain/sites/classicSite.ts",
+          "line": 25,
+          "name": "classicLake"
+        },
+        {
+          "file": "src/lib/domain/sites/classicSite.ts",
+          "line": 56,
+          "name": "classicCarp"
+        },
+        {
+          "file": "src/lib/domain/sites/classicSite.ts",
+          "line": 74,
+          "name": "classicSwims"
+        },
+        {
+          "file": "src/lib/domain/trophies/ribbons.ts",
+          "line": 10,
+          "name": "bestRibbonOf"
+        },
+        {
+          "file": "src/lib/domain/world/seasons.ts",
+          "line": 35,
+          "name": "yearlyAverageGrowthFactor"
+        }
+      ]
+    },
+    "designPatterns": {
+      "name": "designPatterns",
+      "summary": {
+        "roleFamilies": 32,
+        "predictedFiles": 48,
+        "predictedFilesMissing": 0,
+        "entities": 27,
+        "entitiesOutOfRange": 17,
+        "measurementIsHeuristic": true
+      },
+      "offenders": {
+        "roleFamilies": {
+          "+page.server.ts": 23,
+          "+page.svelte": 25,
+          "+server.ts": 10,
+          "activity": 4,
+          "badge": 4,
+          "bar": 7,
+          "button": 4,
+          "card": 13,
+          "dossier": 4,
+          "filters": 7,
+          "fish": 5,
+          "gates": 4,
+          "groundworks": 4,
+          "history": 5,
+          "lake": 8,
+          "line": 4,
+          "list": 4,
+          "match": 9,
+          "palette": 6,
+          "panel": 17,
+          "row": 4,
+          "rules": 6,
+          "site": 8,
+          "step": 6,
+          "summary": 4,
+          "svelte": 13,
+          "swim": 5,
+          "types": 7,
+          "vignette": 8,
+          "water": 8,
+          "words": 4,
+          "works": 5
+        },
+        "patterns": [
+          {
+            "pattern": "every +page.server.ts has a +page.svelte",
+            "predicted": 23,
+            "missing": []
+          },
+          {
+            "pattern": "every +page.svelte has a +page.server.ts",
+            "predicted": 25,
+            "missing": [
+              "src/routes/privacy/+page.server.ts",
+              "src/routes/terms/+page.server.ts"
+            ]
+          }
+        ],
+        "missingPredictedFiles": [],
+        "entityFileCounts": [
+          {
+            "entity": "AreaFeature",
+            "properties": 3,
+            "files": 0,
+            "expectedFiles": 1,
+            "isInRange": false
+          },
+          {
+            "entity": "BedPatch",
+            "properties": 3,
+            "files": 1,
+            "expectedFiles": 1,
+            "isInRange": true
+          },
+          {
+            "entity": "Bid",
+            "properties": 7,
+            "files": 9,
+            "expectedFiles": 3,
+            "isInRange": false
+          },
+          {
+            "entity": "BoardPlacing",
+            "properties": 6,
+            "files": 0,
+            "expectedFiles": 2,
+            "isInRange": false
+          },
+          {
+            "entity": "Carp",
+            "properties": 14,
+            "files": 27,
+            "expectedFiles": 6,
+            "isInRange": false
+          },
+          {
+            "entity": "CarpMemorial",
+            "properties": 13,
+            "files": 1,
+            "expectedFiles": 5,
+            "isInRange": false
+          },
+          {
+            "entity": "CarpTransfer",
+            "properties": 15,
+            "files": 0,
+            "expectedFiles": 6,
+            "isInRange": false
+          },
+          {
+            "entity": "Catch",
+            "properties": 12,
+            "files": 14,
+            "expectedFiles": 5,
+            "isInRange": false
+          },
+          {
+            "entity": "DepthZone",
+            "properties": 3,
+            "files": 1,
+            "expectedFiles": 1,
+            "isInRange": true
+          },
+          {
+            "entity": "FavouriteLake",
+            "properties": 3,
+            "files": 1,
+            "expectedFiles": 1,
+            "isInRange": true
+          },
+          {
+            "entity": "Fisherman",
+            "properties": 12,
+            "files": 5,
+            "expectedFiles": 5,
+            "isInRange": true
+          },
+          {
+            "entity": "Island",
+            "properties": 3,
+            "files": 4,
+            "expectedFiles": 1,
+            "isInRange": false
+          },
+          {
+            "entity": "Lake",
+            "properties": 26,
+            "files": 39,
+            "expectedFiles": 11,
+            "isInRange": false
+          },
+          {
+            "entity": "LakeLayout",
+            "properties": 9,
+            "files": 0,
+            "expectedFiles": 4,
+            "isInRange": false
+          },
+          {
+            "entity": "LakeVisit",
+            "properties": 7,
+            "files": 0,
+            "expectedFiles": 3,
+            "isInRange": false
+          },
+          {
+            "entity": "LakeWork",
+            "properties": 9,
+            "files": 4,
+            "expectedFiles": 4,
+            "isInRange": true
+          },
+          {
+            "entity": "LayoutPoint",
+            "properties": 2,
+            "files": 1,
+            "expectedFiles": 1,
+            "isInRange": true
+          },
+          {
+            "entity": "Listing",
+            "properties": 16,
+            "files": 19,
+            "expectedFiles": 7,
+            "isInRange": false
+          },
+          {
+            "entity": "Match",
+            "properties": 14,
+            "files": 39,
+            "expectedFiles": 6,
+            "isInRange": false
+          },
+          {
+            "entity": "MatchEntry",
+            "properties": 5,
+            "files": 0,
+            "expectedFiles": 2,
+            "isInRange": false
+          },
+          {
+            "entity": "Notification",
+            "properties": 8,
+            "files": 4,
+            "expectedFiles": 3,
+            "isInRange": true
+          },
+          {
+            "entity": "Profile",
+            "properties": 15,
+            "files": 3,
+            "expectedFiles": 6,
+            "isInRange": true
+          },
+          {
+            "entity": "ReedLine",
+            "properties": 3,
+            "files": 0,
+            "expectedFiles": 1,
+            "isInRange": false
+          },
+          {
+            "entity": "Snag",
+            "properties": 4,
+            "files": 2,
+            "expectedFiles": 2,
+            "isInRange": true
+          },
+          {
+            "entity": "Swim",
+            "properties": 5,
+            "files": 14,
+            "expectedFiles": 2,
+            "isInRange": false
+          },
+          {
+            "entity": "Trophy",
+            "properties": 13,
+            "files": 12,
+            "expectedFiles": 5,
+            "isInRange": false
+          },
+          {
+            "entity": "WorldEvent",
+            "properties": 6,
+            "files": 1,
+            "expectedFiles": 2,
+            "isInRange": true
           }
         ]
       }
@@ -1945,12 +3011,152 @@
         ]
       }
     },
+    "fileAreas": {
+      "name": "fileAreas",
+      "summary": {
+        "totalFiles": 890,
+        "frontend": 227,
+        "game": 152,
+        "domain": 149,
+        "backend": 136,
+        "tooling": 76,
+        "database": 46,
+        "shared": 45,
+        "docs": 21,
+        "tests": 19,
+        "api": 10,
+        "infrastructure": 8,
+        "other": 1
+      },
+      "offenders": [
+        {
+          "area": "frontend",
+          "files": 227,
+          "sourceFiles": 216,
+          "sourceLines": 7620
+        },
+        {
+          "area": "game",
+          "files": 152,
+          "sourceFiles": 152,
+          "sourceLines": 5976
+        },
+        {
+          "area": "domain",
+          "files": 149,
+          "sourceFiles": 149,
+          "sourceLines": 5160
+        },
+        {
+          "area": "backend",
+          "files": 136,
+          "sourceFiles": 136,
+          "sourceLines": 3903
+        },
+        {
+          "area": "tooling",
+          "files": 76,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "database",
+          "files": 46,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "shared",
+          "files": 45,
+          "sourceFiles": 43,
+          "sourceLines": 984
+        },
+        {
+          "area": "docs",
+          "files": 21,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "tests",
+          "files": 19,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "api",
+          "files": 10,
+          "sourceFiles": 10,
+          "sourceLines": 109
+        },
+        {
+          "area": "infrastructure",
+          "files": 8,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        },
+        {
+          "area": "other",
+          "files": 1,
+          "sourceFiles": 0,
+          "sourceLines": 0
+        }
+      ]
+    },
     "duplication": {
       "name": "duplication",
       "summary": {
-        "skipped": "jscpd is not installed (npm install -g jscpd)"
+        "clones": 6,
+        "duplicatedLines": 39,
+        "totalLines": 28425,
+        "duplicatedPercentage": 0.14
       },
-      "offenders": []
+      "offenders": [
+        {
+          "file": "src/routes/lakes/+page.server.ts",
+          "duplicatedLineInstances": 14
+        },
+        {
+          "file": "src/routes/cron/close-listings/+server.ts",
+          "duplicatedLineInstances": 10
+        },
+        {
+          "file": "src/routes/cron/close-matches/+server.ts",
+          "duplicatedLineInstances": 10
+        },
+        {
+          "file": "src/lib/server/commands/ListCarpForSale.ts",
+          "duplicatedLineInstances": 8
+        },
+        {
+          "file": "src/lib/server/commands/SellCarpToDealer.ts",
+          "duplicatedLineInstances": 8
+        },
+        {
+          "file": "src/lib/server/queries/GetMarketListings.ts",
+          "duplicatedLineInstances": 7
+        },
+        {
+          "file": "src/lib/server/queries/loadMyListings.ts",
+          "duplicatedLineInstances": 7
+        },
+        {
+          "file": "src/routes/lakes/[lakeId]/+page.server.ts",
+          "duplicatedLineInstances": 7
+        },
+        {
+          "file": "src/routes/world/+page.server.ts",
+          "duplicatedLineInstances": 7
+        },
+        {
+          "file": "src/routes/news/+page.svelte:typescript",
+          "duplicatedLineInstances": 6
+        },
+        {
+          "file": "src/routes/world/+page.svelte:typescript",
+          "duplicatedLineInstances": 6
+        }
+      ]
     }
   }
 }
