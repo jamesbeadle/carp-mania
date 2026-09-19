@@ -3,18 +3,19 @@
 	import type { TheBar } from '$lib/domain/fishing/honours';
 	import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
+	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 	import { bringTheFishIn, castTheNextRod, reelTheRodIn, setOffToAnotherSwim, stayOnThisSwim, strikeAtTheBite, takeThePeg } from '$lib/game/session/anglerActions';
 	import { buzzForBite } from '$lib/game/session/haptics';
-	import { reportLandedFish, type CatchReportOutcome } from '$lib/game/session/landFish';
+	import { reportAndNameTheFish } from '$lib/game/session/nameTheLandedFish';
+	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import { rememberRodSetups } from '$lib/game/session/saveRodSetups';
 	import { quarterHourOf, sessionConditionsFor } from '$lib/game/session/sessionConditions';
 	import { returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
 	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { showingSpotsFor } from '$lib/game/session/showingFish';
 	import { reportLossesAsTheyHappen } from '$lib/game/session/tackleLoss';
-	import { showsThisHour } from '$lib/domain/fishing/showingFish';
+	import { spotsShowingNow } from '$lib/game/session/showsThisHour';
 	import { startTicking } from '$lib/game/session/tickSession';
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
@@ -28,6 +29,7 @@
 		lake: Lake;
 		swims: Swim[];
 		carp: Carp[];
+		shoals: Shoal[];
 		profile: Profile;
 		visit: FishingVisit;
 		bar: TheBar;
@@ -35,15 +37,13 @@
 		matchBoardHref?: string | null;
 	}
 
-	let { lake, swims, carp, profile, visit, bar, owned, matchBoardHref = null }: Props = $props();
+	let { lake, swims, carp, shoals, profile, visit, bar, owned, matchBoardHref = null }: Props = $props();
 
-	const session = new SessionState(lake, carp, profile, visit, bar);
+	const session = new SessionState(lake, carp, profile, visit, bar, shoals);
 	let catchOutcome = $state<CatchReportOutcome | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
-	const hourOfShows = $derived(Math.floor(session.hour));
-	const shows = $derived(showsThisHour(session.seed, hourOfShows, session.carp, session.watercraft));
-	const showingAt = $derived(showingSpotsFor(lake, shows, session.season));
+	const showingAt = $derived(spotsShowingNow(session, lake));
 	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, session.hour));
 	const ambience = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 
@@ -65,7 +65,7 @@
 		const landed = bringTheFishIn(session);
 		if (!landed) return;
 		catchOutcome = null;
-		catchOutcome = await reportLandedFish(lake.id, visit.id, profile, landed);
+		catchOutcome = await reportAndNameTheFish(session, lake.id, visit.id, profile, landed);
 	}
 </script>
 

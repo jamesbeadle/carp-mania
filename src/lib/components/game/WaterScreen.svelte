@@ -46,6 +46,8 @@
 
 	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 
+	const selectedSwimId = $derived(session.swim?.id ?? null);
+
 	const orientation = new Orientation();
 	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
 
@@ -56,7 +58,7 @@
 <svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
 
 {#snippet water()}
-	<LakeCanvas {lake} {swims} {carp} selectedSwimId={session.swim?.id ?? null} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
+	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 {/snippet}
 
 {#snippet overTheLake()}

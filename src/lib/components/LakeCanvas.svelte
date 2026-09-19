@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
+	import { sampleOfShoals } from '$lib/domain/stock/shoalSample';
+	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp, Lake, Swim } from '$lib/domain/types';
 	import { createFishSchool } from '$lib/game/scene/fishSchool';
 	import { createSceneDrawer, isCastClearOfIslands, isPointInWater } from '$lib/game/scene/drawScene';
@@ -14,6 +16,7 @@
 		lake: Lake;
 		swims: Swim[];
 		carp: Carp[];
+		shoals?: Shoal[];
 		selectedSwimId?: string | null;
 		rods?: RodOnBank[];
 		isAnglerOnBank?: boolean;
@@ -25,7 +28,7 @@
 		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, selectedSwimId = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
+	let { lake, swims, carp, shoals = [], selectedSwimId = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
 
 	const SchoolSeedStride = 7919;
 	const SwimHitRadius = SwimPegRadius * 1.4;
@@ -37,7 +40,7 @@
 
 	$effect(() => {
 		const layout = lake.layout;
-		const school = createFishSchool(carp, lake.pike_count, lake.id.length * SchoolSeedStride, layout);
+		const school = createFishSchool([...carp, ...sampleOfShoals(shoals)], lake.pike_count, lake.id.length * SchoolSeedStride, layout);
 		const drawScene = createSceneDrawer(layout);
 		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) => {
 			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt }, secondsElapsed, timeSeconds);

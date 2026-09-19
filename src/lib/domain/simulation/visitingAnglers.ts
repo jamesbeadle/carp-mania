@@ -16,7 +16,9 @@ import type { Weather } from '../world/weather';
 import { isFishable } from './lapseTransfers';
 import { anglersArrivingToday } from './anglerDemand';
 import { chooseTicket, feeFor, willingnessToPayFor } from './ticketChoice';
-import { carpTakenByVisitor } from './visitorTake';
+import { carpOfTaker } from '../fishing/takers';
+import { takerForVisitor } from './visitorTake';
+import type { Shoal } from '../stock/shoals';
 
 export { anglersArrivingToday } from './anglerDemand';
 export { willingnessToPayFor } from './ticketChoice';
@@ -39,6 +41,7 @@ export interface VisitingDay {
 	standing: StandingRecords;
 	weather: Weather;
 	book: TicketProduct[];
+	shoals: Shoal[];
 }
 
 export function noAnglersToday(standing: StandingRecords): AnglerDay {
@@ -57,7 +60,8 @@ export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[],
 function simulateOneAngler(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, today: VisitingDay, day: AnglerDay): NewVisit {
 	const anglerName = randomAnglerName(random(), random());
 	const rating = Math.min(100, Math.max(5, typicalAnglerSkillFor(Number(lake.reputation)) + randomBetween(random, -20, 20)));
-	const fishCaught = Math.round(GoodAnglerCatchesPerDay * (rating / 100) * lakeConfidenceFactor(lake) * today.season.biteFactor * randomBetween(random, 0.4, 1.1));
+	const goodDay = GoodAnglerCatchesPerDay * (rating / 100) * lakeConfidenceFactor(lake) * today.season.biteFactor;
+	const fishCaught = Math.round(goodDay * randomBetween(random, 0.4, 1.1));
 	for (let index = 0; index < fishCaught; index++) recordNpcCatch(lake, carp, swims, random, anglerName, rating, today, day);
 	const collectionRate = lake.has_bailiff ? FeeCollection.WithBailiff : FeeCollection.WithoutBailiff;
 	const isFeePaid = random() < collectionRate;
@@ -68,17 +72,16 @@ function simulateOneAngler(lake: Lake, carp: Carp[], swims: Swim[], random: Rand
 
 function recordNpcCatch(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, anglerName: string, rating: number, today: VisitingDay, day: AnglerDay) {
 	const hour = random() * HoursInADay;
-	const fish = carpTakenByVisitor(lake, carp, rating, hour, conditionsShareFor(hour, today.weather), random);
-	if (!fish) return;
-	const weightLb = Number(fish.weight_lb);
+	const taker = takerForVisitor(lake, carp, today.shoals, rating, hour, conditionsShareFor(hour, today.weather), random);
+	if (!taker) return;
+	const fish = taker.kind === 'named' ? taker.carp : null;
+	const weightLb = Number(carpOfTaker(taker)?.weight_lb ?? 0);
 	const records = recordsBrokenBy(weightLb, day.records);
-	fish.times_caught += 1;
-	fish.is_catalogued = true;
-	fish.fame += fameForNpcCatch(weightLb, records);
+	if (fish) rememberTheCatch(fish, weightLb, records);
 	day.records = raiseRecords(weightLb, day.records);
 	day.catches.push({
 		lake_id: lake.id,
-		carp_id: fish.id,
+		carp_id: fish?.id ?? null,
 		angler_id: null,
 		angler_name: anglerName,
 		weight_lb: weightLb,
@@ -87,4 +90,10 @@ function recordNpcCatch(lake: Lake, carp: Carp[], swims: Swim[], random: RandomF
 		bait: pickRandom(random, BaitNames),
 		hook_size: pickRandom(random, HookSizes)
 	});
+}
+
+function rememberTheCatch(fish: Carp, weightLb: number, records: ReturnType<typeof recordsBrokenBy>) {
+	fish.times_caught += 1;
+	fish.is_catalogued = true;
+	fish.fame += fameForNpcCatch(weightLb, records);
 }

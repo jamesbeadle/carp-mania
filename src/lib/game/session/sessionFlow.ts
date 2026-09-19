@@ -2,7 +2,8 @@ import { castTerrainFor } from '$lib/domain/fishing/castTerrain';
 import { layoutScaleFor } from '$lib/domain/layout/layoutScale';
 import { swimPoint } from '$lib/domain/layout/swimRules';
 import { castDistanceFeet, isCastTooFar, pointWithinCast } from '$lib/domain/tackle/castDistance';
-import { carpThatTookTheBait } from '$lib/domain/fishing/whoTookTheBait';
+import { carpOfTaker } from '$lib/domain/fishing/takers';
+import { takerOfTheBait } from '$lib/domain/fishing/whoTookTheBait';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 import type { Swim } from '$lib/domain/types';
 import { toFraction, toScene, type Point } from '../scene/lakeShape';
@@ -49,5 +50,5 @@ export function fishOnTheEnd(session: SessionState, rod: CastRod, bite: ActiveBi
 	const spot = { terrain: rod.terrain, castPoint: castPointOf(rod) };
 	const water = waterTodayOf(session);
 	const rolled = { roll: bite.roll, hour: bite.hour, kit: rod.kit, seed: session.seed };
-	return carpThatTookTheBait(session.carp, rolled, water, spot);
+	return carpOfTaker(takerOfTheBait(session.carp, rolled, water, spot));
 }

@@ -1,3 +1,4 @@
+import type { Shoal } from '$lib/domain/stock/shoals';
 import type { Carp, Catch, Lake, LakeVisit, Swim } from '$lib/domain/types';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
 
@@ -7,15 +8,17 @@ export interface MyFishery {
 	lake: Lake;
 	swims: Swim[];
 	carp: Carp[];
+	shoals: Shoal[];
 	catches: Catch[];
 	visits: LakeVisit[];
 }
 
 export async function GetMyFishery(locals: App.Locals): Promise<MyFishery> {
 	const lake = await requireOwnedLake(locals);
-	const [swims, carp, catches, visits] = await Promise.all([
+	const [swims, carp, shoals, catches, visits] = await Promise.all([
 		locals.supabase.from('swims').select('*').eq('lake_id', lake.id).order('name'),
 		locals.supabase.from('carp').select('*').eq('lake_id', lake.id).order('weight_lb', { ascending: false }),
+		locals.supabase.from('carp_shoals').select('*').eq('lake_id', lake.id).order('average_weight_lb', { ascending: false }),
 		locals.supabase.from('catches').select('*').eq('lake_id', lake.id).order('caught_at', { ascending: false }).limit(RecentHistoryLimit),
 		locals.supabase.from('lake_visits').select('*').eq('lake_id', lake.id).order('visited_at', { ascending: false }).limit(RecentHistoryLimit)
 	]);
@@ -23,6 +26,7 @@ export async function GetMyFishery(locals: App.Locals): Promise<MyFishery> {
 		lake,
 		swims: (swims.data ?? []) as Swim[],
 		carp: (carp.data ?? []) as Carp[],
+		shoals: (shoals.data ?? []) as Shoal[],
 		catches: (catches.data ?? []) as Catch[],
 		visits: (visits.data ?? []) as LakeVisit[]
 	};

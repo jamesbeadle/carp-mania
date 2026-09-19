@@ -11,8 +11,9 @@
 
 	let { data } = $props();
 
-	const carpNames = $derived(Object.fromEntries(data.water.carp.map((fish) => [fish.id, fish.name])));
-	const isOnTheGlobe = $derived(data.water.lake.latitude !== null);
+	const water = $derived(data.water);
+	const carpNames = $derived(Object.fromEntries(water.carp.map((fish) => [fish.id, fish.name])));
+	const isOnTheGlobe = $derived(water.lake.latitude !== null);
 	const now = $derived(new Date(data.loadedAt));
 	const isOwnWater = $derived(data.water.lake.owner_id === data.user?.id);
 </script>
@@ -33,7 +34,7 @@
 </div>
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas lake={data.water.lake} swims={data.water.swims} carp={data.water.carp} />
+	<LakeCanvas lake={water.lake} swims={water.swims} carp={water.carp} shoals={water.shoals} />
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">The water</h2>
 		<WaterQualityBars lake={data.water.lake} />

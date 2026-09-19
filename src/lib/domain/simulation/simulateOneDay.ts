@@ -2,6 +2,7 @@ import { Prices } from '../economy';
 import { isBookedOut } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '../reputation';
+import type { Shoal } from '../stock/shoals';
 import type { Carp, Lake, Swim } from '../types';
 import { shopTierOf } from '../tackle/shopTier';
 import { overallWaterQuality } from '../waterQuality';
@@ -14,30 +15,35 @@ import { isHeatwaveToday, sufferHeatwave } from './heatwave';
 import { lapseTransfersForOneDay } from './lapseTransfers';
 import { driftFertilityForOneDay } from './naturalFood';
 import { letPikeHuntForOneDay } from './pikePredation';
-import { isFirstDayOfSpring, spawnFry } from './spawning';
+import { shoalsAfterTheDay } from './shoalsAfterTheDay';
 import { noAnglersToday, simulateVisitingAnglers } from './visitingAnglers';
 import type { DayContext, DayOutcome } from './dayTypes';
 import type { NewCatch } from './visitingAnglers';
 
 export type { DayContext, DayOutcome } from './dayTypes';
 
-function visitingDayOf(lake: Lake, context: DayContext) {
-	return { season: context.season, standing: context.records, weather: weatherFor(lake, context.dayStart), book: context.book };
+const NoShoals: Shoal[] = [];
+
+function visitingDayOf(lake: Lake, context: DayContext, shoals: Shoal[]) {
+	const { season, records, book } = context;
+	return { season, standing: records, weather: weatherFor(lake, context.dayStart), book, shoals };
 }
 
-export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext): DayOutcome {
+export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext, shoals: Shoal[] = NoShoals): DayOutcome {
 	const works = completeDueWorks(lake, context.works, context.dayEnd);
-	const fed = feedTheLakeForOneDay({ ...works.lake, fertility: driftFertilityForOneDay(works.lake) }, carp, context.season.growthFactor);
+	const fertile = { ...works.lake, fertility: driftFertilityForOneDay(works.lake) };
+	const fed = feedTheLakeForOneDay(fertile, carp, context.season.growthFactor, shoals);
 	const watered = driftWaterForOneDay(fed.lake);
-	const hunted = letPikeHuntForOneDay(watered, fed.carp, random);
+	const hunted = letPikeHuntForOneDay(watered, fed.carp, random, fed.shoals);
 	const lapsed = lapseTransfersForOneDay(hunted.carp, context.dayEnd);
+	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
+	const shoalsToday = shoalsAfterTheDay(hunted.lake, hunted.shoals, lapsed.carp, context, isHeatwave, random);
+	const today = visitingDayOf(hunted.lake, context, shoalsToday.shoals);
 	const anglers = isBookedOut(context.bookings, context.dayStart, context.dayEnd)
 		? noAnglersToday(context.records)
-		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, visitingDayOf(hunted.lake, context));
-	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
+		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, today);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
 	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd, random);
-	const spawned = isFirstDayOfSpring(context.dayStart, context.dayEnd, hunted.lake.latitude) ? spawnFry(hunted.lake, aged.carp, random) : [];
 
 	return {
 		lake: waterAfterDay(hunted.lake, anglers.catches),
@@ -55,7 +61,10 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		isHeatwave,
 		records: anglers.records,
 		worksCompleted: works.completed,
-		spawned
+		shoals: shoalsToday.shoals,
+		fryShoals: shoalsToday.fryShoals,
+		namedFromShoals: shoalsToday.named,
+		shoalFishTakenByPike: hunted.shoalFishTakenByPike
 	};
 }
 

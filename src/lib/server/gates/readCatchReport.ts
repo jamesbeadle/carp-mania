@@ -15,6 +15,7 @@ export function readCatchReport(candidate: unknown): CatchReport | null {
 	return {
 		visitId: report.visitId,
 		carpId: report.carpId,
+		shoalId: isId(report.shoalId) ? report.shoalId : null,
 		rodIndex: report.rodIndex,
 		hour: report.hour,
 		castPoint: { x: report.castPoint.x, y: report.castPoint.y },

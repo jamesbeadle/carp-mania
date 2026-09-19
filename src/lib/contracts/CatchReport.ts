@@ -11,6 +11,7 @@ export interface SkillGains {
 export interface CatchReport {
 	visitId: string;
 	carpId: string;
+	shoalId: string | null;
 	rodIndex: number;
 	hour: number;
 	castPoint: LayoutPoint;

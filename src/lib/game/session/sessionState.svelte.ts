@@ -3,6 +3,7 @@ import { anglerRatingOf } from '$lib/domain/anglerRating';
 import { isSettledAfter } from '$lib/domain/fishing/catchSettle';
 import type { TheBar } from '$lib/domain/fishing/honours';
 import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
+import type { Shoal } from '$lib/domain/stock/shoals';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 import { isWindowOver, type SessionWindow } from '$lib/domain/fishing/sessionWindow';
 import { seasonFor, type Season } from '$lib/domain/world/seasons';
@@ -41,6 +42,7 @@ export class SessionState {
 	readonly seed: number;
 	readonly lake: Lake;
 	readonly carp: Carp[];
+	readonly shoals: Shoal[];
 	readonly profile: Profile;
 	readonly season: Season;
 	readonly weather: Weather;
@@ -50,11 +52,12 @@ export class SessionState {
 	readonly rating: number;
 	readonly roller: BiteRoller;
 
-	constructor(lake: Lake, carp: Carp[], profile: Profile, visit: FishingVisit, bar: TheBar) {
+	constructor(lake: Lake, carp: Carp[], profile: Profile, visit: FishingVisit, bar: TheBar, shoals: Shoal[] = []) {
 		this.bar = bar;
 		this.seed = visit.seed;
 		this.lake = lake;
 		this.carp = carpInBiteOrder(carp);
+		this.shoals = shoals;
 		this.profile = profile;
 		this.season = seasonFor(lake, new Date(visit.visitedAt));
 		this.weather = weatherFor(lake, new Date(visit.visitedAt));

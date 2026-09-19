@@ -4,7 +4,8 @@ import { castTerrainFor } from '../src/lib/domain/fishing/castTerrain';
 import { DayTicket, isDayTicketStillValid } from '../src/lib/domain/fishing/dayTicket';
 import { ClassicSession, hoursInWindow } from '../src/lib/domain/fishing/sessionWindow';
 import { mix } from '../src/lib/domain/fishing/sessionSeed';
-import { carpForRolledBite, carpInBiteOrder, carpThatTookTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
+import { carpOfTaker } from '../src/lib/domain/fishing/takers';
+import { carpForRolledBite, carpInBiteOrder, takerOfTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
 import { defaultRodSetup, kitFor, MaximumRods } from '../src/lib/domain/tackle/rodSetup';
@@ -31,7 +32,7 @@ export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
 	const june = new Date('2026-06-01T00:00:00Z');
-	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june) };
+	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june), shoals: [] };
 	const setup = defaultRodSetup();
 	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 
@@ -75,7 +76,7 @@ function assertEverySlotHasItsOwnStream() {
 
 function assertTheServerAgreesWithTheClient(take: Slot, miss: Slot, carp: Carp[], water: WaterToday, rod: RodInTheWater, setup: RodSetup) {
 	const spot = { terrain: rod.terrain, castPoint: CastPoint };
-	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), { roll: take.roll, hour: take.hour, kit: rod.kit, seed: VisitSeed }, water, spot);
+	const clientPick = carpOfTaker(takerOfTheBait(carpInBiteOrder(carp), { roll: take.roll, hour: take.hour, kit: rod.kit, seed: VisitSeed }, water, spot));
 	const carpAsTheServerLoadsThem = [...carp].reverse();
 	const reportOf = (slot: Slot) => ({ seed: VisitSeed, rodIndex: slot.rodIndex, hour: slot.hour, castPoint: CastPoint, setup });
 	const serverPick = carpForRolledBite(reportOf(take), water, carpAsTheServerLoadsThem);

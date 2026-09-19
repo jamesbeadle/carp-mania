@@ -6,15 +6,15 @@ import { settleDayTakings } from '../gates/requireMoney';
 import { arrivalNotifications } from './arrivalNotifications';
 import { buryTheDead, deathEvents, deathNotifications, deathsIn } from './buryTheDead';
 import { persistCompletedWorks } from './persistCompletedWorks';
+import { persistStock, type StockBefore } from './persistStock';
 
-export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: Lake, outcomes: DayOutcome[], profile: Profile) {
+export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: Lake, outcomes: DayOutcome[], profile: Profile, before: StockBefore) {
 	const finalDay = outcomes[outcomes.length - 1];
 	const deaths = deathsIn(outcomes);
 	const netMoney = outcomes.reduce((total, day) => total + netMoneyFor(day), 0);
 
 	await trusted.from('lakes').update(finalLake).eq('id', finalLake.id);
-	if (finalDay.carp.length > 0) await trusted.from('carp').upsert(finalDay.carp, { onConflict: 'id' });
-	await insertSpawnedFry(trusted, outcomes);
+	await persistStock(trusted, before, { carp: finalDay.carp, shoals: finalDay.shoals });
 	await insertHistory(trusted, outcomes, profile.display_name);
 	await buryTheDead(trusted, deaths);
 	await settleDayTakings(profile.id, netMoney);
@@ -22,10 +22,8 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 	await persistCompletedWorks(trusted, finalLake, outcomes, profile.id);
 }
 
-async function insertSpawnedFry(trusted: SupabaseClient, outcomes: DayOutcome[]) {
-	const fry = outcomes.flatMap((day) => day.spawned);
-	if (fry.length > 0) await trusted.from('carp').insert(fry);
-}
+const UnknownFish = 'an unknown fish';
+const ShoalFish = 'a fish from the shoal';
 
 async function insertHistory(trusted: SupabaseClient, outcomes: DayOutcome[], ownerName: string) {
 	const catches = outcomes.flatMap((day) => day.catches).map((caught) => ({ ...caught, owner_name: ownerName }));
@@ -45,5 +43,6 @@ async function insertNews(trusted: SupabaseClient, lake: Lake, outcomes: DayOutc
 function worldEventsFor(lake: Lake, outcomes: DayOutcome[]) {
 	const bigCatches = outcomes.flatMap((day) => day.catches.filter((caught) => isBigNpcCatch(caught.weight_lb)));
 	const carpNames = new Map(outcomes[outcomes.length - 1].carp.map((fish) => [fish.id, fish.name]));
-	return bigCatches.map((caught) => bigCatchEvent(lake.id, carpNames.get(caught.carp_id) ?? 'an unknown fish', caught.weight_lb, caught.angler_name));
+	const nameOf = (carpId: string | null) => (carpId ? (carpNames.get(carpId) ?? UnknownFish) : ShoalFish);
+	return bigCatches.map((caught) => bigCatchEvent(lake.id, nameOf(caught.carp_id), caught.weight_lb, caught.angler_name));
 }

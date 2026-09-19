@@ -4,7 +4,8 @@ import type { BookedWindow } from '../matches/bookings';
 import type { Carp, Lake } from '../types';
 import type { Season } from '../world/seasons';
 import type { LakeWork } from '../worldTypes';
-import type { NewBornCarp } from './spawning';
+import type { NewNamedFish } from '../stock/individualise';
+import type { NewShoal, Shoal } from '../stock/shoals';
 import type { NewCatch, NewVisit } from './visitingAnglers';
 
 export interface DayContext {
@@ -33,6 +34,9 @@ export interface DayOutcome {
 	isHeatwave: boolean;
 	records: StandingRecords;
 	worksCompleted: LakeWork[];
-	spawned: NewBornCarp[];
+	shoals: Shoal[];
+	fryShoals: NewShoal[];
+	namedFromShoals: NewNamedFish[];
+	shoalFishTakenByPike: number;
 }
 

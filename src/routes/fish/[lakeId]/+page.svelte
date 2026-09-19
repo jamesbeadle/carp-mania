@@ -6,15 +6,17 @@
 
 	let { data, form } = $props();
 
-	const carpInTheLake = $derived(data.water.carp.filter(isFishable));
+	const water = $derived(data.water);
+	const carpInTheLake = $derived(water.carp.filter(isFishable));
+	const knownCarpCount = $derived(carpInTheLake.filter((fish) => fish.is_catalogued).length);
 	const matchBoardHref = $derived(data.runningMatch?.isEntered ? `/matches/${data.runningMatch.match.id}` : null);
 </script>
 
 <svelte:head><title>Fishing {data.water.lake.name} · Carp Mania</title></svelte:head>
 
 {#if data.visit && data.bar}
-	<FishingGame lake={data.water.lake} swims={data.water.swims} carp={carpInTheLake} profile={data.profile} visit={data.visit} bar={data.bar} owned={data.owned} {matchBoardHref} />
+	<FishingGame lake={water.lake} swims={water.swims} carp={carpInTheLake} shoals={water.shoals} profile={data.profile} visit={data.visit} bar={data.bar} owned={data.owned} {matchBoardHref} />
 {:else}
 	<ActionMessage {form} />
-	<DayTicketOffice water={data.water} profile={data.profile} book={data.book} runningMatch={data.runningMatch} knownCarpCount={carpInTheLake.filter((fish) => fish.is_catalogued).length} />
+	<DayTicketOffice {water} profile={data.profile} book={data.book} runningMatch={data.runningMatch} knownCarpCount={knownCarpCount} />
 {/if}

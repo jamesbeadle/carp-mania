@@ -3,6 +3,7 @@ import { runRatingScenarios } from './testRating';
 import { runRigScenarios } from './testRigs';
 import { runSizeReachScenarios } from './testSizeReach';
 import { runTackleScenarios } from './testTackle';
+import { runShoalScenarios } from './testShoals';
 import { runTicketScenarios } from './testTickets';
 
 export function runDesignEightScenarios() {
@@ -12,4 +13,5 @@ export function runDesignEightScenarios() {
 	runTackleScenarios();
 	runRigScenarios();
 	runTicketScenarios();
+	runShoalScenarios();
 }
