@@ -8,6 +8,7 @@ import { toFraction, type Point } from '../scene/lakeShape';
 import { bringRodIn, castPointOf, isCastOut, restingRod, type CastRod } from '../scene/rodState';
 import { FightState } from './fightState.svelte';
 import { landedFishFor } from './landFish';
+import { waterTodayOf } from './waterToday';
 import type { ActiveBite, SessionState } from './sessionState.svelte';
 
 export function chooseSwim(session: SessionState, swim: Swim) {
@@ -46,7 +47,7 @@ export function strike(session: SessionState) {
 	if (session.hasLandedToday(carp)) return dropTheFish(session, rod.index, `${carp.name} again — once on the bank is enough for one day. It shed the hook and went.`);
 	rod.phase = 'fighting';
 	session.hooked = bite;
-	session.fight = new FightState(carp, rod.setup.line.thickness);
+	session.fight = new FightState(carp, rod.setup.line.thickness, session.rating);
 	session.phase = 'fighting';
 }
 
@@ -64,6 +65,7 @@ export function finishFight(session: SessionState) {
 	session.bar = raiseTheBar(weightLb, session.bar);
 	session.landedToday = [...session.landedToday, session.lastLanded];
 	bringRodIn(rod);
+	session.secondsSinceTheMat = 0;
 	session.phase = 'landed';
 }
 
@@ -74,7 +76,9 @@ export function returnToFishing(session: SessionState) {
 
 function fishOnTheEnd(session: SessionState, rod: CastRod, bite: ActiveBite) {
 	const spot = { terrain: rod.terrain, castPoint: castPointOf(rod) };
-	return carpThatTookTheBait(session.carp, bite.roll, { lake: session.lake, season: session.season }, spot);
+	const water = waterTodayOf(session);
+	const rolled = { roll: bite.roll, hour: bite.hour, setup: rod.setup, seed: session.seed };
+	return carpThatTookTheBait(session.carp, rolled, water, spot);
 }
 
 function dropTheFish(session: SessionState, rodIndex: number, message: string) {

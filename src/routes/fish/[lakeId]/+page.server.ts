@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		visitId ? GetFishingVisit(locals, params.lakeId, visitId) : null
 	]);
 	const isOnTheWater = visit !== null;
-	const bar = isOnTheWater ? await GetTheBar(locals, water.lake) : null;
+	const bar = visit ? await GetTheBar(locals, water.lake, visit.visitedAt) : null;
 	return { water, profile, visit, bar, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 

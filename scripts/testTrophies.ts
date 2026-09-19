@@ -6,7 +6,7 @@ import { isRecordScope, recordScopeNameFor } from '../src/lib/domain/trophies/re
 import { bestRibbonOf, RibbonWords } from '../src/lib/domain/trophies/ribbons';
 
 export function runTrophyScenarios() {
-	const measures = (personalBestLb: number): Measures => ({ personalBestLb, fishLanded: 10, overallSkill: 40, recordsHeld: 0, trophies: 0 });
+	const measures = (personalBestLb: number): Measures => ({ personalBestLb, fishLanded: 10, rating: 40, recordsHeld: 0, trophies: 0 });
 	assert.equal(edgeOf(30, 20), 'ahead');
 	assert.equal(edgeOf(20, 20), 'level');
 	assert.equal(edgeOf(10, 20), 'behind');

@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
 import type { AnglerPublicProfile, AnglerWater, PlaceInTheLine, PublicAngler } from '$lib/contracts/AnglerPublicProfile';
-import { overallAnglerSkill } from '$lib/domain/anglerSkills';
 import { diaryAgeOf } from '$lib/domain/legacy/diary';
 import { requireUser } from '../gates/requireUser';
 import { loadLine } from './GetFishermanDiary';
@@ -8,7 +7,7 @@ import { loadCarpNames, loadCatchHistoryOf, loadFamousFishCaughtBy } from './loa
 import { loadLakeNames } from './loadCarpHistory';
 import { loadMeasureUp } from './loadMeasureUp';
 import { loadTrophyRoom } from './loadTrophyRoom';
-import { skillsOf } from './skillsOf';
+import { loadRatingOf } from './loadAnglerRating';
 
 const NoSuchAngler = 'No angler by that name';
 const PublicColumns = 'id, display_name, avatar_url, experience, line_selection, rig_selection, bait_selection, watercraft';
@@ -16,13 +15,14 @@ const WaterColumns = 'id, name, region, acres, reputation, day_ticket_fee';
 
 export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: string, pageNumber: number): Promise<AnglerPublicProfile> {
 	const viewer = requireUser(locals);
-	const [profile, waters, recentCatches, famousFish, line, trophyRoom] = await Promise.all([
+	const [profile, waters, recentCatches, famousFish, line, trophyRoom, rating] = await Promise.all([
 		loadAngler(locals, anglerId),
 		loadWatersRunBy(locals, anglerId),
 		loadCatchHistoryOf(locals, { angler_id: anglerId }, pageNumber),
 		loadFamousFishCaughtBy(locals, anglerId),
 		loadPlaceInTheLine(locals, anglerId),
-		loadTrophyRoom(locals, anglerId)
+		loadTrophyRoom(locals, anglerId),
+		loadRatingOf(locals, anglerId)
 	]);
 	const isViewer = viewer.id === profile.id;
 	const catches = recentCatches.items;
@@ -31,7 +31,7 @@ export async function GetAnglerPublicProfile(locals: App.Locals, anglerId: strin
 		loadLakeNames(locals, catches.map((caught) => caught.lake_id)),
 		isViewer ? null : loadMeasureUp(locals, viewer.id, profile, trophyRoom)
 	]);
-	return { profile, line, overallSkill: overallAnglerSkill(skillsOf(profile)), waters, recentCatches, famousFish, carpNames, lakeNames, trophyRoom, measureUp, isViewer };
+	return { profile, line, rating, waters, recentCatches, famousFish, carpNames, lakeNames, trophyRoom, measureUp, isViewer };
 }
 
 async function loadPlaceInTheLine(locals: App.Locals, anglerId: string): Promise<PlaceInTheLine | null> {

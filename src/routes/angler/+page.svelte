@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
+	import RatingDial from '$lib/components/angler/RatingDial.svelte';
 	import RivalCard from '$lib/components/angler/RivalCard.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
@@ -37,6 +38,7 @@
 </div>
 
 <div class="space-y-6">
+	<RatingDial rating={angler.rating} skills={angler.profile} />
 	<CatchCards cards={room.cards} isMine />
 	<div class="grid gap-6 lg:grid-cols-2">
 		<RecordsHeld records={room.recordsHeld} isMine />
@@ -59,7 +61,7 @@
 				</dl>
 				<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
 				<SkillBars profile={angler.profile} />
-				<p class="mt-4 text-xs text-mist-400">Skills rise with every fish, and faster when the tackle suited the water. Match readouts unlock at 40.</p>
+				<p class="mt-4 text-xs text-mist-400">Line selection is how invisible your line is; rig selection how well the rig suits the spot; bait selection what the fish trust; watercraft finding the fish and reading the bite. Skills rise with every fish, and faster when the tackle suited the water. Match readouts unlock at craft 40.</p>
 			</section>
 		</div>
 		<section class="panel">

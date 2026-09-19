@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import type { CatchReport } from '$lib/contracts/CatchReport';
-import { overallAnglerSkill } from '$lib/domain/anglerSkills';
+import { anglerRatingOf } from '$lib/domain/anglerRating';
 import type { WaterToday } from '$lib/domain/fishing/biteRoll';
 import { isDayTicketStillValid } from '$lib/domain/fishing/dayTicket';
 import { carpForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
@@ -11,6 +11,7 @@ import { readCatchReport } from '../gates/readCatchReport';
 import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
 import { hasCaughtDuringVisit, loadVisitOf, loadWaterOf, type VisitOnRecord, type WaterOnRecord } from '../queries/loadVisitForCatch';
+import { loadCurrentFishermanId, loadHeaviestBefore } from '../queries/loadPersonalBest';
 import { skillsOf } from '../queries/skillsOf';
 
 const HttpStatus = { BadRequest: 400 } as const;
@@ -26,17 +27,25 @@ export async function RecordCatch(locals: App.Locals, body: unknown) {
 	const [water, profile, hasHadItToday] = await Promise.all([loadWaterOf(visit.lake_id), loadProfile(locals), hasCaughtDuringVisit(user.id, visit, report.carpId)]);
 	if (!water) error(HttpStatus.BadRequest, 'That lake is no longer there');
 	if (hasHadItToday) error(HttpStatus.BadRequest, 'You have already had that fish today');
-	const taker = carpThatWasRolled(report, visit, water, profile);
+	const pedigreeLb = await loadPedigreeBeforeVisit(locals, user.id, visit);
+	const taker = carpThatWasRolled(report, visit, water, profile, pedigreeLb);
 	if (taker?.id !== report.carpId) error(HttpStatus.BadRequest, 'That is not the fish that took the bait');
 
 	const catchId = await recordInTheBook(user.id, report);
 	return json({ catchId });
 }
 
-function carpThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: WaterOnRecord, profile: Profile): Carp | null {
+async function loadPedigreeBeforeVisit(locals: App.Locals, anglerId: string, visit: VisitOnRecord) {
+	const fishermanId = await loadCurrentFishermanId(locals, anglerId);
+	return fishermanId ? loadHeaviestBefore(locals, fishermanId, visit.visited_at) : 0;
+}
+
+function carpThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: WaterOnRecord, profile: Profile, pedigreeLb: number): Carp | null {
+	const skills = skillsOf(profile);
 	const today: WaterToday = {
 		lake: water.lake,
-		overallSkill: overallAnglerSkill(skillsOf(profile)),
+		rating: anglerRatingOf(skills, pedigreeLb).rating,
+		watercraft: skills.watercraft,
 		season: seasonFor(water.lake, new Date(visit.visited_at))
 	};
 	return carpForRolledBite({ ...report, seed: visit.seed }, today, water.carp);

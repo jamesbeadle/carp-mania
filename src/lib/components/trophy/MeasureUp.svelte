@@ -18,7 +18,7 @@
 	const rows = $derived<Row[]>([
 		row('Personal best', measureUp.theirs, measureUp.yours, 'personalBestLb', formatWeight),
 		row('Fish landed', measureUp.theirs, measureUp.yours, 'fishLanded', String),
-		row('Overall skill', measureUp.theirs, measureUp.yours, 'overallSkill', (skill) => String(Math.round(skill))),
+		row('Rating', measureUp.theirs, measureUp.yours, 'rating', (skill) => String(Math.round(skill))),
 		row('Records held', measureUp.theirs, measureUp.yours, 'recordsHeld', String),
 		row('Trophies', measureUp.theirs, measureUp.yours, 'trophies', String)
 	]);

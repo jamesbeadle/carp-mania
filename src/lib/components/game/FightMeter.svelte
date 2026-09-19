@@ -1,18 +1,29 @@
 <script lang="ts">
-	import { TensionBand } from '$lib/domain/fishing/fight';
 	import type { FightState } from '$lib/game/session/fightState.svelte';
 	import { buzzForARun } from '$lib/game/session/haptics';
+	import { ReelInput } from '$lib/game/session/reelInput.svelte';
 	import { followTheFight } from '$lib/game/session/sessionSounds';
 	import { formatWeight } from '$lib/format/weight';
+	import ReelZone from './ReelZone.svelte';
+	import RunWarning from './RunWarning.svelte';
+	import TensionBar from './TensionBar.svelte';
 
-	let { fight, onFinished }: { fight: FightState; onFinished: () => void } = $props();
+	type Placement = 'over_the_lake' | 'over_the_screen';
+
+	let { fight, onFinished, placement = 'over_the_lake' }: { fight: FightState; onFinished: () => void; placement?: Placement } = $props();
+
+	const reel = new ReelInput();
+	const GuessRoundingLb = 5;
+	const MostSecondsPerFrame = 0.1;
+	const MillisecondsPerSecond = 1000;
+	const guessedWeight = $derived(Math.round(Number(fight.carp.weight_lb) / GuessRoundingLb) * GuessRoundingLb);
 
 	$effect(() => {
 		let handle = 0;
 		let last = performance.now();
-		const start = last;
 		const frame = (now: number) => {
-			fight.advance(Math.min(0.1, (now - last) / 1000), (now - start) / 1000);
+			fight.isReeling = reel.isReeling;
+			fight.advance(Math.min(MostSecondsPerFrame, (now - last) / MillisecondsPerSecond));
 			last = now;
 			if (fight.outcome) return onFinished();
 			handle = requestAnimationFrame(frame);
@@ -24,36 +35,14 @@
 	$effect(() => followTheFight(fight.isReeling, fight.isRunning));
 	$effect(() => void (fight.isRunning && buzzForARun()));
 	$effect(() => () => followTheFight(false, false));
-
-	const startReeling = () => (fight.isReeling = true);
-	const stopReeling = () => (fight.isReeling = false);
-	const handleKey = (event: KeyboardEvent, isDown: boolean) => {
-		if (event.code !== 'Space') return;
-		event.preventDefault();
-		fight.isReeling = isDown;
-	};
 </script>
 
-<svelte:window onkeydown={(event) => handleKey(event, true)} onkeyup={(event) => handleKey(event, false)} onblur={stopReeling} />
+<svelte:window onkeydown={(event) => reel.answerTheKey(event, true)} onkeyup={(event) => reel.answerTheKey(event, false)} onblur={() => reel.release()} />
 
 <section class="panel space-y-4">
-	<h3 class="text-xl text-volt-300">Fish on! Something around {formatWeight(Math.round(Number(fight.carp.weight_lb) / 5) * 5)}</h3>
-	<p class="rounded-md px-3 py-2 text-center font-display text-lg font-bold tracking-wide uppercase" class:bg-danger-500={fight.isRunning} class:text-mist-100={fight.isRunning} class:bg-carbon-900={!fight.isRunning} class:text-volt-300={!fight.isRunning}>
-		{fight.isRunning ? 'It\'s running — let go and let it take line' : 'It\'s tiring — hold to reel'}
-	</p>
-	<div class="relative h-8 overflow-hidden rounded-full bg-carbon-950">
-		<div class="absolute inset-y-0 bg-gradient-to-r from-volt-500/50 via-surge-500/40 to-volt-500/50" style="left: {TensionBand.SlackBelow * 100}%; width: {(TensionBand.SnapAbove - TensionBand.SlackBelow) * 100}%"></div>
-		<div class="absolute inset-y-0 w-1.5 rounded-full bg-volt-300 transition-[left] duration-75" style="left: calc({fight.tension * 100}% - 3px)"></div>
-	</div>
-	<div class="flex justify-between text-xs text-mist-400"><span>Slack — hook falls out</span><span>Tight — line snaps</span></div>
-	<button
-		class="button-primary w-full touch-none select-none py-5 text-2xl"
-		class:bg-volt-300={fight.isReeling}
-		onpointerdown={startReeling}
-		onpointerup={stopReeling}
-		onpointerleave={stopReeling}
-		onpointercancel={stopReeling}
-		oncontextmenu={(event) => event.preventDefault()}>{fight.isReeling ? 'Reeling…' : 'Hold to reel'}</button
-	>
+	<h3 class="text-xl text-volt-300">Fish on! Something around {formatWeight(guessedWeight)}</h3>
+	<RunWarning isRunning={fight.isRunning} isRunComing={fight.isRunComing} />
+	<TensionBar tension={fight.tension} band={fight.band} />
+	<ReelZone {reel} isTall={placement === 'over_the_screen'} />
 	<p class="text-center text-sm text-mist-400">{Math.ceil(fight.secondsRemaining)}s until it's in the net</p>
 </section>

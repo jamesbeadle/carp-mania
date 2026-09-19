@@ -1,5 +1,3 @@
-import type { Profile } from './types';
-
 export const SkillScale = { Lowest: 0, Highest: 100, Starter: 25 } as const;
 
 export const SkillNames = ['line_selection', 'rig_selection', 'bait_selection', 'watercraft'] as const;
@@ -15,17 +13,15 @@ export const SkillLabels: Record<SkillName, string> = {
 const GainPerCatch = 0.6;
 const GainForWellMatchedTackle = 0.9;
 
-export function overallAnglerSkill(profile: Pick<Profile, SkillName>) {
-	return SkillNames.reduce((total, skill) => total + profile[skill], 0) / SkillNames.length;
-}
-
 export function skillGainFromCatch(currentSkill: number, matchScore: number) {
 	const headroom = (SkillScale.Highest - currentSkill) / SkillScale.Highest;
 	return round(GainPerCatch * headroom + GainForWellMatchedTackle * matchScore * headroom);
 }
 
 export function clampSkill(value: number) {
-	return Math.min(SkillScale.Highest, Math.max(SkillScale.Lowest, round(value)));
+	const rounded = round(value);
+	const notBelowLowest = Math.max(SkillScale.Lowest, rounded);
+	return Math.min(SkillScale.Highest, notBelowLowest);
 }
 
 function round(value: number) {

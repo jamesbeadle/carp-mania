@@ -3,8 +3,6 @@ import { matchTackleToWater, type TackleMatch } from '$lib/domain/fishing/tackle
 import type { Lake } from '$lib/domain/types';
 import type { CastRod } from '../scene/rodState';
 
-export const StrikeWindowSeconds = 4;
-
 export interface RolledBite {
 	rodIndex: number;
 	hour: number;

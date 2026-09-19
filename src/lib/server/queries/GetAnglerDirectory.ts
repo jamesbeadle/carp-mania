@@ -9,13 +9,13 @@ type SummaryRow = AnglerSkills & {
 	display_name: string;
 	avatar_url: string | null;
 	experience: number;
-	overall_skill: number;
+	rating: number;
 	personal_best_lb: number;
 };
 type WaterRow = NamedWater & { owner_id: string };
 type AnglerWithoutWater = Omit<AnglerDirectoryEntry, 'water'>;
 
-const SortOrders: Record<AnglerSort, string> = { skill: 'overall_skill', best: 'personal_best_lb', landed: 'experience' };
+const SortOrders: Record<AnglerSort, string> = { skill: 'rating', best: 'personal_best_lb', landed: 'experience' };
 
 export async function GetAnglerDirectory(locals: App.Locals, filters: AnglerFilters): Promise<AnglerDirectory> {
 	requireUser(locals);
@@ -37,7 +37,7 @@ function summarise(row: SummaryRow): AnglerWithoutWater {
 		displayName: row.display_name,
 		avatarUrl: row.avatar_url,
 		skills: skillsOf(row),
-		overallSkill: Number(row.overall_skill),
+		rating: Number(row.rating),
 		personalBestLb: Number(row.personal_best_lb),
 		totalCatches: row.experience
 	};

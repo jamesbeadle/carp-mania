@@ -50,7 +50,7 @@ export interface TrophyRoom {
 export interface Measures {
 	personalBestLb: number;
 	fishLanded: number;
-	overallSkill: number;
+	rating: number;
 	recordsHeld: number;
 	trophies: number;
 }

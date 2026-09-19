@@ -15,8 +15,8 @@
 			<h2 class="truncate text-2xl text-volt-300"><a href="/anglers/{angler.id}" class="hover:underline">{angler.displayName}</a></h2>
 		</div>
 		<div class="ml-auto text-right">
-			<p class="stat-label">Skill</p>
-			<p class="font-display text-3xl font-bold text-volt-300 italic">{Math.round(angler.overallSkill)}</p>
+			<p class="stat-label">Rating</p>
+			<p class="font-display text-3xl font-bold text-volt-300 italic">{Math.round(angler.rating)}</p>
 		</div>
 	</div>
 	<SkillBars profile={angler.skills} isCompact />

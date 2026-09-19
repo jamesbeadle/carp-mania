@@ -1,31 +1,29 @@
-import { favouriteSpotOf, type FavouriteSpot } from '$lib/domain/layout/favouriteFeature';
+import { favouriteSpotOf, featuresPresent, type FavouriteSpot } from '$lib/domain/layout/favouriteFeature';
 import { layoutScaleFor } from '$lib/domain/layout/layoutScale';
 import { isAreaFeature, isReedLine, isSnag, type AreaFeatureKind, type LakeLayout, type LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { polygonCentroid } from '$lib/domain/layout/polygonArea';
 import { lakeCentroid, pointFeetTowardsCentre } from '$lib/domain/layout/waterArea';
-import { pickRandom, type RandomFraction } from '$lib/domain/random';
-import type { Carp, Lake, SwimFeature } from '$lib/domain/types';
+import { pickRandom, seededRandom, type RandomFraction } from '$lib/domain/random';
+import type { Show } from '$lib/domain/fishing/showingFish';
+import type { Lake, SwimFeature } from '$lib/domain/types';
 import type { Season } from '$lib/domain/world/seasons';
 import { polylineMidpoint } from './polylineMidpoint';
 
-export const WatercraftShowsFishFrom = 50;
-export const ShowingFish = { MostAtOnce: 3, RefreshSeconds: 20, OffTheIslandFeet: 20 } as const;
+export const OffTheIslandFeet = 20;
+const DecoySeedScale = 4294967296;
 
 type Water = Pick<Lake, 'layout' | 'plot_acres'>;
 type SeasonOfYear = Pick<Season, 'isWinter'>;
 type SpotFinder = (water: Water, random: RandomFraction) => LayoutPoint | null;
 
-export function showingSpotsFor(water: Water, carp: Carp[], season: SeasonOfYear, random: RandomFraction = Math.random): LayoutPoint[] {
-	const catalogued = carp.filter((fish) => fish.is_catalogued);
-	const showing = pickSome(catalogued, ShowingFish.MostAtOnce, random);
-	return showing.map((fish) => spotFor(water, favouriteSpotOf(fish, water.layout, season.isWinter), random));
+export function showingSpotsFor(water: Water, shows: Show[], season: SeasonOfYear): LayoutPoint[] {
+	return shows.map((show) => spotOfShow(water, show, season));
 }
 
-export function watchFishShowing(water: Water, carp: Carp[], season: SeasonOfYear, onShowing: (spots: LayoutPoint[]) => void) {
-	const refresh = () => onShowing(showingSpotsFor(water, carp, season));
-	refresh();
-	const interval = setInterval(refresh, ShowingFish.RefreshSeconds * 1000);
-	return () => clearInterval(interval);
+function spotOfShow(water: Water, show: Show, season: SeasonOfYear) {
+	const random = seededRandom(Math.floor(show.decoyRoll * DecoySeedScale));
+	if (show.isTruthful) return spotFor(water, favouriteSpotOf(show.carp, water.layout, season.isWinter), random);
+	return spotFor(water, { kind: 'feature', feature: pickRandom(random, featuresPresent(water.layout)) }, random);
 }
 
 const SpotFinders: Record<SwimFeature, SpotFinder> = {
@@ -51,7 +49,7 @@ function depthZoneCentre(layout: LakeLayout, zoneId: string) {
 function offTheFirstIsland(water: Water) {
 	const island = water.layout.islands[0];
 	if (!island) return null;
-	return pointFeetTowardsCentre(water.layout, layoutScaleFor(Number(water.plot_acres)), island.points[0], ShowingFish.OffTheIslandFeet);
+	return pointFeetTowardsCentre(water.layout, layoutScaleFor(Number(water.plot_acres)), island.points[0], OffTheIslandFeet);
 }
 
 function centreOfOneArea(layout: LakeLayout, kind: AreaFeatureKind, random: RandomFraction) {
@@ -67,11 +65,4 @@ function midpointOfOne(shapes: { points: LayoutPoint[] }[], random: RandomFracti
 
 function pickOne<Item>(items: Item[], random: RandomFraction): Item | null {
 	return items.length === 0 ? null : pickRandom(random, items);
-}
-
-function pickSome<Item>(items: Item[], count: number, random: RandomFraction): Item[] {
-	const remaining = [...items];
-	const picked: Item[] = [];
-	while (picked.length < count && remaining.length > 0) picked.push(...remaining.splice(Math.floor(random() * remaining.length), 1));
-	return picked;
 }

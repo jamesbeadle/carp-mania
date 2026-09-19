@@ -12,7 +12,7 @@ export interface AnglerDirectoryEntry {
 	displayName: string;
 	avatarUrl: string | null;
 	skills: AnglerSkills;
-	overallSkill: number;
+	rating: number;
 	personalBestLb: number;
 	totalCatches: number;
 	water: NamedWater | null;

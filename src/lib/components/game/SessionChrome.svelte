@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Lake } from '$lib/domain/types';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
+	import FullscreenToggle from '../hud/FullscreenToggle.svelte';
 	import SoundToggle from '../hud/SoundToggle.svelte';
 	import AlarmToggle from './AlarmToggle.svelte';
-	import FullscreenToggle from './FullscreenToggle.svelte';
 	import SessionClock from './SessionClock.svelte';
 
 	interface Props {

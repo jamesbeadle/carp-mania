@@ -10,6 +10,7 @@ export interface Honours extends RecordsBroken {
 export interface TheBar {
 	standing: StandingRecords;
 	personalBestLb: number;
+	pedigreeLb: number;
 }
 
 export const HonourWords: Record<HonourKind, string> = {
@@ -26,7 +27,7 @@ export function honoursFor(weightLb: number, bar: TheBar): Honours {
 }
 
 export function raiseTheBar(weightLb: number, bar: TheBar): TheBar {
-	return { standing: raiseRecords(weightLb, bar.standing), personalBestLb: Math.max(bar.personalBestLb, weightLb) };
+	return { ...bar, standing: raiseRecords(weightLb, bar.standing), personalBestLb: Math.max(bar.personalBestLb, weightLb) };
 }
 
 export function honourKindsOf(honours: Honours): HonourKind[] {

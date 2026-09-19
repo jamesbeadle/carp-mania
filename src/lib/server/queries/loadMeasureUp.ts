@@ -1,16 +1,15 @@
 import type { Measures, MeasureUp, TrophyRoom } from '$lib/contracts/TrophyRoom';
 import type { PublicAngler } from '$lib/contracts/AnglerPublicProfile';
-import { overallAnglerSkill } from '$lib/domain/anglerSkills';
 import { loadProfile } from '../gates/requireMoney';
 import { loadRanks } from './loadTrophyRoom';
-import { skillsOf } from './skillsOf';
+import { loadRatingOf } from './loadAnglerRating';
 
 export async function loadMeasureUp(locals: App.Locals, viewerId: string, angler: PublicAngler, theirRoom: TrophyRoom): Promise<MeasureUp> {
-	const [theirTrophies, yours] = await Promise.all([countTrophiesOf(locals, angler.id), loadYourMeasures(locals, viewerId)]);
+	const [theirTrophies, theirRating, yours] = await Promise.all([countTrophiesOf(locals, angler.id), loadRatingOf(locals, angler.id), loadYourMeasures(locals, viewerId)]);
 	const theirs: Measures = {
 		personalBestLb: theirRoom.ranks.bestLb,
 		fishLanded: angler.experience,
-		overallSkill: overallAnglerSkill(skillsOf(angler)),
+		rating: theirRating,
 		recordsHeld: theirRoom.recordsHeld.length,
 		trophies: theirTrophies
 	};
@@ -18,8 +17,8 @@ export async function loadMeasureUp(locals: App.Locals, viewerId: string, angler
 }
 
 async function loadYourMeasures(locals: App.Locals, viewerId: string): Promise<Measures> {
-	const [profile, ranks, recordsHeld, trophies] = await Promise.all([loadProfile(locals), loadRanks(locals, viewerId), countRecordsHeldBy(locals, viewerId), countTrophiesOf(locals, viewerId)]);
-	return { personalBestLb: ranks.bestLb, fishLanded: profile.experience, overallSkill: overallAnglerSkill(skillsOf(profile)), recordsHeld, trophies };
+	const [profile, ranks, recordsHeld, trophies, rating] = await Promise.all([loadProfile(locals), loadRanks(locals, viewerId), countRecordsHeldBy(locals, viewerId), countTrophiesOf(locals, viewerId), loadRatingOf(locals, viewerId)]);
+	return { personalBestLb: ranks.bestLb, fishLanded: profile.experience, rating, recordsHeld, trophies };
 }
 
 async function countRecordsHeldBy(locals: App.Locals, anglerId: string) {

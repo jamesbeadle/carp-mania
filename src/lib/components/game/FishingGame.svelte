@@ -12,7 +12,10 @@
 	import { returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
 	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { watchFishShowing } from '$lib/game/session/showingFish';
+	import { skillsOfProfile } from '$lib/game/session/skillsOfProfile';
+	import { craftOf } from '$lib/domain/anglerRating';
+	import { showingSpotsFor } from '$lib/game/session/showingFish';
+	import { showsThisHour } from '$lib/domain/fishing/showingFish';
 	import { startTicking } from '$lib/game/session/tickSession';
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
@@ -38,22 +41,19 @@
 	let catchOutcome = $state<CatchReportOutcome | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
-	let showingAt = $state<LayoutPoint[]>([]);
+	const hourOfShows = $derived(Math.floor(session.hour));
+	const shows = $derived(showsThisHour(session.seed, hourOfShows, session.carp, session.watercraft));
+	const showingAt = $derived<LayoutPoint[]>(showingSpotsFor(lake, shows, session.season));
 	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, session.hour));
 	const ambience = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 
 	$effect(() => startTicking(session));
-	$effect(() => watchFishShowing(lake, session.carp, session.season, showFish));
+	$effect(() => void (showingAt.length > 0 && sound.play('rise')));
 	$effect(() => followTheBiteAlarm(session.bite !== null, isAlarmMuted));
 	$effect(() => void (session.bite && buzzForBite()));
 	$effect(() => sound.startAmbience(ambientSceneFor(ambience)));
 	$effect(() => () => sound.stopAmbience());
 	$effect(() => quietTheBank);
-
-	function showFish(spots: LayoutPoint[]) {
-		showingAt = spots;
-		if (spots.length > 0) sound.play('rise');
-	}
 
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);
@@ -69,7 +69,7 @@
 </script>
 
 {#if session.phase === 'tackle_up' && session.swim}
-	<div class="h-full overflow-y-auto px-4 py-6"><div class="mx-auto max-w-5xl"><TackleBuilder {lake} swim={session.swim} season={session.season} overallSkill={session.overallSkill} savedRods={profile.saved_rods ?? []} onReady={handleTackleUp} /></div></div>
+	<div class="h-full overflow-y-auto px-4 py-6"><div class="mx-auto max-w-5xl"><TackleBuilder {lake} swim={session.swim} season={session.season} rating={session.rating} craft={craftOf(skillsOfProfile(profile))} carpCount={session.carp.length} savedRods={profile.saved_rods ?? []} onReady={handleTackleUp} /></div></div>
 {:else}
 	<WaterScreen
 		{session}

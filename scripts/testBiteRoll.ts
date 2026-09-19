@@ -12,7 +12,8 @@ import type { Carp, Lake } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
 
 const VisitSeed = 123456789;
-const DecentSkill = 60;
+const DecentRating = 60;
+const DecentWatercraft = 60;
 const CastPoint = { x: 0.5, y: 0.5 };
 const SeedsToCheck = 40;
 const MinutesPerHour = 60;
@@ -27,7 +28,7 @@ interface Slot {
 export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
-	const water: WaterToday = { lake, overallSkill: DecentSkill, season: seasonFor(lake, new Date('2026-06-01T00:00:00Z')) };
+	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, new Date('2026-06-01T00:00:00Z')) };
 	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), setup: defaultRodSetup() };
 
 	const roll = biteRollFor(VisitSeed, 0, 7, rod, water);
@@ -70,7 +71,7 @@ function assertEverySlotHasItsOwnStream() {
 
 function assertTheServerAgreesWithTheClient(take: Slot, miss: Slot, carp: Carp[], water: WaterToday, rod: RodInTheWater) {
 	const spot = { terrain: rod.terrain, castPoint: CastPoint };
-	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), take.roll, water, spot);
+	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), { roll: take.roll, hour: take.hour, setup: rod.setup, seed: VisitSeed }, water, spot);
 	const carpAsTheServerLoadsThem = [...carp].reverse();
 	const reportOf = (slot: Slot) => ({ seed: VisitSeed, rodIndex: slot.rodIndex, hour: slot.hour, castPoint: CastPoint, setup: rod.setup });
 	const serverPick = carpForRolledBite(reportOf(take), water, carpAsTheServerLoadsThem);

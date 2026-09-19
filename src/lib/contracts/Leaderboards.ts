@@ -33,7 +33,7 @@ export interface TopReputationEntry {
 export interface BestAnglerEntry {
 	profileId: string;
 	displayName: string;
-	overallSkill: number;
+	rating: number;
 }
 
 export interface Leaderboards {

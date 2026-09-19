@@ -25,7 +25,7 @@
 
 <div class="flex flex-col gap-3 px-3 py-3">
 	{#if session.phase === 'landed' && session.lastLanded}
-		<CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} {onContinue} />
+		<CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} isSettling={session.isSettlingAfterCatch} {onContinue} />
 	{:else if session.phase === 'day_over'}
 		<DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} />
 	{:else}

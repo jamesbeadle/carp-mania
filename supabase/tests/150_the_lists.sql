@@ -17,8 +17,8 @@ select public.record_catch(test.player(151), :'visit', :'two', 'Peg 1', 'hair ri
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(
-	(select personal_best_lb = 27.5 and catches = 1 and overall_skill > 25 and display_name = 'Player 151' from public.angler_summaries where id = test.player(151)),
-	'an angler summary carries the personal best, the catch count and the overall skill'
+	(select personal_best_lb = 27.5 and catches = 1 and rating > 25 and display_name = 'Player 151' from public.angler_summaries where id = test.player(151)),
+	'an angler summary carries the personal best, the catch count and the rating'
 );
 reset role;
 update public.lakes set is_public = false where id = :'lake';

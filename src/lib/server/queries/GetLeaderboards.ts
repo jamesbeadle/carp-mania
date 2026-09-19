@@ -44,8 +44,8 @@ async function loadTopReputation(locals: App.Locals, scope: LeaderboardScope, to
 }
 
 async function loadBestAnglers(locals: App.Locals, scope: LeaderboardScope, top: BoardLength) {
-	const anglers = locals.supabase.from('angler_summaries').select('id, display_name, overall_skill');
-	const { data } = await withinScope(anglers, 'home_region', scope).order('overall_skill', Descending).order('display_name').limit(top);
+	const anglers = locals.supabase.from('angler_summaries').select('id, display_name, rating');
+	const { data } = await withinScope(anglers, 'home_region', scope).order('rating', Descending).order('display_name').limit(top);
 	return rowsOf<BestAnglerRow>(data).map(bestAnglerEntry);
 }
 

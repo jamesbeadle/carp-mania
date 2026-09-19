@@ -34,7 +34,7 @@ export interface TopReputationRow {
 export interface BestAnglerRow {
 	id: string;
 	display_name: string;
-	overall_skill: number;
+	rating: number;
 }
 
 export function biggestAliveEntry(row: BiggestAliveRow): BiggestAliveEntry {
@@ -50,5 +50,5 @@ export function topReputationEntry(row: TopReputationRow): TopReputationEntry {
 }
 
 export function bestAnglerEntry(row: BestAnglerRow): BestAnglerEntry {
-	return { profileId: row.id, displayName: row.display_name, overallSkill: Number(row.overall_skill) };
+	return { profileId: row.id, displayName: row.display_name, rating: Number(row.rating) };
 }
