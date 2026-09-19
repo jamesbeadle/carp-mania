@@ -1,5 +1,6 @@
 import type { Carp } from '../types';
 import { feedingWindowFit } from './feedingWindow';
+import { noKitFactor, type KitFactor } from './kitAgeFactor';
 
 export const SizeBias = { AtNoReach: -1.5, AtFullReach: 1.5, SmallestCountedLb: 8, TwentyLb: 20 } as const;
 export const Appetite = { Floor: 0.5, PerConditionPoint: 1 / 200 } as const;
@@ -10,6 +11,7 @@ export interface Take {
 	sizeReach: number;
 	hour: number;
 	spotBonusFor: SpotBonus;
+	kitFactorFor?: KitFactor;
 }
 
 export function noSpotBonus() {
@@ -32,7 +34,8 @@ export function appetiteOf(carp: Pick<Carp, 'condition'>) {
 export function takeWeightOf(carp: Carp, take: Take) {
 	const sizeBias = sizeBiasOf(Number(carp.weight_lb), take.sizeReach);
 	const windowFit = feedingWindowFit(carp, take.hour);
-	return appetiteOf(carp) * sizeBias * windowFit * take.spotBonusFor(carp);
+	const kitFactor = (take.kitFactorFor ?? noKitFactor)(carp);
+	return appetiteOf(carp) * sizeBias * windowFit * take.spotBonusFor(carp) * kitFactor;
 }
 
 export function takeWeightsFor(carp: Carp[], take: Take) {

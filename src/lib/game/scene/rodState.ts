@@ -12,6 +12,7 @@ export interface RodOnBank {
 	phase: RodPhase;
 	baitPoint: Point | null;
 	terrain: Terrain | null;
+	hoursCast: number;
 }
 
 export interface CastRod extends RodOnBank {
@@ -20,7 +21,7 @@ export interface CastRod extends RodOnBank {
 }
 
 export function restingRod(index: number, setup: RodSetup): RodOnBank {
-	return { index, setup, kit: kitFor(setup), phase: 'idle', baitPoint: null, terrain: null };
+	return { index, setup, kit: kitFor(setup), phase: 'idle', baitPoint: null, terrain: null, hoursCast: 0 };
 }
 
 export function isCastOut(rod: RodOnBank): rod is CastRod {

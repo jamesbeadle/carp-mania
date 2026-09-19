@@ -2,12 +2,13 @@
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import OwnedList from '$lib/components/tackle/OwnedList.svelte';
 	import SavedRodsList from '$lib/components/tackle/SavedRodsList.svelte';
-	import { TackleKinds } from '$lib/domain/tackle/kinds';
-	import { ownedItemsIn, ownedOfKind } from '$lib/domain/tackle/tackleBox';
+	import { TackleKinds, type TackleKind } from '$lib/domain/tackle/kinds';
+	import { ownedItemsIn } from '$lib/domain/tackle/tackleBox';
 
 	let { data } = $props();
 
 	const box = $derived(ownedItemsIn(data.box.owned));
+	const ownedOrSpoiled = (kind: TackleKind) => box.filter((line) => line.item.kind === kind && line.quantity > 0);
 </script>
 
 <svelte:head><title>My tackle box · Carp Mania</title></svelte:head>
@@ -21,6 +22,6 @@
 <div class="grid gap-4 lg:grid-cols-2">
 	<div class="lg:col-span-2"><SavedRodsList savedRods={data.box.savedRods} /></div>
 	{#each TackleKinds as kind (kind)}
-		<OwnedList {kind} owned={ownedOfKind(box, kind)} />
+		<OwnedList {kind} owned={ownedOrSpoiled(kind)} />
 	{/each}
 </div>

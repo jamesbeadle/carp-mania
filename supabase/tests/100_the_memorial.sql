@@ -38,7 +38,7 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(101)::text, false);
 select public.pay_day_ticket(:'lake') as visit \gset
 reset role;
-select public.record_catch(test.player(101), :'visit', :'ticket_fish', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie') as player_catch \gset
+select public.record_catch(test.player(101), :'visit', :'ticket_fish', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie') as player_catch \gset
 select test.assert_that((select owner_name = 'Player 100' and angler_name = 'Player 101' from public.catches where id = :'player_catch'), 'a catch credits the owner of the water as well as the angler');
 select test.assert_that(exists (select 1 from public.most_fish_landed('world', 100) where angler_name = 'Player 101' and catches = 1 and heaviest_lb = 18), 'a signed-in angler makes the board');
 select test.assert_that(exists (select 1 from public.waters_of_legend('uk_ireland', 50) where lake_name = 'Memorial Mere' and heaviest_lb = 18 and owner_name = 'Player 100'), 'an angler''s fish makes the water one of legend, and credits its owner');

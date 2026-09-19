@@ -12,7 +12,8 @@ const Weights = {
 } as const;
 
 export function baitTrustScore(bait: BaitStats, feedStock: Record<FeedType, number>) {
-	return Math.min(1, kindTrustScore(bait, feedStock) * bait.appealFactor);
+	const profile = BaitCatalogue[bait.kind];
+	return Math.min(1, kindTrustScore(bait, feedStock) * profile.appeal * bait.appealFactor);
 }
 
 function kindTrustScore(bait: BaitStats, feedStock: Record<FeedType, number>) {

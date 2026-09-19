@@ -16,7 +16,7 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(161)::text, false);
 select public.pay_day_ticket(:'lake') as visit \gset
 reset role;
-select public.record_catch(test.player(161), :'visit', :'small', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(161), :'visit', :'small', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 
 select test.assert_that(
 	(select payload ->> 'anglerId' = test.player(161)::text and payload ->> 'scope' = 'region' from public.world_events where kind = 'record' and lake_id = :'lake' order by created_at desc limit 1),
