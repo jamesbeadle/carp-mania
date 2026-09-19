@@ -17,6 +17,8 @@
 
 <PlaceBanner kind="shop" title="The tackle shop" blurb="The fish market: every fish for sale across the whole world. The seller pays the commission; you pay the transport to your water.">
 	{#snippet actions()}
+		<a href="/market/tackle" class="button-primary text-base">The tackle counter</a>
+		<a href="/tackle" class="button-secondary text-base">My tackle box</a>
 		<a href="/lake#market" class="button-secondary text-base">Sell from my water</a>
 	{/snippet}
 </PlaceBanner>

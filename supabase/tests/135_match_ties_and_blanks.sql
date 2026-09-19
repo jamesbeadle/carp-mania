@@ -47,8 +47,8 @@ select public.pay_day_ticket(:'lake') as visit_a \gset
 select set_config('request.jwt.claim.sub', test.player(137)::text, false);
 select public.pay_day_ticket(:'lake') as visit_b \gset
 reset role;
-select public.record_catch(test.player(136), :'visit_a', :'bigger', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
-select public.record_catch(test.player(137), :'visit_b', :'smaller', 'Peg 2', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(136), :'visit_a', :'bigger', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(137), :'visit_b', :'smaller', 'Peg 2', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 update public.matches set ends_at = now() where id = :'tie';
 select public.close_match(:'tie');
 select test.assert_that(test.money_of(test.player(136)) = 100000, 'a tie on most catches splits that share, and the biggest fish gets the rest');

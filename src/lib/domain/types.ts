@@ -1,4 +1,5 @@
 import type { LakeLayout } from './layout/layoutTypes';
+import type { Tier } from './tackle/brands';
 import type { RodSetup } from './tackle/rodSetup';
 import type { RegionCode } from './world/regionCodes';
 
@@ -54,6 +55,7 @@ export interface Lake {
 	fertility: number;
 	disturbance: number;
 	is_setup_complete: boolean;
+	shop_tier: Tier;
 }
 
 export interface Swim {

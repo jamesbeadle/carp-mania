@@ -13,7 +13,7 @@
 <svelte:head><title>Fishing {data.water.lake.name} · Carp Mania</title></svelte:head>
 
 {#if data.visit && data.bar}
-	<FishingGame lake={data.water.lake} swims={data.water.swims} carp={carpInTheLake} profile={data.profile} visit={data.visit} bar={data.bar} {matchBoardHref} />
+	<FishingGame lake={data.water.lake} swims={data.water.swims} carp={carpInTheLake} profile={data.profile} visit={data.visit} bar={data.bar} owned={data.owned} {matchBoardHref} />
 {:else}
 	<ActionMessage {form} />
 	<DayTicketOffice water={data.water} profile={data.profile} runningMatch={data.runningMatch} knownCarpCount={carpInTheLake.filter((fish) => fish.is_catalogued).length} />

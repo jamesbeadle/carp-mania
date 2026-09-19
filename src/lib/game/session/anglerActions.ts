@@ -6,7 +6,8 @@ import { pointerWords } from '../stage/pointerWords';
 import { buzzForTheNet } from './haptics';
 import type { LandedFish } from './landFish';
 import { moveToSwim, startPickingASwim, stayPut } from './movingSwim';
-import { castRod, chooseSwim, finishFight, nextRodToCast, strike } from './sessionFlow';
+import { finishFight, strike } from './fightFlow';
+import { castRod, chooseSwim, nextRodToCast } from './sessionFlow';
 import { soundTheOutcome, soundTheReelIn } from './sessionSounds';
 import type { SessionState } from './sessionState.svelte';
 

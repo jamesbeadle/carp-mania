@@ -7,7 +7,7 @@ import { seededRandom } from '../src/lib/domain/random';
 import { simulateOneDay, type DayContext } from '../src/lib/domain/simulation/simulateOneDay';
 import { FisheryClock } from '../src/lib/domain/simulation/elapsedDays';
 import { ClassicSwims, classicCarp, classicLake, classicSwims } from '../src/lib/domain/sites/classicSite';
-import { defaultRodSetup } from '../src/lib/domain/tackle/rodSetup';
+import { defaultRodSetup, kitFor } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake, Swim } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
 import { runAgeingScenarios } from './testAgeing';
@@ -25,6 +25,7 @@ import { runSiteScenarios } from './testSites';
 import { runSizeReachScenarios } from './testSizeReach';
 import { runRatingScenarios } from './testRating';
 import { runFightScenarios } from './testFight';
+import { runTackleScenarios } from './testTackle';
 import { runTrophyScenarios } from './testTrophies';
 import { runSpawningScenarios, runWorldScenarios } from './testWorld';
 
@@ -70,7 +71,7 @@ for (let dayNumber = 2; dayNumber <= 30; dayNumber++) {
 console.log('day 30:', { silt: stateLake.silt, weed: stateLake.weed, transparency: stateLake.transparency, reputation: stateLake.reputation, carp: stateCarp.length });
 
 const castTerrain = castTerrainFor(fedLake, { x: 0.5, y: 0.5 });
-const match = matchTackleToWater(defaultRodSetup(), fedLake, castTerrain);
+const match = matchTackleToWater(kitFor(defaultRodSetup()), fedLake, castTerrain);
 assert.ok(match.overall > 0.3 && match.overall <= 1, `sensible match ${match.overall}`);
 const chance = biteChanceForOneHour(fedLake, match.overall, 60, 6);
 assert.ok(chance > 0.05 && chance < 0.9, `sensible bite chance ${chance}`);
@@ -94,4 +95,5 @@ runLightScenarios();
 runRatingScenarios();
 runSizeReachScenarios();
 runFightScenarios();
+runTackleScenarios();
 console.log('domain tests passed');

@@ -13,7 +13,7 @@ select test.assert_that(
 );
 select public.pay_day_ticket(:'lake') as visit \gset
 reset role;
-select public.record_catch(test.player(151), :'visit', :'two', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
+select public.record_catch(test.player(151), :'visit', :'two', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(
@@ -42,7 +42,7 @@ select test.assert_that(not exists (select 1 from public.famous_fish_caught_by(t
 reset role;
 
 select current_fisherman_id as fisherman from public.profiles where id = test.player(151) \gset
-select public.record_catch(test.player(151), :'visit', :'one', 'Peg 2', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
+select public.record_catch(test.player(151), :'visit', :'one', 'Peg 2', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 insert into public.catches (lake_id, carp_id, angler_id, angler_name, weight_lb, swim_name, rig, bait, hook_size, fisherman_id, caught_at)
 values (:'lake', :'two', test.player(151), 'Player 151', 26, 'Peg 3', 'hair rig', 'boilie', 6, :'fisherman', now() - interval '3 days');
 set role authenticated;

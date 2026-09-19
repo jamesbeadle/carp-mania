@@ -4,6 +4,7 @@ import { isBookedOut, type BookedWindow } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '../reputation';
 import type { Carp, Lake, Swim } from '../types';
+import { shopTierOf } from '../tackle/shopTier';
 import { overallWaterQuality } from '../waterQuality';
 import type { Season } from '../world/seasons';
 import type { LakeWork } from '../worldTypes';
@@ -61,7 +62,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const spawned = isFirstDayOfSpring(context.dayStart, context.dayEnd, hunted.lake.latitude) ? spawnFry(hunted.lake, aged.carp, random) : [];
 
 	return {
-		lake: { ...hunted.lake, reputation: reputationAfterDay(hunted.lake, anglers.catches) },
+		lake: waterAfterDay(hunted.lake, anglers.catches),
 		carp: aged.carp,
 		catches: anglers.catches,
 		visits: anglers.visits,
@@ -82,6 +83,10 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 
 export function netMoneyFor(day: Pick<DayOutcome, 'feesCollected' | 'lodgeTakings' | 'bailiffWages' | 'aeratorRunning'>) {
 	return day.feesCollected + day.lodgeTakings - day.bailiffWages - day.aeratorRunning;
+}
+
+function waterAfterDay(lake: Lake, catches: NewCatch[]): Lake {
+	return { ...lake, reputation: reputationAfterDay(lake, catches), shop_tier: shopTierOf(lake) };
 }
 
 function reputationAfterDay(lake: Lake, catches: NewCatch[]) {

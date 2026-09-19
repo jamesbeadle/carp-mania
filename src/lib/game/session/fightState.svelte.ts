@@ -1,9 +1,12 @@
 import { carpPullStrength, easedChange, fightSecondsFor, FightStepSeconds, isFishRunning, isHookPulled, isLineSnapped, nextTension, RunWarningSeconds, TensionBand, tensionBandFor, tensionChangePerSecond, type Band } from '$lib/domain/fishing/fight';
 import { fightPatternOf, surgeAt, type FightPattern } from '$lib/domain/fishing/fightPattern';
-import type { LineThickness } from '$lib/domain/tackle/lines';
+import { doesHookOpen } from '$lib/domain/tackle/hooks';
+import { ReelCatalogue } from '$lib/domain/tackle/reels';
+import { rodSnapChancePerSecond } from '$lib/domain/tackle/rods';
+import type { RodKit } from '$lib/domain/tackle/rodSetup';
 import type { Carp } from '$lib/domain/types';
 
-export type FightOutcome = 'landed' | 'snapped' | 'hook_pulled';
+export type FightOutcome = 'landed' | 'snapped' | 'hook_pulled' | 'rod_snapped' | 'hook_opened';
 
 export class FightState {
 	tension = $state<number>(TensionBand.Ideal);
@@ -13,18 +16,26 @@ export class FightState {
 	isRunComing = $state(false);
 	outcome = $state<FightOutcome | null>(null);
 	readonly carp: Carp;
+	readonly kit: RodKit;
 	readonly band: Band;
 	private readonly pullStrength: number;
+	private readonly retrieveFactor: number;
+	private readonly snapChancePerStep: number;
 	private readonly pattern: FightPattern;
 	private timeSeconds = 0;
 	private unsteppedSeconds = 0;
 	private previousChange = 0;
 
-	constructor(carp: Carp, lineThickness: LineThickness, rating: number) {
+	constructor(carp: Carp, kit: RodKit, rating: number) {
 		this.carp = carp;
-		this.band = tensionBandFor(rating);
+		this.kit = kit;
+		this.band = tensionBandFor(rating, kit.rod.rod);
 		this.secondsRemaining = fightSecondsFor(Number(carp.weight_lb));
-		this.pullStrength = carpPullStrength(Number(carp.weight_lb), lineThickness);
+		const weightLb = Number(carp.weight_lb);
+		const line = kit.line.line;
+		this.pullStrength = carpPullStrength(weightLb, line.breakingStrainLb);
+		this.retrieveFactor = ReelCatalogue[kit.reel.reel].retrieveFactor;
+		this.snapChancePerStep = rodSnapChancePerSecond(weightLb, kit.rod.rod) * FightStepSeconds;
 		this.pattern = fightPatternOf(carp);
 	}
 
@@ -40,10 +51,11 @@ export class FightState {
 	private step() {
 		this.timeSeconds += FightStepSeconds;
 		const surge = surgeAt(this.pattern, this.timeSeconds);
-		this.isRunning = isFishRunning(surge);
 		const surgeAhead = surgeAt(this.pattern, this.timeSeconds + RunWarningSeconds);
+		this.isRunning = isFishRunning(surge);
 		this.isRunComing = !this.isRunning && isFishRunning(surgeAhead);
-		const change = easedChange(this.previousChange, tensionChangePerSecond(this.isReeling, this.pullStrength, surge));
+		const pull = tensionChangePerSecond(this.isReeling, this.pullStrength, surge, this.retrieveFactor);
+		const change = easedChange(this.previousChange, pull);
 		this.previousChange = change;
 		this.tension = nextTension(this.tension, change, FightStepSeconds);
 		this.secondsRemaining = Math.max(0, this.secondsRemaining - FightStepSeconds);
@@ -51,9 +63,12 @@ export class FightState {
 	}
 
 	private judge(): FightOutcome | null {
+		if (Math.random() < this.snapChancePerStep) return 'rod_snapped';
 		if (isLineSnapped(this.tension, this.band)) return 'snapped';
 		if (isHookPulled(this.tension, this.band)) return 'hook_pulled';
-		if (this.secondsRemaining === 0) return 'landed';
-		return null;
+		if (this.secondsRemaining > 0) return null;
+		const hook = this.kit.hook.hook;
+		const hasOpened = doesHookOpen(hook, Number(this.carp.weight_lb));
+		return hasOpened ? 'hook_opened' : 'landed';
 	}
 }

@@ -13,9 +13,9 @@ select public.pay_day_ticket(:'lake') as visit \gset
 select set_config('request.jwt.claim.sub', test.player(172)::text, false);
 select public.pay_day_ticket(:'lake') as rival_visit \gset
 reset role;
-select public.record_catch(test.player(171), :'visit', :'small', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
-select public.record_catch(test.player(171), :'visit', :'prize', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
-select public.record_catch(test.player(172), :'rival_visit', :'twenty', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
+select public.record_catch(test.player(171), :'visit', :'small', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(171), :'visit', :'prize', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(172), :'rival_visit', :'twenty', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(172)::text, false);

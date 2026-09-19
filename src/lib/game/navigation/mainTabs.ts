@@ -11,7 +11,7 @@ export const MainTabs: MainTab[] = [
 	{ id: 'lake', label: 'My lake', href: '/home', paths: ['/home', '/lake'] },
 	{ id: 'fish', label: 'Find water', href: '/lakes', paths: ['/lakes', '/fish', '/matches'] },
 	{ id: 'world', label: 'The world', href: '/world', paths: ['/world', '/news', '/anglers', '/carp'] },
-	{ id: 'market', label: 'Tackle shop', href: '/market', paths: ['/market'] },
+	{ id: 'market', label: 'Tackle shop', href: '/market', paths: ['/market', '/tackle'] },
 	{ id: 'me', label: 'My angler', href: '/angler', paths: ['/angler'] }
 ];
 

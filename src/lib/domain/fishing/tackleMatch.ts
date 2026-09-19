@@ -1,5 +1,5 @@
 import type { Terrain } from '../layout/terrainAt';
-import type { RodSetup } from '../tackle/rodSetup';
+import type { RodKit } from '../tackle/rodSetup';
 import type { Lake } from '../types';
 import { baitTrustScore } from './baitTrust';
 import { hookMatchScore } from './hookMatch';
@@ -18,12 +18,31 @@ export interface TackleMatch {
 
 export type WaterForTackle = Pick<Lake, 'transparency' | 'silt' | 'feed_stock'>;
 
-export function matchTackleToWater(rod: RodSetup, lake: WaterForTackle, terrain: Terrain): TackleMatch {
-	const line = lineMatchScore(rod.line, lake.transparency, lake.silt);
-	const hook = hookMatchScore(rod.hook, lake.transparency);
-	const rig = rigMatchScore(rod.rig, terrain);
-	const bait = baitTrustScore(rod.bait, lake.feed_stock);
-	const tubing = tubingMatchScore(rod.tubing, rod.bait, terrain, lake.transparency);
-	const overall = line * 0.25 + hook * 0.15 + rig * 0.2 + bait * 0.3 + tubing * 0.1;
-	return { line, hook, rig, bait, tubing, overall };
+const Weights = {
+	Line: 0.25,
+	Hook: 0.15,
+	Rig: 0.2,
+	Bait: 0.3,
+	Tubing: 0.1
+} as const;
+const WeedyFeatures = ['weed_bed', 'reed_line', 'lily_pads'];
+
+export function matchTackleToWater(kit: RodKit, lake: WaterForTackle, terrain: Terrain): TackleMatch {
+	const isWeedy = WeedyFeatures.includes(terrain.feature);
+	const transparency = Number(lake.transparency);
+	const baitStats = kit.bait.bait;
+	const silt = Number(lake.silt);
+	const line = lineMatchScore(kit.line.line, transparency, silt, terrain.bed, isWeedy);
+	const hook = hookMatchScore(kit.hook.hook);
+	const rig = rigMatchScore(kit.rig.rig, terrain);
+	const bait = baitTrustScore(baitStats, lake.feed_stock);
+	const tubing = tubingMatchScore(kit.tubing.tubing, baitStats.kind, terrain, transparency);
+	const scores = { line, hook, rig, bait, tubing };
+	return { ...scores, overall: overallOf(scores) };
+}
+
+function overallOf(scores: Omit<TackleMatch, 'overall'>) {
+	const { line, hook, rig, bait, tubing } = scores;
+	const presentation = line * Weights.Line + hook * Weights.Hook + rig * Weights.Rig;
+	return presentation + bait * Weights.Bait + tubing * Weights.Tubing;
 }

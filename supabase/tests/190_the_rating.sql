@@ -13,7 +13,7 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(191)::text, false);
 select public.pay_day_ticket(:'lake') as visit \gset
 reset role;
-select public.record_catch(test.player(191), :'visit', :'fish', 'Peg 1', 'ronnie', 'pop_up', 4, 0, 0, 0, 0);
+select public.record_catch(test.player(191), :'visit', :'fish', 'Peg 1', 'ronnie', 'pop_up', 4, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 
 select test.assert_that((select public.angler_pedigree(test.player(191)) = 58), 'a twenty-nine is a pedigree of 58');
 select test.assert_that((select public.angler_rating(test.player(191)) = 58), 'so a maxed angler with a twenty-nine reads 58');

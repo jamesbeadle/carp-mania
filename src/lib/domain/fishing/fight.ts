@@ -1,4 +1,4 @@
-import { LineBreakingStrainLb, type LineThickness } from '../tackle/lines';
+import { FullDuplon, type RodStats } from '../tackle/rods';
 
 export const TensionBand = { SlackBelow: 0.2, SnapAbove: 0.84, Ideal: 0.5 } as const;
 export const FightDurationSeconds = { Minimum: 8, PerPound: 0.4 } as const;
@@ -21,15 +21,16 @@ export function fightSecondsFor(weightPounds: number) {
 	return FightDurationSeconds.Minimum + weightPounds * FightDurationSeconds.PerPound;
 }
 
-export function carpPullStrength(weightPounds: number, lineThickness: LineThickness) {
-	const breakingStrain = LineBreakingStrainLb[lineThickness];
+export function carpPullStrength(weightPounds: number, breakingStrain: number) {
 	const strength = PullStrength.Floor + (weightPounds / breakingStrain) * PullStrength.PerBreakingStrainRatio;
 	return Math.min(PullStrength.Ceiling, strength);
 }
 
-export function tensionBandFor(rating: number): Band {
+export function tensionBandFor(rating: number, rod: Pick<RodStats, 'isFullDuplon'> = { isFullDuplon: false }): Band {
 	const widening = CraftBandWidening * Math.min(1, Math.max(0, rating / 100));
-	return { slackBelow: TensionBand.SlackBelow - widening, snapAbove: TensionBand.SnapAbove + widening };
+	const duplonSlack = rod.isFullDuplon ? FullDuplon.SlackBelowWidening : 0;
+	const duplonSnap = rod.isFullDuplon ? FullDuplon.SnapAboveWidening : 0;
+	return { slackBelow: TensionBand.SlackBelow - widening - duplonSlack, snapAbove: TensionBand.SnapAbove + widening + duplonSnap };
 }
 
 export function isLineSnapped(tension: number, band: Band) {
@@ -44,8 +45,8 @@ export function isFishRunning(surge: number) {
 	return surge > RunsAboveSurge;
 }
 
-export function tensionChangePerSecond(isReeling: boolean, pullStrength: number, surge: number) {
-	const anglerPull = isReeling ? ReelPullPerSecond : -SlackDropPerSecond;
+export function tensionChangePerSecond(isReeling: boolean, pullStrength: number, surge: number, retrieveFactor = 1) {
+	const anglerPull = isReeling ? ReelPullPerSecond * retrieveFactor : -SlackDropPerSecond;
 	const fishPull = (surge - 0.5) * pullStrength;
 	return anglerPull + fishPull;
 }

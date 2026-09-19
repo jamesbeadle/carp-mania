@@ -1,6 +1,6 @@
 import type { Terrain } from '../layout/terrainAt';
 import { seededRandom } from '../random';
-import type { RodSetup } from '../tackle/rodSetup';
+import type { RodKit } from '../tackle/rodSetup';
 import type { Lake } from '../types';
 import type { Season } from '../world/seasons';
 import { biteChanceForOneHour } from './biteChance';
@@ -18,7 +18,7 @@ export interface BiteRoll {
 
 export interface RodInTheWater {
 	terrain: Terrain;
-	setup: RodSetup;
+	kit: RodKit;
 }
 
 export interface WaterToday {
@@ -41,7 +41,7 @@ export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: R
 }
 
 export function biteChanceThisHour(hour: number, rod: RodInTheWater, water: WaterToday) {
-	const match = matchTackleToWater(rod.setup, water.lake, rod.terrain);
+	const match = matchTackleToWater(rod.kit, water.lake, rod.terrain);
 	const season = water.season;
 	const conditions = { spotFactor: spotBiteFactor(rod.terrain, season), seasonFactor: season.biteFactor };
 	return biteChanceForOneHour(water.lake, match.overall, water.rating, hour, conditions);

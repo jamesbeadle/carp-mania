@@ -22,7 +22,7 @@ export class BiteRoller {
 
 	rollAfterCast(rod: CastRod, clockHour: number): RolledBite {
 		const hour = Math.floor(clockHour);
-		const roll = biteRollFor(this.seed, rod.index, hour, { terrain: rod.terrain, setup: rod.setup }, this.water);
+		const roll = biteRollFor(this.seed, rod.index, hour, { terrain: rod.terrain, kit: rod.kit }, this.water);
 		const rolled = { rodIndex: rod.index, hour, roll };
 		this.rolledByRod.set(rod.index, rolled);
 		return rolled;
@@ -48,5 +48,5 @@ function keyOf(bite: RolledBite) {
 }
 
 export function tackleMatchFor(lake: Lake, rod: CastRod): TackleMatch {
-	return matchTackleToWater(rod.setup, lake, rod.terrain);
+	return matchTackleToWater(rod.kit, lake, rod.terrain);
 }

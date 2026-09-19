@@ -58,9 +58,9 @@ select public.pay_day_ticket(:'lake') as visit_b \gset
 select test.assert_refused('select public.close_ended_matches()', 'permission denied');
 reset role;
 select test.assert_that(test.money_of(test.player(132)) = 100000 - 25, 'an entrant fishes the match without paying for a ticket');
-select public.record_catch(test.player(132), :'visit_a', :'sixteen', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
-select public.record_catch(test.player(132), :'visit_a', :'fourteen', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
-select public.record_catch(test.player(133), :'visit_b', :'thirty', 'Peg 2', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(132), :'visit_a', :'sixteen', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(132), :'visit_a', :'fourteen', 'Peg 1', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(133), :'visit_b', :'thirty', 'Peg 2', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 select test.assert_that(
 	(select angler_id = test.player(132) and catches = 2 and heaviest_lb = 16 and heaviest_carp_id = :'sixteen' from public.match_board(:'match') limit 1),
 	'the board puts the angler with most fish first, with the best of them named'
