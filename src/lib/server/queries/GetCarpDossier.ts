@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { CarpDossier, DossierLake, GrowthPoint } from '$lib/contracts/CarpDossier';
 import { dealerOfferFor } from '$lib/domain/market/dealer';
+import { recentCapturesOf } from '$lib/domain/water/pressure';
 import { guidePriceOf } from '$lib/domain/market/valuation';
 import type { ListingStatus } from '$lib/domain/marketTypes';
 import type { Carp, Catch } from '$lib/domain/types';
@@ -23,7 +24,8 @@ export async function GetCarpDossier(locals: App.Locals, carpId: string): Promis
 		loadTransfersOf(locals, carpId),
 		loadOpenListingIdOf(locals, carpId)
 	]);
-	const lakeNames = await loadLakeNames(locals, [lake.id, carp.origin_lake_id, ...transfers.flatMap((transfer) => [transfer.from_lake_id, transfer.to_lake_id])]);
+	const transferLakeIds = transfers.flatMap((transfer) => [transfer.from_lake_id, transfer.to_lake_id]);
+	const lakeNames = await loadLakeNames(locals, [lake.id, carp.origin_lake_id, ...transferLakeIds]);
 	return {
 		carp,
 		lake,
@@ -36,7 +38,8 @@ export async function GetCarpDossier(locals: App.Locals, carpId: string): Promis
 		bestEverLb: Math.max(heaviestCatchLb, Number(carp.weight_lb)),
 		growth: growthOf(catches, carp, new Date()),
 		openListingId,
-		isMine: lake.ownerId === user.id
+		isMine: lake.ownerId === user.id,
+		recentCaptures: recentCapturesOf(catches, carp.id, new Date())
 	};
 }
 
@@ -58,7 +61,9 @@ async function loadCarpWithLake(locals: App.Locals, carpId: string) {
 }
 
 function dossierLakeFrom(embed: LakeEmbed): DossierLake {
-	return { id: embed.id, name: embed.name, region: embed.region, ownerId: embed.owner_id, ownerName: embed.profiles?.display_name ?? 'Unknown owner' };
+	const { id, name, region } = embed;
+	const ownerName = embed.profiles?.display_name ?? 'Unknown owner';
+	return { id, name, region, ownerId: embed.owner_id, ownerName };
 }
 
 function growthOf(catches: Catch[], carp: Carp, now: Date): GrowthPoint[] {

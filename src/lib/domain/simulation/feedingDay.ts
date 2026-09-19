@@ -4,7 +4,9 @@ import { isOverstocked, StockingDensity } from '../market/density';
 import type { Shoal } from '../stock/shoals';
 import type { Carp, Lake } from '../types';
 import { clampToScale } from '../waterQuality';
-import { regionGrowthCeiling } from '../world/regions';
+import { feedingConfidenceOf, lakeCeilingOf } from '../water/lakeCeiling';
+import type { LakeSpecies } from '../water/species';
+import { headCountOf } from '../stock/shoals';
 import { freeRationFraction } from './naturalFood';
 
 export interface FeedingDay {
@@ -20,18 +22,20 @@ export interface FeedingDay {
 const NaturalFoodProteinScore = 0.5;
 const LeastFeedQuality = 0.6;
 
-export function feedingDayFor(lake: Lake, carp: Carp[], shoals: Shoal[], mouths: number, growthFactor: number) {
+export function feedingDayFor(lake: Lake, carp: Carp[], shoals: Shoal[], mouths: number, growthFactor: number, species: LakeSpecies[] = []) {
 	const proteinScore = feedProteinScore(lake.feed_stock);
 	const conditionScore = feedConditionScore(lake.feed_stock);
 	const { feedStock, rationFraction } = consumeFeedForOneDay(lake.feed_stock, dailyRationKilograms(mouths));
-	const fedFraction = Math.min(1, rationFraction + freeRationFraction(lake));
+	const confidence = feedingConfidenceOf(lake.layout, Number(lake.plot_acres));
+	const fedFraction = Math.min(1, (rationFraction + freeRationFraction(lake)) * confidence);
+	const ceiling = lakeCeilingOf(lake, carp.length + headCountOf(shoals), species);
 	const feeding: FeedingDay = {
 		proteinScore,
 		conditionScore,
 		rationFraction,
 		fedFraction,
 		isOverstocked: isOverstocked(carp, Number(lake.acres), shoals),
-		ceilingLb: regionGrowthCeiling(lake.region),
+		ceilingLb: ceiling.ceilingLb,
 		growthFactor
 	};
 	return { feeding, feedStock };

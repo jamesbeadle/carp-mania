@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import type { RecentCatches } from '$lib/contracts/RecentCatches';
 import type { Shoal } from '$lib/domain/stock/shoals';
+import type { LakeSpecies } from '$lib/domain/water/species';
+import { loadSpeciesOf } from './GetLakeSpecies';
 import type { Carp, Lake, Swim } from '$lib/domain/types';
 import { requireUser } from '../gates/requireUser';
 import { loadRecentCatches } from './loadRecentCatches';
@@ -11,6 +13,7 @@ export interface LakeForAnglers {
 	swims: Swim[];
 	carp: Carp[];
 	shoals: Shoal[];
+	species: LakeSpecies[];
 	catches: RecentCatches;
 }
 
@@ -20,10 +23,11 @@ export async function GetLake(locals: App.Locals, lakeId: string): Promise<LakeF
 	if (!lakeRow) error(404, 'That lake is not open to anglers');
 
 	const { profiles, ...lake } = lakeRow as { profiles: { display_name: string } | null } & Lake;
-	const [swims, carp, shoals, catches] = await Promise.all([
+	const [swims, carp, shoals, species, catches] = await Promise.all([
 		locals.supabase.from('swims').select('*').eq('lake_id', lakeId).order('name'),
 		locals.supabase.from('carp').select('*').eq('lake_id', lakeId).order('weight_lb', { ascending: false }),
 		locals.supabase.from('carp_shoals').select('*').eq('lake_id', lakeId).order('average_weight_lb', { ascending: false }),
+		loadSpeciesOf(locals, lakeId),
 		loadRecentCatches(locals, lakeId, new Date())
 	]);
 	return {
@@ -32,6 +36,7 @@ export async function GetLake(locals: App.Locals, lakeId: string): Promise<LakeF
 		swims: (swims.data ?? []) as Swim[],
 		carp: (carp.data ?? []) as Carp[],
 		shoals: (shoals.data ?? []) as Shoal[],
+		species,
 		catches
 	};
 }

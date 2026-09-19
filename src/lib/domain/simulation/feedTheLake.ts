@@ -1,13 +1,14 @@
 import { headCountOf, type Shoal } from '../stock/shoals';
 import type { Carp, Lake } from '../types';
+import type { LakeSpecies } from '../water/species';
 import { feedingDayFor, feedOneFish } from './feedingDay';
 import { growShoalsForOneDay } from './growShoals';
 
-export function feedTheLakeForOneDay(lake: Lake, carp: Carp[], growthFactor: number, shoals: Shoal[] = []) {
+export function feedTheLakeForOneDay(lake: Lake, carp: Carp[], growthFactor: number, shoals: Shoal[] = [], species: LakeSpecies[] = []) {
 	const fed = carp.filter(isFedToday);
 	const fedShoals = shoals.filter(isFedToday);
 	const mouths = fed.length + headCountOf(fedShoals);
-	const { feeding, feedStock } = feedingDayFor(lake, carp, shoals, mouths, growthFactor);
+	const { feeding, feedStock } = feedingDayFor(lake, carp, shoals, mouths, growthFactor, species);
 	const fedCarp = carp.map((fish) => (isFedToday(fish) ? feedOneFish(fish, feeding) : fish));
 	const grownShoals = growShoalsForOneDay(shoals, feeding);
 	return { lake: { ...lake, feed_stock: feedStock }, carp: fedCarp, shoals: grownShoals };

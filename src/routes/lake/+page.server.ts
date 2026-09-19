@@ -9,6 +9,10 @@ import { MoveFishToMyWater } from '$lib/server/commands/MoveFishToMyWater';
 import { RenameLake } from '$lib/server/commands/RenameLake';
 import { SellFishToDealer } from '$lib/server/commands/SellFishToDealer';
 import { SellShoalFish } from '$lib/server/commands/SellShoalFish';
+import { StockCoarseFish } from '$lib/server/commands/StockCoarseFish';
+import { NetTheSilvers } from '$lib/server/commands/NetTheSilvers';
+import { TurnOnAdvanceBooking } from '$lib/server/commands/TurnOnAdvanceBooking';
+import { SellSyndicatePlaces } from '$lib/server/commands/SellSyndicatePlaces';
 import { AddTicketProduct } from '$lib/server/commands/AddTicketProduct';
 import { RemoveTicketProduct, SetBarbedRule } from '$lib/server/commands/RemoveTicketProduct';
 import { SimulateElapsedTime } from '$lib/server/commands/SimulateElapsedTime';
@@ -21,6 +25,7 @@ import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
 import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
 import { GetBailiffs } from '$lib/server/queries/GetBailiffs';
+import { loadSpeciesOf } from '$lib/server/queries/GetLakeSpecies';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -29,14 +34,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const [fishery, profile, groundworks, marketActivity, waters] = await Promise.all([
 		GetMyFishery(locals), loadProfile(locals), GetMyGroundworks(locals), GetMyMarketActivity(locals), loadMyWaters(locals, user.id)
 	]);
-	const [book, bailiffs] = await Promise.all([GetTicketBook(locals, fishery.lake.id), GetBailiffs(locals)]);
-	return { fishery, profile, whileAway, groundworks, marketActivity, waters, book, bailiffs, loadedAt: new Date().toISOString() };
+	const lakeId = fishery.lake.id;
+	const [book, bailiffs, species] = await Promise.all([GetTicketBook(locals, lakeId), GetBailiffs(locals), loadSpeciesOf(locals, lakeId)]);
+	return { fishery, profile, whileAway, groundworks, marketActivity, waters, book, bailiffs, species, loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {
 	feed: ({ locals, request }) => request.formData().then((formData) => FeedLake(locals, formData)),
 	sellToDealer: ({ locals, request }) => request.formData().then((formData) => SellFishToDealer(locals, formData)),
 	sellShoalFish: ({ locals, request }) => request.formData().then((formData) => SellShoalFish(locals, formData)),
+	stockCoarseFish: ({ locals, request }) => request.formData().then((formData) => StockCoarseFish(locals, formData)),
+	netTheSilvers: ({ locals }) => NetTheSilvers(locals),
+	turnOnBooking: ({ locals, request }) => request.formData().then((formData) => TurnOnAdvanceBooking(locals, formData)),
+	sellSyndicate: ({ locals, request }) => request.formData().then((formData) => SellSyndicatePlaces(locals, formData)),
 	stockPike: ({ locals, request }) => request.formData().then((formData) => StockPike(locals, formData)),
 	stockPikeFood: ({ locals, request }) => request.formData().then((formData) => StockPikeFood(locals, formData)),
 	hireBailiff: ({ locals, request }) => request.formData().then((formData) => HireBailiff(locals, formData)),

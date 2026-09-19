@@ -16,6 +16,7 @@ const MinutesPerHour = 60;
 
 export interface BiteRoll {
 	isTaking: boolean;
+	isNuisance: boolean;
 	minuteOfHour: number;
 	carpIndexRoll: number;
 }
@@ -33,6 +34,8 @@ export interface WaterToday {
 	weather: Weather;
 	shoals: Shoal[];
 	difficulty: number;
+	recentCaptures: Record<string, number>;
+	nuisanceShare: number;
 }
 
 export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: RodInTheWater, water: WaterToday): BiteRoll {
@@ -40,8 +43,12 @@ export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: R
 	const takeRoll = random();
 	const minuteRoll = random();
 	const carpIndexRoll = random();
+	const nuisanceRoll = random();
+	const chance = biteChanceThisHour(hour, rod, water);
+	const isTaking = takeRoll < chance;
 	return {
-		isTaking: takeRoll < biteChanceThisHour(hour, rod, water),
+		isTaking,
+		isNuisance: !isTaking && nuisanceRoll < chance * water.nuisanceShare,
 		minuteOfHour: Math.floor(minuteRoll * MinutesPerHour),
 		carpIndexRoll
 	};

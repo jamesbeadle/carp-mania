@@ -4,6 +4,7 @@
 	import WaterQualityBars from '$lib/components/WaterQualityBars.svelte';
 	import DifficultyReading from '$lib/components/lake/DifficultyReading.svelte';
 	import WaterShop from '$lib/components/lakes/WaterShop.svelte';
+	import WaterHeadline from '$lib/components/lakes/WaterHeadline.svelte';
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
 	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
 	import FishHereButton from '$lib/components/matches/FishHereButton.svelte';
@@ -14,42 +15,48 @@
 	let { data } = $props();
 
 	const water = $derived(data.water);
-	const carpNames = $derived(Object.fromEntries(water.carp.map((fish) => [fish.id, fish.name])));
-	const isOnTheGlobe = $derived(water.lake.latitude !== null);
+	const { lake, carp, shoals, swims } = $derived(water);
+	const diary = $derived(data.diary);
+	const carpNames = $derived(Object.fromEntries(carp.map((fish) => [fish.id, fish.name])));
+	const isOnTheGlobe = $derived(lake.latitude !== null);
+	const isASyndicate = $derived(Number(lake.syndicate_price) > 0);
+	const hasADiary = $derived(lake.is_booking_on || isASyndicate);
 	const now = $derived(new Date(data.loadedAt));
-	const isOwnWater = $derived(data.water.lake.owner_id === data.user?.id);
+	const isOwnWater = $derived(lake.owner_id === data.user?.id);
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
 	<div>
-		<p class="stat-label">{data.water.ownerName}'s water</p>
-		<h1 class="text-4xl text-volt-300">{data.water.lake.name}</h1>
+		<p class="stat-label">{water.ownerName}'s water</p>
+		<h1 class="text-4xl text-volt-300">{lake.name}</h1>
 		<p class="text-sm text-mist-400">
-			{RegionCatalogue[data.water.lake.region].label}
-			{#if isOnTheGlobe}· <a href={worldUrlForLake(data.water.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
+			{RegionCatalogue[lake.region].label}
+			{#if isOnTheGlobe}· <a href={worldUrlForLake(lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
 		</p>
 	</div>
 	<div class="ml-auto flex items-center gap-3">
-		<FavouriteStar lakeId={data.water.lake.id} isFavourite={data.isFavourite} isLabelled />
-		<FishHereButton lake={data.water.lake} runningMatch={data.runningMatch} {isOwnWater} />
+		<FavouriteStar lakeId={lake.id} isFavourite={data.isFavourite} isLabelled />
+		<FishHereButton {lake} runningMatch={data.runningMatch} {isOwnWater} />
 	</div>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas lake={water.lake} swims={water.swims} carp={water.carp} shoals={water.shoals} />
+	<LakeCanvas lake={lake} swims={swims} carp={carp} shoals={shoals} />
 	<section class="panel space-y-4">
 		<h2 class="text-xl text-volt-300">The water</h2>
-		<DifficultyReading lake={water.lake} carp={water.carp} shoals={water.shoals} />
-		<WaterShop lake={water.lake} />
-		<WaterQualityBars lake={data.water.lake} />
+		<WaterHeadline lake={lake} carp={carp} shoals={shoals} book={diary.book} diary={diary.days} {now} />
+		<DifficultyReading lake={lake} carp={carp} shoals={shoals} />
+		{#if hasADiary}<a href="/lakes/{lake.id}/book" class="button-secondary inline-block text-base">The booking diary</a>{/if}
+		<WaterShop lake={lake} />
+		<WaterQualityBars lake={lake} />
 	</section>
 </div>
 
 <div class="mt-6 grid gap-6 lg:grid-cols-2">
 	<section class="panel">
 		<h2 class="mb-3 text-xl text-volt-300">The stock</h2>
-		<StockTable carp={data.water.carp} limit={15} />
+		<StockTable {carp} limit={15} />
 	</section>
-	<RecentCatchesPanel catches={data.water.catches} {carpNames} />
-	<div class="lg:col-span-2"><MatchesAtWater lakeId={data.water.lake.id} matches={data.matches} {now} /></div>
+	<RecentCatchesPanel catches={water.catches} {carpNames} />
+	<div class="lg:col-span-2"><MatchesAtWater lakeId={lake.id} matches={data.matches} {now} /></div>
 </div>

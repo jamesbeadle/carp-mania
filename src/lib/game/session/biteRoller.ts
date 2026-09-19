@@ -22,7 +22,8 @@ export class BiteRoller {
 
 	rollAfterCast(rod: CastRod, clockHour: number): RolledBite {
 		const hour = Math.floor(clockHour);
-		const roll = biteRollFor(this.seed, rod.index, hour, { terrain: rod.terrain, kit: rod.kit }, this.water);
+		const spot = { terrain: rod.terrain, kit: rod.kit };
+		const roll = biteRollFor(this.seed, rod.index, hour, spot, this.water);
 		const rolled = { rodIndex: rod.index, hour, roll };
 		this.rolledByRod.set(rod.index, rolled);
 		return rolled;
@@ -30,7 +31,9 @@ export class BiteRoller {
 
 	biteDueOn(rod: CastRod, clockHour: number): RolledBite | null {
 		const rolled = this.rolledFor(rod, clockHour);
-		const isDue = rolled.roll.isTaking && clockHour >= biteTimeOf(rolled.hour, rolled.roll);
+		const { isTaking, isNuisance } = rolled.roll;
+		const isABite = isTaking || isNuisance;
+		const isDue = isABite && clockHour >= biteTimeOf(rolled.hour, rolled.roll);
 		if (!isDue || this.spentBites.has(keyOf(rolled))) return null;
 		this.spentBites.add(keyOf(rolled));
 		return rolled;

@@ -19,7 +19,7 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0016_records_among_anglers.sql`, `0016b_the_angler_on_the_news.sql`,
    `0017_the_trophy_room.sql`, `0017b_milestones_and_ranks.sql`,
    `0018_rivalry.sql`, `0018b_the_catch_tells_the_beaten.sql`, `0018c_the_next_name_to_beat.sql`,
-   `0019_the_anglers_rating.sql`, `0020_the_tackle_trade.sql`, `0020b_the_catch_uses_the_tackle.sql`, `0021_rigs_and_bait.sql`, `0022_the_farms.sql`, `0022b_fish_in_bulk.sql`, `0023_the_ticket_book.sql`, `0023b_buy_a_ticket.sql`, `0024_the_shoals.sql`, `0024b_a_fish_gets_its_name.sql`, `0025_the_big_water.sql`.
+   `0019_the_anglers_rating.sql`, `0020_the_tackle_trade.sql`, `0020b_the_catch_uses_the_tackle.sql`, `0021_rigs_and_bait.sql`, `0022_the_farms.sql`, `0022b_fish_in_bulk.sql`, `0023_the_ticket_book.sql`, `0023b_buy_a_ticket.sql`, `0024_the_shoals.sql`, `0024b_a_fish_gets_its_name.sql`, `0025_the_big_water.sql`, `0026_the_make_up_of_a_water.sql`, `0026b_the_booking_diary.sql`, `0026c_book_a_peg.sql`.
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to the live domain after deploying — `https://carp-mania.com` for the real game).

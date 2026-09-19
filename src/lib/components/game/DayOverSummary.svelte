@@ -3,21 +3,25 @@
 	import type { LandedFish } from '$lib/game/session/landFish';
 	import { formatWeight } from '$lib/format/weight';
 	import GoFishingButton from './GoFishingButton.svelte';
+	import NuisanceBite from './NuisanceBite.svelte';
+	import type { Carp } from '$lib/domain/types';
 
 	interface Props {
 		landed: LandedFish[];
 		lost: number;
+		nuisance: Carp[];
 		lakeId: string;
 		visitId: string;
 		sessionsLeft: number;
 		endWords: string;
 	}
 
-	let { landed, lost, lakeId, visitId, sessionsLeft, endWords }: Props = $props();
+	let { landed, lost, nuisance, lakeId, visitId, sessionsLeft, endWords }: Props = $props();
 
 	const hasAnotherSession = $derived(sessionsLeft > 1);
 
-	const heaviest = $derived(landed.length > 0 ? Math.max(...landed.map((fish) => Number(fish.carp.weight_lb))) : 0);
+	const weights = $derived(landed.map((fish) => Number(fish.carp.weight_lb)));
+	const heaviest = $derived(Math.max(0, ...weights));
 	const bestHonourOf = (fish: LandedFish) => honourKindsOf(fish.honours)[0] ?? null;
 </script>
 
@@ -27,11 +31,13 @@
 	<p class="text-mist-200">
 		{#if landed.length === 0}A blank. It happens to everyone — try a different swim or bait tomorrow.{:else}Best of the day {formatWeight(heaviest)}. {lost} lost.{/if}
 	</p>
+	<NuisanceBite {nuisance} />
 	<ul class="grid gap-2 text-sm sm:grid-cols-2">
 		{#each landed as fish, index (index)}
 			{@const honour = bestHonourOf(fish)}
+			{@const { carp, swim } = fish}
 			<li class="rounded-lg bg-carbon-900 px-3 py-2">
-				<span class="text-volt-300">{formatWeight(fish.carp.weight_lb)}</span> {fish.carp.name} from {fish.swim.name}
+				<span class="text-volt-300">{formatWeight(carp.weight_lb)}</span> {carp.name} from {swim.name}
 				{#if honour}<span class="ml-1 rounded-full bg-volt-500/15 px-2 text-xs text-volt-300">{HonourWords[honour]}</span>{/if}
 			</li>
 		{/each}

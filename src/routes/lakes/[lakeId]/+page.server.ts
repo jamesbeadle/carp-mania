@@ -4,10 +4,12 @@ import { UnfavouriteLake } from '$lib/server/commands/UnfavouriteLake';
 import { GetLake } from '$lib/server/queries/GetLake';
 import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
 import { GetMyFavourites } from '$lib/server/queries/GetMyFavourites';
+import { GetBookingDiary } from '$lib/server/queries/GetBookingDiary';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	const [water, favouriteIds, matches] = await Promise.all([GetLake(locals, params.lakeId), GetMyFavourites(locals), GetMatchesAtWater(locals, params.lakeId)]);
-	return { water, isFavourite: favouriteIds.includes(params.lakeId), matches, runningMatch: runningMatchAmong(matches), loadedAt: new Date().toISOString() };
+	const lakeId = params.lakeId;
+	const [water, favouriteIds, matches, diary] = await Promise.all([GetLake(locals, lakeId), GetMyFavourites(locals), GetMatchesAtWater(locals, lakeId), GetBookingDiary(locals, lakeId)]);
+	return { water, diary, isFavourite: favouriteIds.includes(params.lakeId), matches, runningMatch: runningMatchAmong(matches), loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {

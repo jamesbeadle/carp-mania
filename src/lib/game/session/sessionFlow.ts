@@ -4,6 +4,7 @@ import { swimPoint } from '$lib/domain/layout/swimRules';
 import { castDistanceFeet, isCastTooFar, pointWithinCast } from '$lib/domain/tackle/castDistance';
 import { carpOfTaker } from '$lib/domain/fishing/takers';
 import { takerOfTheBait } from '$lib/domain/fishing/whoTookTheBait';
+import { nuisanceFishFor } from '$lib/domain/water/nuisanceBites';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 import type { Swim } from '$lib/domain/types';
 import { toFraction, toScene, type Point } from '../scene/lakeShape';
@@ -47,8 +48,11 @@ export function returnToFishing(session: SessionState) {
 }
 
 export function fishOnTheEnd(session: SessionState, rod: CastRod, bite: ActiveBite) {
+	const { lake, species, seed } = session;
+	const { isNuisance } = bite.roll;
+	if (isNuisance) return nuisanceFishFor(lake.id, species, seed, rod.index, bite.hour);
 	const spot = { terrain: rod.terrain, castPoint: castPointOf(rod) };
 	const water = waterTodayOf(session);
-	const rolled = { roll: bite.roll, hour: bite.hour, kit: rod.kit, seed: session.seed };
+	const rolled = { roll: bite.roll, hour: bite.hour, kit: rod.kit, seed };
 	return carpOfTaker(takerOfTheBait(session.carp, rolled, water, spot));
 }

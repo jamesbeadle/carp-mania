@@ -1,6 +1,8 @@
 import type { Shoal } from '$lib/domain/stock/shoals';
+import type { LakeSpecies } from '$lib/domain/water/species';
 import type { Carp, Lake } from '$lib/domain/types';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
+import { loadRecentCaptures, recentCapturesAsRecord } from './loadRecentCaptures';
 
 export interface VisitOnRecord {
 	id: string;
@@ -14,6 +16,8 @@ export interface WaterOnRecord {
 	lake: Lake;
 	carp: Carp[];
 	shoals: Shoal[];
+	recentCaptures: Record<string, number>;
+	species: LakeSpecies[];
 }
 
 export async function loadVisitOf(anglerId: string, visitId: string): Promise<VisitOnRecord | null> {
@@ -24,13 +28,16 @@ export async function loadVisitOf(anglerId: string, visitId: string): Promise<Vi
 }
 
 export async function loadWaterOf(lakeId: string): Promise<WaterOnRecord | null> {
-	const [{ data: lake }, { data: carp }, { data: shoals }] = await Promise.all([
-		trustedSupabase().from('lakes').select('*').eq('id', lakeId).maybeSingle(),
-		trustedSupabase().from('carp').select('*').eq('lake_id', lakeId),
-		trustedSupabase().from('carp_shoals').select('*').eq('lake_id', lakeId)
+	const trusted = trustedSupabase();
+	const [{ data: lake }, { data: carp }, { data: shoals }, captures, { data: species }] = await Promise.all([
+		trusted.from('lakes').select('*').eq('id', lakeId).maybeSingle(),
+		trusted.from('carp').select('*').eq('lake_id', lakeId),
+		trusted.from('carp_shoals').select('*').eq('lake_id', lakeId),
+		loadRecentCaptures(trusted, lakeId, new Date()),
+		trusted.from('lake_species').select('*').eq('lake_id', lakeId)
 	]);
 	if (!lake) return null;
-	return { lake: lake as Lake, carp: (carp ?? []) as Carp[], shoals: (shoals ?? []) as Shoal[] };
+	return { lake: lake as Lake, carp: (carp ?? []) as Carp[], shoals: (shoals ?? []) as Shoal[], recentCaptures: recentCapturesAsRecord(captures), species: (species ?? []) as LakeSpecies[] };
 }
 
 export async function hasCaughtDuringVisit(anglerId: string, visit: VisitOnRecord, carpId: string) {

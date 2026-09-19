@@ -4,6 +4,7 @@ import type { StandingRecords } from '../market/records';
 import type { BookedWindow } from '../matches/bookings';
 import type { Carp, Lake } from '../types';
 import type { Season } from '../world/seasons';
+import type { LakeSpecies } from '../water/species';
 import type { LakeWork } from '../worldTypes';
 import type { NewNamedFish } from '../stock/individualise';
 import type { NewShoal, Shoal } from '../stock/shoals';
@@ -18,6 +19,9 @@ export interface DayContext {
 	bookings: BookedWindow[];
 	book: TicketProduct[];
 	bailiffs: Bailiff[];
+	species: LakeSpecies[];
+	swimCount: number;
+	pegsBooked: number;
 }
 
 export interface DayOutcome {
@@ -41,5 +45,6 @@ export interface DayOutcome {
 	namedFromShoals: NewNamedFish[];
 	shoalFishTakenByPike: number;
 	bailiffs: Bailiff[];
+	turnedAway: number;
 }
 

@@ -1,10 +1,8 @@
 <script lang="ts">
-	import type { FishingVisit } from '$lib/contracts/FishingVisit';
-	import type { TheBar } from '$lib/domain/fishing/honours';
 	import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
-	import type { Shoal } from '$lib/domain/stock/shoals';
-	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
+	import type { Swim } from '$lib/domain/types';
+	import { untrack } from 'svelte';
 	import { bringTheFishIn, castTheNextRod, reelTheRodIn, setOffToAnotherSwim, stayOnThisSwim, strikeAtTheBite, takeThePeg } from '$lib/game/session/anglerActions';
 	import { buzzForBite } from '$lib/game/session/haptics';
 	import { reportAndNameTheFish } from '$lib/game/session/nameTheLandedFish';
@@ -14,6 +12,7 @@
 	import { returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
 	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
+	import type { SessionSetup } from '$lib/game/session/visitFacts';
 	import { reportLossesAsTheyHappen } from '$lib/game/session/tackleLoss';
 	import { spotsShowingNow } from '$lib/game/session/showsThisHour';
 	import { startTicking } from '$lib/game/session/tickSession';
@@ -26,20 +25,16 @@
 	import WaterScreen from './WaterScreen.svelte';
 
 	interface Props {
-		lake: Lake;
+		setup: SessionSetup;
 		swims: Swim[];
-		carp: Carp[];
-		shoals: Shoal[];
-		profile: Profile;
-		visit: FishingVisit;
-		bar: TheBar;
 		owned: OwnedTackle[];
 		matchBoardHref?: string | null;
 	}
 
-	let { lake, swims, carp, shoals, profile, visit, bar, owned, matchBoardHref = null }: Props = $props();
+	let { setup, swims, owned, matchBoardHref = null }: Props = $props();
 
-	const session = new SessionState(lake, carp, profile, visit, bar, shoals);
+	const session = new SessionState(untrack(() => setup));
+	const { lake, profile, visit } = untrack(() => setup);
 	let catchOutcome = $state<CatchReportOutcome | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
