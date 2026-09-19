@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { craftOf } from '$lib/domain/anglerRating';
+	import { conditionsShareFor } from '$lib/domain/fishing/weatherConditions';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import type { Lake, Profile, Swim } from '$lib/domain/types';
@@ -21,10 +22,11 @@
 	const craft = $derived(craftOf(skillsOfProfile(profile)));
 	const savedRods = $derived(profile.saved_rods ?? []);
 	const carpCount = $derived(session.carp.length);
+	const conditionsShare = $derived(conditionsShareFor(session.hour, session.weather));
 </script>
 
 <div class="h-full overflow-y-auto px-4 py-6">
 	<div class="mx-auto max-w-5xl">
-		<TackleBuilder {lake} {swim} season={session.season} rating={session.rating} {craft} {carpCount} {savedRods} {owned} {onReady} />
+		<TackleBuilder {lake} {swim} season={session.season} rating={session.rating} {craft} {carpCount} {conditionsShare} {savedRods} {owned} {onReady} />
 	</div>
 </div>

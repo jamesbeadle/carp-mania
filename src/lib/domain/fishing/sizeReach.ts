@@ -12,7 +12,6 @@ export const SizeReachWeights = {
 export const WaterShareWeights = { Features: 0.4, Quality: 0.3, Mouths: 0.3 } as const;
 export const MouthsPerAcreThatCrowd = 60;
 export const FeatureKindsForFullShare = 4;
-export const NeutralConditionsShare = 0.5;
 const ReachBands = { DoublesBelow: 0.4, TwentiesBelow: 0.7 } as const;
 
 export type ShareName = 'ratingShare' | 'tackleShare' | 'conditionsShare' | 'waterShare';

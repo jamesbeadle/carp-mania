@@ -8,6 +8,7 @@ export interface PublicLakeSummary {
 	carpCount: number;
 	heaviestCarpLb: number;
 	swimCount: number;
+	fromPrice: number;
 }
 
 export interface WatersToFish {

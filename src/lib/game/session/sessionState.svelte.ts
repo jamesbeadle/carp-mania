@@ -2,10 +2,11 @@ import type { FishingVisit } from '$lib/contracts/FishingVisit';
 import { anglerRatingOf } from '$lib/domain/anglerRating';
 import { isSettledAfter } from '$lib/domain/fishing/catchSettle';
 import type { TheBar } from '$lib/domain/fishing/honours';
-import { FishingDay } from '$lib/domain/fishing/sessionClock';
 import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
+import { isWindowOver, type SessionWindow } from '$lib/domain/fishing/sessionWindow';
 import { seasonFor, type Season } from '$lib/domain/world/seasons';
+import { weatherFor, type Weather } from '$lib/domain/world/weather';
 import type { RodOnBank } from '../scene/rodState';
 import { BiteRoller, type RolledBite } from './biteRoller';
 import type { FightState } from './fightState.svelte';
@@ -23,7 +24,7 @@ export interface ActiveBite extends RolledBite {
 
 export class SessionState {
 	phase = $state<SessionPhase>('choose_swim');
-	hour = $state<number>(FishingDay.StartHour);
+	hour = $state<number>(0);
 	swim = $state<Swim | null>(null);
 	rods = $state<RodOnBank[]>([]);
 	bite = $state<ActiveBite | null>(null);
@@ -42,6 +43,10 @@ export class SessionState {
 	readonly carp: Carp[];
 	readonly profile: Profile;
 	readonly season: Season;
+	readonly weather: Weather;
+	readonly window: SessionWindow;
+	readonly sessionsLeft: number;
+	readonly visitId: string;
 	readonly rating: number;
 	readonly roller: BiteRoller;
 
@@ -52,6 +57,11 @@ export class SessionState {
 		this.carp = carpInBiteOrder(carp);
 		this.profile = profile;
 		this.season = seasonFor(lake, new Date(visit.visitedAt));
+		this.weather = weatherFor(lake, new Date(visit.visitedAt));
+		this.window = visit.window;
+		this.sessionsLeft = visit.sessionsLeft;
+		this.visitId = visit.id;
+		this.hour = visit.window.fromHour;
 		this.rating = anglerRatingOf(skillsOfProfile(profile), bar.pedigreeLb).rating;
 		this.roller = new BiteRoller(visit.seed, waterTodayOf(this));
 	}
@@ -61,7 +71,7 @@ export class SessionState {
 	}
 
 	get isDayOver() {
-		return this.hour >= FishingDay.EndHour;
+		return isWindowOver(this.hour, this.window);
 	}
 
 	get isSettlingAfterCatch() {

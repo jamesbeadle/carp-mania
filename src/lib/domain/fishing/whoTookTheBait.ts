@@ -10,7 +10,8 @@ import { castTerrainFor } from './castTerrain';
 import { pickCarpByWeight } from './pickCarp';
 import { kitAgeFactorFor } from './kitAgeFactor';
 import { idsShownTruthfully, showsThisHour } from './showingFish';
-import { NeutralConditionsShare, ratingShareOf, sizeReachOf, waterShareOf } from './sizeReach';
+import { ratingShareOf, sizeReachOf, waterShareOf } from './sizeReach';
+import { conditionsShareFor } from './weatherConditions';
 import { matchTackleToWater } from './tackleMatch';
 import { takeWeightsFor, type SpotBonus } from './takeWeight';
 
@@ -48,13 +49,17 @@ export function favouriteSpotBonusAt(lake: Pick<Lake, 'layout'>, season: Pick<Se
 	};
 }
 
-export function sizeReachFor(water: WaterToday, carpCount: number, tackleMatchOverall: number) {
-	return sizeReachOf({
+export function sizeReachSharesFor(water: WaterToday, carpCount: number, tackleMatchOverall: number, hour: number) {
+	return {
 		ratingShare: ratingShareOf(water.rating),
 		tackleShare: tackleMatchOverall,
-		conditionsShare: NeutralConditionsShare,
+		conditionsShare: conditionsShareFor(hour, water.weather),
 		waterShare: waterShareOf(water.lake, carpCount)
-	});
+	};
+}
+
+export function sizeReachFor(water: WaterToday, carpCount: number, tackleMatchOverall: number, hour: number) {
+	return sizeReachOf(sizeReachSharesFor(water, carpCount, tackleMatchOverall, hour));
 }
 
 export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToday, spot: CastSpot): Carp | null {
@@ -62,7 +67,8 @@ export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: Wate
 	const shownIds = idsShownTruthfully(showsThisHour(bite.seed, bite.hour, carpInOrder, water.watercraft));
 	const spotBonusFor = favouriteSpotBonusAt(water.lake, water.season, spot, shownIds);
 	const kitFactorFor = kitAgeFactorFor(bite.kit, Number(water.lake.transparency));
-	const take = { sizeReach: sizeReachFor(water, carpInOrder.length, match.overall), hour: bite.hour, spotBonusFor, kitFactorFor };
+	const sizeReach = sizeReachFor(water, carpInOrder.length, match.overall, bite.hour);
+	const take = { sizeReach, hour: bite.hour, spotBonusFor, kitFactorFor };
 	return pickCarpByWeight(carpInOrder, takeWeightsFor(carpInOrder, take), bite.roll.carpIndexRoll);
 }
 

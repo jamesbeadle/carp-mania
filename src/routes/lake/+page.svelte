@@ -9,6 +9,7 @@
 	import LedgerPanel from '$lib/components/lake/LedgerPanel.svelte';
 	import PredatorPanel from '$lib/components/lake/PredatorPanel.svelte';
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
+	import TicketBookPanel from '$lib/components/lake/TicketBookPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
@@ -20,7 +21,7 @@
 
 	let { data, form } = $props();
 
-	const tabs = ['Stock', 'Feed', 'Predators', 'Water', 'Groundworks', 'Market', 'Ledger'] as const;
+	const tabs = ['Stock', 'Tickets', 'Feed', 'Predators', 'Water', 'Groundworks', 'Market', 'Ledger'] as const;
 	const MarketAnchor = '#market';
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const sickCarpCount = $derived(data.fishery.carp.filter((fish) => Number(fish.condition) < PikeRules.SickCarpConditionBelow).length);
@@ -58,6 +59,7 @@
 </nav>
 
 {#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} lake={data.fishery.lake} waters={data.waters} />{/if}
+{#if activeTab === 'Tickets'}<TicketBookPanel lake={data.fishery.lake} book={data.book} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffPanel lake={data.fishery.lake} />{/if}

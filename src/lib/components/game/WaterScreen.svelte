@@ -5,6 +5,7 @@
 	import type { Point } from '$lib/game/scene/lakeShape';
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
+	import { formatFishingHour } from '$lib/domain/fishing/sessionClock';
 	import { canReadTheWater } from '$lib/domain/fishing/showingFish';
 	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
@@ -71,7 +72,7 @@
 		<CanvasOverlay><CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} isSettling={session.isSettlingAfterCatch} {onContinue} /></CanvasOverlay>
 	{/if}
 	{#if session.phase === 'day_over'}
-		<CanvasOverlay><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} /></CanvasOverlay>
+		<CanvasOverlay><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} visitId={session.visitId} sessionsLeft={session.sessionsLeft} endWords={formatFishingHour(session.window.toHour)} /></CanvasOverlay>
 	{/if}
 {/snippet}
 

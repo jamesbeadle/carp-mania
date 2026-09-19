@@ -1,13 +1,11 @@
 import { Prices } from '../economy';
-import type { StandingRecords } from '../market/records';
-import { isBookedOut, type BookedWindow } from '../matches/bookings';
+import { isBookedOut } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '../reputation';
 import type { Carp, Lake, Swim } from '../types';
 import { shopTierOf } from '../tackle/shopTier';
 import { overallWaterQuality } from '../waterQuality';
-import type { Season } from '../world/seasons';
-import type { LakeWork } from '../worldTypes';
+import { weatherFor } from '../world/weather';
 import { ageCarpIfNewYear } from './ageing';
 import { completeDueWorks } from './completeWorks';
 import { driftWaterForOneDay, hasAerator } from './driftWater';
@@ -16,35 +14,15 @@ import { isHeatwaveToday, sufferHeatwave } from './heatwave';
 import { lapseTransfersForOneDay } from './lapseTransfers';
 import { driftFertilityForOneDay } from './naturalFood';
 import { letPikeHuntForOneDay } from './pikePredation';
-import { isFirstDayOfSpring, spawnFry, type NewBornCarp } from './spawning';
-import { noAnglersToday, simulateVisitingAnglers, type NewCatch, type NewVisit } from './visitingAnglers';
+import { isFirstDayOfSpring, spawnFry } from './spawning';
+import { noAnglersToday, simulateVisitingAnglers } from './visitingAnglers';
+import type { DayContext, DayOutcome } from './dayTypes';
+import type { NewCatch } from './visitingAnglers';
 
-export interface DayContext {
-	dayStart: Date;
-	dayEnd: Date;
-	season: Season;
-	records: StandingRecords;
-	works: LakeWork[];
-	bookings: BookedWindow[];
-}
+export type { DayContext, DayOutcome } from './dayTypes';
 
-export interface DayOutcome {
-	lake: Lake;
-	carp: Carp[];
-	catches: NewCatch[];
-	visits: NewVisit[];
-	carpTakenByPike: Carp[];
-	carpDiedOfOldAge: Carp[];
-	arrivedCarp: Carp[];
-	carpOutOfQuarantine: Carp[];
-	feesCollected: number;
-	lodgeTakings: number;
-	bailiffWages: number;
-	aeratorRunning: number;
-	isHeatwave: boolean;
-	records: StandingRecords;
-	worksCompleted: LakeWork[];
-	spawned: NewBornCarp[];
+function visitingDayOf(lake: Lake, context: DayContext) {
+	return { season: context.season, standing: context.records, weather: weatherFor(lake, context.dayStart), book: context.book };
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext): DayOutcome {
@@ -55,7 +33,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const lapsed = lapseTransfersForOneDay(hunted.carp, context.dayEnd);
 	const anglers = isBookedOut(context.bookings, context.dayStart, context.dayEnd)
 		? noAnglersToday(context.records)
-		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, context.season, context.records);
+		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, visitingDayOf(hunted.lake, context));
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
 	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd, random);

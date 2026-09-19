@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { describeTerrain, terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
+	import { whyTheOwnerRefusesRods } from '$lib/domain/fishing/ownersRules';
 	import { defaultRodSetup, isRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
 	import { isSetupOwned, ownedItemsIn, type OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import { firstOwnedSetup } from '$lib/game/session/firstOwnedSetup';
@@ -17,12 +18,13 @@
 		rating: number;
 		craft: number;
 		carpCount: number;
+		conditionsShare: number;
 		savedRods: RodSetup[];
 		owned: OwnedTackle[];
 		onReady: (setups: RodSetup[]) => void;
 	}
 
-	let { lake, swim, season, rating, craft, carpCount, savedRods, owned, onReady }: Props = $props();
+	let { lake, swim, season, rating, craft, carpCount, conditionsShare, savedRods, owned, onReady }: Props = $props();
 
 	const box = ownedItemsIn(owned);
 	const usableRods = savedRods.filter((setup) => isRodSetup(setup) && isSetupOwned(owned, setup));
@@ -38,6 +40,7 @@
 	const rodsInUse = $derived(RodCounts.slice(0, rodCount));
 	const isShowingHints = $derived(craft >= HintsUnlockAtCraft);
 	const terrainInFront = $derived(terrainInFrontOfSwim(lake, swim));
+	const ownersRefusal = $derived(whyTheOwnerRefusesRods(lake, setups.slice(0, rodCount)));
 
 	function copyToEveryRod(from: number) {
 		setups = setups.map((setup, index) => (index === from ? setup : structuredClone($state.snapshot(setups[from]))));
@@ -54,7 +57,7 @@
 	{#if hasSavedRods}
 		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
 	{/if}
-	<SizeReachLine {lake} {rating} {carpCount} terrain={terrainInFront} setup={setups[shownRod]} />
+	<SizeReachLine {lake} {rating} {carpCount} {conditionsShare} terrain={terrainInFront} setup={setups[shownRod]} />
 	{#if !isShowingHints}
 		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at craft {HintsUnlockAtCraft}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
 	{/if}
@@ -77,7 +80,8 @@
 </div>
 
 <div class="start-bar sticky bottom-0 -mx-4 mt-4 border-t border-carbon-700 bg-carbon-950/90 px-4 py-3 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
-	<button class="button-primary w-full px-8 py-3 text-lg md:w-auto" onclick={() => onReady(setups.slice(0, rodCount))}>Start fishing with {rodCount} {rodCount === 1 ? 'rod' : 'rods'}</button>
+	{#if ownersRefusal}<p class="mb-2 text-xs text-danger-400">{ownersRefusal}</p>{/if}
+	<button class="button-primary w-full px-8 py-3 text-lg md:w-auto" disabled={ownersRefusal !== null} onclick={() => onReady(setups.slice(0, rodCount))}>Start fishing with {rodCount} {rodCount === 1 ? 'rod' : 'rods'}</button>
 </div>
 
 <style>

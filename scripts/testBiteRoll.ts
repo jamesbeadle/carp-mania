@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { biteRollFor, biteTimeOf, type BiteRoll, type RodInTheWater, type WaterToday } from '../src/lib/domain/fishing/biteRoll';
 import { castTerrainFor } from '../src/lib/domain/fishing/castTerrain';
 import { DayTicket, isDayTicketStillValid } from '../src/lib/domain/fishing/dayTicket';
-import { FishingDay, FishingHoursPerDay } from '../src/lib/domain/fishing/sessionClock';
+import { ClassicSession, hoursInWindow } from '../src/lib/domain/fishing/sessionWindow';
 import { mix } from '../src/lib/domain/fishing/sessionSeed';
 import { carpForRolledBite, carpInBiteOrder, carpThatTookTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
 import { seededRandom } from '../src/lib/domain/random';
@@ -11,6 +11,7 @@ import { defaultRodSetup, kitFor, MaximumRods } from '../src/lib/domain/tackle/r
 import type { Carp, Lake } from '../src/lib/domain/types';
 import type { RodSetup } from '../src/lib/domain/tackle/rodSetup';
 import { seasonFor } from '../src/lib/domain/world/seasons';
+import { weatherFor } from '../src/lib/domain/world/weather';
 
 const VisitSeed = 123456789;
 const DecentRating = 60;
@@ -29,7 +30,8 @@ interface Slot {
 export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
-	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, new Date('2026-06-01T00:00:00Z')) };
+	const june = new Date('2026-06-01T00:00:00Z');
+	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june) };
 	const setup = defaultRodSetup();
 	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 
@@ -54,7 +56,7 @@ export function runBiteRollScenarios() {
 function slotsAcrossTheDay(rod: RodInTheWater, water: WaterToday): Slot[] {
 	const slots: Slot[] = [];
 	for (let rodIndex = 0; rodIndex < MaximumRods; rodIndex++) {
-		for (let hour = FishingDay.StartHour; hour < FishingDay.EndHour; hour++) {
+		for (let hour = ClassicSession.fromHour; hour < ClassicSession.toHour; hour++) {
 			slots.push({ rodIndex, hour, roll: biteRollFor(VisitSeed, rodIndex, hour, rod, water) });
 		}
 	}
@@ -65,9 +67,9 @@ function assertEverySlotHasItsOwnStream() {
 	for (let seed = 1; seed <= SeedsToCheck; seed++) {
 		const streams = new Set<number>();
 		for (let rodIndex = 0; rodIndex < MaximumRods; rodIndex++) {
-			for (let hour = FishingDay.StartHour; hour < FishingDay.EndHour; hour++) streams.add(mix(seed, rodIndex, hour));
+			for (let hour = ClassicSession.fromHour; hour < ClassicSession.toHour; hour++) streams.add(mix(seed, rodIndex, hour));
 		}
-		assert.equal(streams.size, MaximumRods * FishingHoursPerDay, `seed ${seed} gives every rod-hour its own stream`);
+		assert.equal(streams.size, MaximumRods * hoursInWindow(ClassicSession), `seed ${seed} gives every rod-hour its own stream`);
 	}
 }
 
