@@ -8,7 +8,7 @@ interface ReelRange {
 	basePrice: number;
 }
 
-const KindPremium: Record<ReelKind, number> = { carp_small: 1, carp_large: 1.4, big_pit_entry: 2.2, big_pit_full: 3 };
+const KindPremium: Record<ReelKind, number> = { carp_small: 1, carp_large: 1.4, big_pit_entry: 2.2, big_pit_full: 3, prototype_11000: 4 };
 
 const Ranges: ReelRange[] = [
 	{ brand: 'bankside_basics', kinds: ['carp_small', 'carp_large'], basePrice: 45 },

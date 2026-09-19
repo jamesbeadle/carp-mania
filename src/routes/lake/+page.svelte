@@ -10,6 +10,7 @@
 	import PredatorPanel from '$lib/components/lake/PredatorPanel.svelte';
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
 	import TicketBookPanel from '$lib/components/lake/TicketBookPanel.svelte';
+	import BountyPanel from '$lib/components/lake/BountyPanel.svelte';
 	import SpeciesPanel from '$lib/components/lake/SpeciesPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
@@ -34,6 +35,8 @@
 	const sickCarpCount = $derived(carp.filter(isSick).length);
 	const worksUnderway = $derived(inProgressShapesFor(groundworks.inProgress, lake));
 	const stockDraw = $derived(stockDrawOf(carp, shoals));
+	const openBounty = $derived(data.bounties.find((bounty) => bounty.status === 'open') ?? null);
+	const bountySwimId = $derived(openBounty?.swimId ?? null);
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 
 	onMount(() => {
@@ -55,7 +58,7 @@
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas {lake} {swims} {carp} {shoals} drafts={worksUnderway} />
+	<LakeCanvas {lake} {swims} {carp} {shoals} drafts={worksUnderway} {bountySwimId} />
 	<LakeOverview {lake} profile={data.profile} {carp} {shoals} species={data.species} />
 </div>
 
@@ -68,6 +71,7 @@
 {#if activeTab === 'Stock'}<StockPanel {carp} {shoals} {lake} waters={data.waters} />{/if}
 {#if activeTab === 'Stock'}<div class="mt-6"><SpeciesPanel {lake} species={data.species} /></div>{/if}
 {#if activeTab === 'Tickets'}<TicketBookPanel {lake} book={data.book} swimCount={swims.length} {stockDraw} />{/if}
+{#if activeTab === 'Tickets'}<div class="mt-6"><BountyPanel {carp} bounties={data.bounties} /></div>{/if}
 {#if activeTab === 'Feed'}<FeedPanel {lake} carpCount={carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel {lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffTeamPanel {lake} bailiffs={data.bailiffs} />{/if}

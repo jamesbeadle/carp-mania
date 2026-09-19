@@ -1,4 +1,4 @@
-import type { CatchReport, SkillGains } from '$lib/contracts/CatchReport';
+import type { CatchHonours, CatchReport, SkillGains } from '$lib/contracts/CatchReport';
 import { skillGainFromCatch } from '$lib/domain/anglerSkills';
 import type { Honours } from '$lib/domain/fishing/honours';
 import type { TackleMatch } from '$lib/domain/fishing/tackleMatch';
@@ -65,13 +65,14 @@ export function catchReportFor(visitId: string, profile: Profile, landed: Landed
 	};
 }
 
-export interface CatchReportOutcome {
+export interface CatchReportOutcome extends CatchHonours {
 	isSaved: boolean;
 	reason: string | null;
 	carp: Carp | null;
 }
 
 const NoReasonGiven = 'the bailiff gave no reason';
+const NoHonours: CatchHonours = { awards: [], bountyWon: null };
 
 export async function reportLandedFish(lakeId: string, visitId: string, profile: Profile, landed: LandedFish): Promise<CatchReportOutcome> {
 	const response = await fetch(`/fish/${lakeId}/catch`, {
@@ -79,13 +80,13 @@ export async function reportLandedFish(lakeId: string, visitId: string, profile:
 		headers: { 'content-type': 'application/json', accept: 'application/json' },
 		body: JSON.stringify(catchReportFor(visitId, profile, landed))
 	});
-	if (response.ok) return { isSaved: true, reason: null, carp: await carpIn(response) };
-	return { isSaved: false, reason: await reasonIn(response), carp: null };
+	if (response.ok) return { isSaved: true, reason: null, ...(await savedIn(response)) };
+	return { isSaved: false, reason: await reasonIn(response), carp: null, ...NoHonours };
 }
 
-async function carpIn(response: Response) {
-	const body = (await response.json().catch(() => null)) as { carp?: Carp } | null;
-	return body?.carp ?? null;
+async function savedIn(response: Response) {
+	const body = (await response.json().catch(() => null)) as ({ carp?: Carp } & Partial<CatchHonours>) | null;
+	return { carp: body?.carp ?? null, awards: body?.awards ?? NoHonours.awards, bountyWon: body?.bountyWon ?? NoHonours.bountyWon };
 }
 
 async function reasonIn(response: Response) {

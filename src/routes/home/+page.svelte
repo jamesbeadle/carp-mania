@@ -37,7 +37,7 @@
 <div class="h-full">
 	<LakeStage {lake} swims={data.fishery.swims} carp={data.fishery.carp} {conditions} showingAt={rises.points}>
 		{#snippet overTheSky()}
-			<HubCaption profile={data.profile} {lake} {conditions} diary={data.diary} waters={data.waters} />
+			<HubCaption profile={data.profile} {lake} {conditions} diary={data.diary} waters={data.waters} biggestFish={data.biggestFish} />
 		{/snippet}
 		{#snippet belowTheBank()}
 			<HubNav {lake} worksInProgress={data.worksInProgress} />

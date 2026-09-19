@@ -1,0 +1,84 @@
+drop function public.record_shoal_catch(uuid, uuid, uuid, text, text, numeric, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text);
+drop function public.record_catch(uuid, uuid, uuid, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text);
+
+create or replace function public.record_catch(
+	angler uuid, visit uuid, fish uuid, swim_name text, rig text, bait text, hook_size integer,
+	line_gain numeric, rig_gain numeric, bait_gain numeric, watercraft_gain numeric,
+	rod_item text, reel_item text, bait_item text, hour_of_day integer default null
+) returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+	day_ticket_life constant interval := interval '2 hours';
+	bait_per_catch constant numeric := 1;
+	lake uuid;
+	visit_started timestamptz;
+	the_carp public.carp;
+	angler_name text;
+	owner_name text;
+	fisherman uuid;
+	broken record;
+	catch_id uuid;
+begin
+	select lake_id, visited_at into lake, visit_started from public.lake_visits where id = visit and angler_id = angler for update;
+	if lake is null then raise exception 'No day ticket for this visit'; end if;
+	if visit_started < now() - day_ticket_life then raise exception 'That day ticket has expired'; end if;
+	select * into the_carp from public.carp where id = fish and lake_id = lake for update;
+	if the_carp.id is null then raise exception 'That carp is not in this lake'; end if;
+	if the_carp.transit_until is not null or the_carp.quarantine_until is not null then
+		raise exception 'That carp cannot be fished for yet';
+	end if;
+	perform public.assert_not_yet_caught_this_visit(angler, lake, fish, visit_started);
+	select display_name into angler_name from public.profiles where id = angler;
+	if angler_name is null then raise exception 'No angler is signed in'; end if;
+	select owner.display_name into owner_name from public.lakes as water join public.profiles as owner on owner.id = water.owner_id where water.id = lake;
+	select current_fisherman_id into fisherman from public.profiles where id = angler;
+	select * into broken from public.records_broken_by(lake, angler, fish, the_carp.weight_lb);
+
+	insert into public.catches (lake_id, carp_id, angler_id, angler_name, owner_name, fisherman_id, weight_lb, swim_name, rig, bait, hook_size, rod_item_id, reel_item_id, hour_of_day, visit_id)
+	values (lake, fish, angler, angler_name, owner_name, fisherman, the_carp.weight_lb, swim_name, rig, bait, hook_size, rod_item, reel_item, hour_of_day, visit) returning id into catch_id;
+	perform public.use_tackle(angler, bait_item, bait_per_catch);
+	update public.carp set
+		times_caught = times_caught + 1,
+		is_catalogued = true,
+		fame = fame + public.fame_for_player_catch(broken.is_lake_record, broken.is_region_record, broken.is_world_record, broken.is_personal_best)
+	where id = fish;
+	update public.lake_visits set fish_caught = fish_caught + 1 where id = visit;
+	perform public.grow_reputation_for_catch(lake, the_carp.weight_lb);
+	perform public.improve_skills(angler, line_gain, rig_gain, bait_gain, watercraft_gain);
+	perform public.raise_catch_news(lake, fish, the_carp.name, the_carp.weight_lb, angler, angler_name,
+		public.record_scope_of(broken.is_lake_record, broken.is_region_record, broken.is_world_record));
+	perform public.tell_the_beaten(catch_id);
+	perform public.try_bounties_on_catch(catch_id);
+	return catch_id;
+end;
+$$;
+
+create or replace function public.record_shoal_catch(
+	angler uuid, visit uuid, shoal uuid, fish_name text, fish_strain text, fish_weight numeric,
+	swim_name text, rig text, bait text, hook_size integer,
+	line_gain numeric, rig_gain numeric, bait_gain numeric, watercraft_gain numeric,
+	rod_item text, reel_item text, bait_item text, hour_of_day integer default null
+) returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+	the_shoal public.carp_shoals;
+	new_fish uuid;
+begin
+	select * into the_shoal from public.carp_shoals where id = shoal for update;
+	if the_shoal.id is null or the_shoal.count = 0 then raise exception 'That shoal is not in this lake'; end if;
+	if the_shoal.transit_until is not null or the_shoal.quarantine_until is not null then raise exception 'That shoal cannot be fished for yet'; end if;
+	insert into public.carp (lake_id, name, strain, weight_lb, age_years, condition, times_caught, origin, origin_lake_id, fame, is_catalogued, transit_until, quarantine_until)
+	values (the_shoal.lake_id, fish_name, fish_strain, fish_weight, the_shoal.age_years, the_shoal.condition, 0, the_shoal.origin,
+		case when the_shoal.origin = 'bred' then the_shoal.lake_id else null end, 0, true, null, null)
+	returning id into new_fish;
+	update public.carp_shoals set count = count - 1 where id = shoal;
+	delete from public.carp_shoals where id = shoal and count = 0;
+	perform public.record_catch(angler, visit, new_fish, swim_name, rig, bait, hook_size, line_gain, rig_gain, bait_gain, watercraft_gain, rod_item, reel_item, bait_item, hour_of_day);
+	return new_fish;
+end;
+$$;
+
+revoke execute on function public.record_catch(uuid, uuid, uuid, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text, integer),
+	public.record_shoal_catch(uuid, uuid, uuid, text, text, numeric, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text, integer) from public, anon, authenticated;
+grant execute on function public.record_catch(uuid, uuid, uuid, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text, integer),
+	public.record_shoal_catch(uuid, uuid, uuid, text, text, numeric, text, text, text, integer, numeric, numeric, numeric, numeric, text, text, text, integer) to service_role;

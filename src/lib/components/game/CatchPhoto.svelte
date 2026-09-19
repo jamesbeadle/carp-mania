@@ -4,6 +4,7 @@
 	import { drawCarpPortrait } from '$lib/game/render/drawCarpPortrait';
 	import type { CatchReportOutcome, LandedFish } from '$lib/game/session/landFish';
 	import { SwimFeatureLabels } from '$lib/format/labels';
+	import AwardRibbons from './AwardRibbons.svelte';
 	import HonourRibbons from './HonourRibbons.svelte';
 	import ScalesReadout from './ScalesReadout.svelte';
 
@@ -35,6 +36,7 @@
 	{#if isWeighed}
 		<h2 class="text-3xl text-volt-300">{landed.carp.name}</h2>
 		<HonourRibbons honours={landed.honours} />
+		{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} bountyWon={catchOutcome.bountyWon} />{/if}
 	{/if}
 	<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
 	{#if isWeighed}

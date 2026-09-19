@@ -1,4 +1,5 @@
 import type { Bailiff } from '../bailiffs/bailiffTeam';
+import type { NewBounty } from '../bounties/bountyDraw';
 import type { TicketProduct } from '../fishing/ticketBook';
 import type { StandingRecords } from '../market/records';
 import type { BookedWindow } from '../matches/bookings';
@@ -22,6 +23,7 @@ export interface DayContext {
 	species: LakeSpecies[];
 	swimCount: number;
 	pegsBooked: number;
+	hasOpenBounty: boolean;
 }
 
 export interface DayOutcome {
@@ -46,5 +48,6 @@ export interface DayOutcome {
 	shoalFishTakenByPike: number;
 	bailiffs: Bailiff[];
 	turnedAway: number;
+	bountyDrawn: NewBounty | null;
 }
 

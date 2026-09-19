@@ -13,6 +13,12 @@ export function toScene(fraction: LayoutPoint): Point {
 	return { x: fraction.x * SceneSize.Width, y: fraction.y * SceneSize.Height };
 }
 
+export function distanceBetween(first: Point, second: Point) {
+	const across = first.x - second.x;
+	const down = first.y - second.y;
+	return Math.hypot(across, down);
+}
+
 export function toFraction(point: Point): LayoutPoint {
 	return { x: point.x / SceneSize.Width, y: point.y / SceneSize.Height };
 }
