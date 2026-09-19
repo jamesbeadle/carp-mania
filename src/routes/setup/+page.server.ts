@@ -3,12 +3,10 @@ import type { Actions, PageServerLoad } from './$types';
 import { clampedStep, WizardStep, type SetupProgress, type SetupStep } from '$lib/contracts/SetupProgress';
 import { hasChosenPlot } from '$lib/domain/sites/chosenPlot';
 import { isRegionCode, type RegionCode } from '$lib/domain/world/regionCodes';
-import { BuyCarpFromFishFarm } from '$lib/server/commands/BuyCarpFromFishFarm';
 import { BuySite } from '$lib/server/commands/BuySite';
 import { ChoosePlot } from '$lib/server/commands/ChoosePlot';
 import { OpenTheGates } from '$lib/server/commands/OpenTheGates';
 import { RenameLake } from '$lib/server/commands/RenameLake';
-import { GetFishFarmStock } from '$lib/server/queries/GetFishFarmStock';
 import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetRegionGuide } from '$lib/server/queries/GetRegionGuide';
 import { GetSetupProgress } from '$lib/server/queries/GetSetupProgress';
@@ -16,19 +14,15 @@ import { GetSetupProgress } from '$lib/server/queries/GetSetupProgress';
 const HomeOnceOpen = '/home';
 const AnotherWaterParam = 'another';
 const DefaultRegion: RegionCode = 'uk_ireland';
-const StepPostedTo: Record<string, SetupStep> = { rename: WizardStep.Name, buyFromFarm: WizardStep.Stock, open: WizardStep.OpenTheGates };
+const StepPostedTo: Record<string, SetupStep> = { rename: WizardStep.Name, open: WizardStep.OpenTheGates };
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const progress = await GetSetupProgress(locals);
 	if (isNothingLeftToSetUp(progress, url)) redirect(303, HomeOnceOpen);
 	const step = clampedStep(progress, requestedStep(url, progress));
 	const region = regionToGuide(url, progress.profile.plot_region);
-	const [guide, fishery, farmStock] = await Promise.all([
-		GetRegionGuide(locals, region),
-		progress.lake ? GetMyFishery(locals) : null,
-		progress.lake ? GetFishFarmStock(locals, region) : []
-	]);
-	return { progress, step, guide, fishery, farmStock };
+	const [guide, fishery] = await Promise.all([GetRegionGuide(locals, region), progress.lake ? GetMyFishery(locals) : null]);
+	return { progress, step, guide, fishery };
 };
 
 function isNothingLeftToSetUp(progress: SetupProgress, url: URL) {
@@ -61,6 +55,5 @@ export const actions: Actions = {
 		if (isActionFailure(renamed)) return renamed;
 		redirect(303, `/setup?step=${WizardStep.Survey}`);
 	},
-	buyFromFarm: ({ locals, request }) => request.formData().then((formData) => BuyCarpFromFishFarm(locals, formData)),
 	open: ({ locals, request }) => request.formData().then((formData) => OpenTheGates(locals, formData))
 };

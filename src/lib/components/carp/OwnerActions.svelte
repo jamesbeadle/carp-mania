@@ -9,6 +9,7 @@
 
 	const refusal = $derived(dossier.openListingId ? UpForSale : whyDealerRefuses(dossier.carp));
 	const dealerSharePercent = Math.round(DealerTerms.ShareOfGuidePrice * 100);
+	const bulkSharePercent = Math.round(DealerTerms.BulkShare * 100);
 </script>
 
 <section class="panel self-start">
@@ -30,5 +31,5 @@
 	{#if refusal}
 		<p class="mt-2 text-xs text-danger-400">{refusal}</p>
 	{/if}
-	<p class="mt-3 text-xs text-mist-400">The dealer pays {dealerSharePercent}% of guide on the spot, up to {DealerTerms.SalesPerLakePerFisheryDay} fish a fishery day. The market is where the money is.</p>
+	<p class="mt-3 text-xs text-mist-400">The dealer pays {dealerSharePercent}% of guide on the spot for the first {DealerTerms.FullShareFishPerFisheryDay} fish a fishery day, and {bulkSharePercent}% after. The market is where the money is.</p>
 </section>

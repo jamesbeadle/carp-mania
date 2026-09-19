@@ -35,7 +35,7 @@ language sql stable as $$
 	select id from public.lakes where owner_id = player;
 $$;
 
-create function test.farm_fish(band text, fish_name text, weight numeric) returns jsonb
+create function test.farm_fish(fish_name text, weight numeric) returns jsonb
 language sql immutable as $$
-	select jsonb_build_object('band', band, 'name', fish_name, 'strain', 'common', 'weight_lb', weight, 'age_years', 4, 'condition', 85);
+	select jsonb_build_object('name', fish_name, 'strain', 'common', 'weight_lb', weight, 'age_years', 4, 'condition', 85);
 $$;

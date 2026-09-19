@@ -11,7 +11,8 @@
 		farm_delivery: (_, toLake) => `Delivered by the fish farm to ${toLake}`,
 		dealer_purchase: (fromLake) => `Sold to the dealer from ${fromLake}`,
 		dealer_sale: (_, toLake) => `Bought from the dealer for ${toLake}`,
-		sale: (fromLake, toLake) => `Sold from ${fromLake} to ${toLake}`
+		sale: (fromLake, toLake) => `Sold from ${fromLake} to ${toLake}`,
+		estate_move: (fromLake, toLake) => `Moved by its owner from ${fromLake} to ${toLake}`
 	};
 
 	const lakeName = (lakeId: string | null) => (lakeId ? (lakeNames[lakeId] ?? UnknownWater) : UnknownWater);
