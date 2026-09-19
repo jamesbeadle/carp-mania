@@ -1,4 +1,5 @@
 import type { WaterToday } from '../src/lib/domain/fishing/biteRoll';
+import { EasyWater } from '../src/lib/domain/fishing/waterDifficulty';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp } from '../src/lib/domain/sites/classicSite';
 import type { Carp, Lake } from '../src/lib/domain/types';
@@ -9,7 +10,7 @@ const ThirtyLb = 30;
 
 export function waterOn(lake: Lake, rating: number, day: string): WaterToday {
 	const date = new Date(day);
-	return { lake, rating, watercraft: rating, season: seasonFor(lake, date), weather: weatherFor(lake, date), shoals: [] };
+	return { lake, rating, watercraft: rating, season: seasonFor(lake, date), weather: weatherFor(lake, date), shoals: [], difficulty: EasyWater };
 }
 
 export function stockWithThirties(lakeId: string): Carp[] {

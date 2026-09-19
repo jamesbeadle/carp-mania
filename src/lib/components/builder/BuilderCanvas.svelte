@@ -7,8 +7,8 @@
 	import { toolHandlersFor } from '$lib/game/builder/tools/toolFor';
 	import type { ToolContext, ToolHandlers } from '$lib/game/builder/tools/toolHandlers';
 	import type { DraftShape } from '$lib/game/render/drawUnderConstruction';
+	import { CameraState } from '$lib/game/scene/cameraState.svelte';
 	import { toFraction } from '$lib/game/scene/lakeShape';
-	import { toScenePoint } from '$lib/game/scene/renderLoop';
 	import LakeCanvas from '../LakeCanvas.svelte';
 
 	interface Props {
@@ -24,6 +24,7 @@
 	let { builder, lake, sceneLake, swims, sceneSwims, carp, drafts }: Props = $props();
 
 	let wrapper: HTMLDivElement;
+	const camera = new CameraState();
 
 	const contextNow = (): ToolContext => ({ layout: lake.layout, plotAcres: Number(lake.plot_acres), swims });
 	const act = (gesture: keyof ToolHandlers) => (point: LayoutPoint) => toolHandlersFor(builder.tool)[gesture]?.(builder, point, contextNow());
@@ -39,7 +40,7 @@
 	function pointOf(event: PointerEvent): LayoutPoint {
 		const canvas = wrapper.querySelector('canvas');
 		if (!canvas) return { x: 0, y: 0 };
-		return toFraction(toScenePoint(canvas, event.clientX, event.clientY));
+		return toFraction(camera.scenePointOf(canvas, event.clientX, event.clientY));
 	}
 
 	function handleKey(event: KeyboardEvent) {
@@ -68,5 +69,5 @@
 	onpointerleave={() => gestures.leave()}
 	oncontextmenu={(event) => event.preventDefault()}
 >
-	<LakeCanvas lake={sceneLake} swims={sceneSwims} {carp} {drafts} selectedSwimId={builder.selectedSwimId} />
+	<LakeCanvas lake={sceneLake} swims={sceneSwims} {carp} {drafts} {camera} selectedSwimId={builder.selectedSwimId} />
 </div>

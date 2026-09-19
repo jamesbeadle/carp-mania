@@ -1,29 +1,26 @@
 <script lang="ts">
-	import { GroundworksCatalogue, WorkPrices } from '$lib/domain/groundworks/catalogue';
-	import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
+	import { FacilityCatalogue, whyFacilityCannotBeBuilt } from '$lib/domain/groundworks/facilities';
+	import { Facilities, type Facility } from '$lib/domain/layout/layoutTypes';
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
 	import { formatMoney } from '$lib/format/money';
 
-	let { builder }: { builder: BuilderState } = $props();
+	let { builder, built }: { builder: BuilderState; built: Facility[] } = $props();
 
-	const facilities: { draft: WorkDraft; cost: number; days: number }[] = [
-		{ draft: { kind: 'car_park' }, ...WorkPrices.CarPark },
-		{ draft: { kind: 'lodge' }, ...WorkPrices.Lodge },
-		{ draft: { kind: 'aerator' }, ...WorkPrices.Aerator }
-	];
+	const refusalFor = (facility: Facility) => whyFacilityCannotBeBuilt(built, facility);
 </script>
 
 <ul class="space-y-2">
-	{#each facilities as facility (facility.draft.kind)}
-		{@const profile = GroundworksCatalogue[facility.draft.kind]}
-		{@const isChosen = builder.draft?.kind === facility.draft.kind}
+	{#each Facilities as facility (facility)}
+		{@const profile = FacilityCatalogue[facility]}
+		{@const isChosen = builder.draft?.kind === facility}
+		{@const refusal = refusalFor(facility)}
 		<li>
-			<button class="w-full rounded-lg border px-3 py-2 text-left transition" class:border-volt-500={isChosen} class:border-carbon-600={!isChosen} class:bg-carbon-900={!isChosen} onclick={() => builder.place(facility.draft)}>
+			<button class="w-full rounded-lg border px-3 py-2 text-left transition" class:border-volt-500={isChosen} class:border-carbon-600={!isChosen} class:bg-carbon-900={!isChosen} disabled={refusal !== null} title={refusal ?? profile.label} onclick={() => builder.place({ kind: facility })}>
 				<span class="flex items-baseline justify-between gap-2">
-					<span class="font-display text-lg font-bold uppercase text-mist-100">{profile.label}</span>
-					<span class="text-sm text-volt-300">{formatMoney(facility.cost)} · {facility.days} days</span>
+					<span class="font-display text-lg font-bold uppercase" class:text-mist-100={refusal === null} class:text-mist-400={refusal !== null}>{profile.label}</span>
+					<span class="text-sm text-volt-300">{formatMoney(profile.cost)} · {profile.days} days</span>
 				</span>
-				<span class="block text-xs text-mist-400">{profile.blurb}</span>
+				<span class="block text-xs text-mist-400">{refusal ?? profile.blurb}</span>
 			</button>
 		</li>
 	{/each}

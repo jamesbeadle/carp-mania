@@ -9,15 +9,18 @@ import { drawIslands } from '../render/drawIslands';
 import { drawLilies } from '../render/drawLilies';
 import { drawRods } from '../render/drawRods';
 import { drawShowingFish } from '../render/drawShowingFish';
+import { drawSanctuaries } from '../render/drawSanctuaries';
 import { drawSnags } from '../render/drawSnags';
 import { drawSoftBed, paintSoftBed } from '../render/softBed';
 import { drawPegs, drawSwimLabels, swimScenePoint } from '../render/drawSwims';
 import { drawDrafts, type DraftShape } from '../render/drawUnderConstruction';
+import { drawClusters } from '../render/drawClusters';
+import { clusterSwims, isClustered } from './clusterSwims';
 import { drawWater } from '../render/drawWater';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { createFacingTheWater } from './facingTheWater';
 import { moveFishSchool, type SwimmingFish } from './fishSchool';
-import { islandPathsFrom, isInsideWater, isPointInScenePath, lakeCentreOf, lakePathFrom, type Point } from './lakeShape';
+import { islandPathsFrom, lakeCentreOf, lakePathFrom, type Point } from './lakeShape';
 import type { RodOnBank } from './rodState';
 
 export interface SceneInput {
@@ -30,7 +33,11 @@ export interface SceneInput {
 	isAnglerOnBank: boolean;
 	drafts?: DraftShape[];
 	showingAt?: LayoutPoint[];
+	pixelsPerScenePixel?: number;
 }
+
+const LabelsFromPixelsPerScenePixel = 0.5;
+const FullDetail = 1;
 
 export function createSceneDrawer(layout: LakeLayout) {
 	const lakePath = lakePathFrom(layout);
@@ -54,9 +61,14 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawIslands(context, islandPaths);
 		drawSnags(context, layout);
 		drawReeds(context, layout, timeSeconds);
-		drawPegs(context, input.swims, input.selectedSwimId, input.hoveredSwimId);
+		drawSanctuaries(context, layout);
+		const scale = input.pixelsPerScenePixel ?? FullDetail;
+		const clusters = clusterSwims(input.swims, scale);
+		const loosePegs = clusters.filter((cluster) => !isClustered(cluster)).flatMap((cluster) => cluster.swims);
+		drawPegs(context, loosePegs, input.selectedSwimId, input.hoveredSwimId);
+		drawClusters(context, clusters, scale);
 		drawAnglerAndRods(context, input, timeSeconds, facingTheWaterFrom);
-		drawSwimLabels(context, input.swims, input.selectedSwimId, facingTheWaterFrom);
+		if (scale >= LabelsFromPixelsPerScenePixel) drawSwimLabels(context, loosePegs, input.selectedSwimId, facingTheWaterFrom);
 		drawDrafts(context, input.drafts ?? []);
 		drawShowingFish(context, input.showingAt ?? [], timeSeconds);
 	};
@@ -71,18 +83,4 @@ export function createSceneDrawer(layout: LakeLayout) {
 	}
 }
 
-export function isPointInWater(context: CanvasRenderingContext2D, layout: LakeLayout, point: Point) {
-	return isInsideWater(context, lakePathFrom(layout), islandPathsFrom(layout), point);
-}
-
-const CastLineSamples = 40;
-
-export function isCastClearOfIslands(context: CanvasRenderingContext2D, layout: LakeLayout, from: Point, to: Point) {
-	const islands = islandPathsFrom(layout);
-	for (let step = 1; step < CastLineSamples; step++) {
-		const fraction = step / CastLineSamples;
-		const sample = { x: from.x + (to.x - from.x) * fraction, y: from.y + (to.y - from.y) * fraction };
-		if (islands.some((island) => isPointInScenePath(context, island, sample))) return false;
-	}
-	return true;
-}
+export { isCastClearOfIslands, isPointInWater } from './castClearance';

@@ -8,6 +8,7 @@ export const BankPalette = {
 	Path: 'hsl(38 25% 55%)',
 	Shore: 'hsl(40 30% 46%)',
 	Reed: 'hsl(70 45% 32%)',
+	SanctuaryLine: 'hsl(48 80% 62%)',
 	ReedTip: 'hsl(40 55% 60%)',
 	Peg: 'hsl(30 32% 36%)',
 	PegPlank: 'hsla(28 40% 14% / 0.45)',

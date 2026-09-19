@@ -1,4 +1,3 @@
-import { Prices } from '../economy';
 import { isBookedOut } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { driftReputationForOneDay, clampReputation, reputationFromCatch } from '../reputation';
@@ -9,7 +8,10 @@ import { overallWaterQuality } from '../waterQuality';
 import { weatherFor } from '../world/weather';
 import { ageCarpIfNewYear } from './ageing';
 import { completeDueWorks } from './completeWorks';
-import { driftWaterForOneDay, hasAerator } from './driftWater';
+import { driftWaterForOneDay } from './driftWater';
+import { driftTeamForOneDay } from '../bailiffs/performance';
+import { wagesOf } from '../bailiffs/bailiffTeam';
+import { reputationPerDayOf, runningCostOf } from '../groundworks/facilities';
 import { feedTheLakeForOneDay } from './feedTheLake';
 import { isHeatwaveToday, sufferHeatwave } from './heatwave';
 import { lapseTransfersForOneDay } from './lapseTransfers';
@@ -25,15 +27,15 @@ export type { DayContext, DayOutcome } from './dayTypes';
 const NoShoals: Shoal[] = [];
 
 function visitingDayOf(lake: Lake, context: DayContext, shoals: Shoal[]) {
-	const { season, records, book } = context;
-	return { season, standing: records, weather: weatherFor(lake, context.dayStart), book, shoals };
+	const { season, records, book, bailiffs } = context;
+	return { season, standing: records, weather: weatherFor(lake, context.dayStart), book, shoals, bailiffs };
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext, shoals: Shoal[] = NoShoals): DayOutcome {
 	const works = completeDueWorks(lake, context.works, context.dayEnd);
 	const fertile = { ...works.lake, fertility: driftFertilityForOneDay(works.lake) };
 	const fed = feedTheLakeForOneDay(fertile, carp, context.season.growthFactor, shoals);
-	const watered = driftWaterForOneDay(fed.lake);
+	const watered = driftWaterForOneDay(fed.lake, context.bailiffs);
 	const hunted = letPikeHuntForOneDay(watered, fed.carp, random, fed.shoals);
 	const lapsed = lapseTransfersForOneDay(hunted.carp, context.dayEnd);
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
@@ -56,15 +58,16 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		carpOutOfQuarantine: lapsed.outOfQuarantine,
 		feesCollected: anglers.visits.reduce((total, visit) => total + visit.fee_paid, 0),
 		lodgeTakings: anglers.lodgeTakings,
-		bailiffWages: hunted.lake.has_bailiff ? Prices.BailiffDailyWage : 0,
-		aeratorRunning: hasAerator(hunted.lake) ? Prices.AeratorDailyRunning : 0,
+		bailiffWages: wagesOf(context.bailiffs),
+		aeratorRunning: runningCostOf(hunted.lake.layout.facilities),
 		isHeatwave,
 		records: anglers.records,
 		worksCompleted: works.completed,
 		shoals: shoalsToday.shoals,
 		fryShoals: shoalsToday.fryShoals,
 		namedFromShoals: shoalsToday.named,
-		shoalFishTakenByPike: hunted.shoalFishTakenByPike
+		shoalFishTakenByPike: hunted.shoalFishTakenByPike,
+		bailiffs: driftTeamForOneDay(context.bailiffs, random)
 	};
 }
 
@@ -77,7 +80,8 @@ function waterAfterDay(lake: Lake, catches: NewCatch[]): Lake {
 }
 
 function reputationAfterDay(lake: Lake, catches: NewCatch[]) {
-	const gained = catches.reduce((total, caught) => total + reputationFromCatch(caught.weight_lb, Number(lake.reputation)), 0);
+	const fromFacilities = reputationPerDayOf(lake.layout.facilities);
+	const gained = catches.reduce((total, caught) => total + reputationFromCatch(caught.weight_lb, Number(lake.reputation)), fromFacilities);
 	const quality = overallWaterQuality(Number(lake.transparency), Number(lake.weed), Number(lake.silt));
 	return driftReputationForOneDay(clampReputation(Number(lake.reputation) + gained), quality);
 }

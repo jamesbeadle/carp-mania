@@ -13,14 +13,14 @@ export interface Footprint {
 }
 
 export type AreaDraft = Extract<WorkDraft, { kind: 'gravel_bar' | 'deepen' | 'dredge' | 'lily_pads' }>;
-export type BankDraft = Extract<WorkDraft, { kind: 'margin_shelf' | 'reed_bed' }>;
+export type BankDraft = Extract<WorkDraft, { kind: 'margin_shelf' | 'reed_bed' | 'sanctuary' }>;
 
 export function isAreaDraft(draft: WorkDraft): draft is AreaDraft {
 	return draft.kind === 'gravel_bar' || draft.kind === 'deepen' || draft.kind === 'dredge' || draft.kind === 'lily_pads';
 }
 
 export function isBankDraft(draft: WorkDraft): draft is BankDraft {
-	return draft.kind === 'margin_shelf' || draft.kind === 'reed_bed';
+	return draft.kind === 'margin_shelf' || draft.kind === 'reed_bed' || draft.kind === 'sanctuary';
 }
 
 export function isFacilityDraft(draft: WorkDraft) {
@@ -30,7 +30,7 @@ export function isFacilityDraft(draft: WorkDraft) {
 export function footprintOf(draft: WorkDraft, layout: LakeLayout, plotAcres: number): Footprint {
 	if (draft.kind === 'island') return { shape: 'polygon', points: islandPolygonFor(draft.size, draft.centre, draft.rotation, plotAcres) };
 	if (draft.kind === 'margin_shelf') return { shape: 'polygon', points: shelfPolygonFor(draft.points, layout, layoutScaleFor(plotAcres)) };
-	if (draft.kind === 'reed_bed') return { shape: 'polyline', points: draft.points };
+	if (draft.kind === 'reed_bed' || draft.kind === 'sanctuary') return { shape: 'polyline', points: draft.points };
 	if (draft.kind === 'snag') return { shape: 'point', points: [draft.point] };
 	if (draft.kind === 'reshape_shoreline') return { shape: 'polygon', points: draft.outline };
 	if (isAreaDraft(draft)) return { shape: 'polygon', points: draft.points };

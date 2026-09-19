@@ -33,7 +33,7 @@
 	{#if builder.notice}
 		<p class="rounded-lg border border-volt-500/40 bg-volt-500/10 px-3 py-2 text-sm text-volt-300">{builder.notice}</p>
 	{/if}
-	{#if builder.tool === 'facility'}<FacilityPicker {builder} />{/if}
+	{#if builder.tool === 'facility'}<FacilityPicker {builder} built={lake.layout.facilities} />{/if}
 	{#if builder.tool === 'land'}<LandPanel {lake} {hasEarthworksInProgress} />{/if}
 	{#if builder.draft}<DraftControls {builder} />{/if}
 	{#if builder.draft && quote}<QuotePanel {builder} {quote} money={Number(profile.money)} />{/if}

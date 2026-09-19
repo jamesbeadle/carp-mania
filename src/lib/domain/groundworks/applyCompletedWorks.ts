@@ -6,6 +6,7 @@ import { waterAcres } from '../layout/waterArea';
 import type { BedType, Lake } from '../types';
 import { clampToScale } from '../waterQuality';
 import { WorkPrices } from './catalogue';
+import { isFacility } from './facilities';
 import { dredgingEffectOf } from './dredging';
 import { islandPolygonFor } from './islandTemplates';
 import { shelfPolygonFor } from './shelfStrip';
@@ -29,6 +30,7 @@ function layoutAfter(layout: LakeLayout, draft: WorkDraft, id: string, plotAcres
 	if (draft.kind === 'dredge') return withDepth(layout, id, draft.points, depthAt(layout, polygonCentroid(draft.points)) + WorkPrices.Dredge.depthGainedFeet);
 	if (draft.kind === 'margin_shelf') return shelfAfter(layout, draft, id, plotAcres);
 	if (draft.kind === 'reed_bed') return withFeature(layout, { id, kind: 'reed_line', points: draft.points });
+	if (draft.kind === 'sanctuary') return withFeature(layout, { id, kind: 'sanctuary', points: draft.points });
 	if (draft.kind === 'lily_pads') return withFeature(layout, { id, kind: 'lily_pads', points: draft.points });
 	if (draft.kind === 'snag') return withFeature(layout, { id, kind: 'snag', point: draft.point, name: draft.name });
 	if (draft.kind === 'reshape_shoreline') return { ...layout, outline: draft.outline };
@@ -53,8 +55,7 @@ function withFeature(layout: LakeLayout, feature: LakeFeature): LakeLayout {
 }
 
 function withFacility(layout: LakeLayout, kind: WorkDraft['kind']): LakeLayout {
-	const isFacility = kind === 'car_park' || kind === 'lodge' || kind === 'aerator';
-	if (!isFacility || layout.facilities.includes(kind)) return layout;
+	if (!isFacility(kind) || layout.facilities.includes(kind)) return layout;
 	return { ...layout, facilities: [...layout.facilities, kind] };
 }
 

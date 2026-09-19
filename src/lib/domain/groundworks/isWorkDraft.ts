@@ -13,7 +13,7 @@ export function isWorkDraft(candidate: unknown): candidate is WorkDraft {
 	const kind = candidate.kind;
 	if (kind === 'island') return IslandSizes.includes(String(candidate.size)) && isPoint(candidate.centre) && isFiniteNumber(candidate.rotation) && isName(candidate.name);
 	if (kind === 'gravel_bar' || kind === 'deepen') return isPointList(candidate.points) && isFiniteNumber(candidate.depthFeet);
-	if (kind === 'dredge' || kind === 'reed_bed' || kind === 'lily_pads') return isPointList(candidate.points);
+	if (kind === 'dredge' || kind === 'reed_bed' || kind === 'lily_pads' || kind === 'sanctuary') return isPointList(candidate.points);
 	if (kind === 'margin_shelf') return isPointList(candidate.points) && ShelfBeds.includes(String(candidate.bed));
 	if (kind === 'snag') return isPoint(candidate.point) && isName(candidate.name);
 	if (kind === 'reshape_shoreline') return isPointList(candidate.outline);

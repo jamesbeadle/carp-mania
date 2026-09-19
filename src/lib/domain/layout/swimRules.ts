@@ -1,12 +1,13 @@
 import type { Swim } from '../types';
 import { feetToNearestEdge } from './distanceToEdge';
 import { feetBetween, type LayoutScale } from './layoutScale';
-import type { LakeLayout, LayoutPoint } from './layoutTypes';
+import { isSanctuary, type LakeLayout, type LayoutPoint } from './layoutTypes';
 import { isInWater, pointFeetTowardsCentre } from './waterArea';
 
 export const SwimRules = {
 	AcresPerSwim: 0.6,
 	MinimumSpacingFeet: 60,
+	SanctuaryPegFeet: 60,
 	MaximumFeetFromWater: 40,
 	CastInFrontFeet: 60,
 	BuildCost: 350,
@@ -30,6 +31,11 @@ export function isOnTheBank(layout: LakeLayout, scale: LayoutScale, point: Layou
 
 export function isClearOfOtherSwims(scale: LayoutScale, point: LayoutPoint, others: Pick<Swim, 'position_x' | 'position_y'>[]) {
 	return others.every((other) => feetBetween(scale, point, swimPoint(other)) >= SwimRules.MinimumSpacingFeet);
+}
+
+export function isClearOfSanctuaries(layout: LakeLayout, scale: LayoutScale, point: LayoutPoint) {
+	const feetFrom = (points: LayoutPoint[]) => feetToNearestEdge(scale, point, points, false);
+	return layout.features.filter(isSanctuary).every((stretch) => feetFrom(stretch.points) > SwimRules.SanctuaryPegFeet);
 }
 
 export function waterInFrontOfSwim(layout: LakeLayout, scale: LayoutScale, swim: Pick<Swim, 'position_x' | 'position_y'>): LayoutPoint {

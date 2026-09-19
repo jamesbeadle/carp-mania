@@ -3,7 +3,7 @@
 	import EstateSwitcher from '$lib/components/estate/EstateSwitcher.svelte';
 	import LakeCanvas from '$lib/components/LakeCanvas.svelte';
 	import WhileYouWereAway from '$lib/components/home/WhileYouWereAway.svelte';
-	import BailiffPanel from '$lib/components/lake/BailiffPanel.svelte';
+	import BailiffTeamPanel from '$lib/components/lake/BailiffTeamPanel.svelte';
 	import FeedPanel from '$lib/components/lake/FeedPanel.svelte';
 	import LakeOverview from '$lib/components/lake/LakeOverview.svelte';
 	import LedgerPanel from '$lib/components/lake/LedgerPanel.svelte';
@@ -50,7 +50,7 @@
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
 	<LakeCanvas {lake} swims={fishery.swims} carp={fishery.carp} shoals={fishery.shoals} drafts={worksUnderway} />
-	<LakeOverview lake={data.fishery.lake} profile={data.profile} />
+	<LakeOverview {lake} profile={data.profile} carp={fishery.carp} shoals={fishery.shoals} />
 </div>
 
 <nav class="mt-8 mb-4 flex flex-wrap gap-2">
@@ -63,7 +63,7 @@
 {#if activeTab === 'Tickets'}<TicketBookPanel lake={data.fishery.lake} book={data.book} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
-{#if activeTab === 'Water'}<BailiffPanel lake={data.fishery.lake} />{/if}
+{#if activeTab === 'Water'}<BailiffTeamPanel {lake} bailiffs={data.bailiffs} />{/if}
 {#if activeTab === 'Groundworks'}
 	<p class="mb-4 text-sm text-mist-400">
 		Islands, bars, holes, shelves, reeds, swims and the shoreline are all shaped in the editor.

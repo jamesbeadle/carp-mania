@@ -37,6 +37,12 @@ export interface ReedLine {
 	points: LayoutPoint[];
 }
 
+export interface Sanctuary {
+	id: string;
+	kind: 'sanctuary';
+	points: LayoutPoint[];
+}
+
 export interface Snag {
 	id: string;
 	kind: 'snag';
@@ -44,11 +50,11 @@ export interface Snag {
 	name: string;
 }
 
-export type LakeFeature = AreaFeature | ReedLine | Snag;
+export type LakeFeature = AreaFeature | ReedLine | Snag | Sanctuary;
 export type LakeFeatureKind = LakeFeature['kind'];
 
-export type Facility = 'car_park' | 'lodge' | 'aerator';
-export const Facilities: Facility[] = ['car_park', 'lodge', 'aerator'];
+export type Facility = 'car_park' | 'lodge' | 'aerator' | 'toilets' | 'tackle_shop' | 'bar' | 'restaurant' | 'hotel';
+export const Facilities: Facility[] = ['car_park', 'lodge', 'aerator', 'toilets', 'tackle_shop', 'bar', 'restaurant', 'hotel'];
 
 export interface LakeLayout {
 	version: 1;
@@ -68,6 +74,10 @@ export function isSnag(feature: LakeFeature): feature is Snag {
 
 export function isReedLine(feature: LakeFeature): feature is ReedLine {
 	return feature.kind === 'reed_line';
+}
+
+export function isSanctuary(feature: LakeFeature): feature is Sanctuary {
+	return feature.kind === 'sanctuary';
 }
 
 export function isAreaFeature(feature: LakeFeature): feature is AreaFeature {

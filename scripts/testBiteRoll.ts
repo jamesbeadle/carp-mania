@@ -6,6 +6,7 @@ import { ClassicSession, hoursInWindow } from '../src/lib/domain/fishing/session
 import { mix } from '../src/lib/domain/fishing/sessionSeed';
 import { carpOfTaker } from '../src/lib/domain/fishing/takers';
 import { carpForRolledBite, carpInBiteOrder, takerOfTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
+import { EasyWater } from '../src/lib/domain/fishing/waterDifficulty';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
 import { defaultRodSetup, kitFor, MaximumRods } from '../src/lib/domain/tackle/rodSetup';
@@ -32,7 +33,7 @@ export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
 	const june = new Date('2026-06-01T00:00:00Z');
-	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june), shoals: [] };
+	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june), shoals: [], difficulty: EasyWater };
 	const setup = defaultRodSetup();
 	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 

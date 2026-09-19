@@ -1,3 +1,4 @@
+import type { Bailiff } from '../bailiffs/bailiffTeam';
 import type { TicketProduct } from '../fishing/ticketBook';
 import type { StandingRecords } from '../market/records';
 import type { BookedWindow } from '../matches/bookings';
@@ -16,6 +17,7 @@ export interface DayContext {
 	works: LakeWork[];
 	bookings: BookedWindow[];
 	book: TicketProduct[];
+	bailiffs: Bailiff[];
 }
 
 export interface DayOutcome {
@@ -38,5 +40,6 @@ export interface DayOutcome {
 	fryShoals: NewShoal[];
 	namedFromShoals: NewNamedFish[];
 	shoalFishTakenByPike: number;
+	bailiffs: Bailiff[];
 }
 

@@ -4,6 +4,7 @@ import { isSettledAfter } from '$lib/domain/fishing/catchSettle';
 import type { TheBar } from '$lib/domain/fishing/honours';
 import { carpInBiteOrder } from '$lib/domain/fishing/whoTookTheBait';
 import type { Shoal } from '$lib/domain/stock/shoals';
+import { difficultyOfWater } from '$lib/domain/fishing/waterDifficulty';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 import { isWindowOver, type SessionWindow } from '$lib/domain/fishing/sessionWindow';
 import { seasonFor, type Season } from '$lib/domain/world/seasons';
@@ -49,6 +50,7 @@ export class SessionState {
 	readonly window: SessionWindow;
 	readonly sessionsLeft: number;
 	readonly visitId: string;
+	readonly difficulty: number;
 	readonly rating: number;
 	readonly roller: BiteRoller;
 
@@ -58,6 +60,7 @@ export class SessionState {
 		this.lake = lake;
 		this.carp = carpInBiteOrder(carp);
 		this.shoals = shoals;
+		this.difficulty = difficultyOfWater(lake, this.carp, shoals);
 		this.profile = profile;
 		this.season = seasonFor(lake, new Date(visit.visitedAt));
 		this.weather = weatherFor(lake, new Date(visit.visitedAt));

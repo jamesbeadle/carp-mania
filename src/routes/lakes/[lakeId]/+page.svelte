@@ -2,6 +2,8 @@
 	import LakeCanvas from '$lib/components/LakeCanvas.svelte';
 	import StockTable from '$lib/components/StockTable.svelte';
 	import WaterQualityBars from '$lib/components/WaterQualityBars.svelte';
+	import DifficultyReading from '$lib/components/lake/DifficultyReading.svelte';
+	import WaterShop from '$lib/components/lakes/WaterShop.svelte';
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
 	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
 	import FishHereButton from '$lib/components/matches/FishHereButton.svelte';
@@ -35,8 +37,10 @@
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
 	<LakeCanvas lake={water.lake} swims={water.swims} carp={water.carp} shoals={water.shoals} />
-	<section class="panel">
-		<h2 class="mb-3 text-xl text-volt-300">The water</h2>
+	<section class="panel space-y-4">
+		<h2 class="text-xl text-volt-300">The water</h2>
+		<DifficultyReading lake={water.lake} carp={water.carp} shoals={water.shoals} />
+		<WaterShop lake={water.lake} />
 		<WaterQualityBars lake={data.water.lake} />
 	</section>
 </div>

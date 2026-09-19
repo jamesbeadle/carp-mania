@@ -10,6 +10,7 @@ export function workLabelFor(draft: WorkDraft): string {
 	if (draft.kind === 'dredge') return 'Dredging';
 	if (draft.kind === 'margin_shelf') return `${draft.bed === 'gravel' ? 'Gravel' : 'Clay'} margin shelf`;
 	if (draft.kind === 'reed_bed') return 'Reed bed';
+	if (draft.kind === 'sanctuary') return 'Sanctuary';
 	if (draft.kind === 'lily_pads') return 'Lily pads';
 	if (draft.kind === 'snag') return `Snag — ${draft.name}`;
 	if (draft.kind === 'reshape_shoreline') return 'Reshaped shoreline';

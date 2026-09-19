@@ -1,35 +1,22 @@
 import { nothingHappened, type WhileYouWereAway } from '$lib/contracts/WhileYouWereAway';
 import { summariseEstate, type WaterSummary } from '$lib/domain/estate/summariseEstate';
 import type { StandingRecords } from '$lib/domain/market/records';
-import type { TicketProduct } from '$lib/domain/fishing/ticketBook';
 import type { Shoal } from '$lib/domain/stock/shoals';
-import type { BookedWindow } from '$lib/domain/matches/bookings';
+import type { Bailiff } from '$lib/domain/bailiffs/bailiffTeam';
 import { seededRandom } from '$lib/domain/random';
 import { fisheryDaysElapsedSince, FisheryClock, simulatedUntilAfter } from '$lib/domain/simulation/elapsedDays';
 import { simulateOneDay, type DayOutcome } from '$lib/domain/simulation/simulateOneDay';
-import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
+import type { Carp, Lake, Profile } from '$lib/domain/types';
 import { seasonFor } from '$lib/domain/world/seasons';
-import type { LakeWork } from '$lib/domain/worldTypes';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
 import { GetStandingRecords } from '../queries/GetStandingRecords';
-import { GetTicketBook } from '../queries/GetTicketBook';
-import { loadBookings } from '../queries/loadBookings';
 import { loadMyWaters } from '../queries/loadMyWaters';
-import { loadWorksInProgress } from '../queries/loadWorksInProgress';
+import { loadLakeLife, type LakeLife } from '../queries/loadLakeLife';
 import { persistSimulatedDays } from './persistSimulatedDays';
 import { ProvisionalIds } from './persistStock';
 import { summariseDays } from './summariseDays';
-
-interface LakeLife {
-	carp: Carp[];
-	swims: Swim[];
-	works: LakeWork[];
-	bookings: BookedWindow[];
-	book: TicketProduct[];
-	shoals: Shoal[];
-}
 
 export async function SimulateElapsedTime(locals: App.Locals): Promise<WhileYouWereAway> {
 	const user = requireUser(locals);
@@ -58,18 +45,21 @@ function runDays(lake: Lake, life: LakeLife, days: number, records: StandingReco
 	let currentLake = lake;
 	let currentCarp = life.carp;
 	let currentShoals = life.shoals;
+	let currentBailiffs = life.bailiffs;
 	let currentRecords = records;
 	let currentWorks = life.works;
 	for (let day = 0; day < days; day++) {
 		const dayStart = new Date(new Date(lake.simulated_until).getTime() + day * FisheryClock.RealMillisecondsPerFisheryDay);
 		const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
-		const outcome = simulateOneDay(currentLake, currentCarp, life.swims, random, { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: currentRecords, works: currentWorks, bookings: life.bookings, book: life.book }, currentShoals);
+		const outcome = simulateOneDay(currentLake, currentCarp, life.swims, random, { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: currentRecords, works: currentWorks, bookings: life.bookings, book: life.book, bailiffs: currentBailiffs }, currentShoals);
 		outcomes.push(outcome);
 		currentLake = outcome.lake;
 		currentCarp = [...outcome.carp, ...namedAsRows(outcome, currentLake)];
 		currentShoals = [...outcome.shoals, ...fryAsRows(outcome, day)];
+		currentBailiffs = outcome.bailiffs;
 		currentRecords = outcome.records;
-		currentWorks = currentWorks.filter((work) => !outcome.worksCompleted.some((completed) => completed.id === work.id));
+		const completedIds = new Set(outcome.worksCompleted.map((completed) => completed.id));
+		currentWorks = currentWorks.filter((work) => !completedIds.has(work.id));
 	}
 	return outcomes;
 }
@@ -81,16 +71,4 @@ function namedAsRows(outcome: DayOutcome, lake: Lake): Carp[] {
 
 function fryAsRows(outcome: DayOutcome, day: number): Shoal[] {
 	return outcome.fryShoals.map((fry, index) => ({ ...fry, id: `${ProvisionalIds.FryShoal}${day}-${index}` }));
-}
-
-async function loadLakeLife(locals: App.Locals, lake: Lake): Promise<LakeLife> {
-	const [{ data: carp }, { data: swims }, { data: shoals }, works, bookings, book] = await Promise.all([
-		locals.supabase.from('carp').select('*').eq('lake_id', lake.id),
-		locals.supabase.from('swims').select('*').eq('lake_id', lake.id),
-		locals.supabase.from('carp_shoals').select('*').eq('lake_id', lake.id),
-		loadWorksInProgress(locals, lake.id),
-		loadBookings(locals, lake.id, lake.simulated_until),
-		GetTicketBook(locals, lake.id)
-	]);
-	return { carp: (carp ?? []) as Carp[], swims: (swims ?? []) as Swim[], shoals: (shoals ?? []) as Shoal[], works, bookings, book };
 }
