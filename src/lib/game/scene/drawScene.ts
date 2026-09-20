@@ -20,7 +20,9 @@ import { drawWater } from '../render/drawWater';
 import { drawBountyMarker } from '../render/drawBountyMarker';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { createFacingTheWater } from './facingTheWater';
-import { moveFishSchool, type SwimmingFish } from './fishSchool';
+import type { SwimmingFish } from './fishSchool';
+import { moveFishSchool } from './fishSteering';
+import type { WaterBody } from './fishWhiskers';
 import { islandPathsFrom, lakeCentreOf, lakePathFrom, type Point } from './lakeShape';
 import type { RodOnBank } from './rodState';
 
@@ -47,11 +49,13 @@ export function createSceneDrawer(layout: LakeLayout) {
 	const centre = lakeCentreOf(layout);
 	const softBed = paintSoftBed(layout);
 	let facingTheWaterFrom: ((peg: Point) => number) | null = null;
+	let waterBody: WaterBody | null = null;
 
 	return function drawScene(context: CanvasRenderingContext2D, input: SceneInput, secondsElapsed: number, timeSeconds: number) {
 		const transparency = Number(input.lake.transparency);
 		facingTheWaterFrom ??= createFacingTheWater(context, { lakePath, islandPaths, centre });
-		moveFishSchool(input.school, context, lakePath, islandPaths, secondsElapsed, timeSeconds);
+		waterBody ??= { context, lake: lakePath, islands: islandPaths, layout, centre };
+		moveFishSchool(input.school, waterBody, secondsElapsed, timeSeconds);
 		drawBank(context, lakePath);
 		drawWater(context, lakePath, centre, transparency, timeSeconds);
 		drawSoftBed(context, lakePath, softBed);
@@ -59,7 +63,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawBars(context, lakePath, layout);
 		drawWeedBeds(context, lakePath, layout, Number(input.lake.weed), timeSeconds);
 		drawLilies(context, lakePath, layout, timeSeconds);
-		drawFishSchool(context, input.school, lakePath, transparency, timeSeconds);
+		drawFishSchool(context, input.school, lakePath, transparency);
 		drawIslands(context, islandPaths);
 		drawSnags(context, layout);
 		drawReeds(context, layout, timeSeconds);
