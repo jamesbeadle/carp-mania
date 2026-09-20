@@ -28,4 +28,5 @@ export interface CarpDossier {
 	growth: GrowthPoint[];
 	openListingId: string | null;
 	isMine: boolean;
+	recentCaptures: number;
 }

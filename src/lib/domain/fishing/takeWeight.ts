@@ -12,6 +12,13 @@ export interface Take {
 	hour: number;
 	spotBonusFor: SpotBonus;
 	kitFactorFor?: KitFactor;
+	warinessFor?: Wariness;
+}
+
+export type Wariness = (carp: Pick<Carp, 'id'>) => number;
+
+export function noWariness() {
+	return 0;
 }
 
 export function noSpotBonus() {
@@ -35,7 +42,8 @@ export function takeWeightOf(carp: Carp, take: Take) {
 	const sizeBias = sizeBiasOf(Number(carp.weight_lb), take.sizeReach);
 	const windowFit = feedingWindowFit(carp, take.hour);
 	const kitFactor = (take.kitFactorFor ?? noKitFactor)(carp);
-	return appetiteOf(carp) * sizeBias * windowFit * take.spotBonusFor(carp) * kitFactor;
+	const wary = 1 - (take.warinessFor ?? noWariness)(carp);
+	return appetiteOf(carp) * sizeBias * windowFit * take.spotBonusFor(carp) * kitFactor * wary;
 }
 
 export function takeWeightsFor(carp: Carp[], take: Take) {

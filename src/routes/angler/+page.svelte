@@ -1,6 +1,7 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import RatingDial from '$lib/components/angler/RatingDial.svelte';
+	import Diary from '$lib/components/angler/Diary.svelte';
 	import RivalCard from '$lib/components/angler/RivalCard.svelte';
 	import SkillBars from '$lib/components/angler/SkillBars.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
@@ -22,6 +23,9 @@
 	const MyAnglerPath = '/angler';
 	const angler = $derived(data.angler);
 	const room = $derived(angler.trophyRoom);
+	const diary = $derived(angler.diary);
+	const current = $derived(diary.current);
+	const catches = $derived(angler.catches);
 	const hrefFor = (page: number) => listPathFor(MyAnglerPath, {}, page);
 </script>
 
@@ -30,7 +34,7 @@
 <div class="mb-6 flex flex-wrap items-end gap-4">
 	<div>
 		<h1 class="text-4xl text-volt-300">{angler.profile.display_name}</h1>
-		<p class="text-sm text-mist-400">Aged {angler.diary.age} · {placeInTheLine(angler.diary.current.generation)}{#if angler.diary.isSlowingDown} · slowing down now{/if}</p>
+		<p class="text-sm text-mist-400">Aged {diary.age} · {placeInTheLine(current.generation)}{#if diary.isSlowingDown} · slowing down now{/if}</p>
 		<AnglerRanksLine ranks={room.ranks} />
 	</div>
 	<a href="/anglers/{angler.profile.id}" class="button-secondary ml-auto">My public page</a>
@@ -66,12 +70,13 @@
 		</div>
 		<section class="panel">
 			<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>
-			<CatchReportList catches={angler.catches.items} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />
-			<Pager page={angler.catches} noun="catch" plural="catches" {hrefFor} />
-			<a href="/angler/scrapbook/{angler.diary.current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
+			<CatchReportList catches={catches.items} carpNames={angler.carpNames} lakeNames={angler.lakeNames} />
+			<Pager page={catches} noun="catch" plural="catches" {hrefFor} />
+			<a href="/angler/scrapbook/{current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
 		</section>
 		<div class="lg:col-span-2"><TrophyCabinet trophies={angler.trophies} /></div>
-		<div class="lg:col-span-2"><FamilyLine line={angler.diary.line} currentId={angler.diary.current.id} /></div>
+		<div class="lg:col-span-2"><Diary entries={data.diary} /></div>
+		<div class="lg:col-span-2"><FamilyLine line={diary.line} currentId={current.id} /></div>
 	</div>
 </div>
 <div class="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-mist-400">

@@ -1,4 +1,6 @@
 import { honoursFor, raiseTheBar } from '$lib/domain/fishing/honours';
+import { isNuisanceFish, nuisanceWords } from '$lib/domain/water/nuisanceBites';
+import type { Carp } from '$lib/domain/types';
 import { doesHookSnap, hookHoldChance } from '$lib/domain/tackle/hooks';
 import { SnagLoss, TackleLossWords, type TackleLossKind } from '$lib/domain/tackle/losses';
 import { bringRodIn, isCastOut, type CastRod } from '../scene/rodState';
@@ -27,7 +29,8 @@ export function strike(session: SessionState) {
 	if (doesHookSnap(hook, weightLb)) return loseTackle(session, rod, 'hook_snapped');
 	const isHookHolding = Math.random() < hookHoldChance(hook, session.rating);
 	if (!isHookHolding) return dropTheFish(session, rod, StrikeWords.Pulled);
-	if (session.hasLandedToday(carp)) return dropTheFish(session, rod, StrikeWords.Again(carp.name));
+	const isAgain = !isNuisanceFish(carp) && session.hasLandedToday(carp);
+	if (isAgain) return dropTheFish(session, rod, StrikeWords.Again(carp.name));
 	const isOnASnag = rod.terrain.feature === 'snag';
 	if (isOnASnag && Math.random() < SnagLoss.Chance) return loseTackle(session, rod, 'rig_in_snag');
 	rod.phase = 'fighting';
@@ -46,14 +49,23 @@ export function finishFight(session: SessionState) {
 	const loss = LossOfOutcome[fight.outcome];
 	if (loss) return loseTackle(session, rod, loss);
 	if (fight.outcome === 'hook_pulled') return dropTheFish(session, rod, HookPulledWords);
+	if (isNuisanceFish(fight.carp)) return returnTheNuisance(session, rod, fight.carp);
 	const weightLb = Number(fight.carp.weight_lb);
 	const honours = honoursFor(weightLb, session.bar);
-	session.lastLanded = landedFishFor(session.lake, session.swim, fight.carp, rod, hooked, session.hour, honours);
+	const { lake, swim, hour } = session;
+	session.lastLanded = landedFishFor(lake, swim, fight.carp, rod, hooked, hour, honours);
 	session.bar = raiseTheBar(weightLb, session.bar);
 	session.landedToday = [...session.landedToday, session.lastLanded];
 	bringRodIn(rod);
 	session.secondsSinceTheMat = 0;
 	session.phase = 'landed';
+}
+
+function returnTheNuisance(session: SessionState, rod: CastRod, fish: Carp) {
+	session.nuisanceToday = [...session.nuisanceToday, fish];
+	bringRodIn(rod);
+	session.notice = nuisanceWords(fish);
+	session.phase = 'fishing';
 }
 
 function loseTackle(session: SessionState, rod: CastRod, kind: TackleLossKind) {

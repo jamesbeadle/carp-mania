@@ -8,4 +8,5 @@ export interface FishingVisit {
 	window: SessionWindow;
 	ticketKind: TicketKind;
 	sessionsLeft: number;
+	recentCaptures: Record<string, number>;
 }

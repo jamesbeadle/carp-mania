@@ -2,12 +2,24 @@
 	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp, Lake, Profile } from '$lib/domain/types';
 	import DifficultyReading from './DifficultyReading.svelte';
+	import CeilingReading from './CeilingReading.svelte';
+	import DrawReading from './DrawReading.svelte';
+	import type { LakeSpecies } from '$lib/domain/water/species';
 	import { anglersArrivingToday, willingnessToPayFor } from '$lib/domain/simulation/visitingAnglers';
 	import { formatMoney } from '$lib/format/money';
+	import { stockDrawOf } from '$lib/domain/water/stockDraw';
 
-	let { lake, profile, carp = [], shoals = [] }: { lake: Lake; profile: Profile; carp?: Carp[]; shoals?: Shoal[] } = $props();
+	interface Props {
+		lake: Lake;
+		profile: Profile;
+		carp?: Carp[];
+		shoals?: Shoal[];
+		species?: LakeSpecies[];
+	}
 
-	const anglersToday = $derived(anglersArrivingToday(lake));
+	let { lake, profile, carp = [], shoals = [], species = [] }: Props = $props();
+
+	const anglersToday = $derived(anglersArrivingToday(lake, undefined, [], stockDrawOf(carp, shoals)));
 	const willingness = $derived(willingnessToPayFor(Number(lake.reputation)));
 </script>
 
@@ -22,5 +34,5 @@
 		<div><dt class="stat-label">Anglers a day</dt><dd class="text-2xl">{anglersToday}</dd></div>
 		<div><dt class="stat-label">They'll pay up to</dt><dd class="text-2xl">{formatMoney(willingness)}</dd></div>
 	</dl>
-	<div class="mt-4"><DifficultyReading {lake} {carp} {shoals} isOwner /></div>
+	<div class="mt-4 grid gap-3 lg:grid-cols-3"><CeilingReading {lake} {carp} {shoals} {species} /><DrawReading {carp} {shoals} /><DifficultyReading {lake} {carp} {shoals} isOwner /></div>
 </section>

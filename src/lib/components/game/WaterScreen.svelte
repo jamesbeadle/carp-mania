@@ -5,7 +5,6 @@
 	import type { Point } from '$lib/game/scene/lakeShape';
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { formatFishingHour } from '$lib/domain/fishing/sessionClock';
 	import { canReadTheWater } from '$lib/domain/fishing/showingFish';
 	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
@@ -13,12 +12,12 @@
 	import LakeCanvas from '../LakeCanvas.svelte';
 	import SceneStage from '../stage/SceneStage.svelte';
 	import CanvasOverlay from './CanvasOverlay.svelte';
-	import CatchPhoto from './CatchPhoto.svelte';
-	import DayOverSummary from './DayOverSummary.svelte';
 	import FightMeter from './FightMeter.svelte';
 	import MoveSwimButton from './MoveSwimButton.svelte';
 	import NextStepPrompt from './NextStepPrompt.svelte';
 	import RodStatusBar from './RodStatusBar.svelte';
+	import SessionCatchPhoto from './SessionCatchPhoto.svelte';
+	import SessionDayOver from './SessionDayOver.svelte';
 	import SessionDeck from './SessionDeck.svelte';
 	import SessionNotice from './SessionNotice.svelte';
 	import StrikeButton from './StrikeButton.svelte';
@@ -47,6 +46,7 @@
 	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 
 	const selectedSwimId = $derived(session.swim?.id ?? null);
+	const hasRodsOut = $derived(session.rods.length > 0 && session.phase !== 'day_over');
 
 	const orientation = new Orientation();
 	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
@@ -63,7 +63,7 @@
 
 {#snippet overTheLake()}
 	<NextStepPrompt {session} />
-	{#if session.rods.length > 0 && session.phase !== 'day_over'}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
+	{#if hasRodsOut}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
 	<MoveSwimButton {session} {onSetOff} {onStayPut} />
 	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
@@ -71,10 +71,10 @@
 		<CanvasOverlay><FightMeter fight={session.fight} onFinished={onFightFinished} /></CanvasOverlay>
 	{/if}
 	{#if session.phase === 'landed' && session.lastLanded}
-		<CanvasOverlay><CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} isSettling={session.isSettlingAfterCatch} {onContinue} /></CanvasOverlay>
+		<CanvasOverlay><SessionCatchPhoto {session} landed={session.lastLanded} {lake} {profile} {catchOutcome} {onContinue} /></CanvasOverlay>
 	{/if}
 	{#if session.phase === 'day_over'}
-		<CanvasOverlay><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} visitId={session.visitId} sessionsLeft={session.sessionsLeft} endWords={formatFishingHour(session.window.toHour)} /></CanvasOverlay>
+		<CanvasOverlay><SessionDayOver {session} {lake} /></CanvasOverlay>
 	{/if}
 {/snippet}
 

@@ -8,6 +8,7 @@ import { difficultyOfWater } from '$lib/domain/fishing/waterDifficulty';
 import { takerForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
 import { carpNameForIndex } from '$lib/domain/naming/carpNames';
 import type { Carp, Profile } from '$lib/domain/types';
+import { nuisanceBiteShare } from '$lib/domain/water/species';
 import { seasonFor } from '$lib/domain/world/seasons';
 import { weatherFor } from '$lib/domain/world/weather';
 import { readCatchReport } from '../gates/readCatchReport';
@@ -69,7 +70,9 @@ function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: Wa
 		season: seasonFor(water.lake, visitedAt),
 		weather: weatherFor(water.lake, visitedAt),
 		shoals: water.shoals,
-		difficulty: difficultyOfWater(water.lake, water.carp, water.shoals)
+		difficulty: difficultyOfWater(water.lake, water.carp, water.shoals),
+		recentCaptures: water.recentCaptures,
+		nuisanceShare: nuisanceBiteShare(water.species, Number(water.lake.acres))
 	};
 	return takerForRolledBite({ ...report, seed: visit.seed }, today, water.carp);
 }

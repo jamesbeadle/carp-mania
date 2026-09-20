@@ -14,6 +14,7 @@ import { conditionsShareFor } from './weatherConditions';
 import { matchTackleToWater } from './tackleMatch';
 import { carpOfTaker, takerThatTookTheBait, type Taker } from './takers';
 import { headCountOf } from '../stock/shoals';
+import { pressureWariness } from '../water/pressure';
 import type { SpotBonus } from './takeWeight';
 
 const NoBonus = 1;
@@ -70,9 +71,11 @@ export function takerOfTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToda
 	const kitFactorFor = kitAgeFactorFor(bite.kit, Number(water.lake.transparency));
 	const mouths = carpInOrder.length + headCountOf(water.shoals);
 	const sizeReach = sizeReachFor(water, mouths, match.overall, bite.hour);
-	const take = { sizeReach, hour: bite.hour, spotBonusFor, kitFactorFor };
+	const warinessFor = (carp: Pick<Carp, 'id'>) => pressureWariness(water.recentCaptures[carp.id] ?? 0);
+	const take = { sizeReach, hour: bite.hour, spotBonusFor, kitFactorFor, warinessFor };
 	const roll = bite.roll.carpIndexRoll;
-	return takerThatTookTheBait(carpInOrder, water.shoals, take, roll, water.lake.region, carpInOrder.length);
+	const { region } = water.lake;
+	return takerThatTookTheBait(carpInOrder, water.shoals, take, roll, region, carpInOrder.length);
 }
 
 export function takerForRolledBite(report: RolledBiteReport, water: WaterToday, carpInLake: Carp[]): Taker | null {

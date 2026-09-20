@@ -57,6 +57,9 @@ export interface Lake {
 	is_setup_complete: boolean;
 	shop_tier: Tier;
 	is_barbed_banned: boolean;
+	is_booking_on: boolean;
+	syndicate_places_for_sale: number;
+	syndicate_price: number;
 }
 
 export interface Swim {

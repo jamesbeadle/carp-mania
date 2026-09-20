@@ -33,7 +33,7 @@ export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
 	const june = new Date('2026-06-01T00:00:00Z');
-	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june), shoals: [], difficulty: EasyWater };
+	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, june), weather: weatherFor(lake, june), shoals: [], difficulty: EasyWater, recentCaptures: {}, nuisanceShare: 0 };
 	const setup = defaultRodSetup();
 	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 

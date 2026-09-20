@@ -10,24 +10,30 @@
 	import PredatorPanel from '$lib/components/lake/PredatorPanel.svelte';
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
 	import TicketBookPanel from '$lib/components/lake/TicketBookPanel.svelte';
+	import SpeciesPanel from '$lib/components/lake/SpeciesPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import { PikeRules } from '$lib/domain/economy';
+	import type { Carp } from '$lib/domain/types';
 	import { inProgressShapesFor } from '$lib/game/builder/draftShapes';
 	import { bailiffsWord } from '$lib/game/lodge/bailiffsWord';
 	import { onMount } from 'svelte';
+	import { stockDrawOf } from '$lib/domain/water/stockDraw';
 
 	let { data, form } = $props();
 
 	const tabs = ['Stock', 'Tickets', 'Feed', 'Predators', 'Water', 'Groundworks', 'Market', 'Ledger'] as const;
 	const MarketAnchor = '#market';
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
-	const sickCarpCount = $derived(data.fishery.carp.filter((fish) => Number(fish.condition) < PikeRules.SickCarpConditionBelow).length);
-	const worksUnderway = $derived(inProgressShapesFor(data.groundworks.inProgress, data.fishery.lake));
 	const fishery = $derived(data.fishery);
-	const lake = $derived(fishery.lake);
+	const { lake, carp, shoals, swims } = $derived(fishery);
+	const groundworks = $derived(data.groundworks);
+	const isSick = (fish: Carp) => Number(fish.condition) < PikeRules.SickCarpConditionBelow;
+	const sickCarpCount = $derived(carp.filter(isSick).length);
+	const worksUnderway = $derived(inProgressShapesFor(groundworks.inProgress, lake));
+	const stockDraw = $derived(stockDrawOf(carp, shoals));
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 
 	onMount(() => {
@@ -49,8 +55,8 @@
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas {lake} swims={fishery.swims} carp={fishery.carp} shoals={fishery.shoals} drafts={worksUnderway} />
-	<LakeOverview {lake} profile={data.profile} carp={fishery.carp} shoals={fishery.shoals} />
+	<LakeCanvas {lake} {swims} {carp} {shoals} drafts={worksUnderway} />
+	<LakeOverview {lake} profile={data.profile} {carp} {shoals} species={data.species} />
 </div>
 
 <nav class="mt-8 mb-4 flex flex-wrap gap-2">
@@ -59,17 +65,18 @@
 	{/each}
 </nav>
 
-{#if activeTab === 'Stock'}<StockPanel carp={fishery.carp} shoals={fishery.shoals} {lake} waters={data.waters} />{/if}
-{#if activeTab === 'Tickets'}<TicketBookPanel lake={data.fishery.lake} book={data.book} />{/if}
-{#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
-{#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
+{#if activeTab === 'Stock'}<StockPanel {carp} {shoals} {lake} waters={data.waters} />{/if}
+{#if activeTab === 'Stock'}<div class="mt-6"><SpeciesPanel {lake} species={data.species} /></div>{/if}
+{#if activeTab === 'Tickets'}<TicketBookPanel {lake} book={data.book} swimCount={swims.length} {stockDraw} />{/if}
+{#if activeTab === 'Feed'}<FeedPanel {lake} carpCount={carp.length} />{/if}
+{#if activeTab === 'Predators'}<PredatorPanel {lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffTeamPanel {lake} bailiffs={data.bailiffs} />{/if}
 {#if activeTab === 'Groundworks'}
 	<p class="mb-4 text-sm text-mist-400">
 		Islands, bars, holes, shelves, reeds, swims and the shoreline are all shaped in the editor.
 		<a href="/lake/works" class="button-primary ml-3 inline-block px-4 py-1.5 text-base">Open the groundworks editor</a>
 	</p>
-	<WorksLedgerPanel inProgress={data.groundworks.inProgress} ledger={data.groundworks.ledger} />
+	<WorksLedgerPanel inProgress={groundworks.inProgress} ledger={groundworks.ledger} />
 {/if}
-{#if activeTab === 'Market'}<MarketPanel activity={data.marketActivity} carp={data.fishery.carp} loadedAt={data.loadedAt} />{/if}
-{#if activeTab === 'Ledger'}<LedgerPanel visits={data.fishery.visits} catches={data.fishery.catches} carp={data.fishery.carp} />{/if}
+{#if activeTab === 'Market'}<MarketPanel activity={data.marketActivity} {carp} loadedAt={data.loadedAt} />{/if}
+{#if activeTab === 'Ledger'}<LedgerPanel visits={fishery.visits} catches={fishery.catches} {carp} />{/if}

@@ -2,6 +2,7 @@ import type { FishingVisit } from '$lib/contracts/FishingVisit';
 import { isDayTicketStillValid } from '$lib/domain/fishing/dayTicket';
 import type { TicketKind } from '$lib/domain/fishing/ticketBook';
 import { requireUser } from '../gates/requireUser';
+import { loadRecentCaptures, recentCapturesAsRecord } from './loadRecentCaptures';
 
 interface VisitRow {
 	id: string;
@@ -27,6 +28,7 @@ export async function GetFishingVisit(locals: App.Locals, lakeId: string, visitI
 		visitedAt: visit.visited_at,
 		window: { fromHour: visit.session_from_hour, toHour: visit.session_to_hour },
 		ticketKind: visit.ticket_products?.kind ?? FallbackKind,
-		sessionsLeft: visit.sessions_left
+		sessionsLeft: visit.sessions_left,
+		recentCaptures: recentCapturesAsRecord(await loadRecentCaptures(locals.supabase, lakeId, new Date()))
 	};
 }
