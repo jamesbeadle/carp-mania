@@ -5,16 +5,16 @@ import type { WaterToday } from '$lib/domain/fishing/biteRoll';
 import { isDayTicketStillValid } from '$lib/domain/fishing/dayTicket';
 import type { Taker } from '$lib/domain/fishing/takers';
 import { difficultyOfWater } from '$lib/domain/fishing/waterDifficulty';
-import { takerForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
+import { carpInBiteOrder, takerForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
 import { carpNameForIndex } from '$lib/domain/naming/carpNames';
-import type { Carp, Profile } from '$lib/domain/types';
+import type { Carp } from '$lib/domain/types';
 import { nuisanceBiteShare } from '$lib/domain/water/species';
 import { seasonFor } from '$lib/domain/world/seasons';
 import { weatherFor } from '$lib/domain/world/weather';
 import { readCatchReport } from '../gates/readCatchReport';
-import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
-import { hasCaughtDuringVisit, loadVisitOf, loadWaterOf, type VisitOnRecord, type WaterOnRecord } from '../queries/loadVisitForCatch';
+import { countCarpIn, hasCaughtDuringVisit, loadVisitOf, type VisitOnRecord } from '../queries/loadVisitForCatch';
+import { loadRecentCapturesBefore } from '../queries/loadRecentCaptures';
 import { loadStreakDays } from '../queries/loadStreak';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { loadCurrentFishermanId, loadHeaviestBefore } from '../queries/loadPersonalBest';
@@ -33,14 +33,12 @@ export async function RecordCatch(locals: App.Locals, body: unknown) {
 	if (!isDayTicketStillValid(visit.visited_at, new Date())) error(HttpStatus.BadRequest, 'That day ticket was for another day');
 
 	const hadItAlready = report.shoalId === null && hasCaughtDuringVisit(user.id, visit, report.carpId);
-	const [water, profile, hasHadItToday] = await Promise.all([loadWaterOf(visit.lake_id), loadProfile(locals), hadItAlready]);
-	if (!water) error(HttpStatus.BadRequest, 'That lake is no longer there');
+	const [day, hasHadItToday] = await Promise.all([loadTheDayAsFound(locals, user.id, visit), hadItAlready]);
 	if (hasHadItToday) error(HttpStatus.BadRequest, 'You have already had that fish today');
-	const [pedigreeLb, streakDays] = await Promise.all([loadPedigreeBeforeVisit(locals, user.id, visit), loadStreakDays(trustedSupabase(), user.id, visit.visited_at)]);
-	const taker = takerThatWasRolled(report, visit, water, profile, { pedigreeLb, streakDays });
+	const taker = takerThatWasRolled(report, visit, day);
 	if (!taker) error(HttpStatus.BadRequest, NotTheFish);
 	if (taker.kind === 'named') return recordTheNamedFish(user.id, report, taker.carp);
-	return recordTheShoalFish(user.id, report, taker, water);
+	return recordTheShoalFish(user.id, report, taker, visit.lake_id);
 }
 
 async function recordTheNamedFish(anglerId: string, report: CatchReport, carp: Carp) {
@@ -50,18 +48,28 @@ async function recordTheNamedFish(anglerId: string, report: CatchReport, carp: C
 	return json({ catchId, carp, ...honours });
 }
 
-async function recordTheShoalFish(anglerId: string, report: CatchReport, taker: Taker & { kind: 'shoal' }, water: WaterOnRecord) {
+async function recordTheShoalFish(anglerId: string, report: CatchReport, taker: Taker & { kind: 'shoal' }, lakeId: string) {
 	const isTheShoal = taker.shoal.id === report.shoalId;
 	if (!isTheShoal) error(HttpStatus.BadRequest, NotTheFish);
-	const fish = { ...taker.fish, name: carpNameForIndex(water.carp.length) };
+	const fish = { ...taker.fish, name: carpNameForIndex(await countCarpIn(lakeId)) };
 	const { carpId, catchId } = await recordShoalCatch(anglerId, report, taker.shoal, fish);
 	const honours = await honoursAfterTheCatch(anglerId, catchId);
 	return json({ catchId, carp: { ...fish, id: carpId, times_caught: 1 }, ...honours });
 }
 
-interface AnglerOnTheDay {
+interface TheDayAsFound {
+	recentCaptures: Record<string, number>;
 	pedigreeLb: number;
 	streakDays: number;
+}
+
+async function loadTheDayAsFound(locals: App.Locals, anglerId: string, visit: VisitOnRecord): Promise<TheDayAsFound> {
+	const [recentCaptures, pedigreeLb, streakDays] = await Promise.all([
+		loadRecentCapturesBefore(trustedSupabase(), visit.lake_id, new Date(visit.visited_at)),
+		loadPedigreeBeforeVisit(locals, anglerId, visit),
+		loadStreakDays(trustedSupabase(), anglerId, visit.visited_at)
+	]);
+	return { recentCaptures, pedigreeLb, streakDays };
 }
 
 async function loadPedigreeBeforeVisit(locals: App.Locals, anglerId: string, visit: VisitOnRecord) {
@@ -69,20 +77,22 @@ async function loadPedigreeBeforeVisit(locals: App.Locals, anglerId: string, vis
 	return fishermanId ? loadHeaviestBefore(locals, fishermanId, visit.visited_at) : 0;
 }
 
-function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: WaterOnRecord, profile: Profile, angler: AnglerOnTheDay): Taker | null {
-	const skills = skillsOf(profile);
+function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, day: TheDayAsFound): Taker | null {
+	const water = visit.water_as_found;
+	const carp = carpInBiteOrder(water.carp);
+	const skills = skillsOf(visit.skills_at_start);
 	const visitedAt = new Date(visit.visited_at);
 	const today: WaterToday = {
 		lake: water.lake,
-		rating: anglerRatingOf(skills, angler.pedigreeLb).rating,
+		rating: anglerRatingOf(skills, day.pedigreeLb).rating,
 		watercraft: skills.watercraft,
 		season: seasonFor(water.lake, visitedAt),
 		weather: weatherFor(water.lake, visitedAt),
 		shoals: water.shoals,
-		difficulty: difficultyOfWater(water.lake, water.carp, water.shoals),
-		recentCaptures: water.recentCaptures,
+		difficulty: difficultyOfWater(water.lake, carp, water.shoals),
+		recentCaptures: day.recentCaptures,
 		nuisanceShare: nuisanceBiteShare(water.species, Number(water.lake.acres)),
-		streakDays: angler.streakDays
+		streakDays: day.streakDays
 	};
-	return takerForRolledBite({ ...report, seed: visit.seed }, today, water.carp);
+	return takerForRolledBite({ ...report, seed: visit.seed }, today, carp);
 }

@@ -9,7 +9,6 @@ import type { Carp, Lake, Profile } from '$lib/domain/types';
 import { nuisanceBiteShare, type LakeSpecies } from '$lib/domain/water/species';
 import { seasonFor, type Season } from '$lib/domain/world/seasons';
 import { weatherFor, type Weather } from '$lib/domain/world/weather';
-import { skillsOfProfile } from './skillsOfProfile';
 
 export interface SessionSetup {
 	lake: Lake;
@@ -37,6 +36,7 @@ export interface VisitFacts {
 	readonly species: LakeSpecies[];
 	readonly nuisanceShare: number;
 	readonly rating: number;
+	readonly watercraft: number;
 	readonly streakDays: number;
 }
 
@@ -62,6 +62,7 @@ export function visitFactsOf(setup: SessionSetup): VisitFacts {
 		species,
 		nuisanceShare: nuisanceBiteShare(species, Number(lake.acres)),
 		streakDays: visit.streakDays,
-		rating: anglerRatingOf(skillsOfProfile(profile), bar.pedigreeLb).rating
+		rating: anglerRatingOf(visit.skillsAtStart, bar.pedigreeLb).rating,
+		watercraft: Number(visit.skillsAtStart.watercraft)
 	};
 }

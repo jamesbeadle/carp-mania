@@ -12,7 +12,8 @@
 	const runningMatch = $derived(data.runningMatch);
 	const enteredMatchId = $derived(runningMatch?.isEntered ? runningMatch.match.id : null);
 	const matchBoardHref = $derived(enteredMatchId ? `/matches/${enteredMatchId}` : null);
-	const setup = $derived({ ...water, carp: carpInTheLake, profile: data.profile, visit: data.visit, bar: data.bar });
+	const waterAsFound = $derived(data.visit?.waterAsFound ?? water);
+	const setup = $derived({ ...waterAsFound, carp: waterAsFound.carp.filter(isFishable), profile: data.profile, visit: data.visit, bar: data.bar });
 </script>
 
 <svelte:head><title>Fishing {water.lake.name} · Carp Mania</title></svelte:head>
