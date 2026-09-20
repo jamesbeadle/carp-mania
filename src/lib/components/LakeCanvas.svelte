@@ -7,14 +7,14 @@
 	import { CameraLimits, isZoomable } from '$lib/game/scene/camera';
 	import { CameraGestures } from '$lib/game/scene/cameraInput';
 	import { CameraState } from '$lib/game/scene/cameraState.svelte';
-	import { clusterAt, clusterSwims } from '$lib/game/scene/clusterSwims';
-	import { createSceneDrawer, isCastClearOfIslands, isPointInWater } from '$lib/game/scene/drawScene';
-	import { distanceBetween, type Point } from '$lib/game/scene/lakeShape';
+	import { createSceneDrawer } from '$lib/game/scene/drawScene';
+	import type { Point } from '$lib/game/scene/lakeShape';
 	import { SceneSize } from '$lib/game/scene/palette';
 	import { startRenderLoop } from '$lib/game/scene/renderLoop';
 	import type { RodOnBank } from '$lib/game/scene/rodState';
-	import { SwimPegRadius, swimScenePoint } from '$lib/game/render/drawSwims';
+	import { answerTheClick, swimAt } from '$lib/game/scene/waterClicks';
 	import type { DraftShape } from '$lib/game/render/drawUnderConstruction';
+	import type { CastReach } from '$lib/game/session/castReach';
 	import { untrack } from 'svelte';
 	import Minimap from './stage/Minimap.svelte';
 
@@ -26,6 +26,7 @@
 		camera?: CameraState;
 		selectedSwimId?: string | null;
 		bountySwimId?: string | null;
+		castReach?: CastReach | null;
 		rods?: RodOnBank[];
 		isAnglerOnBank?: boolean;
 		drafts?: DraftShape[];
@@ -36,10 +37,9 @@
 		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, bountySwimId = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
+	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, bountySwimId = null, castReach = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
 
 	const SchoolSeedStride = 7919;
-	const SwimHitRadius = SwimPegRadius * 1.4;
 
 	let canvas: HTMLCanvasElement;
 	let hoveredSwimId = $state<string | null>(null);
@@ -53,34 +53,20 @@
 		const drawScene = createSceneDrawer(layout);
 		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) => {
 			const pixelsPerScenePixel = camera.pixelsPerScenePixel(canvas);
-			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel, bountySwimId }, secondsElapsed, timeSeconds);
+			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel, bountySwimId, castReach }, secondsElapsed, timeSeconds);
 		}, () => camera.camera);
 	});
 
 	const scenePointOf = (event: MouseEvent | PointerEvent) => camera.scenePointOf(canvas, event.clientX, event.clientY);
-	const swimAt = (point: Point) => swims.find((swim) => distanceBetween(swimScenePoint(swim), point) <= SwimHitRadius);
 
 	function handleMove(event: PointerEvent) {
 		if (gestures.move(event)) return;
-		hoveredSwimId = swimAt(scenePointOf(event))?.id ?? null;
+		hoveredSwimId = swimAt(swims, scenePointOf(event))?.id ?? null;
 	}
 
 	function handleUp(event: PointerEvent) {
 		if (gestures.up(event)) return;
-		handleClick(scenePointOf(event));
-	}
-
-	function handleClick(point: Point) {
-		const cluster = clusterAt(clusterSwims(swims, camera.pixelsPerScenePixel(canvas)), point, SwimHitRadius / camera.zoom);
-		if (cluster) return camera.zoomAround(CameraLimits.ClickIntoClusterZoom, cluster.centre);
-		const swim = swimAt(point);
-		if (swim) return onSwimClick?.(swim);
-		const context = canvas.getContext('2d');
-		if (!context) return;
-		if (!isPointInWater(context, lake.layout, point)) return onBankClick?.(point);
-		const isBlocked = selectedSwim && !isCastClearOfIslands(context, lake.layout, swimScenePoint(selectedSwim), point);
-		if (isBlocked) return onCastBlockedByIsland?.();
-		onWaterClick?.(point);
+		answerTheClick({ lake, swims, selectedSwim, camera, canvas }, scenePointOf(event), { onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland });
 	}
 </script>
 

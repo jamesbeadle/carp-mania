@@ -36,6 +36,7 @@ export const AnglerPalette = {
 	Float: 'hsl(40 30% 92%)',
 	FloatEdge: 'hsla(0 0% 0% / 0.5)',
 	Ripple: 'hsla(190 30% 95% / 0.5)',
+	CastReach: 'hsla(48 90% 88% / 0.55)',
 	BiteTag: 'hsl(2 78% 62%)',
 	Bivvy: 'hsl(95 22% 34%)',
 	BivvyLight: 'hsla(95 30% 60% / 0.35)',
