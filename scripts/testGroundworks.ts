@@ -9,6 +9,7 @@ import { layoutScaleFor } from '../src/lib/domain/layout/layoutScale';
 import { isInWater } from '../src/lib/domain/layout/waterArea';
 import { FisheryClock } from '../src/lib/domain/simulation/elapsedDays';
 import { completeDueWorks } from '../src/lib/domain/simulation/completeWorks';
+import { runRedrawBankScenarios } from './testRedrawBank';
 import { classicLake, classicSwims } from '../src/lib/domain/sites/classicSite';
 import type { Lake, Swim } from '../src/lib/domain/types';
 import type { LakeWork } from '../src/lib/domain/worldTypes';
@@ -85,5 +86,6 @@ export function runGroundworksScenarios() {
 	dredgeScenarios();
 	shelfScenario();
 	completionScenarios();
+	runRedrawBankScenarios();
 	console.log('groundworks:', { island: GetGroundworksQuote(island, lake, swims, []), dredge: GetGroundworksQuote(dredge, lake, swims, []).effects });
 }

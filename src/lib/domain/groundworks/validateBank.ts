@@ -34,8 +34,8 @@ function strandedSwimFailure(reshaped: LakeLayout, plan: Plan, swim: Swim): stri
 	const peg = swimPoint(swim);
 	const isStranded = isOnTheBank(plan.layout, plan.scale, peg) && !isOnTheBank(reshaped, plan.scale, peg);
 	if (!isStranded) return [];
-	if (isPointInPolygon(peg, reshaped.outline)) return [`${swim.name} would be left in the water`];
-	return [`${swim.name} would be left too far from the water`];
+	if (isPointInPolygon(peg, reshaped.outline)) return [`${swim.name} would be left in the water — move it with Select first, or take it out`];
+	return [`${swim.name} would be left too far from the water — move it with Select first, or take it out`];
 }
 
 function isInsidePlot(point: LayoutPoint) {

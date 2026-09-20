@@ -2,6 +2,7 @@
 	import type { Lake, Swim } from '$lib/domain/types';
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
 	import DrawingControls from './DrawingControls.svelte';
+	import RedrawControls from './RedrawControls.svelte';
 	import NewSwimPanel from './NewSwimPanel.svelte';
 	import SelectedSwimPanel from './SelectedSwimPanel.svelte';
 	import ToolHint from './ToolHint.svelte';
@@ -21,13 +22,15 @@
 	const isPlaced = $derived(builder.draft !== null && builder.phase === 'placed');
 	const isNamingASwim = $derived(builder.tool === 'swim' && builder.swimPoint !== null);
 	const isASwimChosen = $derived(builder.tool === 'select' && selectedSwim !== null);
-	const hasSomethingOnTheBench = $derived(builder.isDrawing || isPlaced || isNamingASwim || isASwimChosen);
+	const hasSomethingOnTheBench = $derived(builder.isDrawing || builder.isRedrawingTheBank || isPlaced || isNamingASwim || isASwimChosen);
 </script>
 
 {#if hasSomethingOnTheBench}
 	<div class="panel mt-2 py-3">
 		{#if builder.isDrawing}
 			<DrawingControls {builder} {failures} />
+		{:else if builder.isRedrawingTheBank}
+			<RedrawControls {builder} />
 		{:else if isPlaced}
 			<div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
 				<p class="min-w-0 text-sm leading-snug sm:flex-1" class:text-danger-400={failures.length > 0} class:text-mist-200={failures.length === 0}>{failures[0] ?? PlacedWords}</p>
