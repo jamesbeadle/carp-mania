@@ -1,6 +1,7 @@
 import { isReedLine, type LakeLayout, type LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { scenePathOf, toScene, type Point } from '../scene/lakeShape';
-import { BankPalette, weedColour } from '../scene/palette';
+import { BankPalette } from '../scene/palette';
+import { weedColour } from '../scene/waterPalette';
 import { pointsAlongPolyline } from './alongPolyline';
 import { areaFeaturesOfKind } from './layoutShapes';
 import { countForArea, scatterWithin, sceneBoundsOf } from './scatter';

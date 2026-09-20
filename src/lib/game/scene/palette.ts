@@ -3,8 +3,8 @@ import type { BedType } from '$lib/domain/types';
 export const SceneSize = { Width: 960, Height: 640 } as const;
 
 export const BankPalette = {
-	GrassFar: 'hsl(96 32% 30%)',
-	GrassNear: 'hsl(92 38% 38%)',
+	GrassFar: 'hsl(96 34% 33%)',
+	GrassNear: 'hsl(92 40% 41%)',
 	Path: 'hsl(38 25% 55%)',
 	Shore: 'hsl(40 30% 46%)',
 	Reed: 'hsl(70 45% 32%)',
@@ -56,8 +56,6 @@ export const BedPalette = {
 	BarRidge: 'hsla(46 60% 96% / 0.5)'
 } as const;
 
-export const DepthShade = { AlphaPerFoot: 0.06, MaximumAlpha: 0.5, SoftEdgePixels: 16 } as const;
-
 export const LilyPalette = {
 	Pad: 'hsl(104 38% 30%)',
 	Highlight: 'hsla(100 55% 66% / 0.7)'
@@ -75,25 +73,3 @@ export const DraftPalette = {
 	Invalid: 'hsl(2 78% 54%)',
 	InvalidFill: 'hsla(2 78% 54% / 0.14)'
 } as const;
-
-export function waterColour(transparency: number, depthFraction: number) {
-	const clarity = transparency / 100;
-	const hue = 160 + (1 - clarity) * 40;
-	const saturation = 30 + clarity * 25;
-	const lightness = 28 - depthFraction * 12 - (1 - clarity) * 6;
-	return `hsl(${hue} ${saturation}% ${lightness}%)`;
-}
-
-export function depthShadeColour(feetBelowBase: number) {
-	const alpha = Math.min(DepthShade.MaximumAlpha, Math.abs(feetBelowBase) * DepthShade.AlphaPerFoot);
-	if (feetBelowBase < 0) return `hsla(70 40% 80% / ${alpha})`;
-	return `hsla(205 50% 5% / ${alpha})`;
-}
-
-export function weedColour(alpha: number) {
-	return `hsla(110 40% 30% / ${alpha})`;
-}
-
-export function showingRippleColour(alpha: number) {
-	return `hsla(185 35% 92% / ${alpha})`;
-}

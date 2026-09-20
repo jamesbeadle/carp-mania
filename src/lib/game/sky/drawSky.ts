@@ -4,7 +4,7 @@ import { drawStars, drawSunAndMoon } from './skyBodies';
 import type { SkyFrame } from './skyLoop';
 import { skyLookFor } from './skyPalette';
 import type { StageConditions } from './stageConditions';
-import { createRain, drawWeather, fallRain } from './weatherEffects';
+import { createRain, drawRainfall, drawSkyWeather } from './weatherEffects';
 
 export interface SkyScene {
 	clouds: ReturnType<typeof createClouds>;
@@ -28,14 +28,14 @@ export function drawSkyBackdrop(frame: SkyFrame, conditions: StageConditions, sc
 	drawSunAndMoon(context, width, height, conditions.hour, look);
 	driftClouds(scene.clouds, conditions.weather.windStrength, frame.secondsElapsed);
 	drawClouds(context, width, height, scene.clouds, conditions.weather.cloudCover, look.daylight, conditions.weather.kind === 'rain');
+	drawSkyWeather(context, width, height, conditions);
 }
 
 export function drawOverhead(frame: SkyFrame, conditions: StageConditions, scene: SkyScene) {
 	const { context, width, height } = frame;
 	context.clearRect(0, 0, width, height);
 	const look = skyLookFor(conditions.hour, conditions.season);
-	if (conditions.weather.kind === 'rain') fallRain(scene.rain, conditions.weather.windStrength, frame.secondsElapsed);
-	drawWeather(context, width, height, conditions, scene.rain);
+	drawRainfall(context, width, height, conditions, scene.rain, frame.secondsElapsed);
 	moveBirds(scene.birdlife, width, height, look.daylight, frame.secondsElapsed);
 	drawBirds(context, scene.birdlife, frame.timeSeconds);
 }

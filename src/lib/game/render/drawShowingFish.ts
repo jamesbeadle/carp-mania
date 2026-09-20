@@ -1,6 +1,6 @@
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { toScene, type Point } from '../scene/lakeShape';
-import { showingRippleColour } from '../scene/palette';
+import { showingRippleColour } from '../scene/waterPalette';
 
 const Ripple = { PeriodSeconds: 2.6, RingCount: 2, SmallestRadius: 3, Growth: 22, PeakAlpha: 0.6, LineWidth: 1.5, StaggerSeconds: 0.9 } as const;
 

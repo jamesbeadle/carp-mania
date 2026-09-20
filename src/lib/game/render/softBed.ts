@@ -1,5 +1,6 @@
 import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
-import { DepthShade, SceneSize } from '../scene/palette';
+import { SceneSize } from '../scene/palette';
+import { DepthShade } from '../scene/waterPalette';
 import { drawBedTints } from './drawBedPatches';
 import { drawDepthZones } from './drawDepthZones';
 

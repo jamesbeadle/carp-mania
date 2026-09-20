@@ -16,7 +16,7 @@ export function createRain(): Raindrop[] {
 	return Array.from({ length: Rain.DropCount }, () => ({ across: Math.random(), up: Math.random(), speed: Rain.SlowestPerSecond + Math.random() * (Rain.FastestPerSecond - Rain.SlowestPerSecond), length: Rain.ShortestLength + Math.random() * (Rain.LongestLength - Rain.ShortestLength) }));
 }
 
-export function fallRain(drops: Raindrop[], windStrength: number, secondsElapsed: number) {
+function fallRain(drops: Raindrop[], windStrength: number, secondsElapsed: number) {
 	for (const drop of drops) {
 		drop.up += drop.speed * secondsElapsed;
 		drop.across += Rain.Slant * windStrength * secondsElapsed;
@@ -28,12 +28,18 @@ export function fallRain(drops: Raindrop[], windStrength: number, secondsElapsed
 	}
 }
 
-export function drawWeather(context: CanvasRenderingContext2D, width: number, height: number, conditions: StageConditions, drops: Raindrop[]) {
+export function drawSkyWeather(context: CanvasRenderingContext2D, width: number, height: number, conditions: StageConditions) {
 	const { weather, hour } = conditions;
-	if (weather.kind === 'rain') return drawRain(context, width, height, weather.windStrength, drops);
+	if (weather.kind === 'rain' || weather.kind === 'overcast') return drawOvercastVeil(context, width, height);
 	if (weather.kind === 'mist') return drawMist(context, width, height, mistStrengthAt(hour));
 	if (weather.kind === 'heat') return drawHeatHaze(context, width, height);
-	if (weather.kind === 'overcast') return drawOvercastVeil(context, width, height);
+}
+
+export function drawRainfall(context: CanvasRenderingContext2D, width: number, height: number, conditions: StageConditions, drops: Raindrop[], secondsElapsed: number) {
+	const { weather } = conditions;
+	if (weather.kind !== 'rain') return;
+	fallRain(drops, weather.windStrength, secondsElapsed);
+	drawRain(context, width, height, weather.windStrength, drops);
 }
 
 export function mistStrengthAt(hour: number) {
@@ -44,7 +50,6 @@ export function mistStrengthAt(hour: number) {
 }
 
 function drawRain(context: CanvasRenderingContext2D, width: number, height: number, windStrength: number, drops: Raindrop[]) {
-	drawOvercastVeil(context, width, height);
 	context.save();
 	context.strokeStyle = Rain.Colour;
 	context.lineWidth = Rain.LineWidth;
