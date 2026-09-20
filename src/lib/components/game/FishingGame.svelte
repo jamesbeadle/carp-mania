@@ -14,7 +14,7 @@
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
 	import type { SessionSetup } from '$lib/game/session/visitFacts';
 	import { reportLossesAsTheyHappen } from '$lib/game/session/tackleLoss';
-	import { spotsShowingNow } from '$lib/game/session/showsThisHour';
+	import { spotsShowingInTheHour } from '$lib/game/session/showsThisHour';
 	import { startTicking } from '$lib/game/session/tickSession';
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
@@ -37,7 +37,8 @@
 	let catchOutcome = $state<CatchReportOutcome | null>(null);
 	let isAlarmMuted = $state(false);
 	let isHowToPlayOpen = $state(false);
-	const showingAt = $derived(spotsShowingNow(session, lake));
+	const hourOfShows = $derived(Math.floor(session.hour));
+	const showingAt = $derived(spotsShowingInTheHour(session, lake, hourOfShows));
 	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, session.hour));
 	const ambience = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 

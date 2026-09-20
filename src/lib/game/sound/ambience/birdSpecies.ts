@@ -9,7 +9,7 @@ export interface Note {
 
 export type Species = (random: () => number) => Note[];
 
-const Distance = { QuietestGain: 0.05, LoudestGain: 0.11 } as const;
+const Distance = { QuietestGain: 0.04, LoudestGain: 0.09 } as const;
 
 export const Songbirds: Species[] = [robin, blackbird, chiffchaff, wren, greatTit];
 
