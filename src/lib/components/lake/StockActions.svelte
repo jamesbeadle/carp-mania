@@ -22,10 +22,10 @@
 </script>
 
 <div class="mt-4 rounded-xl border border-carbon-700/60 bg-carbon-900/60 p-4">
-	<p class="mb-3 text-sm text-mist-400">
-		{#if hasChosen}{fishWord} chosen.{:else}Tick fish to sell or move them together.{/if}
-		The dealer pays {fullSharePercent}% of guide on the first {DealerTerms.FullShareFishPerFisheryDay} fish a fishery day and {bulkSharePercent}% after — a truckload gets a truckload price.
-	</p>
+	<div class="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+		<span class="text-mist-100">{#if hasChosen}{fishWord} chosen{:else}Tick fish to sell or move them together{/if}</span>
+		<span class="text-xs text-mist-400">Dealer pays {fullSharePercent}% of guide on the first {DealerTerms.FullShareFishPerFisheryDay} fish a fishery day, {bulkSharePercent}% after</span>
+	</div>
 	<div class="flex flex-wrap items-center gap-3">
 		<form method="POST" action="?/sellToDealer">
 			{#each chosen as fish (fish.id)}<input type="hidden" name="carpId" value={fish.id} />{/each}

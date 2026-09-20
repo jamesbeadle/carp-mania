@@ -2,10 +2,12 @@
 	import { isBandOf, type SizeBandName } from '$lib/domain/stock/stockBySize';
 	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp, Lake } from '$lib/domain/types';
+	import AboutToggle from './AboutToggle.svelte';
 	import ShoalRow from './ShoalRow.svelte';
 	import StockActions from './StockActions.svelte';
 	import StockBySize from './StockBySize.svelte';
 	import StockList from './StockList.svelte';
+	import StockStats from './StockStats.svelte';
 
 	interface Props {
 		carp: Carp[];
@@ -21,7 +23,6 @@
 	const cataloguedCarp = $derived(carp.filter((fish) => fish.is_catalogued));
 	const shown = $derived(shownIn(chosenBand));
 	const chosen = $derived(cataloguedCarp.filter((fish) => chosenIds.includes(fish.id)));
-	const shoalWords = $derived(shoals.length === 0 ? '' : ` and ${shoals.length} ${shoals.length === 1 ? 'shoal' : 'shoals'}`);
 
 	function shownIn(band: SizeBandName | null) {
 		if (band === null) return cataloguedCarp;
@@ -30,14 +31,12 @@
 </script>
 
 <section class="panel">
-	<div class="mb-3 flex flex-wrap items-start justify-between gap-3">
-		<div>
-			<h3 class="mb-1 text-xl text-volt-300">The stock</h3>
-			<p class="text-sm text-mist-400">{cataloguedCarp.length} named carp{shoalWords}. A shoal fish gets its name the first time it is landed. Small fish come from a stock farm; a forty from a specialist; a fifty from a record grower, dear and old.</p>
-		</div>
+	<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+		<h3 class="text-xl text-volt-300">The stock</h3>
 		<a href="/market/farms" class="button-primary text-base">Buy from the farms</a>
 	</div>
-	<StockBySize carp={cataloguedCarp} {shoals} {chosenBand} onChoose={(band) => (chosenBand = band)} />
+	<StockStats carp={cataloguedCarp} {shoals} />
+	<div class="mt-5"><StockBySize carp={cataloguedCarp} {shoals} {chosenBand} onChoose={(band) => (chosenBand = band)} /></div>
 	{#if shoals.length > 0}
 		<ul class="mb-4 divide-y divide-carbon-700/60 border-b border-carbon-700/60">
 			{#each shoals as shoal (shoal.id)}<ShoalRow {shoal} />{/each}
@@ -45,4 +44,7 @@
 	{/if}
 	<StockList carp={shown} {chosenIds} onChosen={(ids) => (chosenIds = ids)} />
 	<StockActions {chosen} {lake} {waters} />
+	<div class="mt-4">
+		<AboutToggle title="About the stock">A shoal fish gets its name the first time it is landed. Small fish come from a stock farm; a forty from a specialist; a fifty from a record grower, dear and old.</AboutToggle>
+	</div>
 </section>
