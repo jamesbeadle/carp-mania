@@ -41,6 +41,7 @@
 
 <header class="relative mb-6 overflow-hidden rounded-2xl border border-carbon-600/80 shadow-lg shadow-carbon-950/60">
 	<div class="absolute inset-0"><SkyCanvas {conditions} layer="backdrop" /></div>
+	<div class="absolute inset-0 bg-carbon-950/30"></div>
 	<div class="absolute inset-x-0 bottom-0 h-14 sm:h-16" style="background: {ground}; filter: {lighting.seasonFilter}"><LightingOverlays {lighting} /></div>
 	<div class="relative flex flex-wrap items-end gap-x-3 gap-y-3 px-4 pt-5 pb-3 sm:gap-x-5 sm:px-6 sm:pt-6">
 		<div class="h-14 w-24 shrink-0 sm:h-24 sm:w-40" style="filter: {vignetteFilter}"><PlaceVignette {kind} {isNight} {hasBailiff} {noteCount} {words} /></div>

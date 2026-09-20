@@ -4,13 +4,13 @@
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { pointerWords } from '$lib/game/stage/pointerWords';
 
-	let { session, isDocked = false }: { session: SessionState; isDocked?: boolean } = $props();
+	let { session }: { session: SessionState } = $props();
 
 	const prompt = $derived(promptFor(session));
 	const words = $derived(prompt ? pointerWords(prompt) : null);
 
 	function promptFor(current: SessionState) {
-		if (current.phase === 'choose_swim') return 'Pick a swim — click one of the pegs on the bank';
+		if (current.phase === 'choose_swim') return 'Pick a swim — click a peg on the bank or a name';
 		if (current.phase !== 'fishing' || current.bite) return null;
 		if (current.isPickingASwimToMoveTo) return PickASwimPrompt;
 		const next = nextRodToCast(current);
@@ -22,7 +22,7 @@
 </script>
 
 {#if words}
-	<div class={['pointer-events-none rounded-full border border-volt-500/60 bg-carbon-950/85 px-5 py-2 font-display text-lg font-bold tracking-wide text-volt-300 uppercase backdrop-blur', isDocked ? 'text-center' : 'absolute top-3 left-1/2 -translate-x-1/2']}>
+	<div class="short:py-1 short:text-sm rounded-2xl border border-volt-500/60 bg-carbon-950/85 px-4 py-2 text-center font-display text-base font-bold tracking-wide text-volt-300 uppercase">
 		{words}
 	</div>
 {/if}

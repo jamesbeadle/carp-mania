@@ -64,7 +64,7 @@
 
 @layer components {
 	.panel {
-		@apply rounded-2xl border border-carbon-600/80 p-5 shadow-lg shadow-carbon-950/60 backdrop-blur;
+		@apply min-w-0 rounded-2xl border border-carbon-600/80 p-5 shadow-lg shadow-carbon-950/60 backdrop-blur;
 		background:
 			linear-gradient(160deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 45%),
 			var(--color-carbon-800);

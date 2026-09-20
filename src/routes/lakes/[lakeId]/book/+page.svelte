@@ -12,7 +12,7 @@
 
 <svelte:head><title>Book a peg at {lake.name} · Carp Mania</title></svelte:head>
 
-<PlaceBanner kind="office" title="The booking diary at {lake.name}" blurb="Pick a day and a peg; the ticket is paid now and the peg is held for you. A no-show forfeits it at the end of the day. You have {formatMoney(data.profile.money)}.">
+<PlaceBanner kind="jetty" title="The booking diary at {lake.name}" blurb="Pick a day and a peg; the ticket is paid now and the peg is held for you. A no-show forfeits it at the end of the day. You have {formatMoney(data.profile.money)}.">
 	{#snippet actions()}
 		<a href="/lakes/{lake.id}" class="button-secondary text-base">Back to the water</a>
 	{/snippet}

@@ -10,8 +10,8 @@
 	];
 </script>
 
-<div class="pointer-events-none absolute right-3 bottom-2 hidden flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm lg:flex">
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
 	{#each hints as hint (hint.key)}
-		<span><kbd class="rounded border border-carbon-600 bg-carbon-950/70 px-2 py-0.5 font-display text-xs font-bold tracking-wide text-volt-300 uppercase backdrop-blur">{hint.key}</kbd> <span class="text-mist-100/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{hint.action}</span></span>
+		<span class="whitespace-nowrap"><kbd class="rounded border border-carbon-600 bg-carbon-900 px-1.5 py-0.5 font-display text-[11px] font-bold tracking-wide text-volt-300 uppercase">{hint.key}</kbd> <span class="text-mist-400">{hint.action}</span></span>
 	{/each}
 </div>

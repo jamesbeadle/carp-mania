@@ -2,7 +2,7 @@
 	import type { RodOnBank } from '$lib/game/scene/rodState';
 	import RodCard from './RodCard.svelte';
 
-	let { rods, isDocked = false, onReelIn }: { rods: RodOnBank[]; isDocked?: boolean; onReelIn?: (rodIndex: number) => void } = $props();
+	let { rods, isWide = false, onReelIn }: { rods: RodOnBank[]; isWide?: boolean; onReelIn?: (rodIndex: number) => void } = $props();
 
 	const RodKeys = ['1', '2', '3'];
 
@@ -15,8 +15,8 @@
 
 <svelte:window onkeydown={reelInOnNumber} />
 
-<div class={['pointer-events-none gap-2', isDocked ? 'flex flex-col' : 'absolute bottom-3 left-3 flex flex-wrap']}>
+<div class="flex flex-col gap-2">
 	{#each rods as rod (rod.index)}
-		<RodCard {rod} {isDocked} {onReelIn} />
+		<RodCard {rod} {isWide} {onReelIn} />
 	{/each}
 </div>

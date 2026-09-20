@@ -18,15 +18,15 @@
 </script>
 
 <header class="hud sticky top-0 z-30 border-b border-carbon-700 bg-carbon-950/85 backdrop-blur">
-	<div class="mx-auto flex max-w-7xl items-center gap-3 px-3 py-2 lg:px-4">
+	<div class="short:py-1 mx-auto flex max-w-7xl items-center gap-3 px-3 py-2 lg:px-4">
 		<a href="/home" class="mr-1 shrink-0 active:scale-95"><Wordmark size="text-xl lg:text-2xl" /></a>
 		<HudTabs {pathname} />
-		<div class="ml-auto flex items-center gap-2">
+		<div class="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
 			<MoneyCounter {money} />
 			<InboxBell {unreadCount} />
 			<NewsLink />
-			<SoundToggle />
-			<FullscreenToggle />
+			<div class="hidden sm:block"><SoundToggle /></div>
+			<div class="hidden sm:block"><FullscreenToggle /></div>
 			<a href="/angler" class="hidden h-9 w-9 overflow-hidden rounded-full border border-volt-500/60 bg-carbon-900 transition hover:border-volt-400 active:scale-95 lg:block" aria-label="My angler">
 				{#if avatarUrl}<img src={avatarUrl} alt="" class="h-full w-full object-cover" referrerpolicy="no-referrer" />{/if}
 			</a>

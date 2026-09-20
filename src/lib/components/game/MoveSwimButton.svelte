@@ -5,17 +5,17 @@
 
 	interface Props {
 		session: SessionState;
-		isDocked?: boolean;
 		onSetOff: () => void;
 		onStayPut: () => void;
 	}
 
-	let { session, isDocked = false, onSetOff, onStayPut }: Props = $props();
+	let { session, onSetOff, onStayPut }: Props = $props();
 
 	const MoveKey = 'm';
 	const StayKey = 'Escape';
 	const isShown = $derived(canMoveSwim(session));
 	const isPicking = $derived(session.isPickingASwimToMoveTo);
+	const walkWords = `Bring the rods in and walk to another peg — ${SwimMoveWords.Duration} to pack up and walk round`;
 
 	function answerTheKeys(event: KeyboardEvent) {
 		if (!isShown || event.target instanceof HTMLInputElement) return;
@@ -26,12 +26,8 @@
 
 <svelte:window onkeydown={answerTheKeys} />
 
-{#if isShown}
-	<div class={['pointer-events-auto', isDocked ? 'flex' : 'absolute top-3 right-3']}>
-		{#if isPicking}
-			<button class="button-secondary w-full py-1.5 text-base" onclick={onStayPut}>Stay put</button>
-		{:else}
-			<button class="button-secondary w-full py-1.5 text-base" onclick={onSetOff} title="Bring the rods in and walk to another peg — {SwimMoveWords.Duration} to pack up and walk round">Move swim</button>
-		{/if}
-	</div>
+{#if isShown && isPicking}
+	<button class="button-secondary w-full py-2 text-base" onclick={onStayPut}>Stay put</button>
+{:else if isShown}
+	<button class="button-secondary w-full py-2 text-base" onclick={onSetOff} title={walkWords}>Move swim</button>
 {/if}

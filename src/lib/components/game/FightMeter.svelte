@@ -8,9 +8,7 @@
 	import RunWarning from './RunWarning.svelte';
 	import TensionBar from './TensionBar.svelte';
 
-	type Placement = 'over_the_lake' | 'over_the_screen';
-
-	let { fight, onFinished, placement = 'over_the_lake' }: { fight: FightState; onFinished: () => void; placement?: Placement } = $props();
+	let { fight, onFinished }: { fight: FightState; onFinished: () => void } = $props();
 
 	const reel = new ReelInput();
 	const GuessRoundingLb = 5;
@@ -43,6 +41,6 @@
 	<h3 class="text-xl text-volt-300">Fish on! Something around {formatWeight(guessedWeight)}</h3>
 	<RunWarning isRunning={fight.isRunning} isRunComing={fight.isRunComing} />
 	<TensionBar tension={fight.tension} band={fight.band} />
-	<ReelZone {reel} isTall={placement === 'over_the_screen'} />
+	<ReelZone {reel} />
 	<p class="text-center text-sm text-mist-400">{Math.ceil(fight.secondsRemaining)}s until it's in the net</p>
 </section>

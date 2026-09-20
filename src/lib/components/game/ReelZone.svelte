@@ -1,13 +1,11 @@
 <script lang="ts">
 	import type { ReelInput } from '$lib/game/session/reelInput.svelte';
 
-	let { reel, isTall }: { reel: ReelInput; isTall: boolean } = $props();
+	let { reel }: { reel: ReelInput } = $props();
 </script>
 
 <button
-	class="button-primary w-full touch-none select-none text-2xl"
-	class:py-5={!isTall}
-	class:reel-zone={isTall}
+	class="reel-zone button-primary w-full touch-none select-none text-2xl"
 	class:bg-volt-300={reel.isReeling}
 	onpointerdown={(event) => reel.press(event)}
 	onpointerup={() => reel.release()}
@@ -19,5 +17,10 @@
 <style>
 	.reel-zone {
 		min-height: 38vh;
+	}
+	@media (pointer: fine) {
+		.reel-zone {
+			min-height: 9rem;
+		}
 	}
 </style>

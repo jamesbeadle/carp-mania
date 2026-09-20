@@ -42,7 +42,7 @@
 		<ul class="mt-1 divide-y divide-carbon-700/60 text-sm">
 			{#each lines as activity (activity.id)}
 				<li class={['flex items-baseline gap-3 py-1', isAVisitorsCatch(activity) && 'opacity-60']}>
-					<button class="min-w-0 truncate text-left text-mist-100 transition hover:text-volt-300" onclick={() => onPick(activity.lakeId)}>{feedLineFor(activity)}</button>
+					<button class="min-w-0 text-left text-mist-100 transition hover:text-volt-300 sm:truncate" onclick={() => onPick(activity.lakeId)}>{feedLineFor(activity)}</button>
 					<span class="ml-auto text-xs whitespace-nowrap text-mist-400">{formatWhen(activity.createdAt)}</span>
 				</li>
 			{/each}

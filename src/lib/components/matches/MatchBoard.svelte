@@ -23,8 +23,8 @@
 		<ol class="divide-y divide-carbon-700/60">
 			{#each page.board as placing, index (placing.anglerId)}
 				<li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2 text-sm">
-					<span class="w-6 font-display text-2xl font-extrabold text-surge-500 italic tabular-nums">{index + 1}</span>
-					<a href="/anglers/{placing.anglerId}" class="text-mist-100 hover:underline">{placing.anglerName}</a>
+					<span class="w-6 shrink-0 font-display text-2xl font-extrabold text-surge-500 italic tabular-nums">{index + 1}</span>
+					<a href="/anglers/{placing.anglerId}" class="min-w-0 max-w-full flex-1 basis-32 truncate text-mist-100 hover:underline">{placing.anglerName}</a>
 					{#if hasFish && leaders.mostCatches.has(placing.anglerId)}<span class="rounded-full bg-volt-500/15 px-2 text-xs text-volt-300">most fish</span>{/if}
 					{#if hasFish && leaders.biggestFish.has(placing.anglerId)}<span class="rounded-full bg-surge-500/15 px-2 text-xs text-surge-300">biggest</span>{/if}
 					<span class="ml-auto whitespace-nowrap text-volt-300">{placing.catches} fish</span>

@@ -37,8 +37,10 @@
 		<p class="text-sm text-mist-400">Aged {diary.age} · {placeInTheLine(current.generation)}{#if diary.isSlowingDown} · slowing down now{/if}</p>
 		<AnglerRanksLine ranks={room.ranks} />
 	</div>
-	<a href="/anglers/{angler.profile.id}" class="button-secondary ml-auto">My public page</a>
-	<a href="/anglers" class="text-sm text-mist-400 hover:text-mist-100">All anglers</a>
+	<div class="flex items-center gap-4 sm:ml-auto">
+		<a href="/anglers/{angler.profile.id}" class="button-secondary whitespace-nowrap">My public page</a>
+		<a href="/anglers" class="text-sm text-mist-400 hover:text-mist-100">All anglers</a>
+	</div>
 </div>
 
 <div class="space-y-6">
@@ -49,7 +51,7 @@
 		<AwardsPanel awards={room.awards} isMine />
 	</div>
 	<div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
-		<div class="space-y-6">
+		<div class="min-w-0 space-y-6">
 			{#await data.rival}
 				<Skeleton title="The one to beat" rows={2} />
 			{:then rival}
@@ -58,7 +60,7 @@
 				<p class="text-sm text-mist-400">The world board would not load.</p>
 			{/await}
 			<section class="panel">
-				<dl class="mb-6 grid grid-cols-3 gap-3 text-sm">
+				<dl class="mb-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
 					<div><dt class="stat-label">Money</dt><dd class="text-xl">{formatMoney(angler.profile.money)}</dd></div>
 					<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.catches.total}</dd></div>
 					<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(angler.personalBestLb)}</dd></div>

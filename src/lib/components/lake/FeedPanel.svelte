@@ -27,7 +27,7 @@
 		{/each}
 	</ul>
 	<form method="POST" action="?/feed" class="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-		<label>
+		<label class="block">
 			<span class="stat-label">Feed type</span>
 			<select name="feedType" bind:value={feedType} class="field">
 				{#each FeedTypes as type (type)}
@@ -35,7 +35,7 @@
 				{/each}
 			</select>
 		</label>
-		<label>
+		<label class="block">
 			<span class="stat-label">Kilograms</span>
 			<input name="kilograms" type="number" min="1" max="500" bind:value={kilograms} class="field w-28" />
 		</label>

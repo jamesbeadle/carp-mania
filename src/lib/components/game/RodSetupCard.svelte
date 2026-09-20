@@ -33,7 +33,7 @@
 		<h3 class="text-lg text-volt-300">Rod {rodNumber}</h3>
 		{#if onCopyToEveryRod}<button type="button" class="ml-auto text-xs text-surge-400 hover:underline" onclick={onCopyToEveryRod}>Same on every rod</button>{/if}
 	</div>
-	<div class="grid grid-cols-2 gap-2">
+	<div class="grid grid-cols-2 gap-2 md:grid-cols-1">
 		{#each SetupSlots as slot (slot)}
 			<SlotSelect {slot} label={SlotLabels[slot]} {box} bind:value={setup[slot]} />
 		{/each}

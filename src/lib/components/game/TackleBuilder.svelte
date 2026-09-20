@@ -79,7 +79,7 @@
 	{/each}
 </div>
 
-<div class="start-bar sticky bottom-0 -mx-4 mt-4 border-t border-carbon-700 bg-carbon-950/90 px-4 py-3 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
+<div class="start-bar sticky bottom-0 -mx-4 mt-4 flex flex-col border-t border-carbon-700 bg-carbon-950/90 px-4 py-3 backdrop-blur md:items-end">
 	{#if ownersRefusal}<p class="mb-2 text-xs text-danger-400">{ownersRefusal}</p>{/if}
 	<button class="button-primary w-full px-8 py-3 text-lg md:w-auto" disabled={ownersRefusal !== null} onclick={() => onReady(setups.slice(0, rodCount))}>Start fishing with {rodCount} {rodCount === 1 ? 'rod' : 'rods'}</button>
 </div>
