@@ -56,6 +56,7 @@ export interface Lake {
 	disturbance: number;
 	is_setup_complete: boolean;
 	shop_tier: Tier;
+	is_barbed_banned: boolean;
 }
 
 export interface Swim {

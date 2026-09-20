@@ -2,7 +2,7 @@ import type { Carp } from '../types';
 import { feedingWindowFit } from './feedingWindow';
 import { noKitFactor, type KitFactor } from './kitAgeFactor';
 
-export const SizeBias = { AtNoReach: -1.5, AtFullReach: 1.5, SmallestCountedLb: 8, TwentyLb: 20 } as const;
+export const SizeBias = { AtNoReach: -3, AtFullReach: 3, SmallestCountedLb: 8, TwentyLb: 20 } as const;
 export const Appetite = { Floor: 0.5, PerConditionPoint: 1 / 200 } as const;
 
 export type SpotBonus = (carp: Carp) => number;

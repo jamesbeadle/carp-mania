@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { biteChanceForOneHour } from '../src/lib/domain/fishing/biteChance';
 import { castTerrainFor, terrainInFrontOfSwim } from '../src/lib/domain/fishing/castTerrain';
 import { matchTackleToWater } from '../src/lib/domain/fishing/tackleMatch';
+import { defaultBookFor } from '../src/lib/domain/fishing/ticketBook';
 import { noRecordsYet } from '../src/lib/domain/market/records';
 import { seededRandom } from '../src/lib/domain/random';
 import { simulateOneDay, type DayContext } from '../src/lib/domain/simulation/simulateOneDay';
@@ -47,7 +48,8 @@ for (const classic of ClassicSwims) {
 function contextForDay(dayIndex: number, currentLake: Lake): DayContext {
 	const dayStart = new Date(start.getTime() + dayIndex * FisheryClock.RealMillisecondsPerFisheryDay);
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
-	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [] };
+	const book = defaultBookFor(currentLake.id, Number(currentLake.day_ticket_fee)).map((product, index) => ({ ...product, id: `ticket-${index}` }));
+	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [], book };
 }
 
 const fedLake: Lake = { ...lake, feed_stock: { ...lake.feed_stock, fishmeal_boilies: 40 } };

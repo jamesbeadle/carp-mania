@@ -30,7 +30,7 @@
 		{#if isOnTheGlobe}· <a href={worldUrlForLake(summary.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
 	</p>
 	<div class="mt-auto flex items-center gap-3">
-		<span class="text-lg text-volt-300">{formatMoney(summary.lake.day_ticket_fee)}<span class="text-xs text-mist-400"> / day</span></span>
+		<span class="text-lg text-volt-300"><span class="text-xs text-mist-400">from </span>{formatMoney(summary.fromPrice)}</span>
 		<a href="/lakes/{summary.lake.id}" class="button-secondary ml-auto">Look around</a>
 		<GoFishingButton lakeId={summary.lake.id} words="Fish here" />
 	</div>

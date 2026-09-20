@@ -1,5 +1,5 @@
 import type { CatchReport, SkillGains } from '$lib/contracts/CatchReport';
-import { FishingDay } from '$lib/domain/fishing/sessionClock';
+import { LongestSession } from '$lib/domain/fishing/sessionWindow';
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { MaximumRods } from '$lib/domain/tackle/rodSetup';
 import { readRodSetups } from './readRodSetups';
@@ -33,7 +33,7 @@ function isRodIndex(value: unknown): value is number {
 }
 
 function isFishingHour(value: unknown): value is number {
-	return Number.isInteger(value) && (value as number) >= FishingDay.StartHour && (value as number) < FishingDay.EndHour;
+	return Number.isInteger(value) && (value as number) >= LongestSession.fromHour && (value as number) < LongestSession.toHour;
 }
 
 function isLayoutPoint(value: unknown): value is LayoutPoint {

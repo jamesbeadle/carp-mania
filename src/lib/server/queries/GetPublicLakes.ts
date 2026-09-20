@@ -4,13 +4,13 @@ import { WaterListing, type WaterFilters, type WaterSort } from '$lib/domain/lis
 import type { Lake } from '$lib/domain/types';
 import { requireUser } from '../gates/requireUser';
 
-type SummaryRow = Lake & { owner_name: string; carp_count: number; heaviest_lb: number; swim_count: number };
+type SummaryRow = Lake & { owner_name: string; carp_count: number; heaviest_lb: number; swim_count: number; from_price: number };
 
 const SortOrders: Record<WaterSort, { column: string; ascending: boolean }> = {
 	reputation: { column: 'reputation', ascending: false },
 	biggest: { column: 'heaviest_lb', ascending: false },
 	most_stock: { column: 'carp_count', ascending: false },
-	cheapest: { column: 'day_ticket_fee', ascending: true },
+	cheapest: { column: 'from_price', ascending: true },
 	newest: { column: 'created_at', ascending: false }
 };
 
@@ -27,6 +27,6 @@ export async function GetPublicLakes(locals: App.Locals, filters: WaterFilters):
 }
 
 function summarise(row: SummaryRow): PublicLakeSummary {
-	const { owner_name, carp_count, heaviest_lb, swim_count, ...lake } = row;
-	return { lake: lake as Lake, ownerName: owner_name, carpCount: carp_count, heaviestCarpLb: Number(heaviest_lb), swimCount: swim_count };
+	const { owner_name, carp_count, heaviest_lb, swim_count, from_price, ...lake } = row;
+	return { lake: lake as Lake, ownerName: owner_name, carpCount: carp_count, heaviestCarpLb: Number(heaviest_lb), swimCount: swim_count, fromPrice: Number(from_price) };
 }

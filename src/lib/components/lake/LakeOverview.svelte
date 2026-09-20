@@ -20,12 +20,4 @@
 		<div><dt class="stat-label">Anglers a day</dt><dd class="text-2xl">{anglersToday}</dd></div>
 		<div><dt class="stat-label">They'll pay up to</dt><dd class="text-2xl">{formatMoney(willingness)}</dd></div>
 	</dl>
-	<form method="POST" action="?/setFee" class="mt-4 flex items-end gap-2">
-		<label class="flex-1">
-			<span class="stat-label">Day ticket fee (£)</span>
-			<input name="fee" type="number" min="0" max="250" step="1" value={Number(lake.day_ticket_fee)} class="field" />
-		</label>
-		<button class="button-primary">Set fee</button>
-	</form>
-	<p class="mt-2 text-xs text-mist-400">Price above what anglers will pay and fewer turn up. Without a bailiff, some fish for free.</p>
 </section>

@@ -5,6 +5,7 @@
 	import SoundToggle from '../hud/SoundToggle.svelte';
 	import AlarmToggle from './AlarmToggle.svelte';
 	import SessionClock from './SessionClock.svelte';
+	import WeatherLine from './WeatherLine.svelte';
 
 	interface Props {
 		lake: Lake;
@@ -22,7 +23,10 @@
 		<a href="/lakes" class="rounded-full bg-carbon-950/45 px-3 py-1 text-xs text-mist-200 backdrop-blur transition hover:text-volt-300">← Leave the water</a>
 		<h1 class="short:text-xl truncate text-2xl leading-none text-mist-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] lg:text-4xl">{lake.name}</h1>
 		{#if matchBoardHref}<a href={matchBoardHref} class="rounded-full border border-volt-500/60 bg-carbon-950/45 px-3 py-1 text-xs text-volt-300 backdrop-blur transition hover:bg-volt-500/15">Match in play · the board</a>{/if}
-		{#if session.phase !== 'choose_swim'}<SessionClock hour={session.hour} season={session.season} landed={session.landedToday.length} lost={session.lostToday} />{/if}
+		{#if session.phase !== 'choose_swim'}
+			<SessionClock hour={session.hour} window={session.window} season={session.season} landed={session.landedToday.length} lost={session.lostToday} />
+			<WeatherLine weather={session.weather} hour={session.hour} />
+		{/if}
 	</div>
 	<div class="flex shrink-0 items-center gap-2">
 		<button class="flex h-9 w-9 items-center justify-center rounded-full border border-carbon-600 bg-carbon-900/80 font-display text-lg font-bold text-mist-200 transition hover:border-volt-400 hover:text-volt-300 active:scale-95" onclick={onHowToPlay} aria-label="How to play" title="How to play">?</button>

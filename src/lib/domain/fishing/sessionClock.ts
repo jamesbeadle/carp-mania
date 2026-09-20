@@ -1,21 +1,22 @@
-export const FishingDay = {
-	StartHour: 5,
-	EndHour: 24,
-	RealSecondsPerFishingHour: 22
-} as const;
+import { hourOfDay } from './sessionWindow';
 
-export const FishingHoursPerDay = FishingDay.EndHour - FishingDay.StartHour;
+export const FishingDay = { RealSecondsPerFishingHour: 22 } as const;
+
+const BiteHours = { DawnBefore: 8, DuskFrom: 18, MiddayFrom: 11, MiddayTo: 15 } as const;
+const BiteFactor = { DawnAndDusk: 1.3, Midday: 0.7, Ordinary: 1 } as const;
 
 export function timeOfDayBiteFactor(hour: number) {
-	const isDawn = hour < 8;
-	const isDuskOrDark = hour >= 18;
-	if (isDawn || isDuskOrDark) return 1.3;
-	const isMidday = hour >= 11 && hour < 15;
-	return isMidday ? 0.7 : 1;
+	const clockHour = hourOfDay(hour);
+	const isDawn = clockHour < BiteHours.DawnBefore;
+	const isDuskOrDark = clockHour >= BiteHours.DuskFrom;
+	if (isDawn || isDuskOrDark) return BiteFactor.DawnAndDusk;
+	const isMidday = clockHour >= BiteHours.MiddayFrom && clockHour < BiteHours.MiddayTo;
+	return isMidday ? BiteFactor.Midday : BiteFactor.Ordinary;
 }
 
 export function formatFishingHour(hour: number) {
-	const wholeHour = Math.floor(hour);
-	const minutes = Math.floor((hour - wholeHour) * 60);
+	const clockHour = hourOfDay(hour);
+	const wholeHour = Math.floor(clockHour);
+	const minutes = Math.floor((clockHour - wholeHour) * 60);
 	return `${String(wholeHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }

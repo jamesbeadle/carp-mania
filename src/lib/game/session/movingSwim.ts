@@ -25,7 +25,7 @@ export function moveToSwim(session: SessionState, swim: Swim) {
 	if (swim.id === session.swim?.id) return false;
 	for (const rod of session.rods) bringRodIn(rod);
 	session.swim = swim;
-	session.hour = hourAfterMovingSwim(session.hour);
+	session.hour = hourAfterMovingSwim(session.hour, session.window.toHour);
 	session.notice = `Moved to ${swim.name} — ${SwimMoveWords.Duration} gone. Click the water to cast again.`;
 	return true;
 }

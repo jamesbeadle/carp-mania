@@ -4,14 +4,25 @@
 	import { formatWeight } from '$lib/format/weight';
 	import GoFishingButton from './GoFishingButton.svelte';
 
-	let { landed, lost, lakeId }: { landed: LandedFish[]; lost: number; lakeId: string } = $props();
+	interface Props {
+		landed: LandedFish[];
+		lost: number;
+		lakeId: string;
+		visitId: string;
+		sessionsLeft: number;
+		endWords: string;
+	}
+
+	let { landed, lost, lakeId, visitId, sessionsLeft, endWords }: Props = $props();
+
+	const hasAnotherSession = $derived(sessionsLeft > 1);
 
 	const heaviest = $derived(landed.length > 0 ? Math.max(...landed.map((fish) => Number(fish.carp.weight_lb))) : 0);
 	const bestHonourOf = (fish: LandedFish) => honourKindsOf(fish.honours)[0] ?? null;
 </script>
 
 <section class="panel space-y-4">
-	<p class="stat-label">Midnight</p>
+	<p class="stat-label">{endWords}</p>
 	<h2 class="text-3xl text-volt-300">Rods in — {landed.length} carp landed</h2>
 	<p class="text-mist-200">
 		{#if landed.length === 0}A blank. It happens to everyone — try a different swim or bait tomorrow.{:else}Best of the day {formatWeight(heaviest)}. {lost} lost.{/if}
@@ -26,7 +37,13 @@
 		{/each}
 	</ul>
 	<div class="flex flex-wrap gap-3">
-		<GoFishingButton {lakeId} words="Fish another day here" />
+		{#if hasAnotherSession}
+			<form method="POST" action="?/nextSession">
+				<input type="hidden" name="visit" value={visitId} />
+				<button class="button-primary">Sit the next day · {sessionsLeft - 1} left on the ticket</button>
+			</form>
+		{/if}
+		<GoFishingButton {lakeId} words="Fish another day here" buttonClass={hasAnotherSession ? 'button-secondary' : 'button-primary'} />
 		<a href="/lakes" class="button-secondary">Choose another water</a>
 		<a href="/angler" class="button-secondary">My angler</a>
 	</div>

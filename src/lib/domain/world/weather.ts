@@ -2,6 +2,7 @@ import { seededRandom } from '../random';
 import type { Lake } from '../types';
 import { RegionCatalogue } from './regions';
 import { seasonFor } from './seasons';
+import { glassFor, windDirectionFor, type Glass, type WindDirection } from './weatherGlass';
 import { fisheryDayNumber } from './worldClock';
 
 export type WeatherKind = 'clear' | 'overcast' | 'rain' | 'mist' | 'heat';
@@ -10,6 +11,8 @@ export interface Weather {
 	kind: WeatherKind;
 	cloudCover: number;
 	windStrength: number;
+	glass: Glass;
+	windDirection: WindDirection;
 }
 
 const Skies = { OvercastBelow: 0.28, RainBelow: 0.14, MistBelow: 0.08, HeatAbove: 0.9, HotRegionSummerGrowthFrom: 1.2 } as const;
@@ -22,7 +25,9 @@ export function weatherFor(lake: Pick<Lake, 'id' | 'region' | 'latitude'>, now: 
 	const season = seasonFor(lake, now);
 	const roll = random();
 	const kind = weatherKindFor(roll, season.isSummer, season.isWinter, RegionCatalogue[lake.region].summerGrowthFactor);
-	return { kind, cloudCover: cloudCoverFor(kind, random()), windStrength: windStrengthFor(kind, season.isWinter, random()) };
+	const cloudCover = cloudCoverFor(kind, random());
+	const windStrength = windStrengthFor(kind, season.isWinter, random());
+	return { kind, cloudCover, windStrength, glass: glassFor(random(), kind === 'rain'), windDirection: windDirectionFor(random()) };
 }
 
 function weatherKindFor(roll: number, isSummer: boolean, isWinter: boolean, summerGrowthFactor: number): WeatherKind {

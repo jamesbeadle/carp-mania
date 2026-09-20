@@ -7,6 +7,7 @@ import { carpForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Profile } from '$lib/domain/types';
 import { kitFor } from '$lib/domain/tackle/rodSetup';
 import { seasonFor } from '$lib/domain/world/seasons';
+import { weatherFor } from '$lib/domain/world/weather';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { readCatchReport } from '../gates/readCatchReport';
 import { loadProfile } from '../gates/requireMoney';
@@ -47,7 +48,8 @@ function carpThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: Wat
 		lake: water.lake,
 		rating: anglerRatingOf(skills, pedigreeLb).rating,
 		watercraft: skills.watercraft,
-		season: seasonFor(water.lake, new Date(visit.visited_at))
+		season: seasonFor(water.lake, new Date(visit.visited_at)),
+		weather: weatherFor(water.lake, new Date(visit.visited_at))
 	};
 	return carpForRolledBite({ ...report, seed: visit.seed }, today, water.carp);
 }

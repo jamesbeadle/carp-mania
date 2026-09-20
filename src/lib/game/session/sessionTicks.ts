@@ -37,7 +37,7 @@ function countDownTheBite(session: SessionState, secondsElapsed: number) {
 }
 
 export function endTheDay(session: SessionState) {
-	session.hour = FishingDay.EndHour;
+	session.hour = session.window.toHour;
 	session.bite = null;
 	const baitFished = session.rods.map((rod) => ({ kind: 'bait_fished' as const, rodIndex: rod.index, castPoint: rod.baitPoint ?? { x: 0, y: 0 }, hoursFished: rod.hoursCast }));
 	session.tackleLost = [...session.tackleLost, ...baitFished];

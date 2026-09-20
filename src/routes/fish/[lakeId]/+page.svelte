@@ -16,5 +16,5 @@
 	<FishingGame lake={data.water.lake} swims={data.water.swims} carp={carpInTheLake} profile={data.profile} visit={data.visit} bar={data.bar} owned={data.owned} {matchBoardHref} />
 {:else}
 	<ActionMessage {form} />
-	<DayTicketOffice water={data.water} profile={data.profile} runningMatch={data.runningMatch} knownCarpCount={carpInTheLake.filter((fish) => fish.is_catalogued).length} />
+	<DayTicketOffice water={data.water} profile={data.profile} book={data.book} runningMatch={data.runningMatch} knownCarpCount={carpInTheLake.filter((fish) => fish.is_catalogued).length} />
 {/if}

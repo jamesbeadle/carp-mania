@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { honourKindsOf, honoursFor, isARecord, raiseTheBar } from '../src/lib/domain/fishing/honours';
 import { hourAfterMovingSwim, SwimMove } from '../src/lib/domain/fishing/movingSwims';
-import { FishingDay } from '../src/lib/domain/fishing/sessionClock';
+import { ClassicSession } from '../src/lib/domain/fishing/sessionWindow';
 import { pickCarpByWeight } from '../src/lib/domain/fishing/pickCarp';
 import { noSpotBonus, takeWeightsFor, type SpotBonus } from '../src/lib/domain/fishing/takeWeight';
 import { favouriteSpotOf, FavouriteSpotBiteBonus } from '../src/lib/domain/layout/favouriteFeature';
@@ -60,9 +60,9 @@ function runHonourScenarios() {
 }
 
 function runSwimMoveScenarios() {
-	assert.equal(hourAfterMovingSwim(9), 9 + SwimMove.HoursToPackUpAndWalk, 'a move costs the pack-up-and-walk time');
-	assert.equal(hourAfterMovingSwim(FishingDay.EndHour - 0.25), FishingDay.EndHour, 'a move late in the day ends at midnight, not after it');
-	assert.equal(FishingDay.EndHour, 24, 'the fishing day runs to midnight');
-	assert.equal(hourAfterMovingSwim(FishingDay.EndHour), FishingDay.EndHour, 'no move goes past the end of the day');
+	assert.equal(hourAfterMovingSwim(9, ClassicSession.toHour), 9 + SwimMove.HoursToPackUpAndWalk, 'a move costs the pack-up-and-walk time');
+	assert.equal(hourAfterMovingSwim(ClassicSession.toHour - 0.25, ClassicSession.toHour), ClassicSession.toHour, 'a move late in the day ends at midnight, not after it');
+	assert.equal(ClassicSession.toHour, 24, 'the classic fishing day runs to midnight');
+	assert.equal(hourAfterMovingSwim(ClassicSession.toHour, ClassicSession.toHour), ClassicSession.toHour, 'no move goes past the end of the day');
 	console.log('swim moves:', { cost: SwimMove.HoursToPackUpAndWalk });
 }
