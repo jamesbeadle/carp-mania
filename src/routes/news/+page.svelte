@@ -27,7 +27,7 @@
 
 <svelte:head><title>News · Carp Mania</title></svelte:head>
 
-<PlaceBanner kind="signpost" title="News" blurb="What is happening across every water in the game, as it happens. Tap a line to see that water on the globe.">
+<PlaceBanner kind="signpost" title="News" blurb="Every water in the game, as it happens · tap a line to see it on the globe">
 	{#snippet actions()}
 		<a href="/world" class="button-secondary text-base">Spin the globe</a>
 		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>

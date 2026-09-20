@@ -1,17 +1,10 @@
 <script lang="ts">
 	import { fameFactor } from '$lib/domain/market/valuation';
+	import { fameTierOf } from './fameTier';
 
 	let { fame }: { fame: number } = $props();
 
-	const FameTiers = [
-		{ from: 60, label: 'Legend' },
-		{ from: 30, label: 'Famous' },
-		{ from: 10, label: 'Well known' },
-		{ from: 1, label: 'Known' },
-		{ from: 0, label: 'Unknown' }
-	] as const;
-
-	const tier = $derived(FameTiers.find((candidate) => fame >= candidate.from)?.label ?? 'Unknown');
+	const tier = $derived(fameTierOf(fame));
 	const upliftPercent = $derived(Math.round((fameFactor(fame) - 1) * 100));
 </script>
 

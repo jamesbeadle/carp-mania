@@ -17,7 +17,7 @@
 <svelte:head><title>Anglers · Carp Mania</title></svelte:head>
 
 <h1 class="mb-2 text-4xl text-volt-300">Anglers</h1>
-<p class="mb-6 text-mist-400">Every rod in the game. Open an angler for their personal bests, their famous fish and their water.</p>
+<p class="mb-6 text-mist-400">Every rod in the game.</p>
 
 <AnglerFilterBar filters={directory.filters} />
 

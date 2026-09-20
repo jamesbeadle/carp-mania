@@ -3,6 +3,7 @@
 	import KnownFishList from '$lib/components/legacy/KnownFishList.svelte';
 	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
+	import StatRow from '$lib/components/stats/StatRow.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { listPathFor } from '$lib/domain/lists/listPath';
 	import { formatWhen } from '$lib/format/dates';
@@ -13,6 +14,13 @@
 	const book = $derived(data.scrapbook);
 	const fisherman = $derived(book.fisherman);
 	const hrefFor = (page: number) => listPathFor(`/angler/scrapbook/${fisherman.id}`, {}, page);
+	const NoFinalSkill = '—';
+	const finalSkill = $derived(fisherman.final_skill === null ? NoFinalSkill : String(Math.round(Number(fisherman.final_skill))));
+	const lifetimeStats = $derived([
+		{ label: 'Landed', value: String(book.catches.total), caption: 'fish' },
+		{ label: 'Personal best', value: formatWeight(book.personalBestLb), tone: 'volt' as const },
+		{ label: 'Final skill', value: finalSkill }
+	]);
 	const yearsFished = $derived(fisherman.retired_at ? `${formatWhen(fisherman.started_at)} to ${formatWhen(fisherman.retired_at)}` : `since ${formatWhen(fisherman.started_at)}`);
 </script>
 
@@ -38,11 +46,7 @@
 <div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
 	<div class="space-y-6">
 		<section class="panel">
-			<dl class="flex flex-wrap gap-x-8 gap-y-3 text-sm">
-				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{book.catches.total}</dd></div>
-				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(book.personalBestLb)}</dd></div>
-				<div><dt class="stat-label">Final skill</dt><dd class="text-xl">{fisherman.final_skill === null ? '—' : Math.round(Number(fisherman.final_skill))}</dd></div>
-			</dl>
+			<StatRow stats={lifetimeStats} />
 		</section>
 		<TrophyCabinet trophies={book.trophies} />
 		<KnownFishList fishKnown={book.fishKnown} />

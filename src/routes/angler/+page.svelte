@@ -3,7 +3,7 @@
 	import RatingDial from '$lib/components/angler/RatingDial.svelte';
 	import Diary from '$lib/components/angler/Diary.svelte';
 	import RivalCard from '$lib/components/angler/RivalCard.svelte';
-	import SkillBars from '$lib/components/angler/SkillBars.svelte';
+	import SkillsPanel from '$lib/components/angler/SkillsPanel.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
 	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
@@ -27,6 +27,11 @@
 	const current = $derived(diary.current);
 	const catches = $derived(angler.catches);
 	const hrefFor = (page: number) => listPathFor(MyAnglerPath, {}, page);
+	const purseStats = $derived([
+		{ label: 'Money', value: formatMoney(angler.profile.money), tone: 'volt' as const },
+		{ label: 'Landed', value: String(catches.total), caption: 'fish' },
+		{ label: 'Personal best', value: formatWeight(angler.personalBestLb) }
+	]);
 </script>
 
 <svelte:head><title>My angler · Carp Mania</title></svelte:head>
@@ -59,16 +64,7 @@
 			{:catch}
 				<p class="text-sm text-mist-400">The world board would not load.</p>
 			{/await}
-			<section class="panel">
-				<dl class="mb-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-					<div><dt class="stat-label">Money</dt><dd class="text-xl">{formatMoney(angler.profile.money)}</dd></div>
-					<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.catches.total}</dd></div>
-					<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(angler.personalBestLb)}</dd></div>
-				</dl>
-				<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
-				<SkillBars profile={angler.profile} />
-				<p class="mt-4 text-xs text-mist-400">Line selection is how invisible your line is; rig selection how well the rig suits the spot; bait selection what the fish trust; watercraft finding the fish and reading the bite. Skills rise with every fish, and faster when the tackle suited the water. Match readouts unlock at craft 40.</p>
-			</section>
+			<SkillsPanel stats={purseStats} profile={angler.profile} isMine />
 		</div>
 		<section class="panel">
 			<h2 class="mb-3 text-xl text-volt-300">Catch history</h2>

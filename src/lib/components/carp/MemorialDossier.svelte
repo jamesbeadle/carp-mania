@@ -8,10 +8,17 @@
 	import CatchHistory from './CatchHistory.svelte';
 	import FameBadge from './FameBadge.svelte';
 	import SaleHistory from './SaleHistory.svelte';
+	import StatRow from '../stats/StatRow.svelte';
 
 	let { dossier }: { dossier: MemorialDossier } = $props();
 
 	const fish = $derived(dossier.memorial);
+	const stats = $derived([
+		{ label: 'Last weighing', value: formatWeight(fish.weight_lb) },
+		{ label: 'Best ever', value: formatWeight(dossier.bestEverLb) },
+		{ label: 'On the bank', value: `${fish.times_caught}×` },
+		{ label: 'Fame', value: String(fish.fame) }
+	]);
 	const originName = $derived(fish.origin_lake_id ? (dossier.lakeNames[fish.origin_lake_id] ?? null) : null);
 </script>
 
@@ -30,12 +37,7 @@
 		Died {formatWhen(fish.died_at)} at {#if fish.lake_id}<a href="/lakes/{fish.lake_id}" class="text-volt-300 hover:underline">{fish.lake_name}</a>{:else}{fish.lake_name}{/if}, aged {fish.age_years} — {DeathCauseWords[fish.death_cause]}.
 		{#if originName}Came from {originName}.{/if}
 	</p>
-	<dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-		<div><dt class="stat-label">Last weighing</dt><dd class="text-2xl">{formatWeight(fish.weight_lb)}</dd></div>
-		<div><dt class="stat-label">Best ever</dt><dd class="text-2xl">{formatWeight(dossier.bestEverLb)}</dd></div>
-		<div><dt class="stat-label">On the bank</dt><dd class="text-2xl">{fish.times_caught} times</dd></div>
-		<div><dt class="stat-label">Fame</dt><dd class="text-2xl">{fish.fame}</dd></div>
-	</dl>
+	<StatRow {stats} />
 	<h2 class="mt-6 mb-2 text-xl text-volt-300">Catch history</h2>
 	<CatchHistory catches={dossier.catches} />
 	{#if dossier.transfers.length > 0}

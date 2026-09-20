@@ -1,13 +1,24 @@
 <script lang="ts">
 	import type { MyRival } from '$lib/contracts/Rivalry';
-	import { chaserLine, NobodyAbove, placeLine, toBeatLine } from '$lib/domain/world/rivalWords';
-	import { standingWords } from '$lib/domain/world/standingWords';
+	import { NobodyAbove, placeLine, toBeatLine } from '$lib/domain/world/rivalWords';
+	import { formatWeight } from '$lib/format/weight';
+	import StatRow from '../stats/StatRow.svelte';
 	import AnglerAvatar from './AnglerAvatar.svelte';
 
 	let { rival }: { rival: MyRival } = $props();
 
-	const chaser = $derived(chaserLine(rival));
 	const isOnTheLadder = $derived(rival.standing.bestLb > 0);
+	const stats = $derived([
+		{ label: 'Your place', value: `No. ${rival.standing.rank}`, caption: `of ${rival.standing.anglers}`, tone: 'volt' as const },
+		{ label: 'Your best', value: formatWeight(rival.standing.bestLb) },
+		...chaserStat(rival)
+	]);
+
+	function chaserStat(rivalry: MyRival) {
+		if (rivalry.below === null) return [];
+		const gapLb = rivalry.standing.bestLb - rivalry.below.bestLb;
+		return [{ label: 'Chasing you', value: formatWeight(gapLb), caption: `behind · ${rivalry.below.displayName}` }];
+	}
 </script>
 
 <section class="panel">
@@ -23,8 +34,7 @@
 	{:else}
 		<h2 class="mt-1 text-2xl text-volt-300">{NobodyAbove}</h2>
 	{/if}
-	<p class="mt-3 text-mist-100">{toBeatLine(rival)}</p>
-	{#if isOnTheLadder}<p class="mt-1 text-sm text-mist-400">{standingWords(rival.standing, null)}</p>{/if}
-	{#if chaser}<p class="text-sm text-mist-400">{chaser}</p>{/if}
+	<p class="mt-3 text-sm leading-snug text-mist-100">{toBeatLine(rival)}</p>
+	{#if isOnTheLadder}<div class="mt-3"><StatRow {stats} /></div>{/if}
 	<a href="/world/hall-of-fame" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The world board →</a>
 </section>

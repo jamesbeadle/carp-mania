@@ -1,18 +1,34 @@
 <script lang="ts">
 	import type { FarmOnShelf } from '$lib/contracts/FarmShelves';
 	import { GradeCatalogue } from '$lib/domain/market/farms';
+	import type { TransportQuote } from '$lib/domain/market/transport';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
+	import StatRow from '../stats/StatRow.svelte';
 	import PackRow from './PackRow.svelte';
 
 	let { shelf, money }: { shelf: FarmOnShelf; money: number } = $props();
 
+	const NoQuarantine = 'none';
 	const grade = $derived(GradeCatalogue[shelf.farm.grade]);
 	const region = $derived(RegionCatalogue[shelf.farm.region]);
 	const quote = $derived(shelf.quote);
-	const quarantineWords = $derived(quote && quote.quarantineDays > 0 ? `, then ${quote.quarantineDays} days' quarantine and up to ${quote.conditionLoss} condition lost on the road` : '');
-	const dayWord = $derived(quote?.transitDays === 1 ? 'day' : 'days');
-	const kilometres = $derived(Math.round(quote?.distanceKilometres ?? 0));
+	const quoteStats = $derived(quote ? statsOf(quote) : []);
+
+	function statsOf(transport: TransportQuote) {
+		return [
+			{ label: 'Distance', value: `${Math.round(transport.distanceKilometres)} km`, caption: 'from your water' },
+			{ label: 'Transport', value: formatMoney(transport.cost), caption: 'a load' },
+			{ label: 'On the lorry', value: String(transport.transitDays), caption: transport.transitDays === 1 ? 'day' : 'days' },
+			quarantineStat(transport)
+		];
+	}
+
+	function quarantineStat(transport: TransportQuote) {
+		const hasQuarantine = transport.quarantineDays > 0;
+		if (!hasQuarantine) return { label: 'Quarantine', value: NoQuarantine };
+		return { label: 'Quarantine', value: `${transport.quarantineDays} days`, caption: `up to ${transport.conditionLoss} condition lost`, tone: 'warning' as const };
+	}
 </script>
 
 <section class="panel">
@@ -22,9 +38,7 @@
 	</div>
 	<p class="text-sm text-mist-300">{shelf.farm.story} {grade.words}.</p>
 	{#if quote}
-		<p class="mt-1 mb-3 text-xs text-mist-400">
-			{kilometres} km from your water: transport {formatMoney(quote.cost)}, {quote.transitDays} {dayWord} on the lorry{quarantineWords}.
-		</p>
+		<div class="my-4"><StatRow stats={quoteStats} /></div>
 	{:else}
 		<p class="mt-1 mb-3 text-xs text-mist-400">Transport is quoted once you have a water to deliver to.</p>
 	{/if}

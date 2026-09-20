@@ -8,8 +8,10 @@
 </script>
 
 <section class="panel">
-	<h2 class="mb-1 text-xl text-volt-300">Records held today</h2>
-	<p class="mb-3 text-xs text-mist-400">The records that stand right now with {isMine ? 'your' : 'this angler’s'} name on them. Any angler can take one.</p>
+	<div class="mb-3 flex flex-wrap items-baseline gap-x-3">
+		<h2 class="text-xl text-volt-300">Records held today</h2>
+		<span class="text-xs text-mist-400">{records.length} standing</span>
+	</div>
 	{#if records.length === 0}
 		<p class="text-sm text-mist-400">{isMine ? 'None yet. Beat the biggest fish an angler has had on a water and it goes here.' : 'None standing.'}</p>
 	{:else}

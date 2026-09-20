@@ -24,7 +24,7 @@
 	<RegionGuide {guide} />
 	<form method="POST" action="?/buySite" class="panel">
 		<h2 class="mb-1 text-2xl text-volt-300">Choose your site</h2>
-		<p class="mb-4 text-sm text-mist-400">Price is the works already done plus land at {formatMoney(guide.landPricePerAcre)} an acre in {guide.label}. Each site starts with something and comes with a problem.</p>
+		<p class="mb-4 text-sm text-mist-400">The works already done, plus land at {formatMoney(guide.landPricePerAcre)} an acre in {guide.label}.</p>
 		<div class="grid gap-3 md:grid-cols-2">
 			{#each OfferedSites as site (site)}
 				<SiteCard {site} region={guide.region} {plotAcres} isChosen={site === chosenSite} onChoose={(picked) => (chosenSite = picked)} />

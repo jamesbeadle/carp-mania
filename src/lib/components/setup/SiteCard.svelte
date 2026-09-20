@@ -21,6 +21,8 @@
 		<span class="font-display text-xl font-bold text-volt-300 italic">{formatMoney(price)}</span>
 	</div>
 	<p class="mt-1 text-sm text-mist-200">{profile.blurb}</p>
-	<p class="mt-2 text-xs text-mist-400"><span class="stat-label">Starts with</span> {acres} acres of land, {startsWith.join(', ')}</p>
-	<p class="mt-1 text-xs text-danger-400"><span class="stat-label">The problem</span> {profile.problem}</p>
+	<dl class="mt-3 space-y-2 text-xs">
+		<div><dt class="stat-label text-xs">Starts with</dt><dd class="text-mist-300">{acres} acres of land · {startsWith.join(' · ')}</dd></div>
+		<div><dt class="stat-label text-xs text-danger-400">The problem</dt><dd class="text-danger-400">{profile.problem}</dd></div>
+	</dl>
 </label>
