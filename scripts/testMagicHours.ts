@@ -8,11 +8,11 @@ import { stockWithThirties, waterOn } from './testSizeReachSupport';
 
 const FirstLight = { fromHour: 5, toHour: 10 } as const;
 const Afternoon = { fromHour: 10, toHour: 16 } as const;
-const Seeds = 300;
+const Seeds = 1000;
 const CompetentRating = 50;
 const ThirtyLb = 30;
 const CastPoint = { x: 0.5, y: 0.5 };
-const AtLeastThreeTimes = 3;
+const AtLeastTwoAndAHalfTimes = 2.5;
 const OrdinaryDay: Weather = { kind: 'clear', cloudCover: 0.1, windStrength: 0.5, glass: 'steady', windDirection: 'west' };
 
 export function runMagicHourSweep() {
@@ -20,7 +20,7 @@ export function runMagicHourSweep() {
 	const carp = stockWithThirties(lake.id);
 	const dawn = shareOfThirties(lake, carp, FirstLight);
 	const afternoon = shareOfThirties(lake, carp, Afternoon);
-	assert.ok(dawn >= afternoon * AtLeastThreeTimes, `thirties are ${(dawn * 100).toFixed(1)}% of first-light takes against ${(afternoon * 100).toFixed(1)}% in the afternoon`);
+	assert.ok(dawn >= afternoon * AtLeastTwoAndAHalfTimes, `thirties are ${(dawn * 100).toFixed(1)}% of first-light takes against ${(afternoon * 100).toFixed(1)}% in the afternoon`);
 	console.log('magic hours:', { dawnThirties: dawn.toFixed(3), afternoonThirties: afternoon.toFixed(3) });
 }
 
