@@ -10,13 +10,13 @@
 		{@const isCurrent = isTabCurrent(tab, pathname)}
 		<a
 			href={tab.href}
-			class="flex flex-col items-center gap-0.5 py-2 font-display text-[11px] font-bold tracking-wide uppercase transition active:scale-95"
+			class="short:py-1 flex flex-col items-center gap-0.5 py-2 font-display text-[11px] font-bold tracking-wide uppercase transition active:scale-95"
 			class:text-volt-400={isCurrent}
 			class:text-mist-400={!isCurrent}
 			aria-current={isCurrent ? 'page' : undefined}
 		>
 			<span class="rounded-full px-3 py-0.5 transition" class:bg-volt-500-15={isCurrent}><TabGlyph kind={tab.id} /></span>
-			{tab.label}
+			<span class="short:hidden">{tab.label}</span>
 		</a>
 	{/each}
 </nav>

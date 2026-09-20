@@ -37,7 +37,7 @@
 			{#if isOnTheGlobe}· <a href={worldUrlForLake(lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
 		</p>
 	</div>
-	<div class="ml-auto flex items-center gap-3">
+	<div class="flex w-full flex-wrap items-center gap-3 sm:ml-auto sm:w-auto">
 		{#if openBounty}<BountyPill bounty={openBounty} />{/if}
 		<FavouriteStar lakeId={lake.id} isFavourite={data.isFavourite} isLabelled />
 		<FishHereButton {lake} runningMatch={data.runningMatch} {isOwnWater} />

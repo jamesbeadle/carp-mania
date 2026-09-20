@@ -22,8 +22,8 @@
 		{#each species.filter((line) => line.count > 0) as line (line.species)}
 			{@const profile = SpeciesCatalogue[line.species]}
 			{@const label = profile.label.toLowerCase()}
-			<li class="flex items-center gap-3 py-1.5">
-				<span class="font-medium text-mist-100">{line.count} {label}</span><span class="text-xs text-mist-400">{profile.note}</span>
+			<li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-1.5">
+				<span class="font-medium whitespace-nowrap text-mist-100">{line.count} {label}</span><span class="text-xs text-mist-400">{profile.note}</span>
 			</li>
 		{:else}
 			<li class="py-1.5 text-mist-400">Nothing but carp.</li>
@@ -31,8 +31,8 @@
 	</ul>
 	<div class="flex flex-wrap items-end gap-3">
 		<form method="POST" action="?/stockCoarseFish" class="flex flex-wrap items-end gap-2">
-			<label class="text-xs text-mist-400">Species<select name="species" bind:value={chosen} class="field mt-1">{#each SpeciesNames as name (name)}<option value={name}>{SpeciesCatalogue[name].label}</option>{/each}</select></label>
-			<label class="text-xs text-mist-400">How many<input name="count" type="number" min="1" max="5000" bind:value={count} class="field mt-1 w-24" /></label>
+			<label class="block text-xs text-mist-400">Species<select name="species" bind:value={chosen} class="field mt-1">{#each SpeciesNames as name (name)}<option value={name}>{SpeciesCatalogue[name].label}</option>{/each}</select></label>
+			<label class="block text-xs text-mist-400">How many<input name="count" type="number" min="1" max="5000" bind:value={count} class="field mt-1 w-24" /></label>
 			<button class="button-secondary px-3 py-1 text-base">Stock for {formatMoney(price)}</button>
 		</form>
 		<form method="POST" action="?/netTheSilvers">

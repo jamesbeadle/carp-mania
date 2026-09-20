@@ -8,4 +8,4 @@
 	let { lakeId, words, buttonClass = 'button-primary' }: Props = $props();
 </script>
 
-<a href="/fish/{lakeId}" class="{buttonClass} inline-block text-center">{words}</a>
+<a href="/fish/{lakeId}" class="{buttonClass} inline-block text-center whitespace-nowrap">{words}</a>

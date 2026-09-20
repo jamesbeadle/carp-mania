@@ -24,7 +24,7 @@
 				<th class="py-2 pr-3 font-medium">Age</th>
 				<th class="py-2 pr-3 font-medium">Condition</th>
 				<th class="py-2 pr-3 font-medium">Fame</th>
-				<th class="py-2 pr-3 font-medium">Guide price</th>
+				<th class="py-2 pr-3 font-medium whitespace-nowrap">Guide price</th>
 				<th class="py-2 font-medium">Caught</th>
 			</tr>
 		</thead>
@@ -36,11 +36,11 @@
 						<TransitBadge carp={fish} />
 					</td>
 					<td class="py-2 pr-3">{StrainCatalogue[fish.strain].label}</td>
-					<td class="py-2 pr-3 text-volt-300">{formatWeight(fish.weight_lb)}</td>
-					<td class="py-2 pr-3">{fish.age_years} yrs</td>
+					<td class="py-2 pr-3 whitespace-nowrap text-volt-300">{formatWeight(fish.weight_lb)}</td>
+					<td class="py-2 pr-3 whitespace-nowrap">{fish.age_years} yrs</td>
 					<td class="py-2 pr-3 {conditionTone(Number(fish.condition))}">{Math.round(Number(fish.condition))}%</td>
 					<td class="py-2 pr-3">{fish.fame}</td>
-					<td class="py-2 pr-3">{formatMoney(guidePriceOf(fish))}</td>
+					<td class="py-2 pr-3 whitespace-nowrap">{formatMoney(guidePriceOf(fish))}</td>
 					<td class="py-2">{fish.times_caught}×</td>
 				</tr>
 			{/each}

@@ -25,8 +25,8 @@
 	const conditionsShare = $derived(conditionsShareFor(session.hour, session.weather));
 </script>
 
-<div class="h-full overflow-y-auto px-4 py-6">
-	<div class="mx-auto max-w-5xl">
+<div class="h-full overflow-y-auto px-4">
+	<div class="mx-auto max-w-7xl pt-6">
 		<TackleBuilder {lake} {swim} season={session.season} rating={session.rating} {craft} {carpCount} {conditionsShare} {savedRods} {owned} {onReady} />
 	</div>
 </div>

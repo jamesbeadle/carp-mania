@@ -26,7 +26,7 @@
 {:else}
 	<ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#each directory.page.items as angler, index (angler.id)}
-			<li><AnglerCard {angler} rank={firstRank + index} /></li>
+			<li class="min-w-0"><AnglerCard {angler} rank={firstRank + index} /></li>
 		{/each}
 	</ol>
 {/if}

@@ -11,16 +11,8 @@
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
 	import LakeCanvas from '../LakeCanvas.svelte';
 	import SceneStage from '../stage/SceneStage.svelte';
-	import CanvasOverlay from './CanvasOverlay.svelte';
-	import FightMeter from './FightMeter.svelte';
-	import MoveSwimButton from './MoveSwimButton.svelte';
-	import NextStepPrompt from './NextStepPrompt.svelte';
-	import RodStatusBar from './RodStatusBar.svelte';
-	import SessionCatchPhoto from './SessionCatchPhoto.svelte';
-	import SessionDayOver from './SessionDayOver.svelte';
 	import SessionDeck from './SessionDeck.svelte';
-	import SessionNotice from './SessionNotice.svelte';
-	import StrikeButton from './StrikeButton.svelte';
+	import SessionMoments from './SessionMoments.svelte';
 
 	interface Props {
 		session: SessionState;
@@ -46,9 +38,8 @@
 	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 
 	const selectedSwimId = $derived(session.swim?.id ?? null);
-	const hasRodsOut = $derived(session.rods.length > 0 && session.phase !== 'day_over');
-
 	const orientation = new Orientation();
+	const isDeckBeside = $derived(orientation.deckPlacement === 'beside');
 	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
 
 	$effect(() => orientation.watch());
@@ -61,33 +52,9 @@
 	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 {/snippet}
 
-{#snippet overTheLake()}
-	<NextStepPrompt {session} />
-	{#if hasRodsOut}<RodStatusBar rods={session.rods} {onReelIn} />{/if}
-	<MoveSwimButton {session} {onSetOff} {onStayPut} />
-	{#if session.notice && !session.bite}<SessionNotice notice={session.notice} />{/if}
-	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
-	{#if session.phase === 'fighting' && session.fight}
-		<CanvasOverlay><FightMeter fight={session.fight} onFinished={onFightFinished} /></CanvasOverlay>
-	{/if}
-	{#if session.phase === 'landed' && session.lastLanded}
-		<CanvasOverlay><SessionCatchPhoto {session} landed={session.lastLanded} {lake} {profile} {catchOutcome} {onContinue} /></CanvasOverlay>
-	{/if}
-	{#if session.phase === 'day_over'}
-		<CanvasOverlay><SessionDayOver {session} {lake} /></CanvasOverlay>
-	{/if}
-{/snippet}
-
 {#snippet deck()}
-	<SessionDeck {session} {lake} {profile} {catchOutcome} {onContinue} {onReelIn} {onSetOff} {onStayPut} />
+	<SessionDeck {session} {swims} isBesideTheWater={isDeckBeside} onPickSwim={onSwimClick} {onReelIn} {onSetOff} {onStayPut} />
 {/snippet}
 
-{#if orientation.deckPlacement === 'none'}
-	<SceneStage {conditions} {overTheSky} {water} {overTheLake} />
-{:else}
-	<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
-	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} placement="over_the_screen" />{/if}
-	{#if session.phase === 'fighting' && session.fight}
-		<CanvasOverlay placement="over_the_screen"><FightMeter fight={session.fight} onFinished={onFightFinished} placement="over_the_screen" /></CanvasOverlay>
-	{/if}
-{/if}
+<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
+<SessionMoments {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} />

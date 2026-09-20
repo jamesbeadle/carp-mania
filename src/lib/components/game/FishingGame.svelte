@@ -19,7 +19,6 @@
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
 	import HowToPlay from './HowToPlay.svelte';
-	import KeyHints from './KeyHints.svelte';
 	import SessionChrome from './SessionChrome.svelte';
 	import TackleUpScreen from './TackleUpScreen.svelte';
 	import WaterScreen from './WaterScreen.svelte';
@@ -88,7 +87,6 @@
 	>
 		{#snippet overTheSky()}
 			<SessionChrome {lake} {session} {matchBoardHref} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />
-			<KeyHints />
 		{/snippet}
 	</WaterScreen>
 	<HowToPlay isOpen={isHowToPlayOpen} onClose={() => (isHowToPlayOpen = false)} />

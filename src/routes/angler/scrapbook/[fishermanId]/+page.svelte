@@ -38,7 +38,7 @@
 <div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
 	<div class="space-y-6">
 		<section class="panel">
-			<dl class="grid grid-cols-3 gap-3 text-sm">
+			<dl class="flex flex-wrap gap-x-8 gap-y-3 text-sm">
 				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{book.catches.total}</dd></div>
 				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(book.personalBestLb)}</dd></div>
 				<div><dt class="stat-label">Final skill</dt><dd class="text-xl">{fisherman.final_skill === null ? '—' : Math.round(Number(fisherman.final_skill))}</dd></div>

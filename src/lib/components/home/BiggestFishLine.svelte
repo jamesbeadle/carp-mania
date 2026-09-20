@@ -14,5 +14,5 @@
 </script>
 
 {#if fish}
-	<a href="/carp/{fish.carpId}" class="pointer-events-auto rounded-full bg-carbon-950/45 px-3 py-1 text-xs text-mist-200 backdrop-blur hover:text-volt-300">{words}</a>
+	<a href="/carp/{fish.carpId}" class="inline-block max-w-full rounded-xl bg-carbon-950/45 px-3 py-1 text-xs text-mist-200 backdrop-blur hover:text-volt-300">{words}</a>
 {/if}

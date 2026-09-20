@@ -34,12 +34,12 @@
 			</button>
 		</form>
 		{#if destinations.length > 0}
-			<form method="POST" action="?/moveToMyWater" class="flex items-center gap-2">
+			<form method="POST" action="?/moveToMyWater" class="flex max-w-full flex-wrap items-center gap-2">
 				{#each chosen as fish (fish.id)}<input type="hidden" name="carpId" value={fish.id} />{/each}
-				<select name="destinationId" class="field py-1 text-sm">
+				<select name="destinationId" class="field min-w-0 flex-1 py-1 text-sm">
 					{#each destinations as water (water.id)}<option value={water.id}>{water.name}</option>{/each}
 				</select>
-				<button class="button-secondary px-3 py-1 text-base" disabled={!hasChosen}>Move there</button>
+				<button class="button-secondary px-3 py-1 text-base whitespace-nowrap" disabled={!hasChosen}>Move there</button>
 			</form>
 		{/if}
 	</div>

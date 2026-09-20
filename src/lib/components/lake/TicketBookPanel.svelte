@@ -29,25 +29,25 @@
 		{/each}
 	</ul>
 	<form method="POST" action="?/addTicket" class="flex flex-wrap items-end gap-2">
-		<label class="text-xs text-mist-400">
+		<label class="block text-xs text-mist-400">
 			Ticket
 			<select name="kind" bind:value={kind} class="field mt-1">
 				{#each TicketKinds as candidate (candidate)}<option value={candidate}>{TicketKindCatalogue[candidate].label}</option>{/each}
 			</select>
 		</label>
 		{#if isMultiDay}
-			<label class="text-xs text-mist-400">Days<input name="days" type="number" min={MultiDay.FewestDays} max={MultiDay.MostDays} value={MultiDay.FewestDays} class="field mt-1 w-20" /></label>
+			<label class="block text-xs text-mist-400">Days<input name="days" type="number" min={MultiDay.FewestDays} max={MultiDay.MostDays} value={MultiDay.FewestDays} class="field mt-1 w-20" /></label>
 		{/if}
-		<label class="text-xs text-mist-400">
+		<label class="block text-xs text-mist-400">
 			{isMultiDay ? 'Price a day (£)' : 'Price (£)'}
 			<input name="price" type="number" min={TicketPrice.Lowest} max={TicketPrice.Highest} step="1" value={Number(lake.day_ticket_fee)} class="field mt-1 w-28" />
 		</label>
 		<button class="button-primary">Add to the book</button>
 	</form>
 	<BookingSwitches {lake} />
-	<form method="POST" action="?/setBarbedRule" class="mt-4 flex items-center gap-3 text-sm text-mist-200">
+	<form method="POST" action="?/setBarbedRule" class="mt-4 flex flex-wrap items-center gap-3 text-sm text-mist-200">
 		<input type="hidden" name="isBarbedBanned" value={lake.is_barbed_banned ? 'false' : 'true'} />
-		<span>{lake.is_barbed_banned ? 'Barbed hooks are banned here.' : 'Barbed hooks are allowed here.'}</span>
-		<button class="button-secondary px-3 py-1 text-base">{lake.is_barbed_banned ? 'Allow barbed hooks' : 'Ban barbed hooks'}</button>
+		<span class="min-w-0 flex-1 basis-56">{lake.is_barbed_banned ? 'Barbed hooks are banned here.' : 'Barbed hooks are allowed here.'}</span>
+		<button class="button-secondary px-3 py-1 text-base whitespace-nowrap">{lake.is_barbed_banned ? 'Allow barbed hooks' : 'Ban barbed hooks'}</button>
 	</form>
 </section>

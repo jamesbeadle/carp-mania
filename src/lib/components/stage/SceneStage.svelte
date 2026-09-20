@@ -17,32 +17,29 @@
 		deckPlacement?: DeckPlacement;
 	}
 
-	let { conditions, water, overTheLake, overTheSky, belowTheBank, deck, deckPlacement = 'none' }: Props = $props();
+	let { conditions, water, overTheLake, overTheSky, belowTheBank, deck, deckPlacement = 'below' }: Props = $props();
 
 	const lighting = $derived(lakeLightingFor(conditions));
 	const ground = `linear-gradient(180deg, ${BankPalette.GrassFar}, ${BankPalette.GrassNear})`;
 	const isDeckBelow = $derived(deckPlacement === 'below' && deck !== undefined);
 	const isDeckBeside = $derived(deckPlacement === 'beside' && deck !== undefined);
-	const hasDeck = $derived(isDeckBelow || isDeckBeside);
-	const hasBar = $derived(belowTheBank !== undefined);
-	const isLakeShortened = $derived(hasBar || isDeckBelow);
 </script>
 
 <div class="stage relative flex h-full w-full flex-col overflow-hidden">
 	<SkyCanvas {conditions} layer="backdrop" />
-	<div class={['relative', !hasDeck && 'flex-1', hasBar && 'short:min-h-18 min-h-28', isDeckBelow && 'min-h-36', isDeckBeside && 'min-h-16']}>{@render overTheSky?.()}</div>
-	<div class="relative flex" class:min-h-0={isDeckBeside} class:flex-1={isDeckBeside} class:flex-row={isDeckBeside} class:flex-col={!isDeckBeside} style="background: {ground}; filter: {lighting.seasonFilter}">
-		<div class="relative flex justify-center px-2 pt-3 pb-4">
-			<div class="lake-frame" class:shortened={isLakeShortened}>{@render water()}</div>
+	<div class="sky short:min-h-10 relative z-10 min-h-20 shrink-0 bg-gradient-to-b from-carbon-950/45 to-carbon-950/0">{@render overTheSky?.()}</div>
+	<div class="ground relative flex min-h-0" class:flex-1={!isDeckBelow} class:flex-row={isDeckBeside} class:water-band={isDeckBelow}>
+		<div class="water-area relative flex min-h-0 min-w-0 flex-1 items-center justify-center" style="background: {ground}; filter: {lighting.seasonFilter}">
+			<div class="lake-frame">{@render water()}</div>
 			<LightingOverlays {lighting} />
-			<div class="pointer-events-none absolute inset-0 flex justify-center px-2 pt-3 pb-4">
-				<div class="lake-frame relative" class:shortened={isLakeShortened}>{@render overTheLake?.()}</div>
+			<div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+				<div class="lake-frame relative">{@render overTheLake?.()}</div>
 			</div>
 		</div>
-		{#if isDeckBeside}<div class="deck relative z-10 min-w-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+		{#if isDeckBeside}<div class="deck deck-beside relative z-10 min-h-0 shrink-0 overflow-y-auto border-l border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
 	</div>
-	{#if isDeckBelow}<div class="deck relative z-10 min-h-0 flex-1 overflow-y-auto bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
-	{#if hasBar}<div class="relative z-10 shrink-0 border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render belowTheBank?.()}</div>{/if}
+	{#if isDeckBelow}<div class="deck relative z-10 min-h-0 flex-1 overflow-y-auto border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+	{#if belowTheBank}<div class="relative z-10 shrink-0 border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render belowTheBank()}</div>{/if}
 	<SkyCanvas {conditions} layer="overhead" />
 </div>
 
@@ -50,24 +47,37 @@
 	.stage {
 		container-type: size;
 	}
+	.water-area {
+		container-type: size;
+		padding: 0.5rem;
+	}
 	.lake-frame {
-		height: min(76cqh, 64cqw);
+		height: min(calc(100cqh - 1rem), calc((100cqw - 1rem) * 2 / 3));
 		aspect-ratio: 3 / 2;
 	}
-	.lake-frame.shortened {
-		height: min(58cqh, 64cqw);
+	.water-band {
+		height: min(calc((100cqw - 1rem) * 2 / 3 + 1rem), 55cqh);
 	}
-	@container (max-height: 640px) {
-		.lake-frame.shortened {
-			height: min(34cqh, 64cqw);
-		}
-	}
-	@media (max-height: 500px) {
-		.lake-frame.shortened {
-			height: min(30cqh, 64cqw);
-		}
+	.deck-beside {
+		width: min(24rem, 40cqw);
 	}
 	.deck {
 		padding-bottom: env(safe-area-inset-bottom);
+	}
+	@media (min-width: 640px) {
+		.water-area {
+			padding: 0.75rem;
+		}
+		.lake-frame {
+			height: min(calc(100cqh - 1.5rem), calc((100cqw - 1.5rem) * 2 / 3));
+		}
+		.water-band {
+			height: min(calc((100cqw - 1.5rem) * 2 / 3 + 1.5rem), 55cqh);
+		}
+	}
+	@media (min-width: 1536px) {
+		.deck-beside {
+			width: min(27rem, 40cqw);
+		}
 	}
 </style>
