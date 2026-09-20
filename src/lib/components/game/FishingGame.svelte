@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { FishingVisit } from '$lib/contracts/FishingVisit';
 	import type { TheBar } from '$lib/domain/fishing/honours';
-	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
+	import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 	import { bringTheFishIn, castTheNextRod, reelTheRodIn, setOffToAnotherSwim, stayOnThisSwim, strikeAtTheBite, takeThePeg } from '$lib/game/session/anglerActions';
@@ -12,9 +12,8 @@
 	import { returnToFishing, tackleUp } from '$lib/game/session/sessionFlow';
 	import { followTheBiteAlarm, quietTheBank } from '$lib/game/session/sessionSounds';
 	import { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { skillsOfProfile } from '$lib/game/session/skillsOfProfile';
-	import { craftOf } from '$lib/domain/anglerRating';
 	import { showingSpotsFor } from '$lib/game/session/showingFish';
+	import { reportLossesAsTheyHappen } from '$lib/game/session/tackleLoss';
 	import { showsThisHour } from '$lib/domain/fishing/showingFish';
 	import { startTicking } from '$lib/game/session/tickSession';
 	import { ambientSceneFor } from '$lib/game/sound/ambience/ambientScene';
@@ -22,7 +21,7 @@
 	import HowToPlay from './HowToPlay.svelte';
 	import KeyHints from './KeyHints.svelte';
 	import SessionChrome from './SessionChrome.svelte';
-	import TackleBuilder from './TackleBuilder.svelte';
+	import TackleUpScreen from './TackleUpScreen.svelte';
 	import WaterScreen from './WaterScreen.svelte';
 
 	interface Props {
@@ -32,10 +31,11 @@
 		profile: Profile;
 		visit: FishingVisit;
 		bar: TheBar;
+		owned: OwnedTackle[];
 		matchBoardHref?: string | null;
 	}
 
-	let { lake, swims, carp, profile, visit, bar, matchBoardHref = null }: Props = $props();
+	let { lake, swims, carp, profile, visit, bar, owned, matchBoardHref = null }: Props = $props();
 
 	const session = new SessionState(lake, carp, profile, visit, bar);
 	let catchOutcome = $state<CatchReportOutcome | null>(null);
@@ -43,7 +43,7 @@
 	let isHowToPlayOpen = $state(false);
 	const hourOfShows = $derived(Math.floor(session.hour));
 	const shows = $derived(showsThisHour(session.seed, hourOfShows, session.carp, session.watercraft));
-	const showingAt = $derived<LayoutPoint[]>(showingSpotsFor(lake, shows, session.season));
+	const showingAt = $derived(showingSpotsFor(lake, shows, session.season));
 	const conditions = $derived(sessionConditionsFor(lake, visit.visitedAt, session.hour));
 	const ambience = $derived(sessionConditionsFor(lake, visit.visitedAt, quarterHourOf(session.hour)));
 
@@ -54,6 +54,7 @@
 	$effect(() => sound.startAmbience(ambientSceneFor(ambience)));
 	$effect(() => () => sound.stopAmbience());
 	$effect(() => quietTheBank);
+	$effect(() => reportLossesAsTheyHappen(lake, visit.id, session, session.tackleLost.length));
 
 	function handleTackleUp(setups: RodSetup[]) {
 		tackleUp(session, setups);
@@ -69,7 +70,7 @@
 </script>
 
 {#if session.phase === 'tackle_up' && session.swim}
-	<div class="h-full overflow-y-auto px-4 py-6"><div class="mx-auto max-w-5xl"><TackleBuilder {lake} swim={session.swim} season={session.season} rating={session.rating} craft={craftOf(skillsOfProfile(profile))} carpCount={session.carp.length} savedRods={profile.saved_rods ?? []} onReady={handleTackleUp} /></div></div>
+	<TackleUpScreen {session} swim={session.swim} {lake} {profile} {owned} onReady={handleTackleUp} />
 {:else}
 	<WaterScreen
 		{session}

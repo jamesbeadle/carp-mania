@@ -6,6 +6,7 @@ export interface VisitOnRecord {
 	lake_id: string;
 	visited_at: string;
 	seed: number;
+	tackle_losses: number;
 }
 
 export interface WaterOnRecord {
@@ -14,7 +15,7 @@ export interface WaterOnRecord {
 }
 
 export async function loadVisitOf(anglerId: string, visitId: string): Promise<VisitOnRecord | null> {
-	const { data } = await trustedSupabase().from('lake_visits').select('id, lake_id, visited_at, seed').eq('id', visitId).eq('angler_id', anglerId).maybeSingle();
+	const { data } = await trustedSupabase().from('lake_visits').select('id, lake_id, visited_at, seed, tackle_losses').eq('id', visitId).eq('angler_id', anglerId).maybeSingle();
 	const visit = data as VisitOnRecord | null;
 	if (!visit || visit.seed === null) return null;
 	return { ...visit, seed: Number(visit.seed) };

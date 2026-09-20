@@ -6,6 +6,7 @@ import { GetFishingVisit } from '$lib/server/queries/GetFishingVisit';
 import { GetLake } from '$lib/server/queries/GetLake';
 import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
+import { loadOwnedTackle } from '$lib/server/queries/GetTackleBox';
 
 const VisitParam = 'visit';
 const HttpStatus = { BadRequest: 400 } as const;
@@ -19,8 +20,10 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		visitId ? GetFishingVisit(locals, params.lakeId, visitId) : null
 	]);
 	const isOnTheWater = visit !== null;
-	const bar = visit ? await GetTheBar(locals, water.lake, visit.visitedAt) : null;
-	return { water, profile, visit, bar, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
+	const barLoad = visit ? GetTheBar(locals, water.lake, visit.visitedAt) : null;
+	const ownedLoad = visit ? loadOwnedTackle(locals, profile.id) : [];
+	const [bar, owned] = await Promise.all([barLoad, ownedLoad]);
+	return { water, profile, visit, bar, owned, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {

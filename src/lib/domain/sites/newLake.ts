@@ -1,5 +1,5 @@
-import { emptyFeedStock } from '../feed';
 import { waterAcres } from '../layout/waterArea';
+import { untendedWater } from './untendedWater';
 import type { Lake, SiteType } from '../types';
 import { colourFromSilt, transparencyFromSiltAndWeed } from '../waterQuality';
 import { chosenPlotOf, type ProfileWithPlot } from './chosenPlot';
@@ -25,10 +25,7 @@ export function newLakeFor(profile: ProfileWithPlot, site: SiteType, chosenAcres
 		bank_tidiness: siteProfile.water.bankTidiness,
 		day_ticket_fee: NewWater.DayTicketFee,
 		reputation: siteProfile.startingReputation,
-		has_bailiff: false,
-		pike_count: 0,
-		pike_food: 0,
-		feed_stock: emptyFeedStock(),
+		...untendedWater(),
 		is_public: false,
 		simulated_until: now.toISOString(),
 		region: plot.region,

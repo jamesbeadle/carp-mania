@@ -7,8 +7,9 @@ import { mix } from '../src/lib/domain/fishing/sessionSeed';
 import { carpForRolledBite, carpInBiteOrder, carpThatTookTheBait } from '../src/lib/domain/fishing/whoTookTheBait';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
-import { defaultRodSetup, MaximumRods } from '../src/lib/domain/tackle/rodSetup';
+import { defaultRodSetup, kitFor, MaximumRods } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake } from '../src/lib/domain/types';
+import type { RodSetup } from '../src/lib/domain/tackle/rodSetup';
 import { seasonFor } from '../src/lib/domain/world/seasons';
 
 const VisitSeed = 123456789;
@@ -29,7 +30,8 @@ export function runBiteRollScenarios() {
 	const lake: Lake = { id: 'lake-seeded', ...classicLake('owner-1', 'Seeded Water', new Date('2026-01-01T00:00:00Z')) };
 	const carp: Carp[] = classicCarp(lake.id, seededRandom(7)).map((fish, index) => ({ ...fish, id: `carp-${index}` }));
 	const water: WaterToday = { lake, rating: DecentRating, watercraft: DecentWatercraft, season: seasonFor(lake, new Date('2026-06-01T00:00:00Z')) };
-	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), setup: defaultRodSetup() };
+	const setup = defaultRodSetup();
+	const rod: RodInTheWater = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 
 	const roll = biteRollFor(VisitSeed, 0, 7, rod, water);
 	assert.deepEqual(roll, biteRollFor(VisitSeed, 0, 7, rod, water), 'the same inputs give the same roll');
@@ -44,7 +46,7 @@ export function runBiteRollScenarios() {
 	const misses = slots.filter((slot) => !slot.roll.isTaking);
 	assert.ok(takes.length >= 1, 'a decent setup gets at least one take in a day');
 	assert.ok(misses.length >= 1, 'not every hour produces a fish');
-	assertTheServerAgreesWithTheClient(takes[0], misses[0], carp, water, rod);
+	assertTheServerAgreesWithTheClient(takes[0], misses[0], carp, water, rod, setup);
 	assertDayTicketsLapse();
 	console.log('bite roll:', { takesInADay: takes.length, firstTake: takes[0] });
 }
@@ -69,11 +71,11 @@ function assertEverySlotHasItsOwnStream() {
 	}
 }
 
-function assertTheServerAgreesWithTheClient(take: Slot, miss: Slot, carp: Carp[], water: WaterToday, rod: RodInTheWater) {
+function assertTheServerAgreesWithTheClient(take: Slot, miss: Slot, carp: Carp[], water: WaterToday, rod: RodInTheWater, setup: RodSetup) {
 	const spot = { terrain: rod.terrain, castPoint: CastPoint };
-	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), { roll: take.roll, hour: take.hour, setup: rod.setup, seed: VisitSeed }, water, spot);
+	const clientPick = carpThatTookTheBait(carpInBiteOrder(carp), { roll: take.roll, hour: take.hour, kit: rod.kit, seed: VisitSeed }, water, spot);
 	const carpAsTheServerLoadsThem = [...carp].reverse();
-	const reportOf = (slot: Slot) => ({ seed: VisitSeed, rodIndex: slot.rodIndex, hour: slot.hour, castPoint: CastPoint, setup: rod.setup });
+	const reportOf = (slot: Slot) => ({ seed: VisitSeed, rodIndex: slot.rodIndex, hour: slot.hour, castPoint: CastPoint, setup });
 	const serverPick = carpForRolledBite(reportOf(take), water, carpAsTheServerLoadsThem);
 	assert.ok(clientPick && serverPick, 'both sides find a fish');
 	assert.equal(serverPick.id, clientPick.id, 'the server picks the same carp as the client');

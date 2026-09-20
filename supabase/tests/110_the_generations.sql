@@ -16,7 +16,7 @@ select set_config('request.jwt.claim.sub', test.player(111)::text, false);
 select public.pay_day_ticket(:'lake') as visit \gset
 select test.assert_refused(format('select public.retire_fisherman(%L, %L)', test.player(111), 'Young Tom'), 'permission denied for function retire_fisherman');
 reset role;
-select public.record_catch(test.player(111), :'visit', :'first_fish', 'The Peg', 'hair rig', 'boilie', 6, 2, 2, 2, 2) as first_catch \gset
+select public.record_catch(test.player(111), :'visit', :'first_fish', 'The Peg', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie') as first_catch \gset
 select test.assert_that((select fisherman_id = :'old_fisherman' from public.catches where id = :'first_catch'), 'a catch is stamped with the fisherman who had it');
 select test.assert_that((select line_selection = 27 from public.profiles where id = test.player(111)), 'the first of the line learns at the ordinary pace');
 
@@ -47,6 +47,6 @@ select public.pay_day_ticket(:'lake') as second_visit \gset
 reset role;
 select * from public.records_broken_by(:'lake', test.player(111), :'second_fish', 19) \gset broken_
 select test.assert_that(:'broken_is_personal_best' = 't', 'a 19 lb fish is a personal best for the heir although the old man had a 22');
-select public.record_catch(test.player(111), :'second_visit', :'second_fish', 'The Peg', 'hair rig', 'boilie', 6, 2, 2, 2, 2);
+select public.record_catch(test.player(111), :'second_visit', :'second_fish', 'The Peg', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 select test.assert_that((select line_selection = 43 from public.profiles where id = test.player(111)), 'the heir, taught by the old man, learns half as fast again');
 select test.assert_that((select count(*) from public.catches where fisherman_id = :'heir') = 1 and (select count(*) from public.catches where fisherman_id = :'old_fisherman') = 1, 'each fisherman keeps his own catches');

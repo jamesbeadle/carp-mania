@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { describeTerrain } from '$lib/domain/fishing/castTerrain';
-	import { BaitCatalogue } from '$lib/domain/tackle/baits';
-	import { RigCatalogue } from '$lib/domain/tackle/rigs';
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
 	import type { RodOnBank } from '$lib/game/scene/rodState';
 	import { pointerWords } from '$lib/game/stage/pointerWords';
@@ -11,7 +9,8 @@
 	const phaseLabels = { idle: pointerWords('Click water to cast'), cast: 'Fishing', biting: 'Bite!', fighting: 'Fish on' } as const;
 	const phaseTone = { idle: 'text-mist-400', cast: 'text-surge-400', biting: 'text-danger-400', fighting: 'text-volt-400' } as const;
 
-	const tackle = $derived(`${RigCatalogue[rod.setup.rig].label} · ${BaitCatalogue[rod.setup.bait].label}`);
+	const kit = $derived(rod.kit);
+	const tackle = $derived(`${kit.rig.label} · ${kit.bait.label}`);
 	const spot = $derived(rod.terrain ? describeTerrain(rod.terrain, BedTypeLabels, SwimFeatureLabels) : null);
 	const isBiting = $derived(rod.phase === 'biting');
 	const canReelIn = $derived(rod.phase === 'cast' && onReelIn !== undefined);

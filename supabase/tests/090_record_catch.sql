@@ -26,7 +26,7 @@ select public.pay_day_ticket(:'lake') as visit \gset
 select test.assert_that((select seed between 0 and 2147483647 from public.lake_visits where id = :'visit'), 'a visit carries its seed');
 select test.assert_that(test.money_of(test.player(91)) = 99980 and test.money_of(test.player(90)) = 100020, 'the day ticket changes hands');
 select test.assert_refused(
-	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 1, 1, 1, 1)', test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie'),
+	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 1, 1, 1, 1, %L, %L, %L)', test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie', 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie'),
 	'permission denied for function record_catch'
 );
 select set_config('request.jwt.claim.sub', test.player(93)::text, false);
@@ -34,7 +34,7 @@ select public.pay_day_ticket(:'private_lake') as own_visit \gset
 select test.assert_that((select fee_paid = 0 from public.lake_visits where id = :'own_visit'), 'an owner fishes their own private water for nothing');
 
 set role service_role;
-select public.record_catch(test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie', 6, 1, 0.5, 3, 1) as first_catch \gset
+select public.record_catch(test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie', 6, 1, 0.5, 3, 1, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie') as first_catch \gset
 reset role;
 select test.assert_that((select angler_id = test.player(91) and weight_lb = 20 and angler_name = 'Player 91' from public.catches where id = :'first_catch'), 'the catch is the angler''s');
 select test.assert_that((select fame = 15 and times_caught = 1 from public.carp where id = :'twenty'), 'fame: 3 for a player, 10 for the lake record (the visitor''s 45 does not count), 2 for a personal best');
@@ -52,9 +52,9 @@ select test.assert_that((select count(*) from public.world_events where lake_id 
 select test.assert_that((select count(*) from public.notifications where profile_id = test.player(90) and kind = 'record_set') = 1, 'the owner hears of the record');
 
 set role service_role;
-select public.record_catch(test.player(91), :'visit', :'fifteen', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
-select public.record_catch(test.player(91), :'visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
-select public.record_catch(test.player(91), :'visit', :'hidden', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(91), :'visit', :'fifteen', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(91), :'visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(91), :'visit', :'hidden', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 reset role;
 select test.assert_that((select fame from public.carp where id = :'fifteen') = 3, 'an ordinary catch is worth 3');
 select test.assert_that((select fame from public.carp where id = :'thirtytwo') = 15, 'a new lake record and personal best, but not the region record of 35');
@@ -72,14 +72,14 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(91)::text, false);
 select public.pay_day_ticket(:'lake') as second_visit \gset
 set role service_role;
-select public.record_catch(test.player(91), :'second_visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(91), :'second_visit', :'thirtytwo', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 reset role;
 select test.assert_that((select fame from public.carp where id = :'thirtytwo') = 15 + 13, 'a grown fish is a lake record again, but a personal best only once per angler');
 
 set role service_role;
-select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0)', test.player(90), :'visit', :'twenty', 'x', 'x', 'x'), 'No day ticket');
-select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0)', test.player(91), :'visit', :'foreign_fish', 'x', 'x', 'x'), 'not in this lake');
-select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0)', test.player(91), :'visit', :'travelling', 'x', 'x', 'x'), 'cannot be fished for yet');
+select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(90), :'visit', :'twenty', 'x', 'x', 'x', 'r', 'r', 'b'), 'No day ticket');
+select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(91), :'visit', :'foreign_fish', 'x', 'x', 'x', 'r', 'r', 'b'), 'not in this lake');
+select test.assert_refused(format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(91), :'visit', :'travelling', 'x', 'x', 'x', 'r', 'r', 'b'), 'cannot be fished for yet');
 reset role;
 select test.assert_that((select count(*) from pg_proc where proname = 'record_catch') = 1, 'the old record_catch that trusted the client is gone');
 

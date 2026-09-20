@@ -2,7 +2,7 @@ import { favouriteSpotOf, FavouriteSpotBiteBonus, isCastAtFavourite, ShownSpotBo
 import type { LayoutPoint } from '../layout/layoutTypes';
 import type { Terrain } from '../layout/terrainAt';
 import { isFishable } from '../simulation/lapseTransfers';
-import type { RodSetup } from '../tackle/rodSetup';
+import { kitFor, type RodKit, type RodSetup } from '../tackle/rodSetup';
 import type { Carp, Lake } from '../types';
 import type { Season } from '../world/seasons';
 import { biteRollFor, type BiteRoll, type WaterToday } from './biteRoll';
@@ -31,7 +31,7 @@ export interface RolledBiteReport {
 export interface Bite {
 	roll: BiteRoll;
 	hour: number;
-	setup: RodSetup;
+	kit: RodKit;
 	seed: number;
 }
 
@@ -57,7 +57,7 @@ export function sizeReachFor(water: WaterToday, carpCount: number, tackleMatchOv
 }
 
 export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToday, spot: CastSpot): Carp | null {
-	const match = matchTackleToWater(bite.setup, water.lake, spot.terrain);
+	const match = matchTackleToWater(bite.kit, water.lake, spot.terrain);
 	const shownIds = idsShownTruthfully(showsThisHour(bite.seed, bite.hour, carpInOrder, water.watercraft));
 	const spotBonusFor = favouriteSpotBonusAt(water.lake, water.season, spot, shownIds);
 	const take = { sizeReach: sizeReachFor(water, carpInOrder.length, match.overall), hour: bite.hour, spotBonusFor };
@@ -66,10 +66,10 @@ export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: Wate
 
 export function carpForRolledBite(report: RolledBiteReport, water: WaterToday, carpInLake: Carp[]): Carp | null {
 	const spot = { terrain: castTerrainFor(water.lake, report.castPoint), castPoint: report.castPoint };
-	const rod = { terrain: spot.terrain, setup: report.setup };
+	const rod = { terrain: spot.terrain, kit: kitFor(report.setup) };
 	const roll = biteRollFor(report.seed, report.rodIndex, report.hour, rod, water);
 	if (!roll.isTaking) return null;
-	return carpThatTookTheBait(carpInBiteOrder(carpInLake), { roll, hour: report.hour, setup: report.setup, seed: report.seed }, water, spot);
+	return carpThatTookTheBait(carpInBiteOrder(carpInLake), { roll, hour: report.hour, kit: rod.kit, seed: report.seed }, water, spot);
 }
 
 function byId(one: Carp, other: Carp) {

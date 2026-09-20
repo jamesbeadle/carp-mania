@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { biteRollFor, type WaterToday } from '../src/lib/domain/fishing/biteRoll';
+import { biteRollFor, type RodInTheWater, type WaterToday } from '../src/lib/domain/fishing/biteRoll';
 import { castTerrainFor } from '../src/lib/domain/fishing/castTerrain';
 import { FishingDay } from '../src/lib/domain/fishing/sessionClock';
 import { isInsideTheBand, landedFromTakes, SessionCatches } from '../src/lib/domain/fishing/sessionCatches';
@@ -7,7 +7,7 @@ import { biasExponentFor, sizeBiasOf } from '../src/lib/domain/fishing/takeWeigh
 import { carpForRolledBite } from '../src/lib/domain/fishing/whoTookTheBait';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
-import { defaultRodSetup, MaximumRods, type RodSetup } from '../src/lib/domain/tackle/rodSetup';
+import { defaultRodSetup, kitFor, MaximumRods, type RodSetup } from '../src/lib/domain/tackle/rodSetup';
 import type { Carp, Lake } from '../src/lib/domain/types';
 import { seasonFor } from '../src/lib/domain/world/seasons';
 
@@ -17,7 +17,7 @@ const SeedsPerCell = 120;
 const CompetentRating = 50;
 const CastPoint = { x: 0.5, y: 0.5 };
 const CellSpread = { Lowest: 0.85, Highest: 1.15 } as const;
-const SupermarketSetup: RodSetup = { line: { colour: 'brown', thickness: 'thick' }, hook: { size: 8, finish: 'shiny' }, rig: 'zig', bait: 'bread', tubing: 'yellow' };
+const SupermarketSetup: RodSetup = { ...defaultRodSetup(), line: 'bankside_basics-line-20-brown', hook: 'bankside_basics-hook-2-barbed-shiny', rig: 'bankside_basics-rig-zig', bait: 'meadowmill-bait-bread', tubing: 'bankside_basics-tubing-yellow' };
 const ThirtyLb = 30;
 
 export function runSizeReachScenarios() {
@@ -32,7 +32,7 @@ export function runSizeReachScenarios() {
 			const takes = meanTakesPerSession(lake, rating, setup);
 			const ratio = takes / competent;
 			const isWithinSpread = ratio >= CellSpread.Lowest && ratio <= CellSpread.Highest;
-			assert.ok(isWithinSpread, `rating ${rating} on ${setup.rig} moves the count by ${ratio.toFixed(2)}, within the band`);
+			assert.ok(isWithinSpread, `rating ${rating} on ${setup.line} moves the count by ${ratio.toFixed(2)}, within the band`);
 		}
 	}
 	assertTheCalibreRisesWithReach(lake);
@@ -40,7 +40,7 @@ export function runSizeReachScenarios() {
 }
 
 function meanTakesPerSession(lake: Lake, rating: number, setup: RodSetup) {
-	const rod = { terrain: castTerrainFor(lake, CastPoint), setup };
+	const rod = { terrain: castTerrainFor(lake, CastPoint), kit: kitFor(setup) };
 	let takes = 0;
 	for (const month of Months) {
 		const water: WaterToday = { lake, rating, watercraft: rating, season: seasonFor(lake, new Date(month)) };
@@ -49,7 +49,7 @@ function meanTakesPerSession(lake: Lake, rating: number, setup: RodSetup) {
 	return takes / (Months.length * SeedsPerCell);
 }
 
-function takesInASession(seed: number, rod: { terrain: ReturnType<typeof castTerrainFor>; setup: RodSetup }, water: WaterToday) {
+function takesInASession(seed: number, rod: RodInTheWater, water: WaterToday) {
 	let takes = 0;
 	for (let rodIndex = 0; rodIndex < MaximumRods; rodIndex++) {
 		for (let hour = FishingDay.StartHour; hour < FishingDay.EndHour; hour++) if (biteRollFor(seed, rodIndex, hour, rod, water).isTaking) takes += 1;

@@ -2,7 +2,7 @@ import { sound } from '../sound/soundEngine.svelte';
 import type { SoundName } from '../sound/soundLibrary';
 import type { FightOutcome } from './fightState.svelte';
 
-const OutcomeSounds: Record<FightOutcome, SoundName> = { landed: 'net', snapped: 'snap', hook_pulled: 'hook_pulled' };
+const OutcomeSounds: Record<FightOutcome, SoundName> = { landed: 'net', snapped: 'snap', hook_pulled: 'hook_pulled', rod_snapped: 'snap', hook_opened: 'hook_pulled' };
 const ReelInMilliseconds = 900;
 
 export function followTheBiteAlarm(hasBite: boolean, isAlarmMuted: boolean) {

@@ -1,6 +1,5 @@
 import { CarpWeight } from '../carpGrowth';
 import { ClassicFishery } from '../economy';
-import { emptyFeedStock } from '../feed';
 import { ClassicPlotAcres, classicLayoutWithSwimTerrain, type ClassicSwimTerrain } from '../layout/classicLayout';
 import { waterAcres } from '../layout/waterArea';
 import { carpNameForIndex } from '../naming/carpNames';
@@ -8,6 +7,7 @@ import { randomBetween, type RandomFraction } from '../random';
 import { ReputationScale } from '../reputation';
 import { pickStrain } from '../strains';
 import type { Carp, Lake, Swim } from '../types';
+import { untendedWater } from './untendedWater';
 import { colourFromSilt, transparencyFromSiltAndWeed } from '../waterQuality';
 
 const ClassicWater = { Silt: 25, Weed: 30, BankTidiness: 60, Fertility: 50 } as const;
@@ -35,10 +35,7 @@ export function classicLake(ownerId: string, name: string, now: Date): Omit<Lake
 		bank_tidiness: ClassicWater.BankTidiness,
 		day_ticket_fee: ClassicFishery.DayTicketFee,
 		reputation: ReputationScale.Starter,
-		has_bailiff: false,
-		pike_count: 0,
-		pike_food: 0,
-		feed_stock: emptyFeedStock(),
+		...untendedWater(),
 		is_public: true,
 		simulated_until: now.toISOString(),
 		region: 'uk_ireland',

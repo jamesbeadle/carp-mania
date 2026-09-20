@@ -5,6 +5,7 @@ import type { WaterToday } from '$lib/domain/fishing/biteRoll';
 import { isDayTicketStillValid } from '$lib/domain/fishing/dayTicket';
 import { carpForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
 import type { Carp, Profile } from '$lib/domain/types';
+import { kitFor } from '$lib/domain/tackle/rodSetup';
 import { seasonFor } from '$lib/domain/world/seasons';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { readCatchReport } from '../gates/readCatchReport';
@@ -52,18 +53,22 @@ function carpThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: Wat
 }
 
 async function recordInTheBook(anglerId: string, report: CatchReport): Promise<string> {
+	const kit = kitFor(report.setup);
 	const { data: catchId, error: recordError } = await trustedSupabase().rpc('record_catch', {
 		angler: anglerId,
 		visit: report.visitId,
 		fish: report.carpId,
 		swim_name: report.swimName,
-		rig: report.setup.rig,
-		bait: report.setup.bait,
-		hook_size: report.setup.hook.size,
+		rig: kit.rig.rig,
+		bait: kit.bait.bait.kind,
+		hook_size: kit.hook.hook.size,
 		line_gain: report.skillGains.line,
 		rig_gain: report.skillGains.rig,
 		bait_gain: report.skillGains.bait,
-		watercraft_gain: report.skillGains.watercraft
+		watercraft_gain: report.skillGains.watercraft,
+		rod_item: kit.rod.id,
+		reel_item: kit.reel.id,
+		bait_item: kit.bait.id
 	});
 	if (recordError) error(HttpStatus.BadRequest, recordError.message);
 	return catchId as string;

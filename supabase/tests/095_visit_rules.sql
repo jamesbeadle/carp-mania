@@ -9,12 +9,12 @@ select set_config('request.jwt.claim.sub', test.player(96)::text, false);
 select public.pay_day_ticket(:'lake') as visit \gset
 
 set role service_role;
-select public.record_catch(test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 select test.assert_refused(
-	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0)', test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie'),
+	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie'),
 	'already been on the bank today'
 );
-select public.record_catch(test.player(96), :'visit', :'another', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(96), :'visit', :'another', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 reset role;
 select test.assert_that((select times_caught from public.carp where id = :'repeat') = 1, 'the same fish is recorded once a visit');
 select test.assert_that((select times_caught from public.carp where id = :'another') = 1, 'a different fish on the same visit still counts');
@@ -24,7 +24,7 @@ set role service_role;
 insert into public.lake_visits (lake_id, angler_id, angler_name, fee_paid, visited_at, seed)
 values (:'lake', test.player(96), 'Player 96', 20, now() - interval '3 hours', 1) returning id as stale_visit \gset
 select test.assert_refused(
-	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0)', test.player(96), :'stale_visit', :'another', 'The Peg', 'hair rig', 'boilie'),
+	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(96), :'stale_visit', :'another', 'The Peg', 'hair rig', 'boilie', 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie'),
 	'That day ticket has expired'
 );
 reset role;
@@ -34,6 +34,6 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(96)::text, false);
 select public.pay_day_ticket(:'lake') as next_visit \gset
 set role service_role;
-select public.record_catch(test.player(96), :'next_visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0);
+select public.record_catch(test.player(96), :'next_visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
 reset role;
 select test.assert_that((select times_caught from public.carp where id = :'repeat') = 2, 'a new day ticket lets the same fish be caught again');

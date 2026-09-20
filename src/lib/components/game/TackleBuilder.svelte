@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { describeTerrain, terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
-	import { defaultRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
+	import { defaultRodSetup, isRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
+	import { isSetupOwned, ownedItemsIn, type OwnedTackle } from '$lib/domain/tackle/tackleBox';
+	import { firstOwnedSetup } from '$lib/game/session/firstOwnedSetup';
 	import type { Lake, Swim } from '$lib/domain/types';
 	import type { Season } from '$lib/domain/world/seasons';
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
@@ -16,17 +18,21 @@
 		craft: number;
 		carpCount: number;
 		savedRods: RodSetup[];
+		owned: OwnedTackle[];
 		onReady: (setups: RodSetup[]) => void;
 	}
 
-	let { lake, swim, season, rating, craft, carpCount, savedRods, onReady }: Props = $props();
+	let { lake, swim, season, rating, craft, carpCount, savedRods, owned, onReady }: Props = $props();
 
-	const hasSavedRods = savedRods.length > 0;
-	const startingSetups = Array.from({ length: MaximumRods }, (_, index) => structuredClone(savedRods[index] ?? defaultRodSetup()));
+	const box = ownedItemsIn(owned);
+	const usableRods = savedRods.filter((setup) => isRodSetup(setup) && isSetupOwned(owned, setup));
+	const hasSavedRods = usableRods.length > 0;
+	const fallback = firstOwnedSetup(box) ?? defaultRodSetup();
+	const startingSetups = Array.from({ length: MaximumRods }, (_, index) => structuredClone(usableRods[index] ?? fallback));
 	const RodCounts = Array.from({ length: MaximumRods }, (_, index) => index + 1);
 	const HintsUnlockAtCraft = 40;
 	let setups = $state<RodSetup[]>(startingSetups);
-	let rodCount = $state(hasSavedRods ? savedRods.length : MaximumRods);
+	let rodCount = $state(hasSavedRods ? usableRods.length : MaximumRods);
 	let chosenRod = $state(0);
 	const shownRod = $derived(Math.min(chosenRod, rodCount - 1));
 	const rodsInUse = $derived(RodCounts.slice(0, rodCount));
@@ -65,7 +71,7 @@
 <div class="grid gap-4 md:grid-cols-3">
 	{#each rodsInUse as rodNumber (rodNumber)}
 		<div class={rodNumber === shownRod + 1 ? 'block' : 'hidden md:block'}>
-			<RodSetupCard bind:setup={setups[rodNumber - 1]} {rodNumber} {lake} terrain={terrainInFront} {isShowingHints} onCopyToEveryRod={rodCount > 1 ? () => copyToEveryRod(rodNumber - 1) : null} />
+			<RodSetupCard bind:setup={setups[rodNumber - 1]} {rodNumber} {lake} terrain={terrainInFront} {box} {isShowingHints} onCopyToEveryRod={rodCount > 1 ? () => copyToEveryRod(rodNumber - 1) : null} />
 		</div>
 	{/each}
 </div>

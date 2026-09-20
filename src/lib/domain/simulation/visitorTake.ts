@@ -1,16 +1,20 @@
 import { FishingDay } from '../fishing/sessionClock';
-import { fractionOfHundred } from '../fraction';
+import { tierUnlockedBy, type Tier } from '../tackle/brands';
 import { pickCarpByWeight } from '../fishing/pickCarp';
 import { ratingShareOf, NeutralConditionsShare, sizeReachOf, waterShareOf, type WaterForReach } from '../fishing/sizeReach';
 import { noSpotBonus, takeWeightsFor } from '../fishing/takeWeight';
 import { randomBetween, type RandomFraction } from '../random';
 import type { Carp } from '../types';
 
-export const VisitorTackle = { FloorShare: 0.45, ShareAtFullRating: 0.9 } as const;
+export const TierTackleShare: Record<Tier, number> = {
+	starter: 0.45,
+	club: 0.6,
+	specialist: 0.75,
+	custom: 0.9
+};
 
 export function visitorTackleShareFor(rating: number) {
-	const swing = VisitorTackle.ShareAtFullRating - VisitorTackle.FloorShare;
-	return VisitorTackle.FloorShare + swing * fractionOfHundred(rating);
+	return TierTackleShare[tierUnlockedBy(rating)];
 }
 
 export function visitorSizeReach(lake: WaterForReach, carpCount: number, rating: number) {

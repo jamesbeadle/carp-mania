@@ -10,6 +10,7 @@ import type { RodOnBank } from '../scene/rodState';
 import { BiteRoller, type RolledBite } from './biteRoller';
 import type { FightState } from './fightState.svelte';
 import type { LandedFish } from './landFish';
+import type { TackleLoss } from './tackleLoss';
 import { advanceTheSession } from './sessionTicks';
 import { waterTodayOf } from './waterToday';
 import { skillsOfProfile } from './skillsOfProfile';
@@ -33,6 +34,7 @@ export class SessionState {
 	lostToday = $state(0);
 	notice = $state<string | null>(null);
 	isPickingASwimToMoveTo = $state(false);
+	tackleLost = $state<TackleLoss[]>([]);
 	secondsSinceTheMat = $state(0);
 	bar: TheBar;
 	readonly seed: number;
