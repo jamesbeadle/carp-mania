@@ -41,7 +41,7 @@
 	const selectedSwimId = $derived(session.swim?.id ?? null);
 	const orientation = new Orientation();
 	const isDeckBeside = $derived(orientation.deckPlacement === 'beside');
-	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
+	const fishShowingAt = $derived(canReadTheWater(session.watercraft) ? showingAt : []);
 	const castReach = $derived(castReachOf(session));
 
 	$effect(() => orientation.watch());

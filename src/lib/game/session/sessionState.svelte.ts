@@ -45,10 +45,6 @@ export class SessionState {
 		this.roller = new BiteRoller(this.seed, waterTodayOf(this));
 	}
 
-	get watercraft() {
-		return Number(this.profile.watercraft);
-	}
-
 	get isDayOver() {
 		return isWindowOver(this.hour, this.window);
 	}
