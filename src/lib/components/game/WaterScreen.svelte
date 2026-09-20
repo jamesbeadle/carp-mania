@@ -6,6 +6,7 @@
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import { canReadTheWater } from '$lib/domain/fishing/showingFish';
+	import { castReachOf } from '$lib/game/session/castReach';
 	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
@@ -41,6 +42,7 @@
 	const orientation = new Orientation();
 	const isDeckBeside = $derived(orientation.deckPlacement === 'beside');
 	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
+	const castReach = $derived(castReachOf(session));
 
 	$effect(() => orientation.watch());
 	$effect(() => settleAfterTheCatch(session.isSettlingAfterCatch));
@@ -49,7 +51,7 @@
 <svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
 
 {#snippet water()}
-	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
+	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 {/snippet}
 
 {#snippet deck()}

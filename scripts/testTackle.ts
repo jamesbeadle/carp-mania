@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { isTierAtOrBelow, tierUnlockedBy } from '../src/lib/domain/tackle/brands';
-import { castDistanceFeet, pointWithinCast } from '../src/lib/domain/tackle/castDistance';
+import { BaseCastFeet, castDistanceFeet, pointWithinCast } from '../src/lib/domain/tackle/castDistance';
 import { isCatalogueId, TackleCatalogue, tackleItemOfKind } from '../src/lib/domain/tackle/catalogue';
 import { doesHookOpen, hookHoldChance } from '../src/lib/domain/tackle/hooks';
 import { lineVisibility, metresLostOnSnap } from '../src/lib/domain/tackle/lines';
@@ -48,11 +48,11 @@ function assertTheRods() {
 	const kit = kitFor(defaultRodSetup());
 	assert.equal(rodSnapChancePerSecond(30, kit.rod.rod), 0, 'a rod inside its test curve never snaps');
 	assert.ok(Math.abs(rodSnapChancePerSecond(45, kit.rod.rod) - AboutOneInThreeSeconds) < 0.001, 'a forty-five on a 2.75 is a one-in-seventy-a-second risk');
-	assert.equal(castDistanceFeet(kit), 120, 'the starter kit casts the base distance');
+	assert.equal(castDistanceFeet(kit), BaseCastFeet, 'the starter kit casts the base distance');
 	const bigPit = kitFor({ ...defaultRodSetup(), rod: 'marlow-rod-3-13', reel: 'marlow-reel-big_pit_entry' });
 	assert.ok(castDistanceFeet(bigPit) > castDistanceFeet(kit), 'a 13 ft rod and a big pit cast further');
 	const scale = layoutScaleFor(TenAcres);
-	const landed = pointWithinCast({ x: 0.1, y: 0.5 }, { x: 0.9, y: 0.5 }, scale, 120);
+	const landed = pointWithinCast({ x: 0.1, y: 0.5 }, { x: 0.9, y: 0.5 }, scale, BaseCastFeet);
 	assert.ok(landed.x < 0.9 && landed.x > 0.1, 'a cast past the reach lands short on the same line');
 	const lost = tackleLostBy('line_snapped', kit, 40);
 	assert.equal(lost.length, 4, 'a snap costs line, rig, lead and hook');

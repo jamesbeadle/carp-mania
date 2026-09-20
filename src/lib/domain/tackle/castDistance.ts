@@ -5,7 +5,7 @@ import { RigCatalogue } from './rigs';
 import { RodLengthCastFactor } from './rods';
 import type { RodKit } from './rodSetup';
 
-export const BaseCastFeet = 120;
+export const BaseCastFeet = 180;
 const FeetPerMetre = 3.281;
 
 export function castDistanceFeet(kit: RodKit) {

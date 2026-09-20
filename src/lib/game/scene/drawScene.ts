@@ -18,6 +18,8 @@ import { drawClusters } from '../render/drawClusters';
 import { clusterSwims, isClustered } from './clusterSwims';
 import { drawWater } from '../render/drawWater';
 import { drawBountyMarker } from '../render/drawBountyMarker';
+import { drawCastReach } from '../render/drawCastReach';
+import type { CastReach } from '../session/castReach';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { createFacingTheWater } from './facingTheWater';
 import type { SwimmingFish } from './fishSchool';
@@ -38,6 +40,7 @@ export interface SceneInput {
 	showingAt?: LayoutPoint[];
 	pixelsPerScenePixel?: number;
 	bountySwimId?: string | null;
+	castReach?: CastReach | null;
 }
 
 const LabelsFromPixelsPerScenePixel = 0.5;
@@ -68,6 +71,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawSnags(context, layout);
 		drawReeds(context, layout, timeSeconds);
 		drawSanctuaries(context, layout);
+		drawCastReach(context, lakePath, input.castReach ?? null, timeSeconds);
 		const scale = input.pixelsPerScenePixel ?? FullDetail;
 		const clusters = clusterSwims(input.swims, scale);
 		const loosePegs = clusters.filter((cluster) => !isClustered(cluster)).flatMap((cluster) => cluster.swims);
@@ -90,4 +94,3 @@ export function createSceneDrawer(layout: LakeLayout) {
 	}
 }
 
-export { isCastClearOfIslands, isPointInWater } from './castClearance';
