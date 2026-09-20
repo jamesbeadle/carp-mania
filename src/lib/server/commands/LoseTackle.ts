@@ -12,15 +12,17 @@ interface LossReport {
 	visitId: string;
 	kind: TackleLossKind;
 	castDistanceMetres: number;
+	hoursFished: number;
 	kit: RodKit;
 }
 
 function readLossReport(body: unknown): LossReport | null {
-	const candidate = body as { visitId?: unknown; kind?: unknown; castDistanceMetres?: unknown; setup?: unknown } | null;
+	const candidate = body as { visitId?: unknown; kind?: unknown; castDistanceMetres?: unknown; hoursFished?: unknown; setup?: unknown } | null;
 	if (!candidate || typeof candidate.visitId !== 'string') return null;
 	if (!isTackleLossKind(candidate.kind) || !isRodSetup(candidate.setup)) return null;
 	const castDistanceMetres = Number(candidate.castDistanceMetres) || 0;
-	return { visitId: candidate.visitId, kind: candidate.kind, castDistanceMetres, kit: kitFor(candidate.setup) };
+	const hoursFished = Number(candidate.hoursFished) || 0;
+	return { visitId: candidate.visitId, kind: candidate.kind, castDistanceMetres, hoursFished, kit: kitFor(candidate.setup) };
 }
 
 export async function LoseTackle(locals: App.Locals, body: unknown) {
@@ -29,13 +31,14 @@ export async function LoseTackle(locals: App.Locals, body: unknown) {
 	if (!report) error(HttpStatus.BadRequest, 'That loss is not one the bailiff can read');
 	const visit = await loadVisitOf(user.id, report.visitId);
 	if (!visit) error(HttpStatus.BadRequest, 'No day ticket for this visit');
-	if ((visit.tackle_losses ?? 0) >= MostLossesAVisit) error(HttpStatus.BadRequest, 'Nobody loses that much tackle in a day');
+	const isBaitOnly = report.kind === 'bait_fished';
+	if (!isBaitOnly && (visit.tackle_losses ?? 0) >= MostLossesAVisit) error(HttpStatus.BadRequest, 'Nobody loses that much tackle in a day');
 	const castMetres = Math.min(LongestCastMetres, Math.max(0, report.castDistanceMetres));
 	const trusted = trustedSupabase();
-	for (const line of tackleLostBy(report.kind, report.kit, castMetres)) {
+	for (const line of tackleLostBy(report.kind, report.kit, castMetres, report.hoursFished)) {
 		const used = { player: user.id, item: line.itemId, amount: line.quantity };
 		await trusted.rpc('use_tackle', used);
 	}
-	await trusted.from('lake_visits').update({ tackle_losses: (visit.tackle_losses ?? 0) + 1 }).eq('id', visit.id);
+	if (!isBaitOnly) await trusted.from('lake_visits').update({ tackle_losses: (visit.tackle_losses ?? 0) + 1 }).eq('id', visit.id);
 	return json({ isRecorded: true });
 }

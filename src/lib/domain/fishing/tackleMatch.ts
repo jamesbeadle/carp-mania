@@ -34,7 +34,7 @@ export function matchTackleToWater(kit: RodKit, lake: WaterForTackle, terrain: T
 	const silt = Number(lake.silt);
 	const line = lineMatchScore(kit.line.line, transparency, silt, terrain.bed, isWeedy);
 	const hook = hookMatchScore(kit.hook.hook);
-	const rig = rigMatchScore(kit.rig.rig, terrain);
+	const rig = rigMatchScore(kit.rig.rig, terrain, baitStats.kind);
 	const bait = baitTrustScore(baitStats, lake.feed_stock);
 	const tubing = tubingMatchScore(kit.tubing.tubing, baitStats.kind, terrain, transparency);
 	const scores = { line, hook, rig, bait, tubing };

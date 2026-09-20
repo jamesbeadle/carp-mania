@@ -18,8 +18,8 @@ select set_config('request.jwt.claim.sub', test.player(183)::text, false);
 select public.pay_day_ticket(:'lake') as third_visit \gset
 reset role;
 
-select public.record_catch(test.player(181), :'holder_visit', :'first', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
-select public.record_catch(test.player(182), :'taker_visit', :'second', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(181), :'holder_visit', :'first', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
+select public.record_catch(test.player(182), :'taker_visit', :'second', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 
 select test.assert_that(
 	(select count(*) = 1 from public.notifications where profile_id = test.player(181) and kind = 'record_lost'),
@@ -39,7 +39,7 @@ select test.assert_that(
 	'the taker hears nothing'
 );
 
-select public.record_catch(test.player(183), :'third_visit', :'third', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie') as third_catch \gset
+select public.record_catch(test.player(183), :'third_visit', :'third', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie') as third_catch \gset
 select test.assert_that(
 	(select title = 'You''ve dropped to No. 3 on the world board' and body = 'Player 183''s 47 lb went in above you.' and link = '/world/hall-of-fame'
 		from public.notifications where profile_id = test.player(181) and kind = 'board_place_lost'),
@@ -59,7 +59,7 @@ select test.assert_that(
 );
 
 select count(*) as notes_before_the_tiddler from public.notifications where kind in ('record_lost', 'board_place_lost') \gset
-select public.record_catch(test.player(183), :'third_visit', :'tiddler', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-fishmeal_boilie');
+select public.record_catch(test.player(183), :'third_visit', :'tiddler', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 select test.assert_that(
 	(select count(*) = :notes_before_the_tiddler from public.notifications where kind in ('record_lost', 'board_place_lost')),
 	'a catch that is not the angler''s best moves nobody'

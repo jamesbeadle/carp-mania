@@ -10,6 +10,7 @@ export interface TackleLoss {
 	kind: TackleLossKind;
 	rodIndex: number;
 	castPoint: Point;
+	hoursFished?: number;
 }
 
 export interface TackleLossReport {
@@ -17,6 +18,7 @@ export interface TackleLossReport {
 	kind: TackleLossKind;
 	rodIndex: number;
 	castDistanceMetres: number;
+	hoursFished: number;
 	setup: unknown;
 }
 
@@ -38,7 +40,7 @@ export function reportLossesAsTheyHappen(lake: Lake, visitId: string, session: S
 	for (const loss of session.tackleLost.slice(reportedLosses)) {
 		const castDistanceMetres = feetToMetres(feetBetween(scale, peg, toFraction(loss.castPoint)));
 		const setup = session.rods[loss.rodIndex]?.setup;
-		void reportTackleLoss(lake.id, { visitId, kind: loss.kind, rodIndex: loss.rodIndex, castDistanceMetres, setup });
+		void reportTackleLoss(lake.id, { visitId, kind: loss.kind, rodIndex: loss.rodIndex, castDistanceMetres, hoursFished: loss.hoursFished ?? 0, setup });
 	}
 	reportedLosses = lossCount;
 }

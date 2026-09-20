@@ -36,7 +36,7 @@ export const StarterSetup: RodSetup = {
 	rig: 'bankside_basics-rig-hair_lead_clip',
 	lead: 'bankside_basics-lead',
 	tubing: 'bankside_basics-tubing-brown',
-	bait: 'meadowmill-bait-fishmeal_boilie'
+	bait: 'meadowmill-bait-shelf_life_boilie'
 };
 
 export function defaultRodSetup(): RodSetup {

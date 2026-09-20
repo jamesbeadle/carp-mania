@@ -8,6 +8,7 @@ import type { Season } from '../world/seasons';
 import { biteRollFor, type BiteRoll, type WaterToday } from './biteRoll';
 import { castTerrainFor } from './castTerrain';
 import { pickCarpByWeight } from './pickCarp';
+import { kitAgeFactorFor } from './kitAgeFactor';
 import { idsShownTruthfully, showsThisHour } from './showingFish';
 import { NeutralConditionsShare, ratingShareOf, sizeReachOf, waterShareOf } from './sizeReach';
 import { matchTackleToWater } from './tackleMatch';
@@ -60,7 +61,8 @@ export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: Wate
 	const match = matchTackleToWater(bite.kit, water.lake, spot.terrain);
 	const shownIds = idsShownTruthfully(showsThisHour(bite.seed, bite.hour, carpInOrder, water.watercraft));
 	const spotBonusFor = favouriteSpotBonusAt(water.lake, water.season, spot, shownIds);
-	const take = { sizeReach: sizeReachFor(water, carpInOrder.length, match.overall), hour: bite.hour, spotBonusFor };
+	const kitFactorFor = kitAgeFactorFor(bite.kit, Number(water.lake.transparency));
+	const take = { sizeReach: sizeReachFor(water, carpInOrder.length, match.overall), hour: bite.hour, spotBonusFor, kitFactorFor };
 	return pickCarpByWeight(carpInOrder, takeWeightsFor(carpInOrder, take), bite.roll.carpIndexRoll);
 }
 

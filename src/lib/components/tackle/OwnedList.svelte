@@ -4,6 +4,9 @@
 	import OwnedLine from './OwnedLine.svelte';
 
 	let { kind, owned }: { kind: TackleKind; owned: OwnedItem[] } = $props();
+
+	const spoiled = $derived(owned.filter((line) => line.isSpoiled));
+	const fresh = $derived(owned.filter((line) => !line.isSpoiled));
 </script>
 
 <section class="panel">
@@ -12,7 +15,8 @@
 		<p class="mt-2 text-sm text-mist-400">Nothing yet. <a href="/market/tackle" class="text-surge-400 hover:underline">The counter has some.</a></p>
 	{:else}
 		<ul class="mt-2">
-			{#each owned as line (line.itemId)}<OwnedLine {line} />{/each}
+			{#each fresh as line (line.itemId)}<OwnedLine {line} />{/each}
+			{#each spoiled as line (line.itemId)}<OwnedLine {line} />{/each}
 		</ul>
 	{/if}
 </section>

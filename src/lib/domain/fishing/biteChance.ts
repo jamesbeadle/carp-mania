@@ -5,7 +5,7 @@ import { overallWaterQuality, WaterScale } from '../waterQuality';
 import { timeOfDayBiteFactor } from './sessionClock';
 
 export const BaseBitesPerRodHour = 0.17;
-export const CountPull = { Floor: 0.85, CraftSwing: 0.15, TackleSwing: 0.3 } as const;
+export const CountPull = { CompetentRating: 50, CompetentMatch: 0.55, CraftSwing: 0.06, TackleSwing: 0.08 } as const;
 const MaximumChancePerHour = 0.9;
 const SmallestAcres = 0.1;
 const ConfidenceFloor = 0.5;
@@ -40,11 +40,13 @@ export function lakeConfidenceFactor(lake: Pick<Lake, 'transparency' | 'weed' | 
 }
 
 export function craftCountFactor(rating: number) {
-	return CountPull.Floor + CountPull.CraftSwing * fractionOfHundred(rating);
+	const aboveCompetent = (fractionOfHundred(rating) * 100 - CountPull.CompetentRating) / CountPull.CompetentRating;
+	return 1 + CountPull.CraftSwing * aboveCompetent;
 }
 
 export function tackleCountFactor(tackleMatchOverall: number) {
-	return CountPull.Floor + CountPull.TackleSwing * clampFraction(tackleMatchOverall);
+	const aboveCompetent = (clampFraction(tackleMatchOverall) - CountPull.CompetentMatch) / (1 - CountPull.CompetentMatch);
+	return 1 + CountPull.TackleSwing * Math.max(-1, aboveCompetent);
 }
 
 export function biteChanceForOneHour(lake: Lake, tackleMatchOverall: number, rating: number, hour: number, conditions: BiteConditions = NeutralBiteConditions) {

@@ -8,30 +8,30 @@ interface BaitRange {
 	pricePerPack: number;
 }
 
-const Particles: BaitName[] = ['hemp', 'sweetcorn', 'particle'];
+const Particles: BaitName[] = ['hemp', 'sweetcorn', 'tiger_nut'];
 const Everything = BaitNames;
 const Ranges: BaitRange[] = [
 	{ brand: 'meadowmill', kinds: Everything, pricePerPack: 8 },
 	{ brand: 'redclay', kinds: Everything, pricePerPack: 15 },
 	{ brand: 'particle_works', kinds: Particles, pricePerPack: 12 },
-	{ brand: 'nocturne', kinds: ['fishmeal_boilie', 'pop_up', 'shrimp'], pricePerPack: 32 },
-	{ brand: 'saltmarsh', kinds: ['fishmeal_boilie', 'pop_up', 'worm', 'shrimp'], pricePerPack: 70 }
+	{ brand: 'nocturne', kinds: ['frozen_boilie', 'shelf_life_boilie', 'pop_up', 'wafter', 'shrimp'], pricePerPack: 32 },
+	{ brand: 'saltmarsh', kinds: ['frozen_boilie', 'pop_up', 'wafter', 'worm', 'shrimp'], pricePerPack: 70 }
 ];
-const KeepsForever = null;
 
 export const BaitOnSale: BaitItem[] = Ranges.flatMap((range) => range.kinds.map((kind) => baitItem(range, kind)));
 
 function baitItem(range: BaitRange, kind: BaitName): BaitItem {
 	const brand = BaitBrandCatalogue[range.brand];
+	const profile = BaitCatalogue[kind];
 	return {
 		id: `${range.brand}-bait-${kind}`,
 		brand: range.brand,
 		tier: brand.tier,
-		label: `${brand.label} ${BaitCatalogue[kind].label.toLowerCase()}`,
+		label: `${brand.label} ${profile.label.toLowerCase()}`,
 		price: range.pricePerPack,
 		minimumRating: brand.minimumRating,
 		packQuantity: PackSizes.Bait,
 		kind: 'bait',
-		bait: { kind, appealFactor: brand.appealFactor, keepsDays: KeepsForever }
+		bait: { kind, appealFactor: brand.appealFactor, keepsDays: profile.keepsDays }
 	};
 }
