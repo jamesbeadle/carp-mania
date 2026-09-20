@@ -2,6 +2,7 @@
 	import BiggestEverBoard from '$lib/components/hall/BiggestEverBoard.svelte';
 	import HonourRoll from '$lib/components/hall/HonourRoll.svelte';
 	import LegendsBoard from '$lib/components/hall/LegendsBoard.svelte';
+	import PrototypesBoard from '$lib/components/hall/PrototypesBoard.svelte';
 	import ScopeTabs from '$lib/components/hall/ScopeTabs.svelte';
 	import Skeleton from '$lib/components/loading/Skeleton.svelte';
 	import { HallBoard } from '$lib/contracts/HallOfFame';
@@ -43,6 +44,7 @@
 			<HonourRoll title="Most fish landed" blurb="Anglers by fish on the bank, for life." honours={anglerHonours(hall.mostFishLanded)} emptyWords="Nobody has wet a line here yet." viewerId={data.viewerId} />
 			<HonourRoll title="Waters of legend" blurb="Waters by the best fish an angler ever had there, owner credited." honours={waterHonours(hall.watersOfLegend)} emptyWords="No angler has had a fish worth remembering here yet." />
 			<HonourRoll title="Match winners" blurb="Anglers by trophies won in matches, across every generation of their line." honours={matchHonours(hall.matchWinners)} emptyWords="No match has been fished yet." viewerId={data.viewerId} />
+			<PrototypesBoard prototypes={hall.prototypes} />
 		</div>
 	</div>
 {:catch}

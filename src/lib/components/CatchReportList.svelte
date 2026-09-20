@@ -3,6 +3,7 @@
 	import { formatWhen } from '$lib/format/dates';
 	import { humanise } from '$lib/format/labels';
 	import { formatWeight } from '$lib/format/weight';
+	import PrototypeRibbon from './tackle/PrototypeRibbon.svelte';
 
 	let { catches, carpNames = {}, lakeNames = {} }: { catches: Catch[]; carpNames?: Record<string, string>; lakeNames?: Record<string, string> } = $props();
 
@@ -30,6 +31,7 @@
 					<a href="/lakes/{caught.lake_id}" class="text-surge-400 hover:underline">at {lakeNames[caught.lake_id]}</a>
 				{/if}
 				<span class="text-mist-400">· {caught.swim_name} · {humanise(caught.rig)} · {humanise(caught.bait)} · size {caught.hook_size}</span>
+				<PrototypeRibbon itemIds={[caught.rod_item_id, caught.reel_item_id]} />
 				<span class="ml-auto text-xs text-mist-400">{formatWhen(caught.caught_at)}</span>
 			</li>
 		{/each}

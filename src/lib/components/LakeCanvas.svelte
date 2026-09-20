@@ -9,7 +9,7 @@
 	import { CameraState } from '$lib/game/scene/cameraState.svelte';
 	import { clusterAt, clusterSwims } from '$lib/game/scene/clusterSwims';
 	import { createSceneDrawer, isCastClearOfIslands, isPointInWater } from '$lib/game/scene/drawScene';
-	import type { Point } from '$lib/game/scene/lakeShape';
+	import { distanceBetween, type Point } from '$lib/game/scene/lakeShape';
 	import { SceneSize } from '$lib/game/scene/palette';
 	import { startRenderLoop } from '$lib/game/scene/renderLoop';
 	import type { RodOnBank } from '$lib/game/scene/rodState';
@@ -25,6 +25,7 @@
 		shoals?: Shoal[];
 		camera?: CameraState;
 		selectedSwimId?: string | null;
+		bountySwimId?: string | null;
 		rods?: RodOnBank[];
 		isAnglerOnBank?: boolean;
 		drafts?: DraftShape[];
@@ -35,7 +36,7 @@
 		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
+	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, bountySwimId = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
 
 	const SchoolSeedStride = 7919;
 	const SwimHitRadius = SwimPegRadius * 1.4;
@@ -52,13 +53,12 @@
 		const drawScene = createSceneDrawer(layout);
 		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) => {
 			const pixelsPerScenePixel = camera.pixelsPerScenePixel(canvas);
-			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel }, secondsElapsed, timeSeconds);
+			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel, bountySwimId }, secondsElapsed, timeSeconds);
 		}, () => camera.camera);
 	});
 
 	const scenePointOf = (event: MouseEvent | PointerEvent) => camera.scenePointOf(canvas, event.clientX, event.clientY);
-	const swimAt = (point: Point) => swims.find((swim) => distance(swimScenePoint(swim), point) <= SwimHitRadius);
-	const distance = (first: Point, second: Point) => Math.hypot(first.x - second.x, first.y - second.y);
+	const swimAt = (point: Point) => swims.find((swim) => distanceBetween(swimScenePoint(swim), point) <= SwimHitRadius);
 
 	function handleMove(event: PointerEvent) {
 		if (gestures.move(event)) return;

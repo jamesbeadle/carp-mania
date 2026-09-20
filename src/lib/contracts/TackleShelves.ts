@@ -8,6 +8,8 @@ export interface Shelf {
 	story: string;
 	minimumRating: number;
 	isUnlocked: boolean;
+	isSponsored: boolean;
+	credit: number;
 	items: TackleItem[];
 }
 

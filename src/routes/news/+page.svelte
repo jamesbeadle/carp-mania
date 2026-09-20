@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import LiveFeed from '$lib/components/world/LiveFeed.svelte';
+	import OpenBounties from '$lib/components/world/OpenBounties.svelte';
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import { olderFeedPathFor, type FeedGroup } from '$lib/domain/world/feedGroups';
 	import { LiveWorld } from '$lib/game/world/liveWorld.svelte';
@@ -35,6 +36,7 @@
 	{/snippet}
 </PlaceBanner>
 
-<div class="mx-auto max-w-3xl">
+<div class="mx-auto max-w-3xl space-y-6">
+	<OpenBounties bounties={data.bounties} biggestFish={data.biggestFish} />
 	<LiveFeed feed={live.feed} onPick={(lakeId) => goto(worldUrlForLake(lakeId))} onLoadOlder={loadOlder} />
 </div>

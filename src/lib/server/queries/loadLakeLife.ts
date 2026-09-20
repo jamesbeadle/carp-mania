@@ -21,10 +21,11 @@ export interface LakeLife {
 	bailiffs: Bailiff[];
 	species: LakeSpecies[];
 	pegsBookedByDay: Record<number, number>;
+	hasOpenBounty: boolean;
 }
 
 export async function loadLakeLife(locals: App.Locals, lake: Lake): Promise<LakeLife> {
-	const [{ data: carp }, { data: swims }, { data: shoals }, works, bookings, book, bailiffs, species, pegsBookedByDay] = await Promise.all([
+	const [{ data: carp }, { data: swims }, { data: shoals }, works, bookings, book, bailiffs, species, pegsBookedByDay, hasOpenBounty] = await Promise.all([
 		locals.supabase.from('carp').select('*').eq('lake_id', lake.id),
 		locals.supabase.from('swims').select('*').eq('lake_id', lake.id),
 		locals.supabase.from('carp_shoals').select('*').eq('lake_id', lake.id),
@@ -33,9 +34,10 @@ export async function loadLakeLife(locals: App.Locals, lake: Lake): Promise<Lake
 		GetTicketBook(locals, lake.id),
 		loadBailiffsOf(locals, lake.id),
 		loadSpeciesOf(locals, lake.id),
-		loadPegsBookedByDay(locals, lake.id)
+		loadPegsBookedByDay(locals, lake.id),
+		hasAnOpenBounty(locals, lake.id)
 	]);
-	return { carp: (carp ?? []) as Carp[], swims: (swims ?? []) as Swim[], shoals: (shoals ?? []) as Shoal[], works, bookings, book, bailiffs, species, pegsBookedByDay };
+	return { carp: (carp ?? []) as Carp[], swims: (swims ?? []) as Swim[], shoals: (shoals ?? []) as Shoal[], works, bookings, book, bailiffs, species, pegsBookedByDay, hasOpenBounty };
 }
 
 async function loadPegsBookedByDay(locals: App.Locals, lakeId: string): Promise<Record<number, number>> {
@@ -43,4 +45,9 @@ async function loadPegsBookedByDay(locals: App.Locals, lakeId: string): Promise<
 	const byDay: Record<number, number> = {};
 	for (const booking of (data ?? []) as { fishery_day: number }[]) byDay[booking.fishery_day] = (byDay[booking.fishery_day] ?? 0) + 1;
 	return byDay;
+}
+
+async function hasAnOpenBounty(locals: App.Locals, lakeId: string) {
+	const { count } = await locals.supabase.from('bounties').select('id', { count: 'exact', head: true }).eq('lake_id', lakeId).eq('status', 'open');
+	return (count ?? 0) > 0;
 }

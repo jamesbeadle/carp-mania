@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { isTackleLossKind, MostLossesAVisit, tackleLostBy, type TackleLossKind } from '$lib/domain/tackle/losses';
+import { isPrototypeItemId } from '$lib/domain/tackle/prototypes';
 import { isRodSetup, kitFor, type RodKit } from '$lib/domain/tackle/rodSetup';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { requireUser } from '../gates/requireUser';
@@ -38,6 +39,7 @@ export async function LoseTackle(locals: App.Locals, body: unknown) {
 	for (const line of tackleLostBy(report.kind, report.kit, castMetres, report.hoursFished)) {
 		const used = { player: user.id, item: line.itemId, amount: line.quantity };
 		await trusted.rpc('use_tackle', used);
+		if (isPrototypeItemId(line.itemId)) await trusted.rpc('strike_prototype', { player: user.id, item: used.item });
 	}
 	if (!isBaitOnly) await trusted.from('lake_visits').update({ tackle_losses: (visit.tackle_losses ?? 0) + 1 }).eq('id', visit.id);
 	return json({ isRecorded: true });

@@ -5,6 +5,7 @@ import { requireUser } from '../gates/requireUser';
 import { loadCarpNames } from './loadAnglerCatches';
 import { loadStillSwimming } from './loadStillSwimming';
 import { loadAnglerStanding, loadVisitorsBest } from './loadTheStanding';
+import { GetPrototypes } from './GetPrototypes';
 
 const BoardLength = HallBoard.Length;
 const Descending = { ascending: false } as const;
@@ -28,16 +29,17 @@ type WinnerRow = { angler_id: string; angler_name: string; trophies: number; pri
 
 export async function GetHallOfFame(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFame> {
 	requireUser(locals);
-	const [biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners] = await Promise.all([
+	const [biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners, prototypes] = await Promise.all([
 		loadBiggestByAnAngler(locals, scope),
 		loadAnglerStanding(locals, scope),
 		loadVisitorsBest(locals, scope),
 		loadLegends(locals, scope),
 		loadMostFishLanded(locals, scope),
 		loadWatersOfLegend(locals, scope),
-		loadMatchWinners(locals, scope)
+		loadMatchWinners(locals, scope),
+		GetPrototypes(locals.supabase)
 	]);
-	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners };
+	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners, prototypes };
 }
 
 async function loadBiggestByAnAngler(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {

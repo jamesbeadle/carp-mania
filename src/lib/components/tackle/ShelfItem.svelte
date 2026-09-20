@@ -4,7 +4,7 @@
 	import { formatMoney } from '$lib/format/money';
 	import { statsWordsFor } from './itemWords';
 
-	let { item, isUnlocked, canAfford }: { item: TackleItem; isUnlocked: boolean; canAfford: boolean } = $props();
+	let { item, price, isUnlocked, canAfford }: { item: TackleItem; price: number; isUnlocked: boolean; canAfford: boolean } = $props();
 
 	const packWords = $derived(doesKindRunOut(item.kind) ? `${item.packQuantity} ${UnitWords[item.kind]} a pack` : 'each');
 	const OnePack = 1;
@@ -15,7 +15,7 @@
 		<p class="font-medium text-mist-100">{item.label}</p>
 		<p class="text-xs text-mist-400">{statsWordsFor(item)}</p>
 	</div>
-	<span class="text-volt-300">{formatMoney(item.price)} <span class="text-xs text-mist-400">{packWords}</span></span>
+	<span class="text-volt-300">{formatMoney(price)} <span class="text-xs text-mist-400">{packWords}</span></span>
 	{#if !isUnlocked}
 		<span class="rounded-full border border-carbon-600 px-2 py-0.5 text-xs text-mist-400">Rating {item.minimumRating}</span>
 	{:else}

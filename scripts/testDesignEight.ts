@@ -6,6 +6,8 @@ import { runTackleScenarios } from './testTackle';
 import { runBigWaterScenarios } from './testBigWater';
 import { runCameraScenarios } from './testCamera';
 import { runMakeUpScenarios } from './testMakeUp';
+import { runAwardScenarios } from './testAwards';
+import { runBountyScenarios } from './testBounties';
 import { runShoalScenarios } from './testShoals';
 import { runTicketScenarios } from './testTickets';
 
@@ -20,4 +22,6 @@ export function runDesignEightScenarios() {
 	runBigWaterScenarios();
 	runCameraScenarios();
 	runMakeUpScenarios();
+	runAwardScenarios();
+	runBountyScenarios();
 }

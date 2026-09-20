@@ -10,6 +10,8 @@ export interface Catch {
 	rig: string;
 	bait: string;
 	hook_size: number;
+	rod_item_id?: string | null;
+	reel_item_id?: string | null;
 	caught_at: string;
 }
 

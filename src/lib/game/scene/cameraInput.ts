@@ -1,6 +1,6 @@
 import { CameraLimits, viewToScene } from './camera';
 import type { CameraState } from './cameraState.svelte';
-import type { Point } from './lakeShape';
+import { distanceBetween, type Point } from './lakeShape';
 import { toScenePoint } from './renderLoop';
 
 const DragStartsAfterScenePixels = 6;
@@ -9,12 +9,6 @@ const Halfway = 2;
 interface Touch {
 	id: number;
 	view: Point;
-}
-
-function distanceBetween(first: Point, second: Point) {
-	const across = first.x - second.x;
-	const down = first.y - second.y;
-	return Math.hypot(across, down);
 }
 
 function midpointOf(first: Point, second: Point): Point {

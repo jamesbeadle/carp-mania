@@ -17,7 +17,7 @@ import { requireUser } from '../gates/requireUser';
 import { hasCaughtDuringVisit, loadVisitOf, loadWaterOf, type VisitOnRecord, type WaterOnRecord } from '../queries/loadVisitForCatch';
 import { loadCurrentFishermanId, loadHeaviestBefore } from '../queries/loadPersonalBest';
 import { skillsOf } from '../queries/skillsOf';
-import { recordNamedCatch, recordShoalCatch } from './recordInTheBook';
+import { honoursAfterTheCatch, recordNamedCatch, recordShoalCatch } from './recordInTheBook';
 
 const HttpStatus = { BadRequest: 400 } as const;
 const NotTheFish = 'That is not the fish that took the bait';
@@ -44,15 +44,17 @@ export async function RecordCatch(locals: App.Locals, body: unknown) {
 async function recordTheNamedFish(anglerId: string, report: CatchReport, carp: Carp) {
 	if (carp.id !== report.carpId) error(HttpStatus.BadRequest, NotTheFish);
 	const catchId = await recordNamedCatch(anglerId, report, carp.id);
-	return json({ catchId, carp });
+	const honours = await honoursAfterTheCatch(anglerId, catchId);
+	return json({ catchId, carp, ...honours });
 }
 
 async function recordTheShoalFish(anglerId: string, report: CatchReport, taker: Taker & { kind: 'shoal' }, water: WaterOnRecord) {
 	const isTheShoal = taker.shoal.id === report.shoalId;
 	if (!isTheShoal) error(HttpStatus.BadRequest, NotTheFish);
 	const fish = { ...taker.fish, name: carpNameForIndex(water.carp.length) };
-	const carpId = await recordShoalCatch(anglerId, report, taker.shoal, fish);
-	return json({ catchId: carpId, carp: { ...fish, id: carpId, times_caught: 1 } });
+	const { carpId, catchId } = await recordShoalCatch(anglerId, report, taker.shoal, fish);
+	const honours = await honoursAfterTheCatch(anglerId, catchId);
+	return json({ catchId, carp: { ...fish, id: carpId, times_caught: 1 }, ...honours });
 }
 
 async function loadPedigreeBeforeVisit(locals: App.Locals, anglerId: string, visit: VisitOnRecord) {

@@ -1,9 +1,9 @@
-import type { AnglerRanks, CatchCard, Milestone, RecordHeld, TrophyRoom } from '$lib/contracts/TrophyRoom';
+import type { AnglerRanks, CatchCard, RecordHeld, TrophyRoom } from '$lib/contracts/TrophyRoom';
 import { TrophyRoomCards } from '$lib/contracts/TrophyRoom';
 import type { HonourKind } from '$lib/domain/fishing/honours';
-import { isMilestoneKind } from '$lib/domain/trophies/milestones';
 import { isRecordScope, recordScopeNameFor } from '$lib/domain/trophies/recordScopes';
 import { loadCarpNames } from './loadAnglerCatches';
+import { loadAwardsHeld } from './loadAwards';
 import { loadStillSwimming } from './loadStillSwimming';
 
 type CardRow = {
@@ -12,21 +12,20 @@ type CardRow = {
 	holds_lake_record: boolean; holds_region_record: boolean; holds_world_record: boolean;
 };
 type RecordRow = { scope: string; scope_id: string; scope_name: string; catch_id: string; carp_id: string | null; weight_lb: number; caught_at: string };
-type MilestoneRow = { kind: string; reached_at: string | null };
 type RanksRow = { best_rank: number; best_lb: number; skill_rank: number; anglers: number };
 
 const UnnamedFish = 'A fish nobody named';
 const NoRanksYet: AnglerRanks = { bestRank: 0, bestLb: 0, skillRank: 0, anglers: 0 };
 
 export async function loadTrophyRoom(locals: App.Locals, anglerId: string): Promise<TrophyRoom> {
-	const [cardRows, recordRows, milestoneRows, ranks] = await Promise.all([loadCards(locals, anglerId), loadRecords(locals, anglerId), loadMilestones(locals, anglerId), loadRanks(locals, anglerId)]);
+	const [cardRows, recordRows, awards, ranks] = await Promise.all([loadCards(locals, anglerId), loadRecords(locals, anglerId), loadAwardsHeld(locals.supabase, anglerId), loadRanks(locals, anglerId)]);
 	const carpIds = [...cardRows, ...recordRows].map((row) => row.carp_id);
 	const [names, stillSwimming] = await Promise.all([loadCarpNames(locals, carpIds), loadStillSwimming(locals, carpIds)]);
 	const nameOf = (carpId: string | null) => (carpId && names[carpId]) || UnnamedFish;
 	return {
 		cards: cardRows.map((row) => cardFrom(row, nameOf(row.carp_id), stillSwimming)),
 		recordsHeld: recordRows.filter((row) => isRecordScope(row.scope)).map((row) => recordFrom(row, nameOf(row.carp_id))),
-		milestones: milestoneRows.filter((row) => isMilestoneKind(row.kind)).map((row) => ({ kind: row.kind, reachedAt: row.reached_at }) as Milestone),
+		awards,
 		ranks
 	};
 }
@@ -39,11 +38,6 @@ async function loadCards(locals: App.Locals, anglerId: string): Promise<CardRow[
 async function loadRecords(locals: App.Locals, anglerId: string): Promise<RecordRow[]> {
 	const { data } = await locals.supabase.rpc('records_held_by', { angler: anglerId });
 	return (data ?? []) as RecordRow[];
-}
-
-async function loadMilestones(locals: App.Locals, anglerId: string): Promise<MilestoneRow[]> {
-	const { data } = await locals.supabase.rpc('milestones_of', { angler: anglerId });
-	return (data ?? []) as MilestoneRow[];
 }
 
 export async function loadRanks(locals: App.Locals, anglerId: string): Promise<AnglerRanks> {

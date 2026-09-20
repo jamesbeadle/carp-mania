@@ -14,6 +14,7 @@ interface RodRange {
 const HeavierCurvePremium: Record<TestCurveLb, number> = {
 	2.75: 1,
 	3: 1.2,
+	3.25: 1.35,
 	3.5: 1.5
 };
 const LengthPremium: Record<RodLengthFeet, number> = { 10: 1, 12: 1, 13: 1.15 };

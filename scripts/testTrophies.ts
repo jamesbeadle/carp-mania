@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import type { Measures } from '../src/lib/contracts/TrophyRoom';
 import { edgeOf, toBeatWords } from '../src/lib/domain/trophies/measureUp';
-import { isMilestoneKind, MilestoneCatalogue, MilestoneKinds } from '../src/lib/domain/trophies/milestones';
+import { AwardCatalogue, AwardKeys, isAwardKey } from '../src/lib/domain/trophies/awards';
 import { isRecordScope, recordScopeNameFor } from '../src/lib/domain/trophies/recordScopes';
 import { bestRibbonOf, RibbonWords } from '../src/lib/domain/trophies/ribbons';
 
@@ -15,9 +15,9 @@ export function runTrophyScenarios() {
 	assert.equal(toBeatWords('Sam', measures(28), measures(28)), 'Level on personal bests. One ounce settles it.');
 	assert.match(toBeatWords('Sam', measures(0), measures(0)), /nothing on the bank yet/, 'an empty rival is an open door');
 
-	assert.equal(MilestoneKinds.length, Object.keys(MilestoneCatalogue).length, 'every milestone has its words');
-	assert.ok(isMilestoneKind('forty') && !isMilestoneKind('sixty'));
-	assert.equal(MilestoneCatalogue.first_record.label, 'First record');
+	assert.equal(AwardKeys.length, Object.keys(AwardCatalogue).length, 'every award has its words');
+	assert.ok(isAwardKey('first_forty') && !isAwardKey('first_sixty'));
+	assert.equal(AwardCatalogue.first_record.label, 'First record');
 
 	assert.equal(recordScopeNameFor('region', 'uk_ireland'), 'UK & Ireland', 'a region record names the region');
 	assert.equal(recordScopeNameFor('lake', 'Willow Pool'), 'Willow Pool');
@@ -26,5 +26,5 @@ export function runTrophyScenarios() {
 	assert.equal(bestRibbonOf(['region_record', 'lake_record', 'personal_best']), 'region_record', 'the widest honour leads');
 	assert.equal(bestRibbonOf([]), null);
 	assert.equal(RibbonWords.personal_best, 'Personal best');
-	console.log('trophies:', { milestones: MilestoneKinds.length });
+	console.log('trophies:', { awards: AwardKeys.length });
 }

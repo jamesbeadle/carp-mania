@@ -1,5 +1,5 @@
 import type { HonourKind } from '$lib/domain/fishing/honours';
-import type { MilestoneKind } from '$lib/domain/trophies/milestones';
+import type { AwardWon } from './Awards';
 
 export type RecordScope = 'lake' | 'region' | 'world';
 
@@ -28,11 +28,6 @@ export interface RecordHeld {
 	caughtAt: string;
 }
 
-export interface Milestone {
-	kind: MilestoneKind;
-	reachedAt: string | null;
-}
-
 export interface AnglerRanks {
 	bestRank: number;
 	bestLb: number;
@@ -43,7 +38,7 @@ export interface AnglerRanks {
 export interface TrophyRoom {
 	cards: CatchCard[];
 	recordsHeld: RecordHeld[];
-	milestones: Milestone[];
+	awards: AwardWon[];
 	ranks: AnglerRanks;
 }
 

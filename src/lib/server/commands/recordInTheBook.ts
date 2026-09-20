@@ -4,8 +4,12 @@ import type { NewNamedFish } from '$lib/domain/stock/individualise';
 import type { Shoal } from '$lib/domain/stock/shoals';
 import { kitFor } from '$lib/domain/tackle/rodSetup';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
+import type { CatchHonours } from '$lib/contracts/CatchReport';
+import { loadBountyWonBy } from '../queries/GetBounties';
+import { RaiseAwards } from './RaiseAwards';
 
 const HttpStatus = { BadRequest: 400 } as const;
+const HoursInADay = 24;
 
 function tackleArguments(report: CatchReport) {
 	const kit = kitFor(report.setup);
@@ -20,7 +24,8 @@ function tackleArguments(report: CatchReport) {
 		watercraft_gain: report.skillGains.watercraft,
 		rod_item: kit.rod.id,
 		reel_item: kit.reel.id,
-		bait_item: kit.bait.id
+		bait_item: kit.bait.id,
+		hour_of_day: Math.floor(report.hour) % HoursInADay
 	};
 }
 
@@ -30,7 +35,7 @@ export async function recordNamedCatch(anglerId: string, report: CatchReport, ca
 	return catchId as string;
 }
 
-export async function recordShoalCatch(anglerId: string, report: CatchReport, shoal: Shoal, fish: NewNamedFish): Promise<string> {
+export async function recordShoalCatch(anglerId: string, report: CatchReport, shoal: Shoal, fish: NewNamedFish): Promise<{ carpId: string; catchId: string }> {
 	const { data: carpId, error: recordError } = await trustedSupabase().rpc('record_shoal_catch', {
 		angler: anglerId,
 		visit: report.visitId,
@@ -41,5 +46,18 @@ export async function recordShoalCatch(anglerId: string, report: CatchReport, sh
 		...tackleArguments(report)
 	});
 	if (recordError) error(HttpStatus.BadRequest, recordError.message);
-	return carpId as string;
+	return { carpId: carpId as string, catchId: await latestCatchOf(carpId as string) };
+}
+
+async function latestCatchOf(carpId: string) {
+	const { data } = await trustedSupabase().from('catches').select('id').eq('carp_id', carpId).order('caught_at', { ascending: false }).limit(1);
+	const [row] = (data ?? []) as { id: string }[];
+	return row?.id ?? carpId;
+}
+
+export async function honoursAfterTheCatch(anglerId: string, catchId: string): Promise<CatchHonours> {
+	const trusted = trustedSupabase();
+	const [awards, bounty] = await Promise.all([RaiseAwards(anglerId, catchId), loadBountyWonBy(trusted, catchId)]);
+	const bountyWon = bounty ? { kind: bounty.kind, prizeKind: bounty.prizeKind, prizeMoney: bounty.prizeMoney } : null;
+	return { awards, bountyWon };
 }

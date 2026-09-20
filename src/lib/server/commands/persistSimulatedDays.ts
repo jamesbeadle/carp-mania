@@ -5,6 +5,7 @@ import type { Lake, Profile } from '$lib/domain/types';
 import { settleDayTakings } from '../gates/requireMoney';
 import { arrivalNotifications } from './arrivalNotifications';
 import { buryTheDead, deathEvents, deathNotifications, deathsIn } from './buryTheDead';
+import { persistBounties } from './persistBounties';
 import { persistCompletedWorks } from './persistCompletedWorks';
 import { persistStock, type StockBefore } from './persistStock';
 
@@ -22,6 +23,7 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 	await settleDayTakings(profile.id, netMoney);
 	await insertNews(trusted, finalLake, outcomes, profile);
 	await persistCompletedWorks(trusted, finalLake, outcomes, profile.id);
+	await persistBounties(trusted, finalLake.id, outcomes);
 }
 
 const UnknownFish = 'an unknown fish';

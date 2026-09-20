@@ -1,5 +1,6 @@
 import type { CarpMemorial } from '$lib/domain/memorialTypes';
 import type { LeaderboardScope } from './Leaderboards';
+import type { PrototypeOnTheBoard } from './Prototypes';
 
 export const HallBoard = { Length: 10 } as const;
 
@@ -64,4 +65,5 @@ export interface HallOfFame {
 	mostFishLanded: ProlificAngler[];
 	watersOfLegend: WaterOfLegend[];
 	matchWinners: MatchWinner[];
+	prototypes: PrototypeOnTheBoard[];
 }
