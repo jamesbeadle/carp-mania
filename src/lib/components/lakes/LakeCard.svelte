@@ -13,7 +13,8 @@
 	const stats = $derived([
 		{ label: 'Reputation', value: String(Math.round(Number(summary.lake.reputation))) },
 		{ label: 'Stock', value: String(summary.carpCount) },
-		{ label: 'Biggest', value: formatWeight(summary.heaviestCarpLb) }
+		{ label: 'Biggest', value: formatWeight(summary.heaviestCarpLb) },
+		{ label: 'From', value: formatMoney(summary.fromPrice), isPrice: true }
 	]);
 	const facts = $derived([
 		`${summary.swimCount} ${summary.swimCount === 1 ? 'peg' : 'pegs'}`,
@@ -31,18 +32,17 @@
 		</div>
 		<div class="ml-auto"><FavouriteStar lakeId={summary.lake.id} {isFavourite} /></div>
 	</div>
-	<dl class="grid grid-cols-[auto_auto_1fr] gap-x-5">
+	<dl class="flex flex-wrap gap-x-5 gap-y-2">
 		{#each stats as stat (stat.label)}
-			<div class="min-w-0"><dt class="stat-label">{stat.label}</dt><dd class="font-display text-2xl leading-none font-extrabold text-mist-100 italic tabular-nums">{stat.value}</dd></div>
+			<div class="min-w-0"><dt class="stat-label">{stat.label}</dt><dd class="font-display text-2xl leading-none font-extrabold italic tabular-nums {stat.isPrice ? 'text-volt-300' : 'text-mist-100'}">{stat.value}</dd></div>
 		{/each}
 	</dl>
 	<p class="flex flex-wrap gap-x-2 text-sm text-mist-400">
 		<span>{facts.join(' · ')}</span>
 		{#if isOnTheGlobe}<a href={worldUrlForLake(summary.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}
 	</p>
-	<div class="mt-auto flex flex-wrap items-center gap-3">
-		<p class="flex items-baseline gap-x-1"><span class="text-xs text-mist-400">from</span><span class="font-display text-xl font-extrabold text-volt-300 italic tabular-nums">{formatMoney(summary.fromPrice)}</span></p>
-		<a href="/lakes/{summary.lake.id}" class="button-secondary ml-auto">Look around</a>
+	<div class="mt-auto flex flex-wrap justify-end gap-3">
+		<a href="/lakes/{summary.lake.id}" class="button-secondary">Look around</a>
 		<GoFishingButton lakeId={summary.lake.id} words="Fish here" />
 	</div>
 </article>
