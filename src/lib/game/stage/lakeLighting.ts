@@ -14,12 +14,12 @@ export interface LakeLighting {
 }
 
 const SeasonTints: Record<SeasonName, { tint: string; filter: string }> = {
-	winter: { tint: 'hsla(210 40% 82% / 0.28)', filter: 'saturate(0.62) brightness(1.04)' },
-	spring: { tint: 'hsla(96 60% 70% / 0.08)', filter: 'saturate(1.05)' },
-	summer: { tint: 'hsla(60 70% 70% / 0.08)', filter: 'saturate(1.12) contrast(1.02)' },
-	autumn: { tint: 'hsla(28 70% 45% / 0.22)', filter: 'saturate(0.9) sepia(0.12)' }
+	winter: { tint: 'hsla(210 40% 82% / 0.12)', filter: 'saturate(0.88) brightness(1.06)' },
+	spring: { tint: 'hsla(96 60% 70% / 0.08)', filter: 'saturate(1.08)' },
+	summer: { tint: 'hsla(60 70% 70% / 0.08)', filter: 'saturate(1.14) contrast(1.02)' },
+	autumn: { tint: 'hsla(28 70% 45% / 0.12)', filter: 'saturate(0.96) sepia(0.05)' }
 };
-const OvercastFilter = ' brightness(0.88)';
+const OvercastFilter = ' brightness(0.95)';
 const DullWeather = { GlowLeft: 0.35 } as const;
 
 export function lakeLightingFor(conditions: StageConditions): LakeLighting {

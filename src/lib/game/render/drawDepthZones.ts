@@ -1,6 +1,6 @@
 import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
 import { scenePathOf } from '../scene/lakeShape';
-import { depthShadeColour } from '../scene/palette';
+import { depthShadeColour } from '../scene/waterPalette';
 import { largestFirst } from './layoutShapes';
 
 export function drawDepthZones(context: CanvasRenderingContext2D, layout: LakeLayout) {

@@ -1,5 +1,6 @@
 import type { Point } from '../scene/lakeShape';
-import { SceneSize, waterColour } from '../scene/palette';
+import { SceneSize } from '../scene/palette';
+import { waterColour } from '../scene/waterPalette';
 
 const DeepestRadius = 40;
 
