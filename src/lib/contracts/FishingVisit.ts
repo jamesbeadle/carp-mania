@@ -9,4 +9,5 @@ export interface FishingVisit {
 	ticketKind: TicketKind;
 	sessionsLeft: number;
 	recentCaptures: Record<string, number>;
+	streakDays: number;
 }

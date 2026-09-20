@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { BuyTicket, SitTheNextSession } from '$lib/server/commands/BuyTicket';
 import { loadProfile } from '$lib/server/gates/requireMoney';
 import { GetFishingVisit } from '$lib/server/queries/GetFishingVisit';
+import { loadStreakIfFishedNow } from '$lib/server/queries/loadStreak';
 import { GetLake } from '$lib/server/queries/GetLake';
 import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
@@ -22,11 +23,12 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		visitId ? GetFishingVisit(locals, params.lakeId, visitId) : null,
 		GetTicketBook(locals, params.lakeId)
 	]);
+	const streakIfFishedToday = visit ? visit.streakDays : await loadStreakIfFishedNow(locals.supabase, profile.id, new Date());
 	const isOnTheWater = visit !== null;
 	const barLoad = visit ? GetTheBar(locals, water.lake, visit.visitedAt) : null;
 	const ownedLoad = visit ? loadOwnedTackle(locals, profile.id) : [];
 	const [bar, owned] = await Promise.all([barLoad, ownedLoad]);
-	return { water, profile, visit, bar, owned, book, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
+	return { water, profile, visit, bar, owned, book, streakIfFishedToday, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {

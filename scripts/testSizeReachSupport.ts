@@ -10,7 +10,7 @@ const ThirtyLb = 30;
 
 export function waterOn(lake: Lake, rating: number, day: string): WaterToday {
 	const date = new Date(day);
-	return { lake, rating, watercraft: rating, season: seasonFor(lake, date), weather: weatherFor(lake, date), shoals: [], difficulty: EasyWater, recentCaptures: {}, nuisanceShare: 0 };
+	return { lake, rating, watercraft: rating, season: seasonFor(lake, date), weather: weatherFor(lake, date), shoals: [], difficulty: EasyWater, recentCaptures: {}, nuisanceShare: 0, streakDays: 1 };
 }
 
 export function stockWithThirties(lakeId: string): Carp[] {

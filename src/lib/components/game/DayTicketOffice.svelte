@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { MatchCard } from '$lib/contracts/MatchCard';
 	import type { TicketProduct } from '$lib/domain/fishing/ticketBook';
+	import { streakWords } from '$lib/domain/fishing/streak';
 	import { weatherWords } from '$lib/domain/fishing/weatherConditions';
 	import type { Profile } from '$lib/domain/types';
 	import { weatherFor } from '$lib/domain/world/weather';
@@ -14,9 +15,10 @@
 		book: TicketProduct[];
 		runningMatch: MatchCard | null;
 		knownCarpCount: number;
+		streakIfFishedToday: number;
 	}
 
-	let { water, profile, book, runningMatch, knownCarpCount }: Props = $props();
+	let { water, profile, book, runningMatch, knownCarpCount, streakIfFishedToday }: Props = $props();
 
 	const isOwnWater = $derived(water.lake.owner_id === profile.id);
 	const isBookedOut = $derived(runningMatch !== null && !runningMatch.isEntered);
@@ -40,7 +42,8 @@
 			{:else if isOwnWater}It's your own water — no ticket needed. Pick the hours you want to sit.
 			{:else}First light and the evening into the dark are when the big fish feed. You have {formatMoney(profile.money)}.{/if}{barbedWords}
 		</p>
-		<p class="mb-4 text-xs text-mist-400">Today: {todaysWeather}.</p>
+		<p class="mb-1 text-xs text-mist-400">Today: {todaysWeather}.</p>
+		<p class="mb-4 text-xs text-volt-300">{streakWords(streakIfFishedToday)}</p>
 		<TicketPicker {book} money={Number(profile.money)} isFree={isOwnWater || isFishingTheMatch} {freeWords} />
 	{/if}
 </section>

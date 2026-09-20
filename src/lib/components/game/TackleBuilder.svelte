@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { describeTerrain, terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
 	import { whyTheOwnerRefusesRods } from '$lib/domain/fishing/ownersRules';
+	import { streakWords } from '$lib/domain/fishing/streak';
 	import { defaultRodSetup, isRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
 	import { isSetupOwned, ownedItemsIn, type OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import { firstOwnedSetup } from '$lib/game/session/firstOwnedSetup';
@@ -19,12 +20,13 @@
 		craft: number;
 		carpCount: number;
 		conditionsShare: number;
+		streakDays: number;
 		savedRods: RodSetup[];
 		owned: OwnedTackle[];
 		onReady: (setups: RodSetup[]) => void;
 	}
 
-	let { lake, swim, season, rating, craft, carpCount, conditionsShare, savedRods, owned, onReady }: Props = $props();
+	let { lake, swim, season, rating, craft, carpCount, conditionsShare, streakDays, savedRods, owned, onReady }: Props = $props();
 
 	const box = ownedItemsIn(owned);
 	const usableRods = savedRods.filter((setup) => isRodSetup(setup) && isSetupOwned(owned, setup));
@@ -58,6 +60,7 @@
 		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
 	{/if}
 	<SizeReachLine {lake} {rating} {carpCount} {conditionsShare} terrain={terrainInFront} setup={setups[shownRod]} />
+	<p class="mt-2 text-sm text-volt-300">{streakWords(streakDays)}</p>
 	{#if !isShowingHints}
 		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at craft {HintsUnlockAtCraft}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
 	{/if}

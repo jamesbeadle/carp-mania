@@ -5,6 +5,7 @@
 	import SoundToggle from '../hud/SoundToggle.svelte';
 	import AlarmToggle from './AlarmToggle.svelte';
 	import SessionClock from './SessionClock.svelte';
+	import StreakPill from './StreakPill.svelte';
 	import WeatherLine from './WeatherLine.svelte';
 
 	interface Props {
@@ -36,6 +37,7 @@
 		<div class="short:order-2 short:basis-auto order-3 min-w-0 basis-full">
 			<div class="inline-flex max-w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-carbon-700 bg-carbon-950/80 px-3 py-1.5 backdrop-blur sm:px-4">
 				<SessionClock hour={session.hour} window={session.window} season={session.season} landed={session.landedToday.length} lost={session.lostToday} />
+				<StreakPill streakDays={session.streakDays} />
 				<WeatherLine weather={session.weather} hour={session.hour} />
 			</div>
 		</div>

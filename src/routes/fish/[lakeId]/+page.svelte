@@ -21,5 +21,5 @@
 	<FishingGame setup={{ ...setup, visit: data.visit, bar: data.bar }} swims={water.swims} owned={data.owned} {matchBoardHref} />
 {:else}
 	<ActionMessage {form} />
-	<DayTicketOffice {water} profile={data.profile} book={data.book} {runningMatch} {knownCarpCount} />
+	<DayTicketOffice {water} profile={data.profile} book={data.book} {runningMatch} {knownCarpCount} streakIfFishedToday={data.streakIfFishedToday} />
 {/if}

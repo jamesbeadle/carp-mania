@@ -15,6 +15,8 @@ import { readCatchReport } from '../gates/readCatchReport';
 import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
 import { hasCaughtDuringVisit, loadVisitOf, loadWaterOf, type VisitOnRecord, type WaterOnRecord } from '../queries/loadVisitForCatch';
+import { loadStreakDays } from '../queries/loadStreak';
+import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { loadCurrentFishermanId, loadHeaviestBefore } from '../queries/loadPersonalBest';
 import { skillsOf } from '../queries/skillsOf';
 import { honoursAfterTheCatch, recordNamedCatch, recordShoalCatch } from './recordInTheBook';
@@ -34,8 +36,8 @@ export async function RecordCatch(locals: App.Locals, body: unknown) {
 	const [water, profile, hasHadItToday] = await Promise.all([loadWaterOf(visit.lake_id), loadProfile(locals), hadItAlready]);
 	if (!water) error(HttpStatus.BadRequest, 'That lake is no longer there');
 	if (hasHadItToday) error(HttpStatus.BadRequest, 'You have already had that fish today');
-	const pedigreeLb = await loadPedigreeBeforeVisit(locals, user.id, visit);
-	const taker = takerThatWasRolled(report, visit, water, profile, pedigreeLb);
+	const [pedigreeLb, streakDays] = await Promise.all([loadPedigreeBeforeVisit(locals, user.id, visit), loadStreakDays(trustedSupabase(), user.id, visit.visited_at)]);
+	const taker = takerThatWasRolled(report, visit, water, profile, { pedigreeLb, streakDays });
 	if (!taker) error(HttpStatus.BadRequest, NotTheFish);
 	if (taker.kind === 'named') return recordTheNamedFish(user.id, report, taker.carp);
 	return recordTheShoalFish(user.id, report, taker, water);
@@ -57,24 +59,30 @@ async function recordTheShoalFish(anglerId: string, report: CatchReport, taker: 
 	return json({ catchId, carp: { ...fish, id: carpId, times_caught: 1 }, ...honours });
 }
 
+interface AnglerOnTheDay {
+	pedigreeLb: number;
+	streakDays: number;
+}
+
 async function loadPedigreeBeforeVisit(locals: App.Locals, anglerId: string, visit: VisitOnRecord) {
 	const fishermanId = await loadCurrentFishermanId(locals, anglerId);
 	return fishermanId ? loadHeaviestBefore(locals, fishermanId, visit.visited_at) : 0;
 }
 
-function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: WaterOnRecord, profile: Profile, pedigreeLb: number): Taker | null {
+function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: WaterOnRecord, profile: Profile, angler: AnglerOnTheDay): Taker | null {
 	const skills = skillsOf(profile);
 	const visitedAt = new Date(visit.visited_at);
 	const today: WaterToday = {
 		lake: water.lake,
-		rating: anglerRatingOf(skills, pedigreeLb).rating,
+		rating: anglerRatingOf(skills, angler.pedigreeLb).rating,
 		watercraft: skills.watercraft,
 		season: seasonFor(water.lake, visitedAt),
 		weather: weatherFor(water.lake, visitedAt),
 		shoals: water.shoals,
 		difficulty: difficultyOfWater(water.lake, water.carp, water.shoals),
 		recentCaptures: water.recentCaptures,
-		nuisanceShare: nuisanceBiteShare(water.species, Number(water.lake.acres))
+		nuisanceShare: nuisanceBiteShare(water.species, Number(water.lake.acres)),
+		streakDays: angler.streakDays
 	};
 	return takerForRolledBite({ ...report, seed: visit.seed }, today, water.carp);
 }

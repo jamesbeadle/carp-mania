@@ -27,6 +27,6 @@
 
 <div class="h-full overflow-y-auto px-4">
 	<div class="mx-auto max-w-7xl pt-6">
-		<TackleBuilder {lake} {swim} season={session.season} rating={session.rating} {craft} {carpCount} {conditionsShare} {savedRods} {owned} {onReady} />
+		<TackleBuilder {lake} {swim} season={session.season} rating={session.rating} {craft} {carpCount} {conditionsShare} streakDays={session.streakDays} {savedRods} {owned} {onReady} />
 	</div>
 </div>
