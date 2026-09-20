@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { honourKindsOf, honoursFor, isARecord, raiseTheBar } from '../src/lib/domain/fishing/honours';
 import { hourAfterMovingSwim, SwimMove } from '../src/lib/domain/fishing/movingSwims';
 import { FishingDay } from '../src/lib/domain/fishing/sessionClock';
-import { pickCarpThatTookTheBait, sameChanceForEveryFish } from '../src/lib/domain/fishing/pickCarp';
+import { pickCarpByWeight } from '../src/lib/domain/fishing/pickCarp';
+import { noSpotBonus, takeWeightsFor, type SpotBonus } from '../src/lib/domain/fishing/takeWeight';
 import { favouriteSpotOf, FavouriteSpotBiteBonus } from '../src/lib/domain/layout/favouriteFeature';
 import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
@@ -25,18 +26,22 @@ export function runFishingScenarios() {
 	assert.ok(islandLovers.length > 0, 'some classic carp favour the island margin');
 
 	const bonusForIslandLovers = (fish: Carp) => (lovesTheIsland(fish) ? FavouriteSpotBiteBonus : 1);
-	const plainShare = shareOfTakes(carp, lovesTheIsland, sameChanceForEveryFish, seededRandom(3));
+	const plainShare = shareOfTakes(carp, lovesTheIsland, noSpotBonus, seededRandom(3));
 	const bonusShare = shareOfTakes(carp, lovesTheIsland, bonusForIslandLovers, seededRandom(3));
 	assert.ok(bonusShare > plainShare, `a bait on the favourite spot skews the take: ${bonusShare} vs ${plainShare}`);
-	assert.equal(pickCarpThatTookTheBait([], 0.5, bonusForIslandLovers), null, 'an empty lake gives no fish');
+	assert.equal(pickCarpByWeight([], [], 0.5), null, 'an empty lake gives no fish');
 	console.log('fishing:', { islandLovers: islandLovers.length, plainShare: plainShare.toFixed(3), bonusShare: bonusShare.toFixed(3) });
 	runBiteRollScenarios();
 }
 
-function shareOfTakes(carp: Carp[], isCounted: (fish: Carp) => boolean, bonusFor: (fish: Carp) => number, random: () => number) {
+const MiddlingReach = 0.5;
+const MidMorning = 9;
+
+function shareOfTakes(carp: Carp[], isCounted: (fish: Carp) => boolean, spotBonusFor: SpotBonus, random: () => number) {
 	let counted = 0;
+	const weights = takeWeightsFor(carp, { sizeReach: MiddlingReach, hour: MidMorning, spotBonusFor });
 	for (let take = 0; take < TakesToSample; take++) {
-		const taker = pickCarpThatTookTheBait(carp, random(), bonusFor);
+		const taker = pickCarpByWeight(carp, weights, random());
 		if (taker && isCounted(taker)) counted += 1;
 	}
 	return counted / TakesToSample;

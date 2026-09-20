@@ -6,6 +6,7 @@ import type { Terrain } from './terrainAt';
 export type FavouriteSpot = { kind: 'feature'; feature: SwimFeature } | { kind: 'depth_zone'; zoneId: string };
 
 export const FavouriteSpotBiteBonus = 1.3;
+export const ShownSpotBonus = 1.6;
 
 export function featuresPresent(layout: LakeLayout): SwimFeature[] {
 	const present: SwimFeature[] = ['open_water'];

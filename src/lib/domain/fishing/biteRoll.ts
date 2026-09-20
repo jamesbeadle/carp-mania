@@ -23,7 +23,8 @@ export interface RodInTheWater {
 
 export interface WaterToday {
 	lake: Lake;
-	overallSkill: number;
+	rating: number;
+	watercraft: number;
 	season: Season;
 }
 
@@ -41,8 +42,9 @@ export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: R
 
 export function biteChanceThisHour(hour: number, rod: RodInTheWater, water: WaterToday) {
 	const match = matchTackleToWater(rod.setup, water.lake, rod.terrain);
-	const conditions = { spotFactor: spotBiteFactor(rod.terrain, water.season), seasonFactor: water.season.biteFactor };
-	return biteChanceForOneHour(water.lake, match.overall, water.overallSkill, hour, conditions);
+	const season = water.season;
+	const conditions = { spotFactor: spotBiteFactor(rod.terrain, season), seasonFactor: season.biteFactor };
+	return biteChanceForOneHour(water.lake, match.overall, water.rating, hour, conditions);
 }
 
 export function biteTimeOf(hour: number, roll: BiteRoll) {

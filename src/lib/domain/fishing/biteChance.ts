@@ -1,11 +1,21 @@
 import { totalFeedKilograms } from '../feed';
+import { clampFraction, fractionOfHundred } from '../fraction';
 import type { Lake } from '../types';
 import { overallWaterQuality, WaterScale } from '../waterQuality';
 import { timeOfDayBiteFactor } from './sessionClock';
 
-const BaseBitesPerRodHour = 0.5;
-const SkillFloor = 0.35;
+export const BaseBitesPerRodHour = 0.17;
+export const CountPull = { Floor: 0.85, CraftSwing: 0.15, TackleSwing: 0.3 } as const;
 const MaximumChancePerHour = 0.9;
+const SmallestAcres = 0.1;
+const ConfidenceFloor = 0.5;
+const Feeding = {
+	HeavyAboveKilogramsPerAcre: 8,
+	HeavilyFedFactor: 0.85,
+	HungryFactor: 1.15,
+	MostFullness: 0.3,
+	FullnessPerKilogram: 0.04
+} as const;
 
 export interface BiteConditions {
 	spotFactor: number;
@@ -15,27 +25,35 @@ export interface BiteConditions {
 export const NeutralBiteConditions: BiteConditions = { spotFactor: 1, seasonFactor: 1 };
 
 export function lakeHungerFactor(lake: Pick<Lake, 'feed_stock' | 'acres'>) {
-	const kilogramsPerAcre = totalFeedKilograms(lake.feed_stock) / Math.max(0.1, Number(lake.acres));
-	const isHeavilyFed = kilogramsPerAcre > 8;
-	return isHeavilyFed ? 0.85 : 1.15 - Math.min(0.3, kilogramsPerAcre * 0.04);
+	const acres = Math.max(SmallestAcres, Number(lake.acres));
+	const kilogramsPerAcre = totalFeedKilograms(lake.feed_stock) / acres;
+	const isHeavilyFed = kilogramsPerAcre > Feeding.HeavyAboveKilogramsPerAcre;
+	if (isHeavilyFed) return Feeding.HeavilyFedFactor;
+	const fullness = Math.min(Feeding.MostFullness, kilogramsPerAcre * Feeding.FullnessPerKilogram);
+	return Feeding.HungryFactor - fullness;
 }
 
 export function lakeConfidenceFactor(lake: Pick<Lake, 'transparency' | 'weed' | 'silt' | 'disturbance'>) {
-	const quality = overallWaterQuality(Number(lake.transparency), Number(lake.weed), Number(lake.silt) + Number(lake.disturbance ?? 0));
-	return 0.5 + quality / (WaterScale.Best * 2);
+	const cloudiness = Number(lake.silt) + Number(lake.disturbance ?? 0);
+	const quality = overallWaterQuality(Number(lake.transparency), Number(lake.weed), cloudiness);
+	return ConfidenceFloor + quality / (WaterScale.Best * 2);
 }
 
-export function skillFactor(overallSkill: number) {
-	return SkillFloor + (overallSkill / 100) * (1 - SkillFloor);
+export function craftCountFactor(rating: number) {
+	return CountPull.Floor + CountPull.CraftSwing * fractionOfHundred(rating);
 }
 
-export function biteChanceForOneHour(lake: Lake, tackleMatchOverall: number, overallSkill: number, hour: number, conditions: BiteConditions = NeutralBiteConditions) {
+export function tackleCountFactor(tackleMatchOverall: number) {
+	return CountPull.Floor + CountPull.TackleSwing * clampFraction(tackleMatchOverall);
+}
+
+export function biteChanceForOneHour(lake: Lake, tackleMatchOverall: number, rating: number, hour: number, conditions: BiteConditions = NeutralBiteConditions) {
 	const chance =
 		BaseBitesPerRodHour *
 		lakeHungerFactor(lake) *
 		lakeConfidenceFactor(lake) *
-		tackleMatchOverall *
-		skillFactor(overallSkill) *
+		tackleCountFactor(tackleMatchOverall) *
+		craftCountFactor(rating) *
 		timeOfDayBiteFactor(hour) *
 		conditions.spotFactor *
 		conditions.seasonFactor;

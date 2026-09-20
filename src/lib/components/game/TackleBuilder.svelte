@@ -6,28 +6,31 @@
 	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
 	import RodSetupCard from './RodSetupCard.svelte';
 	import SegmentedChoice from './SegmentedChoice.svelte';
+	import SizeReachLine from './SizeReachLine.svelte';
 
 	interface Props {
 		lake: Lake;
 		swim: Swim;
 		season: Season;
-		overallSkill: number;
+		rating: number;
+		craft: number;
+		carpCount: number;
 		savedRods: RodSetup[];
 		onReady: (setups: RodSetup[]) => void;
 	}
 
-	let { lake, swim, season, overallSkill, savedRods, onReady }: Props = $props();
+	let { lake, swim, season, rating, craft, carpCount, savedRods, onReady }: Props = $props();
 
 	const hasSavedRods = savedRods.length > 0;
 	const startingSetups = Array.from({ length: MaximumRods }, (_, index) => structuredClone(savedRods[index] ?? defaultRodSetup()));
 	const RodCounts = Array.from({ length: MaximumRods }, (_, index) => index + 1);
-	const HintsUnlockAtSkill = 40;
+	const HintsUnlockAtCraft = 40;
 	let setups = $state<RodSetup[]>(startingSetups);
 	let rodCount = $state(hasSavedRods ? savedRods.length : MaximumRods);
 	let chosenRod = $state(0);
 	const shownRod = $derived(Math.min(chosenRod, rodCount - 1));
 	const rodsInUse = $derived(RodCounts.slice(0, rodCount));
-	const isShowingHints = $derived(overallSkill >= HintsUnlockAtSkill);
+	const isShowingHints = $derived(craft >= HintsUnlockAtCraft);
 	const terrainInFront = $derived(terrainInFrontOfSwim(lake, swim));
 
 	function copyToEveryRod(from: number) {
@@ -45,8 +48,9 @@
 	{#if hasSavedRods}
 		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
 	{/if}
+	<SizeReachLine {lake} {rating} {carpCount} terrain={terrainInFront} setup={setups[shownRod]} />
 	{#if !isShowingHints}
-		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at skill {HintsUnlockAtSkill}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
+		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at craft {HintsUnlockAtCraft}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
 	{/if}
 	<div class="mt-3 max-w-xs">
 		<p class="stat-label mb-1">Rods</p>

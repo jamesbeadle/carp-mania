@@ -5,7 +5,8 @@
 	import type { Point } from '$lib/game/scene/lakeShape';
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
-	import { WatercraftShowsFishFrom } from '$lib/game/session/showingFish';
+	import { canReadTheWater } from '$lib/domain/fishing/showingFish';
+	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
 	import LakeCanvas from '../LakeCanvas.svelte';
@@ -45,11 +46,13 @@
 	let { session, lake, swims, carp, profile, conditions, showingAt, catchOutcome, overTheSky, onSwimClick, onWaterClick, onCastBlockedByIsland, onStrike, onFightFinished, onContinue, onReelIn, onSetOff, onStayPut }: Props = $props();
 
 	const orientation = new Orientation();
-	const canReadTheWater = $derived(Number(profile.watercraft) >= WatercraftShowsFishFrom);
-	const fishShowingAt = $derived(canReadTheWater ? showingAt : []);
+	const fishShowingAt = $derived(canReadTheWater(Number(profile.watercraft)) ? showingAt : []);
 
 	$effect(() => orientation.watch());
+	$effect(() => settleAfterTheCatch(session.isSettlingAfterCatch));
 </script>
+
+<svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
 
 {#snippet water()}
 	<LakeCanvas {lake} {swims} {carp} selectedSwimId={session.swim?.id ?? null} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
@@ -65,7 +68,7 @@
 		<CanvasOverlay><FightMeter fight={session.fight} onFinished={onFightFinished} /></CanvasOverlay>
 	{/if}
 	{#if session.phase === 'landed' && session.lastLanded}
-		<CanvasOverlay><CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} {onContinue} /></CanvasOverlay>
+		<CanvasOverlay><CatchPhoto landed={session.lastLanded} anglerName={profile.display_name} lakeName={lake.name} {catchOutcome} isSettling={session.isSettlingAfterCatch} {onContinue} /></CanvasOverlay>
 	{/if}
 	{#if session.phase === 'day_over'}
 		<CanvasOverlay><DayOverSummary landed={session.landedToday} lost={session.lostToday} lakeId={lake.id} /></CanvasOverlay>
@@ -82,6 +85,6 @@
 	<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
 	{#if session.bite}<StrikeButton bite={session.bite} {onStrike} placement="over_the_screen" />{/if}
 	{#if session.phase === 'fighting' && session.fight}
-		<CanvasOverlay placement="over_the_screen"><FightMeter fight={session.fight} onFinished={onFightFinished} /></CanvasOverlay>
+		<CanvasOverlay placement="over_the_screen"><FightMeter fight={session.fight} onFinished={onFightFinished} placement="over_the_screen" /></CanvasOverlay>
 	{/if}
 {/if}

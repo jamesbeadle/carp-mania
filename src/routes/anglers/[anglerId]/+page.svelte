@@ -46,7 +46,7 @@
 	<div class="grid gap-6 lg:grid-cols-2">
 		<section class="panel">
 			<dl class="mb-6 grid grid-cols-3 gap-3 text-sm">
-				<div><dt class="stat-label">Overall skill</dt><dd class="text-xl">{Math.round(angler.overallSkill)}</dd></div>
+				<div><dt class="stat-label">Rating</dt><dd class="text-xl">{Math.round(angler.rating)}</dd></div>
 				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.profile.experience}</dd></div>
 				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(room.ranks.bestLb)}</dd></div>
 			</dl>

@@ -22,6 +22,9 @@ import { runMatchScenarios } from './testMatches';
 import { runPikeScenarios } from './testPike';
 import { runRivalryScenarios } from './testRivalry';
 import { runSiteScenarios } from './testSites';
+import { runSizeReachScenarios } from './testSizeReach';
+import { runRatingScenarios } from './testRating';
+import { runFightScenarios } from './testFight';
 import { runTrophyScenarios } from './testTrophies';
 import { runSpawningScenarios, runWorldScenarios } from './testWorld';
 
@@ -88,4 +91,7 @@ runListScenarios();
 runTrophyScenarios();
 runRivalryScenarios();
 runLightScenarios();
+runRatingScenarios();
+runSizeReachScenarios();
+runFightScenarios();
 console.log('domain tests passed');

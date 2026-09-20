@@ -7,7 +7,7 @@
 	import HonourRibbons from './HonourRibbons.svelte';
 	import ScalesReadout from './ScalesReadout.svelte';
 
-	let { landed, anglerName, lakeName, catchOutcome, onContinue }: { landed: LandedFish; anglerName: string; lakeName: string; catchOutcome: CatchReportOutcome | null; onContinue: () => void } = $props();
+	let { landed, anglerName, lakeName, catchOutcome, isSettling, onContinue }: { landed: LandedFish; anglerName: string; lakeName: string; catchOutcome: CatchReportOutcome | null; isSettling: boolean; onContinue: () => void } = $props();
 
 	let canvas: HTMLCanvasElement;
 	let isWeighed = $state(false);
@@ -46,6 +46,6 @@
 		<p class="text-xs text-mist-400">
 			{#if catchOutcome === null}Saving the catch report…{:else if catchOutcome.isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}<span class="text-danger-400">The catch report could not be saved: {catchOutcome.reason}.</span>{/if}
 		</p>
-		<button class="button-primary" onclick={onContinue}>Back to the rods</button>
+		<button class="button-primary" disabled={isSettling} onclick={onContinue}>Back to the rods</button>
 	{/if}
 </section>

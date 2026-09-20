@@ -39,5 +39,5 @@ function topReputationRow(entry: TopReputationEntry): LeaderboardRow {
 }
 
 function bestAnglerRow(entry: BestAnglerEntry, viewerId: string | null): LeaderboardRow {
-	return { key: entry.profileId, label: entry.displayName, detail: 'overall skill', value: String(Math.round(entry.overallSkill)), href: `/anglers/${entry.profileId}`, isViewers: entry.profileId === viewerId };
+	return { key: entry.profileId, label: entry.displayName, detail: 'rating', value: String(Math.round(entry.rating)), href: `/anglers/${entry.profileId}`, isViewers: entry.profileId === viewerId };
 }

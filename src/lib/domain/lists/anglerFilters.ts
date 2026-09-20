@@ -11,7 +11,7 @@ export interface AnglerFilters {
 }
 
 export const AnglerSorts: { sort: AnglerSort; label: string }[] = [
-	{ sort: 'skill', label: 'Most skilled' },
+	{ sort: 'skill', label: 'Highest rated' },
 	{ sort: 'best', label: 'Biggest personal best' },
 	{ sort: 'landed', label: 'Most fish landed' }
 ];
