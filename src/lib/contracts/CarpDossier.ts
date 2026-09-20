@@ -26,7 +26,6 @@ export interface CarpDossier {
 	dealerOffer: number;
 	bestEverLb: number;
 	growth: GrowthPoint[];
-	openListingId: string | null;
 	isMine: boolean;
 	recentCaptures: number;
 }

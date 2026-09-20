@@ -902,3 +902,27 @@ These are the judgement calls in this plan that the draft did not make, or made 
 | The rest of the backlog — adverts, the season ticket, Search Console, Vercel and Supabase Pro, AdSense, Paddle, the terms, the launch checklist | Not game design; unaffected |
 
 Each phase's task is raised in Your Business Today under the same goal as the trades task when the phase starts, with this document attached, and its work log posted when the branch is pushed.
+
+---
+
+## 12. Build notes
+
+Where the build departed from the plan, one line each, by phase. Everything not listed was built as written.
+
+**Phase 1 — angler rating.** `SizeBias` widened to ±3 (`AtNoReach: -3, AtFullReach: 3`) so the magic-hour thirties' share clears the ×3 the sweep asks for; the sweep judges that ratio on a fixed ordinary-weather day rather than a random one. `BaseBitesPerRodHour = 0.135`, not the draft's figure, to hold the competent angler at 6.8 fish in 24 hours. The count pull is recentred on the competent angler rather than on rating 0.
+
+**Phase 2 — the tackle trade.** Saved rod setups are reset once by the migration (`profiles.saved_rods = '[]'`) because the old setups named no catalogue items. There is no `StockUpForSession` — bait is bought at the counter like everything else, and a spoiled bait is refused at the cast rather than silently swapped.
+
+**Phase 4 — farms and stock.** Farms live on `/market/farms` as a list with a distance and a quote, not as pins on the globe. A Danube fifty to a UK water quotes £1,032 and three days (the real 2,230 km), not the plan's £810 and two. `GetStockBySize` is computed on the client from the carp and shoals already loaded, not a query. A record grower offers one pack of its biggest bands a week or none — the week off is decided per farm, not per band.
+
+**Phase 5 — tickets and hours.** The day ticket runs 07:00–19:00 as the notes say (decision 1). A multi-day ticket is one `lake_visits` row that `sit_the_next_session` resets for each sitting, not one row a day. The session's weather is held across midnight rather than re-rolled. `conditionsShareFor` replaces the draft's `NeutralConditionsShare` constant.
+
+**Phase 6 — the shoals.** A visiting angler's shoal take writes a catch row with `carp_id` null and no carp row; only a player's take names a fish (`record_shoal_catch`). Named fish and fry shoals born in the simulation carry provisional ids (`named-`, `fry-`) until `persistStock` writes them.
+
+**Phase 7 — the big water.** The groundworks editor pans by wheel and the minimap's buttons only; pinch and drag pan are on the fishing and viewing canvases. The classic layout is 12% featured, not the draft's quarter, so its feeding confidence reads as part-featured.
+
+**Phase 8 — the make-up of a water.** The bare clay bowl's ceiling reads 19 lb, not 20, within the design's tolerance. Netting the silvers is applied at once with disturbance 8 rather than as a four-day works item. Species are seeded per site type by the migration and by a trigger on new lakes. Fishery days for the booking diary come from the world clock (one real hour), so a week's diary is seven real hours.
+
+**Phase 9 — honours and bounties.** Awards are decided in TypeScript (`awardsEarnedBy`) from SQL tallies (`award_tallies_of`), not by a `raise_awards` in plpgsql, so the catalogue lives in one tested place; `RaiseAwards` runs after every catch, after dealer sales, and when the angler opens their own trophy room, which is where a match win's award is caught. `catches` gained `hour_of_day` and `visit_id` so night owl, early bird and the full book can be counted. A prototype is a catalogue design with numbered instances (`blackmere-prototype-rod-no-7`), resolved by `tackleItem` like any other id; two a brand a fishery year, enforced when the bounty opens. A peg at a legend or a stocked fish that cannot be delivered (no such water, no free peg, the winner owns no water) pays the bounty's money instead. Prize-only tackle sits in the catalogue at price 0 and is kept off the shelves by `isPrizeOnly`. `GetBiggestFishInTheGame` is `GetBiggestFish` (the five-word rule). The migration is seven files (`0027`–`0027g`) to stay under 100 lines each.
+
+**Phase 10 — fish trades: not shipped, and the fish market closed with it.** Trades were built to the story's acceptance criterion on `feature/fish-trades` and then dropped before merging, because any fish or money passing from one player to another lets a second account pay the first: a sock puppet with £100,000 of starting money can buy a fish at any price, or accept any trade. For the same reason the auction market from Design II is closed on `feature/no-player-trading` — no listings, bids or buy-now; `0028_the_fish_market_closes.sql` refunds every open bid, cancels the open listings and drops the listing, bidding, settling and closing functions; `/market` is the tackle shop (the counter) with the farms beside it; the lodge loses its Market tab; the world map loses its *fish for sale* filter and count; an old listing link opens the fish's own page. Fish now enter a water from the farms and leave it through the dealer or to another water of the same owner — no player-to-player route remains for fish. Money still passes between players where the game needs it: day tickets, syndicate places, match fees and stakes, and owner-posted bounties; those are bounded by real time or by the payer's own money, and are the routes to watch if a second account is ever abused.

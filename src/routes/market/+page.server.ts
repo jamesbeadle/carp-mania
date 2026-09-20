@@ -1,10 +1,11 @@
-import type { PageServerLoad } from './$types';
-import { readMarketFilters } from '$lib/domain/market/readMarketFilters';
-import { GetMarketIndex } from '$lib/server/queries/GetMarketIndex';
-import { GetMarketListings } from '$lib/server/queries/GetMarketListings';
+import type { Actions, PageServerLoad } from './$types';
+import { BuyTackle } from '$lib/server/commands/BuyTackle';
+import { GetTackleShelves } from '$lib/server/queries/GetTackleShelves';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-	const filters = readMarketFilters(url.searchParams);
-	const [market, index] = await Promise.all([GetMarketListings(locals, filters), GetMarketIndex(locals)]);
-	return { market, index, loadedAt: new Date().toISOString() };
+export const load: PageServerLoad = async ({ locals }) => {
+	return { shelves: await GetTackleShelves(locals) };
+};
+
+export const actions: Actions = {
+	buy: async ({ locals, request }) => BuyTackle(locals, await request.formData())
 };

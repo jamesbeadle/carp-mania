@@ -9,7 +9,6 @@
 	let { filters, onChange }: Props = $props();
 
 	const toggles = [
-		{ key: 'isForSaleOnly', label: 'Fish for sale' },
 		{ key: 'isOnTheBankOnly', label: 'Anglers on the bank' },
 		{ key: 'isFavouritesOnly', label: 'My favourites' }
 	] as const;

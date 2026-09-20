@@ -7,7 +7,6 @@
 
 	const AcresDecimals = 1;
 
-	const forSaleLine = $derived(numbers.listingCount === 0 ? 'Nothing for sale' : `${numbers.listingCount} fish for sale`);
 	const onTheBankLine = $derived(anglersLine(numbers.anglersOnBankNow));
 
 	function anglersLine(count: number) {
@@ -22,4 +21,4 @@
 	<div><dt class="stat-label">Biggest</dt><dd class="text-xl text-volt-300">{formatWeight(numbers.heaviestLb)}</dd></div>
 	<div><dt class="stat-label">Day ticket</dt><dd class="text-xl">{formatMoney(numbers.dayTicketFee)}</dd></div>
 </dl>
-<p class="text-sm text-mist-400">{forSaleLine} · {onTheBankLine}</p>
+<p class="text-sm text-mist-400">{onTheBankLine}</p>

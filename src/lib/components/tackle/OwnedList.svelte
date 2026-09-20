@@ -12,7 +12,7 @@
 <section class="panel">
 	<h2 class="text-xl text-volt-300">{TackleKindLabels[kind]}</h2>
 	{#if owned.length === 0}
-		<p class="mt-2 text-sm text-mist-400">Nothing yet. <a href="/market/tackle" class="text-surge-400 hover:underline">The counter has some.</a></p>
+		<p class="mt-2 text-sm text-mist-400">Nothing yet. <a href="/market" class="text-surge-400 hover:underline">The counter has some.</a></p>
 	{:else}
 		<ul class="mt-2">
 			{#each fresh as line (line.itemId)}<OwnedLine {line} />{/each}

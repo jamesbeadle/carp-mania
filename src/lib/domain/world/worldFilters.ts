@@ -17,7 +17,6 @@ export interface WorldFilters {
 	minimumReputation: number | null;
 	minimumHeaviestLb: number | null;
 	maximumDayTicketFee: number | null;
-	isForSaleOnly: boolean;
 	isOnTheBankOnly: boolean;
 	isFavouritesOnly: boolean;
 	sort: WorldSort;
@@ -29,7 +28,6 @@ export const NoWorldFilters: WorldFilters = {
 	minimumReputation: null,
 	minimumHeaviestLb: null,
 	maximumDayTicketFee: null,
-	isForSaleOnly: false,
 	isOnTheBankOnly: false,
 	isFavouritesOnly: false,
 	sort: 'reputation'
@@ -63,7 +61,6 @@ function passesEveryFilter(pin: WorldPin, filters: WorldFilters, favouriteIds: R
 	if (filters.minimumReputation !== null && pin.reputation < filters.minimumReputation) return false;
 	if (filters.minimumHeaviestLb !== null && pin.heaviestLb < filters.minimumHeaviestLb) return false;
 	if (filters.maximumDayTicketFee !== null && pin.dayTicketFee > filters.maximumDayTicketFee) return false;
-	if (filters.isForSaleOnly && pin.listingCount === 0) return false;
 	if (filters.isOnTheBankOnly && pin.anglersOnBankNow === 0) return false;
 	if (filters.isFavouritesOnly && !favouriteIds.has(pin.id)) return false;
 	return true;

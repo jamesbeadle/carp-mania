@@ -1,6 +1,5 @@
 {
 	"crons": [
-		{ "path": "/cron/close-listings", "schedule": "* * * * *" },
 		{ "path": "/cron/close-matches", "schedule": "* * * * *" },
 		{ "path": "/cron/close-bounties", "schedule": "* * * * *" }
 	]

@@ -6,7 +6,6 @@ export interface PostcardNumbers {
 	acres: number;
 	heaviestLb: number;
 	dayTicketFee: number;
-	listingCount: number;
 	anglersOnBankNow: number;
 	ownerName: string;
 	ownerId: string;

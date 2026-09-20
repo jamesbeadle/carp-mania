@@ -13,10 +13,6 @@ export interface LakeWork {
 }
 
 export type NotificationKind =
-	| 'outbid'
-	| 'won'
-	| 'sold'
-	| 'unsold'
 	| 'arrived'
 	| 'quarantine_over'
 	| 'works_complete'
