@@ -31,7 +31,7 @@ export const PrivacyPolicy: LegalDocument = {
 			heading: 'What other players can see',
 			paragraphs: [
 				`Carp Mania is a shared world. Other signed-in players can see your angler's name and picture, the waters you have opened to anglers and the fish in them, your catches, records and scrapbooks, the matches you host or enter, and the events the world feed reports — a big fish, a sale, a new water, a retirement. Your email address is never shown to anyone.`,
-				`A water you keep private is visible only to you, though a fish you put up for sale is seen by everyone while the listing runs. Nothing in the game is visible to people who aren't signed in.`
+				`A water you keep private is visible only to you. Nothing in the game is visible to people who aren't signed in.`
 			]
 		},
 		{

@@ -13,20 +13,17 @@
 	import BountyPanel from '$lib/components/lake/BountyPanel.svelte';
 	import SpeciesPanel from '$lib/components/lake/SpeciesPanel.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
-	import MarketPanel from '$lib/components/market/MarketPanel.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import { PikeRules } from '$lib/domain/economy';
 	import type { Carp } from '$lib/domain/types';
 	import { inProgressShapesFor } from '$lib/game/builder/draftShapes';
 	import { bailiffsWord } from '$lib/game/lodge/bailiffsWord';
-	import { onMount } from 'svelte';
 	import { stockDrawOf } from '$lib/domain/water/stockDraw';
 
 	let { data, form } = $props();
 
-	const tabs = ['Stock', 'Tickets', 'Feed', 'Predators', 'Water', 'Groundworks', 'Market', 'Ledger'] as const;
-	const MarketAnchor = '#market';
+	const tabs = ['Stock', 'Tickets', 'Feed', 'Predators', 'Water', 'Groundworks', 'Ledger'] as const;
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const fishery = $derived(data.fishery);
 	const { lake, carp, shoals, swims } = $derived(fishery);
@@ -39,9 +36,6 @@
 	const bountySwimId = $derived(openBounty?.swimId ?? null);
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 
-	onMount(() => {
-		if (location.hash === MarketAnchor) activeTab = 'Market';
-	});
 </script>
 
 <svelte:head><title>The lodge at {lake.name} · Carp Mania</title></svelte:head>
@@ -82,5 +76,4 @@
 	</p>
 	<WorksLedgerPanel inProgress={groundworks.inProgress} ledger={groundworks.ledger} />
 {/if}
-{#if activeTab === 'Market'}<MarketPanel activity={data.marketActivity} {carp} loadedAt={data.loadedAt} />{/if}
 {#if activeTab === 'Ledger'}<LedgerPanel visits={fishery.visits} catches={fishery.catches} {carp} />{/if}

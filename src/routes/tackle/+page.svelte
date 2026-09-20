@@ -15,7 +15,7 @@
 
 <PlaceBanner kind="shop" title="My tackle box" blurb="What you own, by kind. Line, hooks, rigs, leads, tubing and bait run out; rods and reels last until one snaps. Your rating is {Math.round(data.box.rating)}.">
 	{#snippet actions()}
-		<a href="/market/tackle" class="button-primary text-base">The tackle counter</a>
+		<a href="/market" class="button-primary text-base">The tackle counter</a>
 	{/snippet}
 </PlaceBanner>
 

@@ -9,7 +9,6 @@ import { requireOwnedLake } from '../gates/requireOwnedLake';
 import { loadMyWaters } from '../queries/loadMyWaters';
 
 const DestinationField = 'destinationId';
-const OpenStatus = 'open';
 
 export async function MoveFishToMyWater(locals: App.Locals, formData: FormData) {
 	const lake = await requireOwnedLake(locals);
@@ -22,8 +21,7 @@ export async function MoveFishToMyWater(locals: App.Locals, formData: FormData) 
 	const fish = await loadChosenFishInLake(locals, chosen.value, lake.id);
 	const missing = whyChosenFishAreMissing(chosen.value, fish);
 	if (missing) return fail(400, { message: missing });
-	const listed = await loadOpenListingIds(locals, chosen.value);
-	const refusal = fish.map((one) => whyFishCannotMove(one, destinationId, listed)).find((reason) => reason !== null);
+	const refusal = fish.map((one) => whyFishCannotMove(one, destinationId)).find((reason) => reason !== null);
 	if (refusal) return fail(400, { message: refusal });
 
 	const destination = waters.find((water) => water.id === destinationId)!;
@@ -41,9 +39,4 @@ export async function MoveFishToMyWater(locals: App.Locals, formData: FormData) 
 	});
 	if (error) return fail(400, { message: error.message });
 	return { message: `${moved} fish on the lorry to ${destination.name} for ${formatMoney(quote.cost)} — ${quote.transitDays} days in transit` };
-}
-
-async function loadOpenListingIds(locals: App.Locals, carpIds: string[]) {
-	const { data: listings } = await locals.supabase.from('listings').select('carp_id').in('carp_id', carpIds).eq('status', OpenStatus);
-	return new Set(((listings ?? []) as { carp_id: string }[]).map((listing) => listing.carp_id));
 }

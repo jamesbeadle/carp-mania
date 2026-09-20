@@ -11,6 +11,5 @@ export interface WorldPin {
 	heaviestLb: number;
 	acres: number;
 	dayTicketFee: number;
-	listingCount: number;
 	anglersOnBankNow: number;
 }

@@ -13,7 +13,6 @@ export interface WorldPinRow {
 	heaviest_lb: number | null;
 	acres: number;
 	day_ticket_fee: number;
-	listing_count: number;
 	anglers_on_bank_now: number;
 }
 
@@ -37,7 +36,6 @@ export function worldPinFrom(row: WorldPinRow): WorldPin {
 		heaviestLb: Number(row.heaviest_lb ?? 0),
 		acres: Number(row.acres),
 		dayTicketFee: Number(row.day_ticket_fee),
-		listingCount: Number(row.listing_count),
 		anglersOnBankNow: Number(row.anglers_on_bank_now)
 	};
 }

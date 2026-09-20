@@ -9,7 +9,6 @@ export const WorldParam = {
 	Reputation: 'reputation',
 	Biggest: 'biggest',
 	Fee: 'fee',
-	ForSale: 'forSale',
 	OnBank: 'onBank',
 	Favourites: 'favourites',
 	Sort: 'sort',
@@ -27,7 +26,6 @@ export function filtersFromSearchParams(params: URLSearchParams): WorldFilters {
 		minimumReputation: numberOrNull(params.get(WorldParam.Reputation)),
 		minimumHeaviestLb: numberOrNull(params.get(WorldParam.Biggest)),
 		maximumDayTicketFee: numberOrNull(params.get(WorldParam.Fee)),
-		isForSaleOnly: params.get(WorldParam.ForSale) === Ticked,
 		isOnTheBankOnly: params.get(WorldParam.OnBank) === Ticked,
 		isFavouritesOnly: params.get(WorldParam.Favourites) === Ticked,
 		sort: isWorldSort(sort) ? sort : NoWorldFilters.sort
@@ -55,7 +53,6 @@ function searchParamsFrom(filters: WorldFilters, selectedLakeId: string | null):
 	setIfPresent(params, WorldParam.Reputation, filters.minimumReputation);
 	setIfPresent(params, WorldParam.Biggest, filters.minimumHeaviestLb);
 	setIfPresent(params, WorldParam.Fee, filters.maximumDayTicketFee);
-	tickIf(params, WorldParam.ForSale, filters.isForSaleOnly);
 	tickIf(params, WorldParam.OnBank, filters.isOnTheBankOnly);
 	tickIf(params, WorldParam.Favourites, filters.isFavouritesOnly);
 	if (filters.sort !== NoWorldFilters.sort) params.set(WorldParam.Sort, filters.sort);

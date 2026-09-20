@@ -71,7 +71,7 @@
 			<a href="/lakes/{lakeId}" class="button-secondary text-center text-base">Look around</a>
 			<GoFishingButton {lakeId} words="Fish for {formatMoney(postcard.numbers.dayTicketFee)}" buttonClass="button-primary block w-full text-center text-base" />
 			<FavouriteStar {lakeId} {isFavourite} isLabelled />
-			<a href="/market?lake={lakeId}" class="button-secondary text-center text-base">Market</a>
+			<a href="/lakes/{lakeId}/shop" class="button-secondary text-center text-base">The shop</a>
 		</div>
 	{/if}
 </aside>

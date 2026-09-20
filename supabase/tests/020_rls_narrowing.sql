@@ -72,8 +72,4 @@ select test.give_carp(:'hidden_pool', 'Secret', 'leather', 22, 85, 0) as secret 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(20)::text, false);
 select test.assert_that((select count(*) from public.carp where id = :'secret') = 0, 'a private water''s fish are unseen');
-select set_config('request.jwt.claim.sub', test.player(21)::text, false);
-select public.list_carp_for_sale(:'secret', 'auction', 500, null, null, 48);
-select set_config('request.jwt.claim.sub', test.player(20)::text, false);
-select test.assert_that((select count(*) from public.carp where id = :'secret') = 1, 'until it is up for sale');
 reset role;

@@ -8,11 +8,7 @@ select test.give_carp(:'lake', 'Listed Lil', 'common', 24, 90, 5) as listed \gse
 insert into public.catches (lake_id, carp_id, angler_name, weight_lb, swim_name, rig, bait, hook_size) values (:'lake', :'warrior', 'Ada', 38, 'The Point', 'hair', 'boilie', 4);
 
 set role authenticated;
-select set_config('request.jwt.claim.sub', test.player(100)::text, false);
-select public.list_carp_for_sale(:'listed', 'auction', 1000, null, null, 24) as listing \gset
 select set_config('request.jwt.claim.sub', test.player(101)::text, false);
-select public.place_bid(:'listing', 1000);
-select test.assert_that(test.money_of(test.player(101)) < 100000, 'the bid is held');
 select test.assert_refused(format('select public.bury_carp(array[%L]::uuid[], %L)', :'warrior', 'old_age'), 'permission denied for function bury_carp');
 reset role;
 
@@ -23,7 +19,6 @@ select test.assert_that(
 	'the memorial keeps the fish as it was'
 );
 select test.assert_that((select carp_id = :'warrior' from public.catches where angler_name = 'Ada'), 'a catch still points at the dead fish');
-select test.assert_that(test.money_of(test.player(101)) = 100000, 'the bidder on a fish that died gets everything back');
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(101)::text, false);

@@ -1,17 +1,12 @@
-import type { Actions, PageServerLoad } from './$types';
-import { BuyListedCarpNow } from '$lib/server/commands/BuyListedCarpNow';
-import { CancelListing } from '$lib/server/commands/CancelListing';
-import { PlaceBid } from '$lib/server/commands/PlaceBid';
-import { GetListing } from '$lib/server/queries/GetListing';
-import { ListingRefresh } from './listingRefresh';
+import { error, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { requireUser } from '$lib/server/gates/requireUser';
 
-export const load: PageServerLoad = async ({ locals, params, depends }) => {
-	depends(ListingRefresh.Dependency);
-	return { listingPage: await GetListing(locals, params.listingId), loadedAt: new Date().toISOString() };
-};
+const HttpStatus = { NotFound: 404, MovedForGood: 301 } as const;
 
-export const actions: Actions = {
-	bid: ({ locals, request }) => request.formData().then((formData) => PlaceBid(locals, formData)),
-	buyNow: ({ locals, request }) => request.formData().then((formData) => BuyListedCarpNow(locals, formData)),
-	cancel: ({ locals, request }) => request.formData().then((formData) => CancelListing(locals, formData))
+export const load: PageServerLoad = async ({ locals, params }) => {
+	requireUser(locals);
+	const { data: listing } = await locals.supabase.from('listings').select('carp_id').eq('id', params.listingId).maybeSingle();
+	if (!listing) error(HttpStatus.NotFound, 'The fish market has closed and that listing is gone');
+	redirect(HttpStatus.MovedForGood, `/carp/${(listing as { carp_id: string }).carp_id}`);
 };

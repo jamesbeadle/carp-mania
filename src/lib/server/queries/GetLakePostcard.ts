@@ -31,7 +31,6 @@ function postcardNumbersFrom(pin: WorldPin, ownerId: string): PostcardNumbers {
 		acres: pin.acres,
 		heaviestLb: pin.heaviestLb,
 		dayTicketFee: pin.dayTicketFee,
-		listingCount: pin.listingCount,
 		anglersOnBankNow: pin.anglersOnBankNow,
 		ownerName: pin.ownerName,
 		ownerId,

@@ -16,7 +16,7 @@ export function arrivalNotifications(profileId: string, outcomes: DayOutcome[]):
 		profile_id: profileId,
 		kind: 'quarantine_over' as const,
 		title: `${fish.name} is out of quarantine`,
-		body: `${fish.name} can be fished for and listed again.`,
+		body: `${fish.name} can be fished for again.`,
 		link: `/carp/${fish.id}`
 	}));
 	const bigFish = visitorsBigFishNotifications(profileId, outcomes);
