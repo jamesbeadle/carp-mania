@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SwimMoveWords } from '$lib/domain/fishing/movingSwims';
+	import { RuleBookPath } from '$lib/rules/ruleBook';
 	import PlaceSheet from '../stage/PlaceSheet.svelte';
 
 	let { isOpen, onClose }: { isOpen: boolean; onClose: () => void } = $props();
@@ -24,4 +25,5 @@
 			</li>
 		{/each}
 	</ol>
+	<a href={RuleBookPath} class="mt-5 inline-block text-sm text-surge-400 hover:underline">Every rule, in questions and answers — the rule book →</a>
 </PlaceSheet>

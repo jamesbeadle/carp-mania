@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { LegalPages } from '$lib/legal/legalPages';
+	import { RuleBookPath } from '$lib/rules/ruleBook';
 	import MeshBackdrop from './brand/MeshBackdrop.svelte';
 	import Wordmark from './brand/Wordmark.svelte';
 
@@ -22,7 +23,7 @@
 			<p class="mt-4 text-danger-400">Sign-in didn't complete — try again.</p>
 		{/if}
 		<p class="mt-10 text-xs text-mist-400">
-			Free to play, no adverts. {#each LegalPages as page, index (page.path)}{#if index > 0}{' · '}{/if}<a href={page.path} class="hover:text-mist-100 hover:underline">{page.label}</a>{/each}
+			Free to play, no adverts. <a href={RuleBookPath} class="hover:text-mist-100 hover:underline">How it works</a>{#each LegalPages as page (page.path)}{' · '}<a href={page.path} class="hover:text-mist-100 hover:underline">{page.label}</a>{/each}
 		</p>
 	</div>
 </section>
