@@ -1,6 +1,6 @@
 import type { WorkKind } from '$lib/domain/groundworks/workKinds';
 
-export type BuilderTool = 'select' | 'island' | 'bar' | 'deepen' | 'dredge' | 'shelf' | 'reeds' | 'lilies' | 'snag' | 'sanctuary' | 'swim' | 'shore' | 'extend' | 'land' | 'facility';
+export type BuilderTool = 'select' | 'island' | 'bar' | 'deepen' | 'dredge' | 'shelf' | 'reeds' | 'lilies' | 'snag' | 'sanctuary' | 'swim' | 'redraw' | 'shore' | 'extend' | 'land' | 'facility';
 
 export interface ToolProfile {
 	label: string;
@@ -20,6 +20,7 @@ export const ToolCatalogue: Record<BuilderTool, ToolProfile> = {
 	snag: { label: 'Snag', hint: 'Click the water to sink the snag.', kind: 'snag' },
 	sanctuary: { label: 'Sanctuary', hint: 'Click along the bank; click the last point again to finish the stretch. No peg may sit within 60 ft of it.', kind: 'sanctuary' },
 	swim: { label: 'Swim', hint: 'Click the bank to place a new peg.', kind: null },
+	redraw: { label: 'Redraw', hint: 'Click the shoreline where the new bank starts, click along the new line (or nowhere, for a smooth curve), then click the shoreline again to finish.', kind: 'reshape_shoreline' },
 	shore: { label: 'Shore', hint: 'Drag a point of the shoreline to move the bank.', kind: 'reshape_shoreline' },
 	extend: { label: 'Extend', hint: 'Drag anywhere on the shoreline to pull out a new point.', kind: 'reshape_shoreline' },
 	land: { label: 'Land', hint: 'Buy five acres next door; the plot grows around the water.', kind: null },

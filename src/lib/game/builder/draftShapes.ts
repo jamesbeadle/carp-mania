@@ -9,8 +9,10 @@ import { shapeWhileDrawing } from './shapeWhileDrawing';
 
 type Plot = Pick<Lake, 'layout' | 'plot_acres'>;
 
+const RedrawLabel = 'New bank — click the shoreline to finish';
+
 export function draftShapesFor(builder: BuilderState, failures: string[], lake: Plot, swims: Swim[], inProgress: LabelledWork[]): DraftShape[] {
-	return [...inProgressShapesFor(inProgress, lake), ...currentDraftShapes(builder, failures, lake), ...swimShapes(builder, swims)];
+	return [...inProgressShapesFor(inProgress, lake), ...currentDraftShapes(builder, failures, lake), ...bankPathShapes(builder), ...swimShapes(builder, swims)];
 }
 
 export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot): DraftShape[] {
@@ -27,6 +29,14 @@ function currentDraftShapes(builder: BuilderState, failures: string[], lake: Plo
 	const footprint = footprintOf(draft, lake.layout, Number(lake.plot_acres));
 	if (footprint.points.length === 0) return [];
 	return [{ kind: footprint.shape, points: footprint.points, label: workLabelFor(draft), isValid: failures.length === 0 }];
+}
+
+function bankPathShapes(builder: BuilderState): DraftShape[] {
+	const start = builder.bankStart;
+	if (!start) return [];
+	const placed = [start.point, ...builder.bankPath];
+	const points = builder.hover ? [...placed, builder.hover] : placed;
+	return [{ kind: 'polyline', points, label: RedrawLabel, isValid: true, isBeingDrawn: true, handles: placed.map((point) => ({ point, role: 'vertex', isSnapped: false })) }];
 }
 
 function swimShapes(builder: BuilderState, swims: Swim[]): DraftShape[] {

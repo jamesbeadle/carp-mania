@@ -1,3 +1,4 @@
+import type { BankAnchor } from '$lib/domain/groundworks/bankAnchor';
 import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { BuilderTool } from './toolCatalogue';
@@ -12,6 +13,8 @@ export class BuilderState {
 	selectedSwimId = $state<string | null>(null);
 	swimPoint = $state<LayoutPoint | null>(null);
 	draggedVertex = $state<number | null>(null);
+	bankStart = $state<BankAnchor | null>(null);
+	bankPath = $state<LayoutPoint[]>([]);
 	notice = $state<string | null>(null);
 
 	get isReadyToOrder() {
@@ -20,6 +23,10 @@ export class BuilderState {
 
 	get isDrawing() {
 		return this.phase === 'drawing';
+	}
+
+	get isRedrawingTheBank() {
+		return this.bankStart !== null;
 	}
 
 	choose(tool: BuilderTool) {
@@ -33,6 +40,8 @@ export class BuilderState {
 		this.swimPoint = null;
 		this.selectedSwimId = null;
 		this.draggedVertex = null;
+		this.bankStart = null;
+		this.bankPath = [];
 		this.notice = null;
 	}
 
@@ -47,10 +56,16 @@ export class BuilderState {
 	}
 
 	undoLastPoint() {
+		if (this.isRedrawingTheBank) return this.undoBankPoint();
 		const draft = this.draft;
 		if (!this.isDrawing || !draft || !('points' in draft)) return;
 		const points = draft.points.slice(0, -1);
 		if (points.length === 0) return this.clear();
 		this.draft = { ...draft, points };
+	}
+
+	private undoBankPoint() {
+		if (this.bankPath.length === 0) return this.clear();
+		this.bankPath = this.bankPath.slice(0, -1);
 	}
 }

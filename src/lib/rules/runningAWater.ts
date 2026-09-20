@@ -48,7 +48,7 @@ export const RunningAWater: RuleChapter = {
 		},
 		{
 			question: 'What are groundworks?',
-			answer: `The editor for shaping the water: islands, gravel bars, deep holes, margin shelves, reed beds, lily pads, snags, sanctuaries, the swims and the shoreline itself. Each work has a price and takes fishery days to finish; up to ${WorksInProgress.MaximumEarthworks} earthworks run at once, and cancelling one early refunds ${refundShare}%. Features are what make swims worth fishing, and what the game's difficulty reading is built on.`
+			answer: `The editor for shaping the water: islands, gravel bars, deep holes, margin shelves, reed beds, lily pads, snags, sanctuaries, the swims and the shoreline itself. To change the bank, Redraw is the easy way: click the shoreline where the new bank starts, click along the new line or nowhere at all, and click the shoreline again — the stretch between is replaced by a rounded bank. Shore and Extend drag single points. Each work has a price and takes fishery days to finish; up to ${WorksInProgress.MaximumEarthworks} earthworks run at once, and cancelling one early refunds ${refundShare}%. A swim the new bank would leave in the water, or too far from it, has to be moved with Select or taken out first.`
 		},
 		{
 			question: 'What happens while I am away?',
