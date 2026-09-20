@@ -3,27 +3,32 @@
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
 	import GoFishingButton from '../game/GoFishingButton.svelte';
+	import StatRow from '../stats/StatRow.svelte';
 
 	let { waters, anglerName }: { waters: AnglerWater[]; anglerName: string } = $props();
 
 	const AcresDecimals = 1;
+
+	function statsOf(water: AnglerWater) {
+		return [
+			{ label: 'Reputation', value: String(Math.round(Number(water.reputation))), tone: 'volt' as const },
+			{ label: 'Water', value: Number(water.acres).toFixed(AcresDecimals), caption: 'acres' },
+			{ label: 'Day ticket', value: formatMoney(water.day_ticket_fee), caption: 'a day' }
+		];
+	}
 </script>
 
 <section class="panel space-y-6">
 	<p class="stat-label">{anglerName}'s {waters.length > 1 ? 'waters' : 'water'}</p>
 	{#each waters as water (water.id)}
 		<div>
-		<h2 class="mb-4 text-3xl text-volt-300">{water.name}</h2>
-		<dl class="grid grid-cols-3 gap-4 text-sm">
-			<div><dt class="stat-label">Region</dt><dd class="text-mist-100">{RegionCatalogue[water.region].label}</dd></div>
-			<div><dt class="stat-label">Reputation</dt><dd class="text-2xl">{Math.round(Number(water.reputation))}</dd></div>
-			<div><dt class="stat-label">Water</dt><dd class="text-2xl">{Number(water.acres).toFixed(AcresDecimals)} <span class="text-sm text-mist-400">acres</span></dd></div>
-		</dl>
-		<div class="mt-5 flex items-center gap-3">
-			<span class="text-lg text-volt-300">{formatMoney(water.day_ticket_fee)}<span class="text-xs text-mist-400"> / day</span></span>
-			<a href="/lakes/{water.id}" class="button-secondary ml-auto">Look around</a>
-			<GoFishingButton lakeId={water.id} words="Fish here" />
-		</div>
+			<h2 class="text-3xl text-volt-300">{water.name}</h2>
+			<p class="mb-4 text-sm text-mist-400">{RegionCatalogue[water.region].label}</p>
+			<StatRow stats={statsOf(water)} />
+			<div class="mt-5 flex flex-wrap items-center justify-end gap-3">
+				<a href="/lakes/{water.id}" class="button-secondary">Look around</a>
+				<GoFishingButton lakeId={water.id} words="Fish here" />
+			</div>
 		</div>
 	{/each}
 	{#if waters.length === 0}

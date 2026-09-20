@@ -12,7 +12,7 @@
 	import TicketBookPanel from '$lib/components/lake/TicketBookPanel.svelte';
 	import BountyPanel from '$lib/components/lake/BountyPanel.svelte';
 	import SpeciesPanel from '$lib/components/lake/SpeciesPanel.svelte';
-	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
+	import GroundworksTab from '$lib/components/lake/GroundworksTab.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import { PikeRules } from '$lib/domain/economy';
@@ -69,11 +69,5 @@
 {#if activeTab === 'Feed'}<FeedPanel {lake} carpCount={carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel {lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffTeamPanel {lake} bailiffs={data.bailiffs} />{/if}
-{#if activeTab === 'Groundworks'}
-	<p class="mb-4 text-sm text-mist-400">
-		Islands, bars, holes, shelves, reeds, swims and the shoreline are all shaped in the editor.
-		<a href="/lake/works" class="button-primary ml-3 inline-block px-4 py-1.5 text-base">Open the groundworks editor</a>
-	</p>
-	<WorksLedgerPanel inProgress={groundworks.inProgress} ledger={groundworks.ledger} />
-{/if}
+{#if activeTab === 'Groundworks'}<GroundworksTab {groundworks} />{/if}
 {#if activeTab === 'Ledger'}<LedgerPanel visits={fishery.visits} catches={fishery.catches} {carp} />{/if}

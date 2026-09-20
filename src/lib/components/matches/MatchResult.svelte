@@ -16,7 +16,7 @@
 			<li class="rounded-xl border border-carbon-600/80 bg-carbon-900/60 p-3">
 				<p class="stat-label">{TrophyWords[trophy.kind]}</p>
 				<p class="text-xl text-mist-100"><a href="/anglers/{trophy.profile_id}" class="hover:underline">{trophy.angler_name}</a></p>
-				<p class="text-sm text-mist-400">{featOf(trophy)} · {formatMoney(trophy.prize)}</p>
+				<p class="flex flex-wrap items-baseline gap-x-2"><span class="font-display text-2xl leading-none font-extrabold text-volt-300 italic tabular-nums">{formatMoney(trophy.prize)}</span><span class="text-xs text-mist-400">for {featOf(trophy)}</span></p>
 			</li>
 		{/each}
 	</ul>

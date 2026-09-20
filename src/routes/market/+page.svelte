@@ -12,7 +12,7 @@
 
 <svelte:head><title>The tackle shop · Carp Mania</title></svelte:head>
 
-<PlaceBanner kind="shop" title="The tackle shop" blurb="Rods, reels, line, hooks, rigs, leads, tubing and bait, by brand. This counter stocks up to the {TierLabels[shelves.stocksUpTo]} tier; Custom-tier kit is only sold at a water whose shop has earned it. Your rating is {Math.round(shelves.rating)}; you have {formatMoney(shelves.money)}.">
+<PlaceBanner kind="shop" title="The tackle shop" blurb="Stocks up to the {TierLabels[shelves.stocksUpTo]} tier · your rating {Math.round(shelves.rating)} · {formatMoney(shelves.money)} to spend">
 	{#snippet actions()}
 		<a href="/tackle" class="button-secondary text-base">My tackle box</a>
 		<a href="/market/farms" class="button-secondary text-base">The farms</a>

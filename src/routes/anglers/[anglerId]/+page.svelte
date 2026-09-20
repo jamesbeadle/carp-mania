@@ -3,7 +3,7 @@
 	import AnglerAvatar from '$lib/components/angler/AnglerAvatar.svelte';
 	import AnglerWaterCard from '$lib/components/angler/AnglerWaterCard.svelte';
 	import FamousFish from '$lib/components/angler/FamousFish.svelte';
-	import SkillBars from '$lib/components/angler/SkillBars.svelte';
+	import SkillsPanel from '$lib/components/angler/SkillsPanel.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
 	import AnglerRanksLine from '$lib/components/trophy/AnglerRanksLine.svelte';
 	import CatchCards from '$lib/components/trophy/CatchCards.svelte';
@@ -19,6 +19,11 @@
 	const angler = $derived(data.angler);
 	const room = $derived(angler.trophyRoom);
 	const hrefFor = (page: number) => listPathFor(`/anglers/${angler.profile.id}`, {}, page);
+	const headlineStats = $derived([
+		{ label: 'Rating', value: String(Math.round(angler.rating)), tone: 'volt' as const },
+		{ label: 'Landed', value: String(angler.profile.experience), caption: 'fish' },
+		{ label: 'Personal best', value: formatWeight(room.ranks.bestLb) }
+	]);
 </script>
 
 <svelte:head><title>{angler.profile.display_name} · Carp Mania</title></svelte:head>
@@ -44,15 +49,7 @@
 		<AwardsPanel awards={room.awards} />
 	</div>
 	<div class="grid gap-6 lg:grid-cols-2">
-		<section class="panel">
-			<dl class="mb-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-				<div><dt class="stat-label">Rating</dt><dd class="text-xl">{Math.round(angler.rating)}</dd></div>
-				<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.profile.experience}</dd></div>
-				<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(room.ranks.bestLb)}</dd></div>
-			</dl>
-			<h2 class="mb-3 text-xl text-volt-300">Skills</h2>
-			<SkillBars profile={angler.profile} />
-		</section>
+		<SkillsPanel stats={headlineStats} profile={angler.profile} />
 		<AnglerWaterCard waters={angler.waters} anglerName={angler.profile.display_name} />
 		<section class="panel">
 			<h2 class="mb-3 text-xl text-volt-300">Famous fish</h2>

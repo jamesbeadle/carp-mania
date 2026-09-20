@@ -19,7 +19,7 @@
 <div class="mb-4 flex flex-wrap items-end gap-4">
 	<div>
 		<h1 class="text-4xl text-volt-300">Hall of fame</h1>
-		<p class="text-mist-400">What the game remembers: the greatest fish, the anglers who had them, the waters that grew them, and the legends now gone.</p>
+		<p class="text-mist-400">The greatest fish, the anglers who had them, the waters that grew them, and the legends now gone.</p>
 	</div>
 	<a href="/world" class="ml-auto text-sm text-surge-400 hover:underline">← The world</a>
 </div>

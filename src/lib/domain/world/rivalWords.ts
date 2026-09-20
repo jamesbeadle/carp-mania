@@ -15,11 +15,6 @@ function theTopLine(rival: MyRival): string {
 	return `The best fish by any angler is yours — ${formatWeight(rival.standing.bestLb)}. Hold it.`;
 }
 
-export function chaserLine(rival: MyRival): string | null {
-	if (rival.below === null) return null;
-	return `${rival.below.displayName} is ${formatWeight(rival.standing.bestLb - rival.below.bestLb)} behind you.`;
-}
-
 export function placeLine(neighbour: BoardNeighbour): string {
 	return `No. ${neighbour.rank} · ${formatWeight(neighbour.bestLb)}`;
 }

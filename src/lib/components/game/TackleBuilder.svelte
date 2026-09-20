@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { describeTerrain, terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
+	import { terrainInFrontOfSwim } from '$lib/domain/fishing/castTerrain';
 	import { whyTheOwnerRefusesRods } from '$lib/domain/fishing/ownersRules';
 	import { streakWords } from '$lib/domain/fishing/streak';
 	import { defaultRodSetup, isRodSetup, MaximumRods, type RodSetup } from '$lib/domain/tackle/rodSetup';
@@ -7,10 +7,11 @@
 	import { firstOwnedSetup } from '$lib/game/session/firstOwnedSetup';
 	import type { Lake, Swim } from '$lib/domain/types';
 	import type { Season } from '$lib/domain/world/seasons';
-	import { BedTypeLabels, SwimFeatureLabels } from '$lib/format/labels';
+	import AboutToggle from '../stats/AboutToggle.svelte';
 	import RodSetupCard from './RodSetupCard.svelte';
 	import SegmentedChoice from './SegmentedChoice.svelte';
 	import SizeReachLine from './SizeReachLine.svelte';
+	import TackleUpStats from './TackleUpStats.svelte';
 
 	interface Props {
 		lake: Lake;
@@ -51,22 +52,20 @@
 
 <section class="panel mb-4">
 	<p class="stat-label">Tackle up at</p>
-	<h2 class="text-2xl text-volt-300">{swim.name}</h2>
-	<p class="mt-1 text-sm text-mist-400">
-		Straight out in front: {describeTerrain(terrainInFront, BedTypeLabels, SwimFeatureLabels)} · transparency {Math.round(Number(lake.transparency))}% · season: {season.name}
-	</p>
-	<p class="mt-1 hidden text-xs text-mist-400 sm:block">The spot you cast to decides the bottom, the depth and the feature — the readouts below assume the water straight out from the peg.</p>
-	{#if hasSavedRods}
-		<p class="mt-2 text-xs text-volt-300">Your rods are set up as you left them last time. Change anything you like — it's remembered when you start fishing.</p>
-	{/if}
-	<SizeReachLine {lake} {rating} {carpCount} {conditionsShare} terrain={terrainInFront} setup={setups[shownRod]} />
-	<p class="mt-2 text-sm text-volt-300">{streakWords(streakDays)}</p>
-	{#if !isShowingHints}
-		<p class="mt-2 text-xs text-mist-400">Match readouts unlock at craft {HintsUnlockAtCraft}. Until then, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</p>
-	{/if}
-	<div class="mt-3 max-w-xs">
-		<p class="stat-label mb-1">Rods</p>
-		<SegmentedChoice choices={RodCounts} chosen={rodCount} labelFor={(count) => `${count}`} onChoose={(count) => (rodCount = count)} ariaLabel="How many rods" />
+	<h2 class="mb-3 text-2xl text-volt-300">{swim.name}</h2>
+	<TackleUpStats {lake} terrain={terrainInFront} {season} />
+	<div class="mt-4 grid gap-4 md:grid-cols-2">
+		<SizeReachLine {lake} {rating} {carpCount} {conditionsShare} terrain={terrainInFront} setup={setups[shownRod]} />
+		<div class="max-w-xs">
+			<p class="stat-label mb-1">Rods</p>
+			<SegmentedChoice choices={RodCounts} chosen={rodCount} labelFor={(count) => `${count}`} onChoose={(count) => (rodCount = count)} ariaLabel="How many rods" />
+			<p class="mt-2 text-xs text-volt-300">{streakWords(streakDays)}</p>
+			{#if hasSavedRods}<p class="mt-2 text-xs text-volt-300">As you left them last time — changes are remembered when you start fishing.</p>{/if}
+			{#if !isShowingHints}<p class="mt-2 text-xs text-mist-400">Match readouts unlock at craft {HintsUnlockAtCraft}.</p>{/if}
+		</div>
+	</div>
+	<div class="mt-4">
+		<AboutToggle title="About the readouts">The spot you cast to decides the bottom, the depth and the feature; these readouts assume the water straight out from the peg. Until the match readouts unlock, fish it by feel: clear line in clear water, matt hooks, rigs that suit the bottom, bait the lake has been fed on.</AboutToggle>
 	</div>
 </section>
 

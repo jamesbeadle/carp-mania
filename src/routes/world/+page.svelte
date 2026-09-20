@@ -77,7 +77,7 @@
 
 <svelte:head><title>The world · Carp Mania</title></svelte:head>
 
-<PlaceBanner kind="signpost" title="The world" blurb="Every open water in the game, pinned where it is. Spin, zoom, tap a pin.">
+<PlaceBanner kind="signpost" title="The world" blurb="Every open water in the game, pinned where it is · spin, zoom, tap a pin">
 	{#snippet actions()}
 		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>
 		<a href="/matches" class="button-secondary text-base">Matches</a>

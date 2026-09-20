@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { pressureWariness, pressureWords } from '$lib/domain/water/pressure';
+	import { Pressure, pressureWariness, pressureWords } from '$lib/domain/water/pressure';
+	import StatTile from '../stats/StatTile.svelte';
 
 	let { recentCaptures }: { recentCaptures: number } = $props();
 
-	const wariness = $derived(Math.round(pressureWariness(recentCaptures) * 100));
-	const isWary = $derived(wariness > 0);
+	const wariness = $derived(pressureWariness(recentCaptures));
+	const isWary = $derived(recentCaptures >= Pressure.WaryFrom);
+	const tone = $derived(isWary ? ('warning' as const) : ('mist' as const));
+	const caption = $derived(isWary ? `${Math.round(wariness * 100)}% off its take` : 'this week');
 </script>
 
-<span class="text-mist-400" class:text-danger-400={isWary}>· {pressureWords(recentCaptures)}{#if isWary}&nbsp;({wariness}% off its take){/if}</span>
+<StatTile label="Pressure" value="{recentCaptures}×" {caption} verdict={pressureWords(recentCaptures)} share={wariness / Pressure.MostWariness} {tone} />

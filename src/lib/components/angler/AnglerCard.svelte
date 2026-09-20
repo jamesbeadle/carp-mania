@@ -2,9 +2,15 @@
 	import type { AnglerDirectoryEntry } from '$lib/contracts/AnglerDirectory';
 	import { formatWeight } from '$lib/format/weight';
 	import AnglerAvatar from './AnglerAvatar.svelte';
+	import StatRow from '../stats/StatRow.svelte';
 	import SkillBars from './SkillBars.svelte';
 
 	let { angler, rank }: { angler: AnglerDirectoryEntry; rank: number } = $props();
+
+	const stats = $derived([
+		{ label: 'Personal best', value: formatWeight(angler.personalBestLb) },
+		{ label: 'Landed', value: String(angler.totalCatches), caption: 'fish' }
+	]);
 </script>
 
 <article class="panel flex flex-col gap-4">
@@ -20,10 +26,7 @@
 		</div>
 	</div>
 	<SkillBars profile={angler.skills} isCompact />
-	<dl class="grid grid-cols-2 gap-2 text-sm">
-		<div><dt class="stat-label">Personal best</dt><dd class="text-xl">{formatWeight(angler.personalBestLb)}</dd></div>
-		<div><dt class="stat-label">Landed</dt><dd class="text-xl">{angler.totalCatches}</dd></div>
-	</dl>
+	<StatRow {stats} />
 	<p class="mt-auto text-sm text-mist-400">
 		{#if angler.water}
 			Runs <a href="/lakes/{angler.water.id}" class="text-mist-100 hover:underline">{angler.water.name}</a>

@@ -3,6 +3,7 @@
 	import type { Lake } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 	import { LengthChoices, SplitChoices, StartChoices, suggestedTitleFor } from '$lib/game/matches/hostingChoices';
+	import HostMatchCosts from './HostMatchCosts.svelte';
 
 	interface Props {
 		lake: Lake;
@@ -53,19 +54,6 @@
 		<span class="stat-label">The split</span>
 		<select name="mostCatchesShare" class="field mt-1">{#each SplitChoices as choice (choice.share)}<option value={choice.share} selected={choice.share === MatchTerms.Splits[2]}>{choice.label}</option>{/each}</select>
 	</label>
-	<dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 rounded-xl border border-carbon-600/80 bg-carbon-900/60 p-3 text-sm">
-		<dt class="text-mist-400">Booking the water for {lastsHours} hours</dt>
-		<dd class="text-right text-mist-100">{isOwnWater ? 'your own water — nothing' : formatMoney(bookingFee)}</dd>
-		<dt class="text-mist-400">Your stake</dt>
-		<dd class="text-right text-mist-100">{formatMoney(Math.max(0, hostStake))}</dd>
-		<dt class="text-mist-100">To pay now</dt>
-		<dd class="text-right text-xl text-volt-300">{formatMoney(cost)}</dd>
-		<dt class="text-mist-400">Pot with every peg taken ({pegs})</dt>
-		<dd class="text-right text-mist-100">{formatMoney(fullHouse)}</dd>
-	</dl>
-	<p class="text-xs text-mist-400">
-		{isOwnWater ? 'Your own anglers stay away while the match runs, so the day tickets you would have sold are the price.' : `The owner gets the booking fee — six anglers' tickets an hour — and their water is closed to everyone but your entrants.`}
-		You have {formatMoney(money)}.
-	</p>
+	<HostMatchCosts {lastsHours} {bookingFee} hostStake={Math.max(0, hostStake)} {cost} {fullHouse} {pegs} {money} {isOwnWater} />
 	<button class="button-primary" disabled={!canAfford}>{canAfford ? 'Book the match' : `You need ${formatMoney(cost)}`}</button>
 </form>

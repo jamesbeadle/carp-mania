@@ -49,7 +49,7 @@
 <aside class="panel flex flex-col gap-3">
 	{#if !lakeId}
 		<p class="stat-label">Postcard</p>
-		<p class="text-sm text-mist-400">Click a pin for a postcard: a live look at the water, its numbers, and the buttons to fish it.</p>
+		<p class="text-sm text-mist-400">Tap a pin for its postcard.</p>
 	{:else if failure}
 		<p class="stat-label">Postcard</p>
 		<p class="text-sm text-danger-400">{failure}</p>

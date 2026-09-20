@@ -20,7 +20,7 @@
 
 <section class="panel">
 	<h2 class="text-2xl text-volt-300">Biggest fish caught by an angler</h2>
-	<p class="mb-3 text-xs text-mist-400">Anglers only — the angler who had it and the owner of the water it came from, remembered together.</p>
+	<p class="mb-3 text-xs text-mist-400">Anglers only · the owner of the water credited alongside.</p>
 	{#if catches.length === 0}
 		<p class="text-sm text-mist-400">Nothing on the board yet — the first great fish is still out there.</p>
 	{:else}
@@ -45,9 +45,9 @@
 	<p class="mt-3 text-sm text-volt-300">{words}</p>
 	{#if visitorsBest}
 		<p class="mt-2 text-xs text-mist-400/80">
-			Visitors' best, for the record: {formatWeight(visitorsBest.weightLb)}
+			Visitors' best: {formatWeight(visitorsBest.weightLb)}
 			{#if visitorsBest.carpId}<a href="/carp/{visitorsBest.carpId}" class="hover:underline">at {visitorsBest.lakeName}</a>{:else}at {visitorsBest.lakeName}{/if}
-			by {visitorsBest.anglerName}, {formatWhen(visitorsBest.caughtAt)}. Visitors keep the fishery busy; they never hold a record.
+			by {visitorsBest.anglerName}, {formatWhen(visitorsBest.caughtAt)} — a visitor never holds a record.
 		</p>
 	{/if}
 </section>
