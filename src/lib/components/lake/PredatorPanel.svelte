@@ -4,7 +4,7 @@
 	import type { Lake } from '$lib/domain/types';
 	import { formatMoney } from '$lib/format/money';
 	import StatRow from '../stats/StatRow.svelte';
-	import AboutToggle from './AboutToggle.svelte';
+	import AboutToggle from '../stats/AboutToggle.svelte';
 
 	let { lake, sickCarpCount }: { lake: Lake; sickCarpCount: number } = $props();
 

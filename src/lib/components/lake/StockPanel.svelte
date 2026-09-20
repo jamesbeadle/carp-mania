@@ -2,7 +2,7 @@
 	import { isBandOf, type SizeBandName } from '$lib/domain/stock/stockBySize';
 	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp, Lake } from '$lib/domain/types';
-	import AboutToggle from './AboutToggle.svelte';
+	import AboutToggle from '../stats/AboutToggle.svelte';
 	import ShoalRow from './ShoalRow.svelte';
 	import StockActions from './StockActions.svelte';
 	import StockBySize from './StockBySize.svelte';

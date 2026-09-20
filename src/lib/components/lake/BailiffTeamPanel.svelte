@@ -3,7 +3,7 @@
 	import { BailiffTerms } from '$lib/domain/bailiffs/bailiffTeam';
 	import type { Lake } from '$lib/domain/types';
 	import WaterQualityBars from '../WaterQualityBars.svelte';
-	import AboutToggle from './AboutToggle.svelte';
+	import AboutToggle from '../stats/AboutToggle.svelte';
 	import BailiffCard from './BailiffCard.svelte';
 	import BailiffStats from './BailiffStats.svelte';
 	import CandidateCard from './CandidateCard.svelte';

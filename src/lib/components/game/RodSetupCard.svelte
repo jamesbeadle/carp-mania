@@ -7,6 +7,7 @@
 	import type { OwnedItem } from '$lib/domain/tackle/tackleBox';
 	import type { Terrain } from '$lib/domain/layout/terrainAt';
 	import type { Lake } from '$lib/domain/types';
+	import StatRow from '../stats/StatRow.svelte';
 	import MatchReadout from './MatchReadout.svelte';
 	import RodWarnings from './RodWarnings.svelte';
 	import SlotSelect from './SlotSelect.svelte';
@@ -26,6 +27,7 @@
 	const SlotLabels: Record<TackleKind, string> = { rod: 'Rod', reel: 'Reel', line: 'Line', hook: 'Hook', rig: 'Rig', lead: 'Lead', tubing: 'Tubing', bait: 'Bait' };
 	const kit = $derived(kitOf(setup));
 	const match = $derived(kit ? matchTackleToWater(kit, lake, terrain) : null);
+	const reachStats = $derived(kit ? [{ label: 'Casts', value: `${castDistanceFeet(kit)} ft` }, { label: 'Lands up to', value: `${landsUpToLb(kit.rod.rod)} lb` }] : []);
 </script>
 
 <section class="panel space-y-3">
@@ -39,7 +41,7 @@
 		{/each}
 	</div>
 	{#if kit}
-		<p class="text-xs text-mist-400">Casts {castDistanceFeet(kit)} ft · lands up to {landsUpToLb(kit.rod.rod)} lb</p>
+		<StatRow stats={reachStats} />
 		<RodWarnings {kit} {box} />
 	{/if}
 	{#if isShowingHints && match}<MatchReadout {match} />{/if}

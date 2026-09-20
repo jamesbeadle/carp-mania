@@ -2,7 +2,7 @@
 	import { DayTicketHoursPerPrice, type TicketProduct } from '$lib/domain/fishing/ticketBook';
 	import { anglersArrivingToday, willingnessToPayFor } from '$lib/domain/simulation/visitingAnglers';
 	import type { Lake } from '$lib/domain/types';
-	import AboutToggle from './AboutToggle.svelte';
+	import AboutToggle from '../stats/AboutToggle.svelte';
 	import AddTicketForm from './AddTicketForm.svelte';
 	import BookingSwitches from './BookingSwitches.svelte';
 	import TicketBookStats from './TicketBookStats.svelte';

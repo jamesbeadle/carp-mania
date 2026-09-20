@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { StrainCatalogue } from '$lib/domain/strains';
 	import { formatFishingHour } from '$lib/domain/fishing/sessionClock';
 	import { drawCarpPortrait } from '$lib/game/render/drawCarpPortrait';
 	import type { CatchReportOutcome, LandedFish } from '$lib/game/session/landFish';
-	import { SwimFeatureLabels } from '$lib/format/labels';
 	import AwardRibbons from './AwardRibbons.svelte';
+	import CatchPhotoStats from './CatchPhotoStats.svelte';
 	import HonourRibbons from './HonourRibbons.svelte';
 	import ScalesReadout from './ScalesReadout.svelte';
 
@@ -13,8 +12,6 @@
 	let canvas: HTMLCanvasElement;
 	let isWeighed = $state(false);
 	const PhotoSize = { Width: 520, Height: 320 } as const;
-	const isNewToTheBook = $derived(!landed.carp.is_catalogued);
-	const spot = $derived(`${SwimFeatureLabels[landed.terrain.feature].toLowerCase()} in ${landed.terrain.depthFeet} ft`);
 
 	$effect(() => {
 		const context = canvas.getContext('2d');
@@ -39,12 +36,9 @@
 		{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} bountyWon={catchOutcome.bountyWon} />{/if}
 	{/if}
 	<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
+	<p class="text-xs text-mist-400">{anglerName} at {lakeName}</p>
 	{#if isWeighed}
-		<p class="text-sm text-mist-200">
-			A {StrainCatalogue[landed.carp.strain].label.toLowerCase()} carp for {anglerName} at {lakeName}, from {landed.swim.name}, cast to the {spot}.
-			{#if isNewToTheBook}Nobody had seen this fish before — it's now in the book as {landed.carp.name}.{:else if landed.carp.times_caught === 0}First time this fish has been on the bank.{:else}Caught {landed.carp.times_caught} times before.{/if}
-			{#if landed.carp.fame > 0}<span class="text-volt-300">Fame {landed.carp.fame}.</span>{/if}
-		</p>
+		<CatchPhotoStats {landed} />
 		<p class="text-xs text-mist-400">
 			{#if catchOutcome === null}Saving the catch report…{:else if catchOutcome.isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}<span class="text-danger-400">The catch report could not be saved: {catchOutcome.reason}.</span>{/if}
 		</p>

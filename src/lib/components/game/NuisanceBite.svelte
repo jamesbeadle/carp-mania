@@ -8,5 +8,5 @@
 </script>
 
 {#if nuisance.length > 0}
-	<p class="text-sm text-mist-400">Nuisance bites: {words} — none of them count.</p>
+	<p class="text-xs text-mist-400">Nuisance bites — {words}.</p>
 {/if}

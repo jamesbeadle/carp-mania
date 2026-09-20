@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { productLabel, ticketCostOf, type TicketProduct } from '$lib/domain/fishing/ticketBook';
+	import type { TicketProduct } from '$lib/domain/fishing/ticketBook';
 	import { weatherWords } from '$lib/domain/fishing/weatherConditions';
+	import { headCountIn } from '$lib/domain/stock/headCount';
 	import type { Shoal } from '$lib/domain/stock/shoals';
 	import { stockBySize, type SizeCount } from '$lib/domain/stock/stockBySize';
 	import type { Carp, Lake } from '$lib/domain/types';
-	import { nextFreeDay, dayWords, type DiaryDay } from '$lib/domain/water/bookings';
-	import { syndicateWords, isSyndicateWater } from '$lib/domain/water/syndicate';
+	import type { DiaryDay } from '$lib/domain/water/bookings';
 	import { weatherFor } from '$lib/domain/world/weather';
-	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
+	import StatRow from '../stats/StatRow.svelte';
+	import { gettingOnStat } from './gettingOn';
+	import { ticketsFromStat } from './ticketsFrom';
 
 	interface Props {
 		lake: Lake;
@@ -21,35 +23,31 @@
 
 	let { lake, carp, shoals, book, diary, now }: Props = $props();
 
+	const NothingYet = '—';
 	const heaviest = $derived(carp.reduce((best, fish) => Math.max(best, Number(fish.weight_lb)), 0));
 	const bands = $derived(stockBySize(carp, shoals).filter((line) => line.count > 0));
-	const nextFree = $derived(nextFreeDay(diary));
-	const walkOnWords = $derived(walkOn());
-	const onSale = $derived(book.filter((product) => product.is_on_sale));
 	const bandWords = $derived(bands.map(bandLine).join(' · '));
+	const gettingOn = $derived(gettingOnStat(lake, diary, now));
+	const stats = $derived([
+		{ label: 'Biggest', value: heaviest > 0 ? formatWeight(heaviest) : NothingYet, tone: 'volt' as const },
+		{ label: 'Stock', value: String(headCountIn(carp, shoals)), caption: 'carp' },
+		{ ...ticketsFromStat(book), label: 'From' },
+		{ label: gettingOn.label, value: gettingOn.value }
+	]);
+	const lines = $derived([
+		{ label: 'Sizes', words: bandWords || 'nothing stocked yet' },
+		{ label: gettingOn.value, words: gettingOn.caption },
+		{ label: 'Today', words: weatherWords(weatherFor(lake, now)) }
+	]);
 
 	function bandLine(line: SizeCount) {
-		const label = line.band.label.toLowerCase();
-		return `${line.count} ${label}`;
-	}
-
-	function walkOn() {
-		if (isSyndicateWater(lake)) return syndicateWords(lake);
-		if (!lake.is_booking_on) return 'Walk on — buy a ticket when you arrive.';
-		return nextFree ? `Advance booking — next free peg ${dayWords(nextFree, now).toLowerCase()}.` : 'Advance booking — full for the week.';
+		return `${line.count} ${line.band.label.toLowerCase()}`;
 	}
 </script>
 
-<div class="grid gap-3 sm:grid-cols-2">
-	<div class="rounded-xl border border-carbon-700/60 bg-carbon-900/60 p-4">
-		<p class="stat-label">The best fish in it</p>
-		<p class="text-2xl text-volt-300">{heaviest > 0 ? formatWeight(heaviest) : 'Nothing landed yet'}</p>
-		<p class="mt-1 text-xs text-mist-400">{bandWords}</p>
-	</div>
-	<div class="rounded-xl border border-carbon-700/60 bg-carbon-900/60 p-4">
-		<p class="stat-label">Getting on</p>
-		<p class="text-sm text-mist-100">{walkOnWords}</p>
-		<p class="mt-1 text-xs text-mist-400">{onSale.map((product) => `${productLabel(product)} ${formatMoney(ticketCostOf(product))}`).join(' · ')}</p>
-		<p class="mt-1 text-xs text-mist-400">Today: {weatherWords(weatherFor(lake, now))}.</p>
-	</div>
-</div>
+<StatRow {stats} />
+<dl class="mt-3 space-y-1 text-xs text-mist-400">
+	{#each lines as line (line.label)}
+		<div class="flex flex-wrap items-baseline gap-x-2"><dt class="stat-label">{line.label}</dt><dd>{line.words}</dd></div>
+	{/each}
+</dl>

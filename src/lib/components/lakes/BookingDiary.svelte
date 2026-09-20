@@ -3,7 +3,9 @@
 	import type { Lake } from '$lib/domain/types';
 	import { dayWords, type DiaryDay } from '$lib/domain/water/bookings';
 	import { untrack } from 'svelte';
+	import StatRow from '../stats/StatRow.svelte';
 	import PegRow from './PegRow.svelte';
+	import { ticketsFromStat } from './ticketsFrom';
 
 	let { lake, diary }: { lake: Lake; diary: BookingDiary } = $props();
 
@@ -15,6 +17,12 @@
 	const myBookingsToday = $derived(diary.myBookings.filter((booking) => booking.fishery_day === chosenDay));
 	const myPegsToday = $derived(myBookingsToday.map((booking) => booking.swim_id));
 	const isChosen = (candidate: DiaryDay) => candidate.fisheryDay === chosenDay;
+	const stats = $derived([
+		{ label: 'Free pegs', value: String(day?.freePegs ?? 0), caption: `of ${diary.swims.length}`, tone: 'volt' as const },
+		{ label: 'Yours', value: String(myPegsToday.length), caption: 'that day' },
+		ticketsFromStat(diary.book),
+		{ label: 'Bookable', value: String(days.length), caption: 'days ahead' }
+	]);
 </script>
 
 <section class="panel">
@@ -28,6 +36,7 @@
 				</button>
 			{/each}
 		</div>
+		<div class="mb-4"><StatRow {stats} /></div>
 		{#if day}
 			<ul class="divide-y divide-carbon-700/60">
 				{#each diary.swims as swim (swim.id)}

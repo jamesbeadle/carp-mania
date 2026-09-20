@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { MatchPage } from '$lib/contracts/MatchPage';
 	import { formatMoney } from '$lib/format/money';
-	import { pegsWords } from '$lib/game/matches/matchWords';
 	import GoFishingButton from '../game/GoFishingButton.svelte';
+	import AboutToggle from '../stats/AboutToggle.svelte';
+	import StatRow from '../stats/StatRow.svelte';
 
 	let { page }: { page: MatchPage } = $props();
 
@@ -11,23 +12,22 @@
 	const isOpen = $derived(card.phase === 'upcoming' || card.phase === 'in_play');
 	const canCancel = $derived(card.isHost && card.phase === 'upcoming');
 	const canFishNow = $derived(card.isEntered && card.phase === 'in_play');
-	const entryWords = $derived(Number(match.entry_fee) === 0 ? 'Free to enter' : `${formatMoney(match.entry_fee)} to enter`);
+	const entryWords = $derived(Number(match.entry_fee) === 0 ? 'free to enter' : `${formatMoney(match.entry_fee)} to enter`);
+	const stats = $derived([
+		{ label: 'Most fish', value: formatMoney(page.prizes.mostCatches), caption: `${match.most_catches_share}%` },
+		{ label: 'Biggest', value: formatMoney(page.prizes.biggestFish) },
+		{ label: "Host's stake", value: formatMoney(match.host_stake) },
+		{ label: 'Entries', value: String(card.entryCount), caption: `of ${match.pegs} pegs` }
+	]);
 </script>
 
 <section class="panel self-start">
 	<p class="stat-label">The pot</p>
-	<p class="mb-3 text-4xl text-volt-300">{formatMoney(card.pot)}</p>
-	<dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm">
-		<dt class="text-mist-400">Most catches</dt>
-		<dd class="text-right text-mist-100">{formatMoney(page.prizes.mostCatches)} <span class="text-xs text-mist-400">({match.most_catches_share}%)</span></dd>
-		<dt class="text-mist-400">Biggest fish</dt>
-		<dd class="text-right text-mist-100">{formatMoney(page.prizes.biggestFish)}</dd>
-		<dt class="text-mist-400">Host's stake</dt>
-		<dd class="text-right text-mist-100">{formatMoney(match.host_stake)}</dd>
-		<dt class="text-mist-400">Entries</dt>
-		<dd class="text-right text-mist-100">{pegsWords(card.entryCount, match.pegs)}</dd>
-	</dl>
-	{#if isOpen}<p class="mt-3 text-xs text-mist-400">{entryWords}. Every entry fee goes in the pot; ties share the prize. The water is closed to everyone else while the match runs, and entrants fish it without a day ticket.</p>{/if}
+	<p class="mb-3 flex flex-wrap items-baseline gap-x-2"><span class="text-4xl text-volt-300">{formatMoney(card.pot)}</span>{#if isOpen}<span class="text-xs text-mist-400">{entryWords}</span>{/if}</p>
+	<StatRow {stats} />
+	{#if isOpen}
+		<div class="mt-3"><AboutToggle title="About the pot">Every entry fee goes in the pot; ties share the prize. The water is closed to everyone else while the match runs, and entrants fish it without a day ticket.</AboutToggle></div>
+	{/if}
 
 	{#if canFishNow}
 		<div class="mt-4"><GoFishingButton lakeId={match.lake_id} words="Fish the match" buttonClass="button-primary block w-full text-center" /></div>
