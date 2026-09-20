@@ -1,7 +1,7 @@
 import { startNoise } from '../synth/noise';
 import { rampGain, startLfo, type AmbientLayer } from './ambientLayer';
 
-const Lap = { BandHertz: 640, Q: 0.8, PeakGain: 0.1, SwellHertz: 0.17, SwellDepth: 0.5, RippleHertz: 0.9, RippleDepth: 0.15 } as const;
+const Lap = { BandHertz: 640, Q: 0.8, PeakGain: 0.09, SwellHertz: 0.11, SwellDepth: 0.35, RippleHertz: 0.07, RippleDepth: 0.2 } as const;
 
 export function startWaterLap(context: AudioContext, destination: AudioNode): AmbientLayer {
 	const noise = startNoise(context, 'white');

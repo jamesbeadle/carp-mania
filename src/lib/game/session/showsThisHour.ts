@@ -6,8 +6,7 @@ import { showingSpotsFor } from './showingFish';
 
 type Water = Pick<Lake, 'layout' | 'plot_acres'>;
 
-export function spotsShowingNow(session: SessionState, water: Water): LayoutPoint[] {
-	const hourOfShows = Math.floor(session.hour);
+export function spotsShowingInTheHour(session: SessionState, water: Water, hourOfShows: number): LayoutPoint[] {
 	const shows = showsThisHour(session.seed, hourOfShows, session.carp, session.watercraft);
 	return showingSpotsFor(water, shows, session.season);
 }

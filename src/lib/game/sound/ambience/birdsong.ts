@@ -1,7 +1,7 @@
 import type { AmbientLayer } from './ambientLayer';
 import { owlHoot, singPhrase, Songbirds } from './birdSpecies';
 
-const Chorus = { ShortestGapSeconds: 1.5, LongestGapSeconds: 7, QuietCheckSeconds: 4 } as const;
+const Chorus = { ShortestGapSeconds: 5, LongestGapSeconds: 20, QuietCheckSeconds: 6 } as const;
 const Owl = { ShortestGapSeconds: 18, LongestGapSeconds: 45, Gain: 0.05 } as const;
 const Pan = { Spread: 0.8 } as const;
 
