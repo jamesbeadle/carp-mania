@@ -1,6 +1,7 @@
 import { MagicHours } from '$lib/domain/fishing/magicHours';
 import { SwimMoveWords } from '$lib/domain/fishing/movingSwims';
 import { ShowingFish } from '$lib/domain/fishing/showingFish';
+import { Streak } from '$lib/domain/fishing/streak';
 import { StrikeWindow } from '$lib/domain/fishing/strikeWindow';
 import { hoursOf, MultiDay, TicketKindCatalogue, TicketKinds } from '$lib/domain/fishing/ticketBook';
 import { MaximumRods, SetupSlots } from '$lib/domain/tackle/rodSetup';
@@ -34,6 +35,10 @@ export const FishingASession: RuleChapter = {
 		{
 			question: 'When do the fish bite?',
 			answer: `Bites come at dawn and dusk more than the middle of the day, and the size of what bites follows the clock too. ${magicLines} The weather on the day and the season shift it: summer bites come fast in the shallows, winter fish sit in the deepest water.`
+		},
+		{
+			question: 'What is a streak?',
+			answer: `Days in a row with a ticket bought. Day one is an ordinary day; every consecutive day after it adds ${Math.round(Streak.BitesPerDay * 100)}% to how often the fish bite, up to day ${Streak.MostDays} (×${(1 + (Streak.MostDays - 1) * Streak.BitesPerDay).toFixed(1)}). Miss a day and it starts again from one. The pill in the clock strip shows the day you are on.`
 		},
 		{
 			question: 'What do I do when the alarm goes?',

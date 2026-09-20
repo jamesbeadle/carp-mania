@@ -4,7 +4,7 @@ import type { Lake } from '../types';
 import { overallWaterQuality, WaterScale } from '../waterQuality';
 import { timeOfDayBiteFactor } from './sessionClock';
 
-export const BaseBitesPerRodHour = 0.19;
+export const BaseBitesPerRodHour = 0.135;
 export const CountPull = { CompetentRating: 50, CompetentMatch: 0.55, CraftSwing: 0.06, TackleSwing: 0.08 } as const;
 const MaximumChancePerHour = 0.9;
 const SmallestAcres = 0.1;
@@ -20,9 +20,10 @@ const Feeding = {
 export interface BiteConditions {
 	spotFactor: number;
 	seasonFactor: number;
+	streakFactor: number;
 }
 
-export const NeutralBiteConditions: BiteConditions = { spotFactor: 1, seasonFactor: 1 };
+export const NeutralBiteConditions: BiteConditions = { spotFactor: 1, seasonFactor: 1, streakFactor: 1 };
 
 export function lakeHungerFactor(lake: Pick<Lake, 'feed_stock' | 'acres'>) {
 	const acres = Math.max(SmallestAcres, Number(lake.acres));
@@ -58,6 +59,7 @@ export function biteChanceForOneHour(lake: Lake, tackleMatchOverall: number, rat
 		craftCountFactor(rating) *
 		timeOfDayBiteFactor(hour) *
 		conditions.spotFactor *
-		conditions.seasonFactor;
+		conditions.seasonFactor *
+		conditions.streakFactor;
 	return Math.min(MaximumChancePerHour, chance);
 }

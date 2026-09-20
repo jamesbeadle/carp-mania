@@ -37,6 +37,7 @@ export interface VisitFacts {
 	readonly species: LakeSpecies[];
 	readonly nuisanceShare: number;
 	readonly rating: number;
+	readonly streakDays: number;
 }
 
 export function visitFactsOf(setup: SessionSetup): VisitFacts {
@@ -60,6 +61,7 @@ export function visitFactsOf(setup: SessionSetup): VisitFacts {
 		recentCaptures: visit.recentCaptures,
 		species,
 		nuisanceShare: nuisanceBiteShare(species, Number(lake.acres)),
+		streakDays: visit.streakDays,
 		rating: anglerRatingOf(skillsOfProfile(profile), bar.pedigreeLb).rating
 	};
 }
