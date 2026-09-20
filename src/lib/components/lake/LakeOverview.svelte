@@ -1,9 +1,11 @@
 <script lang="ts">
-	import type { Lake, Profile } from '$lib/domain/types';
+	import type { Shoal } from '$lib/domain/stock/shoals';
+	import type { Carp, Lake, Profile } from '$lib/domain/types';
+	import DifficultyReading from './DifficultyReading.svelte';
 	import { anglersArrivingToday, willingnessToPayFor } from '$lib/domain/simulation/visitingAnglers';
 	import { formatMoney } from '$lib/format/money';
 
-	let { lake, profile }: { lake: Lake; profile: Profile } = $props();
+	let { lake, profile, carp = [], shoals = [] }: { lake: Lake; profile: Profile; carp?: Carp[]; shoals?: Shoal[] } = $props();
 
 	const anglersToday = $derived(anglersArrivingToday(lake));
 	const willingness = $derived(willingnessToPayFor(Number(lake.reputation)));
@@ -20,4 +22,5 @@
 		<div><dt class="stat-label">Anglers a day</dt><dd class="text-2xl">{anglersToday}</dd></div>
 		<div><dt class="stat-label">They'll pay up to</dt><dd class="text-2xl">{formatMoney(willingness)}</dd></div>
 	</dl>
+	<div class="mt-4"><DifficultyReading {lake} {carp} {shoals} isOwner /></div>
 </section>

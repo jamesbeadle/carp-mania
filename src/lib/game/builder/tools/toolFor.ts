@@ -8,6 +8,7 @@ import { islandTool } from './island';
 import { landTool } from './land';
 import { liliesTool } from './lilies';
 import { reedsTool } from './reeds';
+import { sanctuaryTool } from './sanctuary';
 import { selectTool } from './select';
 import { shelfTool } from './shelf';
 import { shoreTool } from './shore';
@@ -25,6 +26,7 @@ const HandlersByTool: Record<BuilderTool, ToolHandlers> = {
 	reeds: reedsTool,
 	lilies: liliesTool,
 	snag: snagTool,
+	sanctuary: sanctuaryTool,
 	swim: swimTool,
 	shore: shoreTool,
 	extend: extendTool,

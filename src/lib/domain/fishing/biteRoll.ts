@@ -9,6 +9,7 @@ import { biteChanceForOneHour } from './biteChance';
 import { mix } from './sessionSeed';
 import { hourOfDay } from './sessionWindow';
 import { spotBiteFactor } from './spotFactor';
+import { spotSpreadFactor } from './spotSpread';
 import { matchTackleToWater } from './tackleMatch';
 
 const MinutesPerHour = 60;
@@ -31,6 +32,7 @@ export interface WaterToday {
 	season: Season;
 	weather: Weather;
 	shoals: Shoal[];
+	difficulty: number;
 }
 
 export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: RodInTheWater, water: WaterToday): BiteRoll {
@@ -48,7 +50,8 @@ export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: R
 export function biteChanceThisHour(hour: number, rod: RodInTheWater, water: WaterToday) {
 	const match = matchTackleToWater(rod.kit, water.lake, rod.terrain);
 	const season = water.season;
-	const conditions = { spotFactor: spotBiteFactor(rod.terrain, season), seasonFactor: season.biteFactor };
+	const spot = spotBiteFactor(rod.terrain, season);
+	const conditions = { spotFactor: spot * spotSpreadFactor(water.difficulty, spot), seasonFactor: season.biteFactor };
 	return biteChanceForOneHour(water.lake, match.overall, water.rating, hourOfDay(hour), conditions);
 }
 

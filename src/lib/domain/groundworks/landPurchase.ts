@@ -1,7 +1,7 @@
 import type { Lake } from '../types';
 import { landPriceFor } from '../world/regions';
 
-export const LandPurchase = { AcresPerPurchase: 5, MaximumPlotAcres: 40 } as const;
+export const LandPurchase = { AcresPerPurchase: 5, MaximumPlotAcres: 200 } as const;
 
 export interface LandQuote {
 	acres: number;

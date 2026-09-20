@@ -3,7 +3,8 @@ import { CancelGroundworks } from '$lib/server/commands/CancelGroundworks';
 import { CancelListing } from '$lib/server/commands/CancelListing';
 import { FeedLake } from '$lib/server/commands/FeedLake';
 import { ListFishForSale } from '$lib/server/commands/ListFishForSale';
-import { DismissBailiff, HireBailiff } from '$lib/server/commands/ManageBailiff';
+import { HireBailiff } from '$lib/server/commands/HireBailiff';
+import { SackBailiff } from '$lib/server/commands/SackBailiff';
 import { MoveFishToMyWater } from '$lib/server/commands/MoveFishToMyWater';
 import { RenameLake } from '$lib/server/commands/RenameLake';
 import { SellFishToDealer } from '$lib/server/commands/SellFishToDealer';
@@ -19,6 +20,7 @@ import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
 import { GetMyMarketActivity } from '$lib/server/queries/GetMyMarketActivity';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
+import { GetBailiffs } from '$lib/server/queries/GetBailiffs';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -27,8 +29,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const [fishery, profile, groundworks, marketActivity, waters] = await Promise.all([
 		GetMyFishery(locals), loadProfile(locals), GetMyGroundworks(locals), GetMyMarketActivity(locals), loadMyWaters(locals, user.id)
 	]);
-	const book = await GetTicketBook(locals, fishery.lake.id);
-	return { fishery, profile, whileAway, groundworks, marketActivity, waters, book, loadedAt: new Date().toISOString() };
+	const [book, bailiffs] = await Promise.all([GetTicketBook(locals, fishery.lake.id), GetBailiffs(locals)]);
+	return { fishery, profile, whileAway, groundworks, marketActivity, waters, book, bailiffs, loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {
@@ -37,8 +39,8 @@ export const actions: Actions = {
 	sellShoalFish: ({ locals, request }) => request.formData().then((formData) => SellShoalFish(locals, formData)),
 	stockPike: ({ locals, request }) => request.formData().then((formData) => StockPike(locals, formData)),
 	stockPikeFood: ({ locals, request }) => request.formData().then((formData) => StockPikeFood(locals, formData)),
-	hireBailiff: ({ locals }) => HireBailiff(locals),
-	dismissBailiff: ({ locals }) => DismissBailiff(locals),
+	hireBailiff: ({ locals, request }) => request.formData().then((formData) => HireBailiff(locals, formData)),
+	sackBailiff: ({ locals, request }) => request.formData().then((formData) => SackBailiff(locals, formData)),
 	addTicket: ({ locals, request }) => request.formData().then((formData) => AddTicketProduct(locals, formData)),
 	removeTicket: ({ locals, request }) => request.formData().then((formData) => RemoveTicketProduct(locals, formData)),
 	setBarbedRule: ({ locals, request }) => request.formData().then((formData) => SetBarbedRule(locals, formData)),

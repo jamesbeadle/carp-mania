@@ -1,3 +1,5 @@
+import { Facilities, type Facility } from '../layout/layoutTypes';
+import { FacilityCatalogue } from './facilities';
 import type { IslandSize, WorkKind } from './workKinds';
 
 export interface WorkProfile {
@@ -16,10 +18,14 @@ export const GroundworksCatalogue: Record<WorkKind, WorkProfile> = {
 	lily_pads: { label: 'Plant lily pads', blurb: 'A summer holding spot in water no deeper than 6 ft. Dormant in winter.', disturbance: 0 },
 	snag: { label: 'Sink a snag', blurb: 'A fallen tree. Big fish hold there; one hooked fish in ten finds it.', disturbance: 0 },
 	reshape_shoreline: { label: 'Reshape the shoreline', blurb: 'Drag the bank. Water you add is dug at the going rate.', disturbance: 5 },
-	car_park: { label: 'Car park and track', blurb: 'Fifteen percent more anglers turn up when they can park.', disturbance: 0 },
-	lodge: { label: 'Lodge', blurb: 'Bacon rolls and bait. Four pounds a head from every angler.', disturbance: 0 },
-	aerator: { label: 'Aerator', blurb: 'No heatwave losses and a little cleaner water, for fifteen pounds a day.', disturbance: 0 }
+	sanctuary: { label: 'Mark a sanctuary', blurb: 'A stretch of bank with no pegs. Costs nothing but pegs; big fish favour it.', disturbance: 0 },
+	...facilityWorks()
 };
+
+function facilityWorks(): Record<Facility, WorkProfile> {
+	const entries = Facilities.map((facility) => [facility, { ...FacilityCatalogue[facility], disturbance: 0 }]);
+	return Object.fromEntries(entries) as Record<Facility, WorkProfile>;
+}
 
 export const IslandWorks: Record<IslandSize, { cost: number; days: number; acres: number }> = {
 	small: { cost: 3500, days: 6, acres: 0.15 },
@@ -36,9 +42,7 @@ export const WorkPrices = {
 	LilyPads: { cost: 600, days: 3, maximumAcres: 0.25, maximumDepthFeet: 6 },
 	Snag: { cost: 700, days: 1, minimumFeetFromBank: 30 },
 	Shoreline: { costPerHundredFeetMoved: 900, daysPerHundredFeetMoved: 3, digCostPerAcreAdded: 3500, digDaysPerAcreAdded: 8, disturbancePerAcreAdded: 10 },
-	CarPark: { cost: 4000, days: 4 },
-	Lodge: { cost: 12000, days: 10 },
-	Aerator: { cost: 2500, days: 2 },
+	Sanctuary: { cost: 0, days: 1, pegFreeFeet: 60 },
 	BarDepth: { minimumFeet: 3, maximumFeet: 5 }
 } as const;
 

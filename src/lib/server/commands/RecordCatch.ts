@@ -4,6 +4,7 @@ import { anglerRatingOf } from '$lib/domain/anglerRating';
 import type { WaterToday } from '$lib/domain/fishing/biteRoll';
 import { isDayTicketStillValid } from '$lib/domain/fishing/dayTicket';
 import type { Taker } from '$lib/domain/fishing/takers';
+import { difficultyOfWater } from '$lib/domain/fishing/waterDifficulty';
 import { takerForRolledBite } from '$lib/domain/fishing/whoTookTheBait';
 import { carpNameForIndex } from '$lib/domain/naming/carpNames';
 import type { Carp, Profile } from '$lib/domain/types';
@@ -67,7 +68,8 @@ function takerThatWasRolled(report: CatchReport, visit: VisitOnRecord, water: Wa
 		watercraft: skills.watercraft,
 		season: seasonFor(water.lake, visitedAt),
 		weather: weatherFor(water.lake, visitedAt),
-		shoals: water.shoals
+		shoals: water.shoals,
+		difficulty: difficultyOfWater(water.lake, water.carp, water.shoals)
 	};
 	return takerForRolledBite({ ...report, seed: visit.seed }, today, water.carp);
 }

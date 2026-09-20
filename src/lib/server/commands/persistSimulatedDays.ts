@@ -15,6 +15,8 @@ export async function persistSimulatedDays(trusted: SupabaseClient, finalLake: L
 
 	await trusted.from('lakes').update(finalLake).eq('id', finalLake.id);
 	await persistStock(trusted, before, { carp: finalDay.carp, shoals: finalDay.shoals });
+	const team = finalDay.bailiffs;
+	if (team.length > 0) await trusted.from('bailiffs').upsert(team, { onConflict: 'id' });
 	await insertHistory(trusted, outcomes, profile.display_name);
 	await buryTheDead(trusted, deaths);
 	await settleDayTakings(profile.id, netMoney);

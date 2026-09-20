@@ -49,7 +49,7 @@ function contextForDay(dayIndex: number, currentLake: Lake): DayContext {
 	const dayStart = new Date(start.getTime() + dayIndex * FisheryClock.RealMillisecondsPerFisheryDay);
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
 	const book = defaultBookFor(currentLake.id, Number(currentLake.day_ticket_fee)).map((product, index) => ({ ...product, id: `ticket-${index}` }));
-	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [], book };
+	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [], book, bailiffs: [] };
 }
 
 const fedLake: Lake = { ...lake, feed_stock: { ...lake.feed_stock, fishmeal_boilies: 40 } };
