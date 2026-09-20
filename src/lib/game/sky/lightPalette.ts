@@ -15,17 +15,19 @@ export interface DayLight {
 	glowOpacity: number;
 }
 
-const Night: Omit<LightKeyframe, 'hour'> = { moment: 'night', shade: [228, 46, 14], shadeOpacity: 0.72, glow: [232, 40, 30], glowOpacity: 0 };
+export const NightShade = { MostOpacity: 0.5 } as const;
+
+const Night: Omit<LightKeyframe, 'hour'> = { moment: 'night', shade: [226, 44, 26], shadeOpacity: NightShade.MostOpacity, glow: [216, 50, 74], glowOpacity: 0.1 };
 
 export const LightKeyframes: LightKeyframe[] = [
 	{ hour: 0, ...Night },
-	{ hour: 4.5, moment: 'before dawn', shade: [222, 42, 22], shadeOpacity: 0.64, glow: [345, 55, 62], glowOpacity: 0.06 },
+	{ hour: 4.5, moment: 'before dawn', shade: [222, 42, 30], shadeOpacity: 0.44, glow: [345, 55, 62], glowOpacity: 0.08 },
 	{ hour: 6, moment: 'sunrise', shade: [18, 48, 42], shadeOpacity: 0.24, glow: [24, 90, 62], glowOpacity: 0.24 },
 	{ hour: 7.5, moment: 'morning', shade: [40, 40, 60], shadeOpacity: 0.04, glow: [46, 85, 72], glowOpacity: 0.08 },
 	{ hour: 12, moment: 'midday', shade: [40, 40, 60], shadeOpacity: 0, glow: [46, 85, 72], glowOpacity: 0 },
 	{ hour: 17.5, moment: 'golden hour', shade: [30, 45, 45], shadeOpacity: 0.1, glow: [36, 92, 58], glowOpacity: 0.18 },
 	{ hour: 19.5, moment: 'sunset', shade: [262, 35, 30], shadeOpacity: 0.32, glow: [14, 88, 56], glowOpacity: 0.28 },
-	{ hour: 21, moment: 'blue hour', shade: [232, 46, 20], shadeOpacity: 0.62, glow: [278, 42, 46], glowOpacity: 0.1 },
+	{ hour: 21, moment: 'blue hour', shade: [232, 46, 26], shadeOpacity: 0.48, glow: [278, 42, 46], glowOpacity: 0.1 },
 	{ hour: 24, ...Night }
 ];
 

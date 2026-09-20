@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { blendHsl, blendHue, hslWords, surroundingKeyframes } from '../src/lib/game/sky/keyframes';
-import { lightAt, LightKeyframes } from '../src/lib/game/sky/lightPalette';
+import { lightAt, LightKeyframes, NightShade } from '../src/lib/game/sky/lightPalette';
 import { mistStrengthAt } from '../src/lib/game/sky/weatherEffects';
 
 export function runLightScenarios() {
@@ -31,5 +31,8 @@ export function runLightScenarios() {
 	assert.equal(mistStrengthAt(13), 0, 'mist is gone by midday');
 	assert.equal(mistStrengthAt(23), 1, 'mist gathers again after dark');
 	assert.ok(lightAt(6).glowOpacity < 0.3, 'the sunrise glow no longer washes the water out');
+	const smallHours = [0, 1, 2, 3, 3.9, 4.5, 22, 23];
+	assert.ok(smallHours.every((hour) => lightAt(hour).shadeOpacity <= NightShade.MostOpacity), 'the small hours never shade past half — the water and the fish still read at 3am');
+	assert.ok(lightAt(3).glowOpacity > 0, 'a cool moonlight glow lifts the water at night');
 	console.log('light:', { sunrise: lightAt(6).glowColour, dusk: lightAt(18.5).shadeColour, mistAtNine: mistStrengthAt(9).toFixed(2) });
 }
