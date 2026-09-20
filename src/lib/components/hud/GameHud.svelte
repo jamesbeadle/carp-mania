@@ -4,6 +4,7 @@
 	import InboxBell from './InboxBell.svelte';
 	import MoneyCounter from './MoneyCounter.svelte';
 	import NewsLink from './NewsLink.svelte';
+	import RuleBookLink from './RuleBookLink.svelte';
 	import SoundToggle from './SoundToggle.svelte';
 	import FullscreenToggle from './FullscreenToggle.svelte';
 
@@ -25,6 +26,7 @@
 			<MoneyCounter {money} />
 			<InboxBell {unreadCount} />
 			<NewsLink />
+			<RuleBookLink />
 			<div class="hidden sm:block"><SoundToggle /></div>
 			<div class="hidden sm:block"><FullscreenToggle /></div>
 			<a href="/angler" class="hidden h-9 w-9 overflow-hidden rounded-full border border-volt-500/60 bg-carbon-900 transition hover:border-volt-400 active:scale-95 lg:block" aria-label="My angler">

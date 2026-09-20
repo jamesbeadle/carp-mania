@@ -160,6 +160,7 @@
     "fileCountBand": 2.0,
     "acceptedGaps": [
       "src/routes/privacy/+page.server.ts",
+      "src/routes/rules/+page.server.ts",
       "src/routes/terms/+page.server.ts"
     ]
   },
