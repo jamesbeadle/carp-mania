@@ -21,6 +21,10 @@ export const FishingASession: RuleChapter = {
 			answer: `Open a water — your own from My lake, or any open fishery from Find water — and buy a ticket. Then pick a swim by clicking a peg on the bank or its name in the list, set up your rods, and cast. The screen tells you what to do next at every step.`
 		},
 		{
+			question: 'Can I see who is fishing a water before I buy a ticket?',
+			answer: `Yes. Every water's page shows who is on the bank right now — each angler with a live ticket, when they arrived and how many fish they have had — so you can see how busy it is and who you would be fishing alongside.`
+		},
+		{
 			question: 'What tickets are there, and how long do they last?',
 			answer: `${ticketLines} A multi-day ticket runs from ${MultiDay.FewestDays} to ${MultiDay.MostDays} days. Owners set their own prices, and a day ticket is priced per ${dayTicketHours} hours.`
 		},

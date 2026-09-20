@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { Streak, streakBiteFactor, streakDaysOf, streakWords } from '../src/lib/domain/fishing/streak';
+import { runOnTheBankScenarios } from './testOnTheBank';
 
 const Today = '2026-09-20T10:18:00Z';
 
@@ -15,4 +16,5 @@ export function runStreakScenarios() {
 	assert.equal(streakBiteFactor(Streak.MostDays), streakBiteFactor(Streak.MostDays + 3), 'the streak tops out');
 	assert.ok(streakWords(3).includes('Day 3'), 'the words name the day');
 	console.log('streak:', { dayOne: streakBiteFactor(1), dayFive: streakBiteFactor(5), words: streakWords(3) });
+	runOnTheBankScenarios();
 }

@@ -5,6 +5,7 @@
 	import DifficultyReading from '$lib/components/lake/DifficultyReading.svelte';
 	import WaterShop from '$lib/components/lakes/WaterShop.svelte';
 	import WaterHeadline from '$lib/components/lakes/WaterHeadline.svelte';
+	import OnTheBankNow from '$lib/components/lakes/OnTheBankNow.svelte';
 	import BountyPill from '$lib/components/lakes/BountyPill.svelte';
 	import BountyCard from '$lib/components/world/BountyCard.svelte';
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
@@ -49,6 +50,7 @@
 	<section class="panel space-y-4">
 		<h2 class="text-xl text-volt-300">The water</h2>
 		<WaterHeadline {lake} {carp} {shoals} book={diary.book} diary={diary.days} {now} />
+		<OnTheBankNow anglers={data.onTheBank} {now} myId={data.user?.id ?? null} />
 		{#if openBounty}<BountyCard bounty={openBounty} isOnTheWater />{/if}
 		<DifficultyReading {lake} {carp} {shoals} />
 		{#if hasADiary}<a href="/lakes/{lake.id}/book" class="button-secondary inline-block text-base">The booking diary</a>{/if}
