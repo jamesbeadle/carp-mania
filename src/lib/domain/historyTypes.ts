@@ -1,7 +1,7 @@
 export interface Catch {
 	id: string;
 	lake_id: string;
-	carp_id: string;
+	carp_id: string | null;
 	angler_id: string | null;
 	angler_name: string;
 	owner_name: string | null;

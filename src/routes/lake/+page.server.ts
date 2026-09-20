@@ -7,6 +7,7 @@ import { DismissBailiff, HireBailiff } from '$lib/server/commands/ManageBailiff'
 import { MoveFishToMyWater } from '$lib/server/commands/MoveFishToMyWater';
 import { RenameLake } from '$lib/server/commands/RenameLake';
 import { SellFishToDealer } from '$lib/server/commands/SellFishToDealer';
+import { SellShoalFish } from '$lib/server/commands/SellShoalFish';
 import { AddTicketProduct } from '$lib/server/commands/AddTicketProduct';
 import { RemoveTicketProduct, SetBarbedRule } from '$lib/server/commands/RemoveTicketProduct';
 import { SimulateElapsedTime } from '$lib/server/commands/SimulateElapsedTime';
@@ -33,6 +34,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	feed: ({ locals, request }) => request.formData().then((formData) => FeedLake(locals, formData)),
 	sellToDealer: ({ locals, request }) => request.formData().then((formData) => SellFishToDealer(locals, formData)),
+	sellShoalFish: ({ locals, request }) => request.formData().then((formData) => SellShoalFish(locals, formData)),
 	stockPike: ({ locals, request }) => request.formData().then((formData) => StockPike(locals, formData)),
 	stockPikeFood: ({ locals, request }) => request.formData().then((formData) => StockPikeFood(locals, formData)),
 	hireBailiff: ({ locals }) => HireBailiff(locals),

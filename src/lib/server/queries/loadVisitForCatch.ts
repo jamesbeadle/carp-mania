@@ -1,3 +1,4 @@
+import type { Shoal } from '$lib/domain/stock/shoals';
 import type { Carp, Lake } from '$lib/domain/types';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 
@@ -12,6 +13,7 @@ export interface VisitOnRecord {
 export interface WaterOnRecord {
 	lake: Lake;
 	carp: Carp[];
+	shoals: Shoal[];
 }
 
 export async function loadVisitOf(anglerId: string, visitId: string): Promise<VisitOnRecord | null> {
@@ -22,12 +24,13 @@ export async function loadVisitOf(anglerId: string, visitId: string): Promise<Vi
 }
 
 export async function loadWaterOf(lakeId: string): Promise<WaterOnRecord | null> {
-	const [{ data: lake }, { data: carp }] = await Promise.all([
+	const [{ data: lake }, { data: carp }, { data: shoals }] = await Promise.all([
 		trustedSupabase().from('lakes').select('*').eq('id', lakeId).maybeSingle(),
-		trustedSupabase().from('carp').select('*').eq('lake_id', lakeId)
+		trustedSupabase().from('carp').select('*').eq('lake_id', lakeId),
+		trustedSupabase().from('carp_shoals').select('*').eq('lake_id', lakeId)
 	]);
 	if (!lake) return null;
-	return { lake: lake as Lake, carp: (carp ?? []) as Carp[] };
+	return { lake: lake as Lake, carp: (carp ?? []) as Carp[], shoals: (shoals ?? []) as Shoal[] };
 }
 
 export async function hasCaughtDuringVisit(anglerId: string, visit: VisitOnRecord, carpId: string) {

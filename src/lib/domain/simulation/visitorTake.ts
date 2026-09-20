@@ -1,7 +1,9 @@
 import { tierUnlockedBy, type Tier } from '../tackle/brands';
-import { pickCarpByWeight } from '../fishing/pickCarp';
+import { takerThatTookTheBait, type Taker } from '../fishing/takers';
+import type { Shoal } from '../stock/shoals';
+import type { RegionCode } from '../world/regionCodes';
 import { ratingShareOf, sizeReachOf, waterShareOf, type WaterForReach } from '../fishing/sizeReach';
-import { noSpotBonus, takeWeightsFor } from '../fishing/takeWeight';
+import { noSpotBonus } from '../fishing/takeWeight';
 import type { RandomFraction } from '../random';
 import type { Carp } from '../types';
 
@@ -25,7 +27,7 @@ export function visitorSizeReach(lake: WaterForReach, carpCount: number, rating:
 	});
 }
 
-export function carpTakenByVisitor(lake: WaterForReach, carp: Carp[], rating: number, hour: number, conditionsShare: number, random: RandomFraction): Carp | null {
+export function takerForVisitor(lake: WaterForReach & { region: RegionCode }, carp: Carp[], shoals: Shoal[], rating: number, hour: number, conditionsShare: number, random: RandomFraction): Taker | null {
 	const take = { sizeReach: visitorSizeReach(lake, carp.length, rating, conditionsShare), hour, spotBonusFor: noSpotBonus };
-	return pickCarpByWeight(carp, takeWeightsFor(carp, take), random());
+	return takerThatTookTheBait(carp, shoals, take, random(), lake.region, carp.length);
 }

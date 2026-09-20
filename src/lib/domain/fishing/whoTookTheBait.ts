@@ -7,13 +7,14 @@ import type { Carp, Lake } from '../types';
 import type { Season } from '../world/seasons';
 import { biteRollFor, type BiteRoll, type WaterToday } from './biteRoll';
 import { castTerrainFor } from './castTerrain';
-import { pickCarpByWeight } from './pickCarp';
 import { kitAgeFactorFor } from './kitAgeFactor';
 import { idsShownTruthfully, showsThisHour } from './showingFish';
 import { ratingShareOf, sizeReachOf, waterShareOf } from './sizeReach';
 import { conditionsShareFor } from './weatherConditions';
 import { matchTackleToWater } from './tackleMatch';
-import { takeWeightsFor, type SpotBonus } from './takeWeight';
+import { carpOfTaker, takerThatTookTheBait, type Taker } from './takers';
+import { headCountOf } from '../stock/shoals';
+import type { SpotBonus } from './takeWeight';
 
 const NoBonus = 1;
 
@@ -62,22 +63,28 @@ export function sizeReachFor(water: WaterToday, carpCount: number, tackleMatchOv
 	return sizeReachOf(sizeReachSharesFor(water, carpCount, tackleMatchOverall, hour));
 }
 
-export function carpThatTookTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToday, spot: CastSpot): Carp | null {
+export function takerOfTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToday, spot: CastSpot): Taker | null {
 	const match = matchTackleToWater(bite.kit, water.lake, spot.terrain);
 	const shownIds = idsShownTruthfully(showsThisHour(bite.seed, bite.hour, carpInOrder, water.watercraft));
 	const spotBonusFor = favouriteSpotBonusAt(water.lake, water.season, spot, shownIds);
 	const kitFactorFor = kitAgeFactorFor(bite.kit, Number(water.lake.transparency));
-	const sizeReach = sizeReachFor(water, carpInOrder.length, match.overall, bite.hour);
+	const mouths = carpInOrder.length + headCountOf(water.shoals);
+	const sizeReach = sizeReachFor(water, mouths, match.overall, bite.hour);
 	const take = { sizeReach, hour: bite.hour, spotBonusFor, kitFactorFor };
-	return pickCarpByWeight(carpInOrder, takeWeightsFor(carpInOrder, take), bite.roll.carpIndexRoll);
+	const roll = bite.roll.carpIndexRoll;
+	return takerThatTookTheBait(carpInOrder, water.shoals, take, roll, water.lake.region, carpInOrder.length);
 }
 
-export function carpForRolledBite(report: RolledBiteReport, water: WaterToday, carpInLake: Carp[]): Carp | null {
+export function takerForRolledBite(report: RolledBiteReport, water: WaterToday, carpInLake: Carp[]): Taker | null {
 	const spot = { terrain: castTerrainFor(water.lake, report.castPoint), castPoint: report.castPoint };
 	const rod = { terrain: spot.terrain, kit: kitFor(report.setup) };
 	const roll = biteRollFor(report.seed, report.rodIndex, report.hour, rod, water);
 	if (!roll.isTaking) return null;
-	return carpThatTookTheBait(carpInBiteOrder(carpInLake), { roll, hour: report.hour, kit: rod.kit, seed: report.seed }, water, spot);
+	return takerOfTheBait(carpInBiteOrder(carpInLake), { roll, hour: report.hour, kit: rod.kit, seed: report.seed }, water, spot);
+}
+
+export function carpForRolledBite(report: RolledBiteReport, water: WaterToday, carpInLake: Carp[]): Carp | null {
+	return carpOfTaker(takerForRolledBite(report, water, carpInLake));
 }
 
 function byId(one: Carp, other: Carp) {

@@ -5,6 +5,7 @@ import type { TackleMatch } from '$lib/domain/fishing/tackleMatch';
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { Terrain } from '$lib/domain/layout/terrainAt';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
+import { isProvisionalId, shoalIdOfProvisional } from '$lib/domain/fishing/takers';
 import type { Carp, Lake, Profile, Swim } from '$lib/domain/types';
 import { castPointOf, type CastRod } from '../scene/rodState';
 import { tackleMatchFor, type RolledBite } from './biteRoller';
@@ -46,10 +47,15 @@ export function skillGainsFor(profile: Profile, match: TackleMatch): SkillGains 
 	};
 }
 
+function shoalIdOf(carpId: string) {
+	return isProvisionalId(carpId) ? shoalIdOfProvisional(carpId) : null;
+}
+
 export function catchReportFor(visitId: string, profile: Profile, landed: LandedFish): CatchReport {
 	return {
 		visitId,
 		carpId: landed.carp.id,
+		shoalId: shoalIdOf(landed.carp.id),
 		rodIndex: landed.rodIndex,
 		hour: landed.biteHour,
 		castPoint: { x: landed.castPoint.x, y: landed.castPoint.y },
@@ -62,6 +68,7 @@ export function catchReportFor(visitId: string, profile: Profile, landed: Landed
 export interface CatchReportOutcome {
 	isSaved: boolean;
 	reason: string | null;
+	carp: Carp | null;
 }
 
 const NoReasonGiven = 'the bailiff gave no reason';
@@ -72,8 +79,13 @@ export async function reportLandedFish(lakeId: string, visitId: string, profile:
 		headers: { 'content-type': 'application/json', accept: 'application/json' },
 		body: JSON.stringify(catchReportFor(visitId, profile, landed))
 	});
-	if (response.ok) return { isSaved: true, reason: null };
-	return { isSaved: false, reason: await reasonIn(response) };
+	if (response.ok) return { isSaved: true, reason: null, carp: await carpIn(response) };
+	return { isSaved: false, reason: await reasonIn(response), carp: null };
+}
+
+async function carpIn(response: Response) {
+	const body = (await response.json().catch(() => null)) as { carp?: Carp } | null;
+	return body?.carp ?? null;
 }
 
 async function reasonIn(response: Response) {

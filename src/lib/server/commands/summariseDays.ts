@@ -21,7 +21,7 @@ export function summariseDays(outcomes: DayOutcome[]): WhileYouWereAway {
 		heatwaveDays: outcomes.filter((day) => day.isHeatwave).length,
 		visitorsBigFish: visitorsBigFishBetween(firstRecords.lakeRecordLb, lastRecords.lakeRecordLb),
 		worksCompleted: outcomes.flatMap((day) => day.worksCompleted.map((work) => workLabelFor(draftOf(work)))),
-		frySpawned: sum(outcomes, (day) => day.spawned.length)
+		frySpawned: sum(outcomes, (day) => day.fryShoals.reduce((total, shoal) => total + shoal.count, 0))
 	};
 }
 

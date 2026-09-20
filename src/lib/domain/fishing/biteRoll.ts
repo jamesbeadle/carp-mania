@@ -1,5 +1,6 @@
 import type { Terrain } from '../layout/terrainAt';
 import { seededRandom } from '../random';
+import type { Shoal } from '../stock/shoals';
 import type { RodKit } from '../tackle/rodSetup';
 import type { Lake } from '../types';
 import type { Season } from '../world/seasons';
@@ -29,6 +30,7 @@ export interface WaterToday {
 	watercraft: number;
 	season: Season;
 	weather: Weather;
+	shoals: Shoal[];
 }
 
 export function biteRollFor(seed: number, rodIndex: number, hour: number, rod: RodInTheWater, water: WaterToday): BiteRoll {

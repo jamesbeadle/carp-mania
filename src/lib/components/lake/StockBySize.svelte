@@ -1,21 +1,24 @@
 <script lang="ts">
 	import { stockBySize, type SizeBandName } from '$lib/domain/stock/stockBySize';
+	import type { Shoal } from '$lib/domain/stock/shoals';
 	import type { Carp } from '$lib/domain/types';
 	import { formatWeight } from '$lib/format/weight';
 
 	interface Props {
 		carp: Carp[];
+		shoals: Shoal[];
 		chosenBand: SizeBandName | null;
 		onChoose: (band: SizeBandName | null) => void;
 	}
 
-	let { carp, chosenBand, onChoose }: Props = $props();
+	let { carp, shoals, chosenBand, onChoose }: Props = $props();
 
-	const counts = $derived(stockBySize(carp));
+	const counts = $derived(stockBySize(carp, shoals));
+	const headCount = $derived(carp.length + shoals.reduce((total, shoal) => total + shoal.count, 0));
 </script>
 
 <div class="mb-4 flex flex-wrap gap-2">
-	<button class="size-pill" class:is-chosen={chosenBand === null} onclick={() => onChoose(null)}>All · {carp.length}</button>
+	<button class="size-pill" class:is-chosen={chosenBand === null} onclick={() => onChoose(null)}>All · {headCount}</button>
 	{#each counts as line (line.band.name)}
 		<button
 			class="size-pill"

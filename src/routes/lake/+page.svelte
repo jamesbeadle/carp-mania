@@ -26,7 +26,8 @@
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const sickCarpCount = $derived(data.fishery.carp.filter((fish) => Number(fish.condition) < PikeRules.SickCarpConditionBelow).length);
 	const worksUnderway = $derived(inProgressShapesFor(data.groundworks.inProgress, data.fishery.lake));
-	const lake = $derived(data.fishery.lake);
+	const fishery = $derived(data.fishery);
+	const lake = $derived(fishery.lake);
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 
 	onMount(() => {
@@ -48,7 +49,7 @@
 <ActionMessage {form} />
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas lake={data.fishery.lake} swims={data.fishery.swims} carp={data.fishery.carp} drafts={worksUnderway} />
+	<LakeCanvas {lake} swims={fishery.swims} carp={fishery.carp} shoals={fishery.shoals} drafts={worksUnderway} />
 	<LakeOverview lake={data.fishery.lake} profile={data.profile} />
 </div>
 
@@ -58,7 +59,7 @@
 	{/each}
 </nav>
 
-{#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} lake={data.fishery.lake} waters={data.waters} />{/if}
+{#if activeTab === 'Stock'}<StockPanel carp={fishery.carp} shoals={fishery.shoals} {lake} waters={data.waters} />{/if}
 {#if activeTab === 'Tickets'}<TicketBookPanel lake={data.fishery.lake} book={data.book} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
