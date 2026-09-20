@@ -12,11 +12,6 @@ select test.assert_that(public.guide_price_of(20, 'common', 100, 500) = 2500, 'f
 select test.assert_that(public.guide_price_of(20, 'common', 0, 0) = 600, 'condition 0 is worth 0.6');
 select test.assert_that(public.guide_price_of(25, 'mirror', 90, 0) = 2016, 'matches valuation.ts for a 25 lb mirror at 90');
 
-select test.assert_that((select count(*) from public.farm_bands()) = 4, 'four farm bands');
-select test.assert_that(public.farm_band_price('stockies') = 150 and public.farm_band_price('doubles') = 300, 'small bands');
-select test.assert_that(public.farm_band_price('mid_doubles') = 720 and public.farm_band_price('twenties') = 1500, 'big bands');
-select test.assert_that(public.farm_band_price('thirties') is null, 'nothing over 25 lb comes from the farm');
-select test.assert_that(public.farm_supply_left('danube', 'stockies') = 200, 'a quiet region has its full list');
 
 select test.assert_that(public.haversine_km(51.5074, -0.1278, 48.8566, 2.3522) = 343.6, 'London to Paris matches greatCircle.ts');
 select test.assert_that(public.haversine_km(51.5074, -0.1278, 52.52, 13.405) = 931.6, 'London to Berlin');

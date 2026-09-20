@@ -73,7 +73,7 @@ select public.cancel_listing(:'cancelled_listing');
 select test.assert_that((select status from public.listings where id = :'cancelled_listing') = 'cancelled', 'cancelled with no bids');
 select test.assert_refused(format('select public.cancel_listing(%L)', :'cancelled_listing'), 'already closed');
 select public.list_carp_for_sale(:'cancelled', 'auction', 100, null, null, 12) as relisted \gset
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'cancelled'), 'up for sale');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'cancelled'), 'up for sale');
 select public.cancel_listing(:'relisted');
 select test.assert_that(test.money_of(test.player(80)) = 100000 - 25 + 460 - 25 - 25 - 25 - 25, 'every listing fee is spent, cancelled or not');
 

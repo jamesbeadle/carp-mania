@@ -1,23 +1,22 @@
 select test.sign_up(40);
 select test.sign_up(41);
 select test.give_lake(test.player(40), 'Mersey Pit', 'uk_ireland', 53.4, -2.9, 5);
+select test.give_lake(test.player(41), 'Dee Pool', 'uk_ireland', 53.2, -3.1, 5);
 select test.give_carp(test.lake_of(test.player(40)), 'Prime', 'mirror', 25, 90, 0) as prime \gset
 select test.give_carp(test.lake_of(test.player(40)), 'Poorly', 'common', 15, 20, 0) as poorly \gset
 select test.give_carp(test.lake_of(test.player(40)), 'Unseen', 'common', 15, 80, 0) as unseen \gset
 select test.give_carp(test.lake_of(test.player(40)), 'Travelling', 'common', 15, 80, 0) as travelling \gset
-select test.give_carp(test.lake_of(test.player(40)), 'Second', 'common', 10, 100, 0) as second \gset
-select test.give_carp(test.lake_of(test.player(40)), 'Third', 'common', 10, 100, 0) as third \gset
-select test.give_carp(test.lake_of(test.player(40)), 'Fourth', 'common', 10, 100, 0) as fourth \gset
 update public.carp set is_catalogued = false where id = :'unseen';
 update public.carp set transit_until = now() + interval '1 hour' where id = :'travelling';
+select jsonb_agg(test.give_carp(test.lake_of(test.player(41)), 'Ten ' || n, 'common', 10, 100, 0)) as tens from generate_series(1, 12) as n \gset
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(41)::text, false);
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'prime'), 'not in your water');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'prime'), 'not in your water');
 
 select set_config('request.jwt.claim.sub', test.player(40)::text, false);
 select test.assert_that(public.guide_price_of(25, 'mirror', 90, 0) = 2016, 'a 25 lb mirror at 90 is worth £2,016');
-select public.sell_to_dealer(:'prime') as offer \gset
+select public.sell_fish_to_dealer(array[:'prime']::uuid[]) as offer \gset
 select test.assert_that(:offer = 1109, 'the dealer pays 55% of guide, rounded');
 select test.assert_that(test.money_of(test.player(40)) = 101109, 'the money lands at once');
 select test.assert_that((select count(*) from public.carp where id = :'prime') = 0, 'the fish is gone');
@@ -27,14 +26,18 @@ select test.assert_that(
 	'the transfer keeps the fish, the name and the price'
 );
 
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'poorly'), 'under 30 condition');
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'unseen'), 'catalogued');
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'travelling'), 'in transit');
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'prime'), 'not in your water');
-
-select public.sell_to_dealer(:'second');
-select public.sell_to_dealer(:'third');
-select test.assert_refused(format('select public.sell_to_dealer(%L)', :'fourth'), 'taken 3 fish from your water today');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'poorly'), 'under 30 condition');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'unseen'), 'catalogued');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'travelling'), 'in transit');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L]::uuid[])', :'prime'), 'not in your water');
+select test.assert_refused(format('select public.sell_fish_to_dealer(array[%L, %L]::uuid[])', :'poorly', :'unseen'), 'under 30 condition');
 reset role;
-select test.assert_that((select count(*) from public.carp where id = :'fourth') = 1, 'the fourth fish stays');
-select test.assert_that(test.money_of(test.player(40)) = 101109 + 165 + 165, 'three sales a day');
+select test.assert_that((select count(*) from public.carp where id in (:'poorly', :'unseen')) = 2, 'one refused fish stops the whole sale');
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', test.player(41)::text, false);
+select public.sell_fish_to_dealer((select array_agg(value::uuid) from jsonb_array_elements_text(:'tens'::jsonb))) as bulk \gset
+select test.assert_that(:bulk = 3 * 165 + 9 * 135, 'twelve fish in one go: 55% on the first three of the fishery day, 45% on the other nine');
+reset role;
+select test.assert_that(test.money_of(test.player(41)) = 100000 + 3 * 165 + 9 * 135, 'the bulk sale lands at once');
+select test.assert_that((select count(*) from public.carp where lake_id = test.lake_of(test.player(41)) and name like 'Ten %') = 0, 'all twelve are gone');

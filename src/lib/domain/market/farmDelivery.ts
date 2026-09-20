@@ -3,10 +3,10 @@ import { randomBetween, type RandomFraction } from '../random';
 import { pickStrain } from '../strains';
 import type { CarpStrain } from '../types';
 import type { RegionCode } from '../world/regionCodes';
-import { ageForFarmFish, FarmBands, FarmFishCondition, type FarmBand, type FarmBandKey, type FarmOrder } from './fishFarm';
+import type { FarmPack } from './farmPacks';
 
 export interface FarmFish {
-	band: FarmBandKey;
+	packId: string;
 	name: string;
 	strain: CarpStrain;
 	weight_lb: number;
@@ -15,25 +15,23 @@ export interface FarmFish {
 }
 
 const QuartersPerPound = 4;
+const AgeSpreadYears = 1;
 
-export function farmFishFor(order: FarmOrder, region: RegionCode | null, existingCount: number, random: RandomFraction): FarmFish[] {
-	const delivery: FarmFish[] = [];
-	for (const band of FarmBands) {
-		const count = order[band.key] ?? 0;
-		for (let index = 0; index < count; index++) delivery.push(oneFarmFish(band, region, existingCount + delivery.length, random));
-	}
-	return delivery;
+export function farmFishFor(pack: FarmPack, count: number, region: RegionCode, existingCount: number, random: RandomFraction): FarmFish[] {
+	return Array.from({ length: count }, (_, index) => oneFarmFish(pack, region, existingCount + index, random));
 }
 
-function oneFarmFish(band: FarmBand, region: RegionCode | null, nameIndex: number, random: RandomFraction): FarmFish {
-	const weight_lb = roundToQuarterPound(randomBetween(random, band.minimumLb, band.maximumLb));
+function oneFarmFish(pack: FarmPack, region: RegionCode, nameIndex: number, random: RandomFraction): FarmFish {
+	const { fromLb, toLb, ageYears } = pack.band;
+	const weight_lb = roundToQuarterPound(randomBetween(random, fromLb, toLb));
+	const age_years = Math.round(randomBetween(random, ageYears - AgeSpreadYears, ageYears + AgeSpreadYears));
 	return {
-		band: band.key,
+		packId: pack.id,
 		name: carpNameForIndex(nameIndex),
 		strain: pickStrain(random(), region),
 		weight_lb,
-		age_years: ageForFarmFish(weight_lb),
-		condition: Math.round(randomBetween(random, FarmFishCondition.Minimum, FarmFishCondition.Maximum))
+		age_years: Math.max(1, age_years),
+		condition: Math.round(randomBetween(random, pack.conditionLowest, pack.conditionHighest))
 	};
 }
 

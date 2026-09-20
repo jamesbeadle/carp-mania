@@ -2,7 +2,7 @@ import type { ListingKind } from './market/listingRules';
 
 export type ListingStatus = 'open' | 'sold' | 'unsold' | 'cancelled';
 export type BidStatus = 'leading' | 'outbid' | 'won' | 'refunded';
-export type TransferKind = 'sale' | 'dealer_purchase' | 'farm_delivery' | 'dealer_sale';
+export type TransferKind = 'sale' | 'dealer_purchase' | 'farm_delivery' | 'dealer_sale' | 'estate_move';
 
 export interface Listing {
 	id: string;
@@ -45,7 +45,7 @@ export interface CarpTransfer {
 	commission: number;
 	transport_cost: number;
 	distance_km: number;
-	farm_band: string | null;
+	farm_pack_id: string | null;
 	departed_at: string;
 	arrives_at: string;
 	quarantine_until: string | null;

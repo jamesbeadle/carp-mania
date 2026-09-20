@@ -41,7 +41,7 @@
 {:else if data.step === WizardStep.Survey && data.fishery}
 	<SurveyStep fishery={data.fishery} />
 {:else if data.step === WizardStep.Stock && data.fishery}
-	<StockStep fishery={data.fishery} farmStock={data.farmStock} />
+	<StockStep fishery={data.fishery} />
 {:else if data.step === WizardStep.OpenTheGates && data.progress.lake}
 	<OpenTheGatesStep lake={data.progress.lake} />
 {/if}

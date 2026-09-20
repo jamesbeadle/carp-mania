@@ -57,7 +57,7 @@
 	{/each}
 </nav>
 
-{#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} lake={data.fishery.lake} farmStock={data.farmStock} />{/if}
+{#if activeTab === 'Stock'}<StockPanel carp={data.fishery.carp} lake={data.fishery.lake} waters={data.waters} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel lake={data.fishery.lake} carpCount={data.fishery.carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel lake={data.fishery.lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffPanel lake={data.fishery.lake} />{/if}
