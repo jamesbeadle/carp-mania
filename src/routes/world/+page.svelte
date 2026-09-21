@@ -3,15 +3,16 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
-	import FilterRail from '$lib/components/world/FilterRail.svelte';
-	import type { FlyToTarget } from '$lib/components/world/FlyToButtons.svelte';
+	import Leaderboards from '$lib/components/world/Leaderboards.svelte';
 	import LiveFeed from '$lib/components/world/LiveFeed.svelte';
-	import PostcardDrawer from '$lib/components/world/PostcardDrawer.svelte';
-	import WorldStage from '$lib/components/world/WorldStage.svelte';
+	import MatchingWaters from '$lib/components/world/MatchingWaters.svelte';
+	import WorldHero from '$lib/components/world/WorldHero.svelte';
+	import WorldToolbar from '$lib/components/world/WorldToolbar.svelte';
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import type { WorldPin } from '$lib/contracts/WorldPin';
 	import { olderFeedPathFor, type FeedGroup } from '$lib/domain/world/feedGroups';
 	import { filterWorldPins, type WorldFilters } from '$lib/domain/world/worldFilters';
+	import type { FlyToTarget } from '$lib/game/world/flyTo';
 	import { LiveWorld } from '$lib/game/world/liveWorld.svelte';
 	import { subscribeToWorldEvents } from '$lib/game/world/realtimeFeed';
 	import { filtersFromSearchParams, selectedLakeFrom, worldUrlFor } from '$lib/game/world/worldUrl';
@@ -23,8 +24,7 @@
 	const QuietNavigation = { replaceState: true, keepFocus: true, noScroll: true } as const;
 
 	const live = new LiveWorld(untrack(() => data.feed));
-	let stage: WorldStage;
-	let isRailOpen = $state(false);
+	let hero: WorldHero;
 
 	const filters = $derived(filtersFromSearchParams(page.url.searchParams));
 	const selectedLakeId = $derived(selectedLakeFrom(page.url.searchParams));
@@ -41,7 +41,7 @@
 	function applyFilters(next: WorldFilters) {
 		const previousRegion = filters.region;
 		navigate(next, selectedLakeId);
-		if (next.region && next.region !== previousRegion) stage.flyToRegion(next.region);
+		if (next.region && next.region !== previousRegion) hero.flyToRegion(next.region);
 	}
 
 	function select(pin: WorldPin | null) {
@@ -50,16 +50,15 @@
 
 	function pickLake(lakeId: string) {
 		const pin = pinById(lakeId);
-		if (pin) return select(pin);
-		goto(`/lakes/${lakeId}`);
+		if (!pin) return goto(`/lakes/${lakeId}`);
+		select(pin);
+		hero.flyTo(pin.latitude, pin.longitude, FlyToZoom);
 	}
 
 	function flyTo(target: FlyToTarget) {
-		if (target === 'somewhere_new') return stage.flyToRandom();
+		if (target === 'somewhere_new') return hero.flyToRandom();
 		const pin = target === 'my_water' ? pinById(data.myLakeId) : biggestFishPin();
-		if (!pin) return;
-		select(pin);
-		stage.flyTo(pin.latitude, pin.longitude, FlyToZoom);
+		if (pin) pickLake(pin.id);
 	}
 
 	async function loadOlder(before: string, group: FeedGroup | null): Promise<WorldActivity[]> {
@@ -77,21 +76,22 @@
 
 <svelte:head><title>The world · Carp Mania</title></svelte:head>
 
-<PlaceBanner kind="signpost" title="The world" blurb="Every open water in the game, pinned where it is · spin, zoom, tap a pin">
+<PlaceBanner kind="signpost" title="The world" blurb="The greatest catches, the waters they came from, and every open water in the game pinned where it is">
 	{#snippet actions()}
 		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>
 		<a href="/anglers" class="button-secondary text-base">Anglers</a>
-		<button class="button-secondary text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
+		<a href="/news" class="button-secondary text-base">News</a>
 	{/snippet}
 </PlaceBanner>
 
-<div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)_20rem]">
-	<div class:hidden={!isRailOpen} class="lg:block">
-		<FilterRail {filters} {matches} totalCount={data.pins.length} selectedPinId={selectedLakeId} hasMyWater={pinById(data.myLakeId) !== null} onChange={applyFilters} onFlyTo={flyTo} onPick={select} />
+<div class="flex flex-col gap-4">
+	<WorldToolbar {filters} shownCount={matches.length} totalCount={data.pins.length} hasMyWater={pinById(data.myLakeId) !== null} onChange={applyFilters} onFlyTo={flyTo} />
+	<WorldHero bind:this={hero} pins={matches} hasAnyPins={data.pins.length > 0} {selectedLakeId} {isSelectedAFavourite} arcs={live.arcs} pulses={live.pulses} greatest={data.greatest} feed={live.feed} viewerId={data.user?.id ?? null} onSelect={select} onPickLake={pickLake} />
+	<div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+		<div class="flex min-w-0 flex-col gap-4">
+			<LiveFeed feed={live.feed} onPick={pickLake} onLoadOlder={loadOlder} />
+			<section class="panel"><Leaderboards region={filters.region} /></section>
+		</div>
+		<aside class="panel"><MatchingWaters {matches} totalCount={data.pins.length} selectedPinId={selectedLakeId} onPick={select} /></aside>
 	</div>
-	<div class="flex min-w-0 flex-col gap-4">
-		<WorldStage bind:this={stage} pins={matches} hasAnyPins={data.pins.length > 0} selectedPinId={selectedLakeId} arcs={live.arcs} pulses={live.pulses} onSelect={select} />
-		<LiveFeed feed={live.feed} onPick={pickLake} onLoadOlder={loadOlder} />
-	</div>
-	<PostcardDrawer lakeId={selectedLakeId} isFavourite={isSelectedAFavourite} onClose={() => select(null)} />
 </div>
