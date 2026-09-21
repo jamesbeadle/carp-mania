@@ -13,8 +13,11 @@ const KindPremium: Record<ReelKind, number> = { carp_small: 1, carp_large: 1.4, 
 const Ranges: ReelRange[] = [
 	{ brand: 'bankside_basics', kinds: ['carp_small', 'carp_large'], basePrice: 45 },
 	{ brand: 'marlow', kinds: ['carp_small', 'carp_large', 'big_pit_entry'], basePrice: 110 },
+	{ brand: 'fenwater', kinds: ['carp_large', 'big_pit_entry'], basePrice: 130 },
 	{ brand: 'ironwood', kinds: ['big_pit_entry', 'big_pit_full'], basePrice: 260 },
-	{ brand: 'blackmere', kinds: ['carp_large', 'big_pit_full'], basePrice: 520 }
+	{ brand: 'north_ridge', kinds: ['big_pit_entry', 'big_pit_full'], basePrice: 300 },
+	{ brand: 'blackmere', kinds: ['carp_large', 'big_pit_full'], basePrice: 520 },
+	{ brand: 'silvermere', kinds: ['carp_large', 'big_pit_full'], basePrice: 640 }
 ];
 
 export const ReelsOnSale: ReelItem[] = Ranges.flatMap((range) => range.kinds.map((kind) => reelItem(range, kind)));

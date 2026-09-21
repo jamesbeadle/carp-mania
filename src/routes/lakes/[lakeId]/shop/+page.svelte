@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
-	import BrandShelf from '$lib/components/tackle/BrandShelf.svelte';
+	import ShopBrowser from '$lib/components/tackle/ShopBrowser.svelte';
 	import { TierLabels } from '$lib/domain/tackle/brands';
 	import { formatMoney } from '$lib/format/money';
 
@@ -20,8 +20,4 @@
 </PlaceBanner>
 <ActionMessage {form} />
 
-<div class="space-y-4">
-	{#each shelves.shelves as shelf (shelf.brand)}
-		<BrandShelf {shelf} money={shelves.money} />
-	{/each}
-</div>
+<ShopBrowser counter={shelves} />

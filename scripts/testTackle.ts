@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { isTierAtOrBelow, tierUnlockedBy } from '../src/lib/domain/tackle/brands';
+import { BrandCatalogue, isTierAtOrBelow, tierUnlockedBy } from '../src/lib/domain/tackle/brands';
+import { differencesFrom, itemEffectsOf, itemWordsOf } from '../src/lib/domain/tackle/itemEffects';
+import { kitInUseFrom } from '../src/lib/domain/tackle/kitInUse';
 import { BaseCastFeet, castDistanceFeet, pointWithinCast } from '../src/lib/domain/tackle/castDistance';
 import { isCatalogueId, TackleCatalogue, tackleItemOfKind } from '../src/lib/domain/tackle/catalogue';
 import { doesHookOpen, HookOpening, hookHoldChance, hookOpeningChance } from '../src/lib/domain/tackle/hooks';
@@ -28,6 +30,7 @@ export function runTackleScenarios() {
 	assert.equal(metresLostOnSnap(40), 60, 'a snap costs the cast and twenty metres');
 	assertTheHooks();
 	assertTheRods();
+	assertTheEffects();
 	assert.equal(shopTierFor(90, 90), 'custom', 'a superb water stocks custom kit');
 	assert.equal(shopTierFor(20, 40), 'starter', 'a poor water stocks starter kit');
 	console.log('tackle:', { items: TackleCatalogue.length });
@@ -59,4 +62,22 @@ function assertTheRods() {
 	assert.ok(landed.x < 0.9 && landed.x > 0.1, 'a cast past the reach lands short on the same line');
 	const lost = tackleLostBy('line_snapped', kit, 40);
 	assert.equal(lost.length, 4, 'a snap costs line, rig, lead and hook');
+}
+
+function assertTheEffects() {
+	const rod = tackleItemOfKind('north_ridge-rod-3.5-13', 'rod');
+	const starterRod = tackleItemOfKind('bankside_basics-rod-2.75-12', 'rod');
+	assert.ok(rod && starterRod, 'North Ridge and the starter rod are on sale');
+	assert.equal(BrandCatalogue.north_ridge.tier, 'specialist', 'North Ridge is a specialist brand');
+	const effects = itemEffectsOf(rod);
+	assert.deepEqual(effects.map((one) => one.key), ['reach', 'landing', 'forgiveness'], 'a rod reads as reach, landing power and forgiveness');
+	assert.equal(effects[1].share, 1, 'a 3.5 lb rod lands the heaviest fish in the game');
+	const [biggest] = differencesFrom(rod, starterRod);
+	assert.equal(biggest.label, 'Landing power', 'the biggest difference from the starter rod is landing power');
+	assert.ok(biggest.percent > 0, 'and it is a gain');
+	assert.deepEqual(differencesFrom(rod, null), [], 'nothing to compare with, nothing said');
+	const never = tackleItemOfKind('quarryman-hook-4-micro-matt', 'hook');
+	assert.ok(never && itemEffectsOf(never)[1].share === 1, 'a hook that never straightens has full strength');
+	assert.ok(itemWordsOf(starterRod).includes('lands up to 35 lb'), 'the words say what the rod lands');
+	assert.equal(kitInUseFrom([]).rod?.id, starterRod.id, 'with no saved rods the starter kit is what is in use');
 }

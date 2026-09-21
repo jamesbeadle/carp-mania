@@ -14,7 +14,9 @@ const Ranges: LineRange[] = [
 	lineRange('bankside_basics', [35, 40, 45, 50], 12, SpoolSizes.Standard),
 	lineRange('tench_and_sons', [34, 38, 43, 47], 16, SpoolSizes.Standard),
 	lineRange('marlow', [32, 36, 40, 44], 28, SpoolSizes.Standard),
+	lineRange('fenwater', [33, 37, 41, 45], 24, SpoolSizes.Large),
 	lineRange('halcyon', [30, 33, 36, 38], 55, SpoolSizes.Large),
+	lineRange('north_ridge', [31, 34, 37, 39], 60, SpoolSizes.Large),
 	lineRange('vellum_and_steel', [28, 30, 33, 35], 120, SpoolSizes.Large)
 ];
 

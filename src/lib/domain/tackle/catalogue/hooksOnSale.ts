@@ -15,6 +15,7 @@ const Ranges: HookRange[] = [
 	{ brand: 'marlow', straightensAboveLb: 42, snapsAboveLb: 58, pricePerPack: 7 },
 	{ brand: 'quarryman', straightensAboveLb: NeverStraightensLb, snapsAboveLb: 60, pricePerPack: 9 },
 	{ brand: 'halcyon', straightensAboveLb: 55, snapsAboveLb: 75, pricePerPack: 14 },
+	{ brand: 'north_ridge', straightensAboveLb: 58, snapsAboveLb: 80, pricePerPack: 16 },
 	{ brand: 'vellum_and_steel', straightensAboveLb: NeverStraightensLb, snapsAboveLb: 90, pricePerPack: 30 }
 ];
 
