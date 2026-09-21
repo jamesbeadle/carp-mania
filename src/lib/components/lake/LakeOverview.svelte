@@ -9,6 +9,7 @@
 	import { formatMoney } from '$lib/format/money';
 	import { stockDrawOf } from '$lib/domain/water/stockDraw';
 	import StatRow from '../stats/StatRow.svelte';
+	import FacilitiesRow from '../facilities/FacilitiesRow.svelte';
 
 	interface Props {
 		lake: Lake;
@@ -30,5 +31,6 @@
 		<button class="button-secondary">Rename</button>
 	</form>
 	<StatRow stats={[{ label: 'Money', value: formatMoney(profile.money), tone: 'volt' }, { label: 'Reputation', value: String(Math.round(Number(lake.reputation))), caption: '/100' }, { label: 'Anglers a day', value: String(anglersToday) }, { label: 'They pay up to', value: formatMoney(willingness) }]} />
+	<div class="mt-3"><FacilitiesRow built={lake.layout.facilities} emptyWords="No facilities yet — a car park or a lodge is built in Groundworks." /></div>
 	<div class="mt-4 grid gap-3 @min-[52rem]:grid-cols-3"><CeilingReading {lake} {carp} {shoals} {species} /><DrawReading {carp} {shoals} /><DifficultyReading {lake} {carp} {shoals} isOwner /></div>
 </section>

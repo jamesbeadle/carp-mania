@@ -4,6 +4,7 @@
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 	import { worldUrlForLake } from '$lib/game/world/worldUrl';
+	import FacilitiesRow from '../facilities/FacilitiesRow.svelte';
 	import GoFishingButton from '../game/GoFishingButton.svelte';
 	import FavouriteStar from './FavouriteStar.svelte';
 
@@ -37,6 +38,7 @@
 			<div class="min-w-0"><dt class="stat-label">{stat.label}</dt><dd class="font-display text-2xl leading-none font-extrabold italic tabular-nums {stat.isPrice ? 'text-volt-300' : 'text-mist-100'}">{stat.value}</dd></div>
 		{/each}
 	</dl>
+	<FacilitiesRow built={summary.lake.layout.facilities} />
 	<p class="flex flex-wrap gap-x-2 text-sm text-mist-400">
 		<span>{facts.join(' · ')}</span>
 		{#if isOnTheGlobe}<a href={worldUrlForLake(summary.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}

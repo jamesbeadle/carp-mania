@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LakeCanvas from '$lib/components/LakeCanvas.svelte';
+	import FacilitiesRow from '$lib/components/facilities/FacilitiesRow.svelte';
 	import StockTable from '$lib/components/StockTable.svelte';
 	import WaterQualityBars from '$lib/components/WaterQualityBars.svelte';
 	import DifficultyReading from '$lib/components/lake/DifficultyReading.svelte';
@@ -51,6 +52,7 @@
 		<h2 class="text-xl text-volt-300">The water</h2>
 		<WaterHeadline {lake} {carp} {shoals} book={diary.book} diary={diary.days} {now} />
 		<OnTheBankNow anglers={data.onTheBank} {now} myId={data.user?.id ?? null} />
+		<FacilitiesRow built={lake.layout.facilities} emptyWords="No facilities on the bank yet." />
 		{#if openBounty}<BountyCard bounty={openBounty} isOnTheWater />{/if}
 		<DifficultyReading {lake} {carp} {shoals} />
 		{#if hasADiary}<a href="/lakes/{lake.id}/book" class="button-secondary inline-block text-base">The booking diary</a>{/if}
