@@ -40,7 +40,7 @@ export async function GetHallOfFame(locals: App.Locals, scope: LeaderboardScope)
 	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, prototypes };
 }
 
-async function loadBiggestByAnAngler(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {
+export async function loadBiggestByAnAngler(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {
 	let catches = locals.supabase.from('catches').select(BiggestColumns).not('angler_id', 'is', null);
 	if (scope !== WorldScope) catches = catches.eq('lakes.region', scope);
 	const { data } = await catches.order('weight_lb', Descending).order('caught_at').limit(BoardLength);

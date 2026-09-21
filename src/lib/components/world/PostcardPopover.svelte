@@ -7,13 +7,7 @@
 	import FavouriteStar from '../lakes/FavouriteStar.svelte';
 	import PostcardNumbers from './PostcardNumbers.svelte';
 
-	interface Props {
-		lakeId: string | null;
-		isFavourite: boolean;
-		onClose: () => void;
-	}
-
-	let { lakeId, isFavourite, onClose }: Props = $props();
+	let { lakeId, isFavourite, onClose }: { lakeId: string; isFavourite: boolean; onClose: () => void } = $props();
 
 	const PostcardPath = '/world/postcard';
 	const NotOnTheMap = 'That water is not on the map any more.';
@@ -22,46 +16,30 @@
 	let failure = $state<string | null>(null);
 
 	$effect(() => {
-		if (!lakeId) return clearPostcard();
 		loadPostcard(lakeId);
 	});
 
-	function clearPostcard() {
-		postcard = null;
-		failure = null;
-	}
-
 	async function loadPostcard(wantedLakeId: string) {
+		postcard = null;
 		failure = null;
 		const response = await fetch(`${PostcardPath}/${wantedLakeId}`);
-		const isStillWanted = wantedLakeId === lakeId;
-		if (!isStillWanted) return;
-		if (!response.ok) return showFailure();
+		if (wantedLakeId !== lakeId) return;
+		if (!response.ok) return void (failure = NotOnTheMap);
 		postcard = (await response.json()) as LakePostcard;
-	}
-
-	function showFailure() {
-		postcard = null;
-		failure = NotOnTheMap;
 	}
 </script>
 
-<aside class="panel flex flex-col gap-3">
-	{#if !lakeId}
-		<p class="stat-label">Postcard</p>
-		<p class="text-sm text-mist-400">Tap a pin for its postcard.</p>
-	{:else if failure}
-		<p class="stat-label">Postcard</p>
+<aside class="flex flex-col gap-3 rounded-2xl border border-carbon-700 bg-carbon-950/90 p-4 shadow-xl shadow-carbon-950/60 backdrop-blur">
+	{#if failure}
 		<p class="text-sm text-danger-400">{failure}</p>
 		<button class="button-secondary self-start text-base" onclick={onClose}>Close</button>
 	{:else if !postcard}
-		<p class="stat-label">Postcard</p>
 		<p class="text-sm text-mist-400">Writing the postcard…</p>
 	{:else}
 		<div class="flex items-start gap-2">
 			<div class="min-w-0">
 				<p class="stat-label">{postcard.numbers.ownerName}'s water · {RegionCatalogue[postcard.numbers.region].label}</p>
-				<h2 class="text-2xl text-volt-300">{postcard.lake.name}</h2>
+				<h2 class="truncate text-2xl text-volt-300">{postcard.lake.name}</h2>
 			</div>
 			<button class="ml-auto text-xl text-mist-400 hover:text-mist-100" onclick={onClose} aria-label="Close the postcard">×</button>
 		</div>
