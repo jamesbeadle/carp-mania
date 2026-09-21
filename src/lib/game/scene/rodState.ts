@@ -32,6 +32,14 @@ export function castPointOf(rod: CastRod): LayoutPoint {
 	return toFraction(rod.baitPoint);
 }
 
+export function rodCastingNext(rods: RodOnBank[]): RodOnBank | null {
+	return rods.find((rod) => rod.phase === 'idle') ?? null;
+}
+
+export function isCastingNext(rod: RodOnBank, rods: RodOnBank[]) {
+	return rodCastingNext(rods)?.index === rod.index;
+}
+
 export function bringRodIn(rod: RodOnBank) {
 	rod.phase = 'idle';
 	rod.baitPoint = null;

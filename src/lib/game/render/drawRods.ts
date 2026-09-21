@@ -2,6 +2,7 @@ import type { Point } from '../scene/lakeShape';
 import { AnglerPalette } from '../scene/palette';
 import type { RodOnBank } from '../scene/rodState';
 import { drawCanvasLabel } from './drawCanvasLabel';
+import { drawRestingRods } from './drawRestingRods';
 
 const Rest = { Forward: 12, Spread: 14 } as const;
 const RodLength = 34;
@@ -12,6 +13,7 @@ const Ripples = { Count: 3, Speed: 18, Spacing: 9, Reach: 27, Smallest: 3, LineW
 export function drawRods(context: CanvasRenderingContext2D, angler: Point, facing: number, rods: RodOnBank[], timeSeconds: number) {
 	const rests = rods.map((rod) => rodRestPoint(angler, facing, rod.index, rods.length));
 	drawPod(context, rests);
+	drawRestingRods(context, rests, facing, rods, timeSeconds);
 	rods.forEach((rod, index) => {
 		if (rod.phase === 'idle' || !rod.baitPoint) return;
 		const tip = rodTip(rests[index], rod.baitPoint, shakeOf(rod, timeSeconds));

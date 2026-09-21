@@ -38,6 +38,9 @@ export const AnglerPalette = {
 	Ripple: 'hsla(190 30% 95% / 0.5)',
 	CastReach: 'hsla(48 90% 88% / 0.55)',
 	BiteTag: 'hsl(2 78% 62%)',
+	RestingRod: 'hsla(30 20% 20% / 0.7)',
+	CastingNext: 'hsl(117 80% 57%)',
+	CastingNextHalo: 'hsla(117 80% 57% / 0.35)',
 	Bivvy: 'hsl(95 22% 34%)',
 	BivvyLight: 'hsla(95 30% 60% / 0.35)',
 	BivvyDoor: 'hsla(90 20% 10% / 0.6)'

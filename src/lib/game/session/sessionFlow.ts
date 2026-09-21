@@ -8,7 +8,7 @@ import { nuisanceFishFor } from '$lib/domain/water/nuisanceBites';
 import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 import type { Swim } from '$lib/domain/types';
 import { toFraction, toScene, type Point } from '../scene/lakeShape';
-import { bringRodIn, castPointOf, isCastOut, restingRod, type CastRod } from '../scene/rodState';
+import { bringRodIn, castPointOf, isCastOut, restingRod, rodCastingNext, type CastRod } from '../scene/rodState';
 import { waterTodayOf } from './waterToday';
 import type { ActiveBite, SessionState } from './sessionState.svelte';
 
@@ -39,7 +39,7 @@ export function castRod(session: SessionState, rodIndex: number, scenePoint: Poi
 }
 
 export function nextRodToCast(session: SessionState) {
-	return session.rods.find((rod) => rod.phase === 'idle') ?? null;
+	return rodCastingNext(session.rods);
 }
 
 export function returnToFishing(session: SessionState) {

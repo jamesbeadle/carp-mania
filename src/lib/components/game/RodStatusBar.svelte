@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RodOnBank } from '$lib/game/scene/rodState';
+	import { isCastingNext, type RodOnBank } from '$lib/game/scene/rodState';
 	import RodCard from './RodCard.svelte';
 
 	let { rods, isWide = false, onReelIn }: { rods: RodOnBank[]; isWide?: boolean; onReelIn?: (rodIndex: number) => void } = $props();
@@ -17,6 +17,6 @@
 
 <div class="flex flex-col gap-2">
 	{#each rods as rod (rod.index)}
-		<RodCard {rod} {isWide} {onReelIn} />
+		<RodCard {rod} isCastingNext={isCastingNext(rod, rods)} {isWide} {onReelIn} />
 	{/each}
 </div>
