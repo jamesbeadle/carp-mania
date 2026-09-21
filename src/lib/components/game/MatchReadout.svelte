@@ -1,16 +1,20 @@
 <script lang="ts">
 	import type { TackleMatch } from '$lib/domain/fishing/tackleMatch';
+	import StatBar from '../stats/StatBar.svelte';
 
 	let { match }: { match: TackleMatch } = $props();
 
-	const percent = (score: number) => `${Math.round(score * 100)}%`;
+	const parts = $derived([
+		{ label: 'Line', share: match.line },
+		{ label: 'Hook', share: match.hook },
+		{ label: 'Rig', share: match.rig },
+		{ label: 'Bait', share: match.bait },
+		{ label: 'Tubing', share: match.tubing }
+	]);
 </script>
 
-<dl class="grid grid-cols-5 gap-1 text-center text-xs">
-	<div><dt class="text-mist-400">Line</dt><dd>{percent(match.line)}</dd></div>
-	<div><dt class="text-mist-400">Hook</dt><dd>{percent(match.hook)}</dd></div>
-	<div><dt class="text-mist-400">Rig</dt><dd>{percent(match.rig)}</dd></div>
-	<div><dt class="text-mist-400">Bait</dt><dd>{percent(match.bait)}</dd></div>
-	<div><dt class="text-mist-400">Tubing</dt><dd>{percent(match.tubing)}</dd></div>
+<dl class="grid grid-cols-5 gap-1 text-center text-[0.7rem]">
+	{#each parts as part (part.label)}
+		<div><dt class="text-mist-400">{part.label}</dt><dd class="tabular-nums text-mist-100">{Math.round(part.share * 100)}%</dd><StatBar share={part.share} /></div>
+	{/each}
 </dl>
-<p class="text-center text-sm">Overall match <span class="font-semibold text-volt-300">{percent(match.overall)}</span></p>

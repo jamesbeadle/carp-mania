@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { RodSet } from '$lib/domain/tackle/rodSets';
 	import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 	import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 	import type { Swim } from '$lib/domain/types';
@@ -27,9 +28,10 @@
 		setup: SessionSetup;
 		swims: Swim[];
 		owned: OwnedTackle[];
+		rodSets: RodSet[];
 	}
 
-	let { setup, swims, owned }: Props = $props();
+	let { setup, swims, owned, rodSets }: Props = $props();
 
 	const session = new SessionState(untrack(() => setup));
 	const { lake, profile, visit } = untrack(() => setup);
@@ -64,7 +66,7 @@
 </script>
 
 {#if session.phase === 'tackle_up' && session.swim}
-	<TackleUpScreen {session} swim={session.swim} {lake} {profile} {owned} onReady={handleTackleUp} />
+	<TackleUpScreen {session} swim={session.swim} {lake} {profile} {owned} {rodSets} onReady={handleTackleUp} />
 {:else}
 	<WaterScreen
 		{session}
