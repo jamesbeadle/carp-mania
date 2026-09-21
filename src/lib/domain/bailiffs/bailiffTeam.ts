@@ -49,6 +49,18 @@ export function wagesOf(team: Pick<Bailiff, 'wage'>[]) {
 	return team.reduce((total, bailiff) => total + Number(bailiff.wage), 0);
 }
 
+export function acresUntilAnotherBailiff(acres: number) {
+	return bailiffCapFor(acres) * BailiffTerms.AcresPerBailiff - acres;
+}
+
+export function teamRoomWords(team: Pick<Bailiff, 'id'>[], acres: number) {
+	const cap = bailiffCapFor(acres);
+	const bailiffWord = cap === 1 ? 'bailiff' : 'bailiffs';
+	const isFull = team.length >= cap;
+	if (!isFull) return `One bailiff keeps about ${BailiffTerms.AcresPerBailiff} acres in order, so ${acres} acres has room for ${cap} ${bailiffWord} — ${cap - team.length} more can be hired.`;
+	return `One bailiff keeps about ${BailiffTerms.AcresPerBailiff} acres in order, so ${acres} acres has room for ${cap} ${bailiffWord} and the team is full. Another ${acresUntilAnotherBailiff(acres)} acres of water — bought as land in Groundworks — would make room for one more.`;
+}
+
 export function whyCannotHire(team: Pick<Bailiff, 'id'>[], acres: number) {
 	const cap = bailiffCapFor(acres);
 	if (team.length >= cap) return `${acres} acres keeps ${cap} ${cap === 1 ? 'bailiff' : 'bailiffs'} busy — that is the team`;

@@ -9,8 +9,12 @@
 	<span class="font-medium text-mist-100">{candidate.name}</span>
 	<span class="text-xs text-mist-400">asks {formatMoney(candidate.askingWage)} a day</span>
 	<span class="text-xs text-mist-200">“{candidate.reference}”</span>
-	<form method="POST" action="?/hireBailiff" class="ml-auto">
-		<input type="hidden" name="candidateId" value={candidate.id} />
-		<button class="button-primary px-3 py-1 text-base" disabled={isFull} title={isFull ? 'The team is full for a water this size' : `Hire ${candidate.name}`}>Hire</button>
-	</form>
+	{#if isFull}
+		<span class="ml-auto text-xs text-mist-400">No room on the team</span>
+	{:else}
+		<form method="POST" action="?/hireBailiff" class="ml-auto">
+			<input type="hidden" name="candidateId" value={candidate.id} />
+			<button class="button-primary px-3 py-1 text-base" title="Hire {candidate.name}">Hire</button>
+		</form>
+	{/if}
 </li>
