@@ -3,13 +3,13 @@ import { AwardKeys, NoTallies } from '../src/lib/domain/trophies/awards';
 import { awardsEarnedBy, awardWordsFor, nextAwardsFor, newlyEarned, progressOf } from '../src/lib/domain/trophies/awardProgress';
 
 export function runAwardScenarios() {
-	assert.equal(AwardKeys.length, 21, 'twenty-one awards');
+	assert.equal(AwardKeys.length, 19, 'nineteen awards');
 	assert.deepEqual(awardsEarnedBy(NoTallies), [], 'nothing is won with nothing done');
 	const firstDouble = { ...NoTallies, bestLb: 12.5, fishLanded: 1 };
 	assert.deepEqual(awardsEarnedBy(firstDouble), ['first_double'], 'a twelve is the first double and nothing more');
-	const aLife = { ...NoTallies, bestLb: 41, fishLanded: 600, regionsFished: 5, homeGrownBestLb: 31, lightRodBestLb: 40, trophies: 1, recordsSet: 2, recordWaters: 3, lifetimeLb: 10400, nightFish: 50, morningFish: 12, ticketKindsFished: 3, fishSold: 100, bountiesTaken: 1 };
+	const aLife = { ...NoTallies, bestLb: 41, fishLanded: 600, regionsFished: 5, homeGrownBestLb: 31, lightRodBestLb: 40, recordsSet: 2, recordWaters: 3, lifetimeLb: 10400, nightFish: 50, morningFish: 12, ticketKindsFished: 3, fishSold: 100 };
 	const earned = awardsEarnedBy(aLife);
-	assert.equal(earned.length, 17, 'a full life short of the fifty, the thousandth fish, ten regions and the early bird');
+	assert.equal(earned.length, 15, 'a full life short of the fifty, the thousandth fish, ten regions and the early bird');
 	assert.ok(!earned.includes('early_bird') && !earned.includes('first_fifty'), 'twelve morning fish is not the early bird');
 	assert.deepEqual(newlyEarned(aLife, earned), [], 'nothing new when everything is held');
 	assert.deepEqual(newlyEarned({ ...aLife, morningFish: 50 }, earned), ['early_bird'], 'the fiftieth morning fish is the early bird');

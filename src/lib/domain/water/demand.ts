@@ -18,7 +18,7 @@ export function demandBandOf(ratio: number): DemandBand {
 }
 
 export const DemandWords: Record<DemandBand, { state: string; advice: string }> = {
-	quiet: { state: 'quiet', advice: 'Advertise. Stock a thirty. Post a bounty.' },
+	quiet: { state: 'quiet', advice: 'Advertise. Stock a thirty. Build a car park.' },
 	busy: { state: 'busy', advice: 'Raise the ticket.' },
 	turning_away: { state: 'turning anglers away', advice: 'Turn on advance booking — every angler turned away costs reputation.' },
 	waiting_list: { state: 'a waiting list', advice: 'Sell a syndicate.' }

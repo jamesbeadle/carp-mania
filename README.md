@@ -22,7 +22,7 @@ src/lib/domain      the rules of the game — pure TypeScript, no framework, run
 src/lib/server      commands and queries (CQRS) with their gates; the only code that touches Supabase
 src/lib/game        the lake scene, the fishing session, the groundworks editor and the canvas globe
 src/lib/components  Svelte views
-src/routes          the site map: /setup, /home, /lake, /lake/works, /world, /news, /lakes, /fish, /matches, /market, /carp, /anglers, /inbox
+src/routes          the site map: /setup, /home, /lake, /lake/works, /world, /news, /lakes, /fish, /market, /carp, /anglers, /inbox
 supabase/migrations tables, row-level security, and the security-definer functions that move money and fish
 supabase/tests      SQL scenarios run against a local Postgres by npm run test:sql
 ```

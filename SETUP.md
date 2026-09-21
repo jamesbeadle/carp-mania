@@ -5,7 +5,7 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
 ## 1. Supabase project
 
 1. Create a project at supabase.com. Note the **Project URL**, the **anon (public) key** and the **service_role key** from Project Settings → API.
-2. Database → Extensions: enable **pg_cron**. It closes ended matches and bounties every minute and purges the live feed hourly. If you enable it later, re-run `0014d_closing_a_match.sql` afterwards; without it, Vercel crons call `close_ended_matches()` and `close_ended_bounties()` through the service-role client (`/cron/close-matches`, `/cron/close-bounties`) — the functions are the contract, the scheduler is interchangeable.
+2. Database → Extensions: enable **pg_cron**. It purges the live feed hourly. If you enable it later, re-run `0009j_the_schedules.sql` afterwards.
 3. Open the SQL editor and run the files in `supabase/migrations/`, in name order — each one is safe on a live database with players in it:
    `0001_tables.sql`, `0002_policies.sql`, `0003_functions.sql`, `0004_saved_rods.sql`,
    `0005_the_money_once.sql` (run it exactly once: it gifts every existing player £95,000), `0005b_the_fish.sql`, `0005c_trusted_writes.sql`, `0005d_the_guide_price.sql`, `0005e_the_farm_order_checks.sql`, `0005f_the_fish_farm.sql`, `0005g_the_dealer.sql`,
@@ -19,7 +19,7 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
    `0016_records_among_anglers.sql`, `0016b_the_angler_on_the_news.sql`,
    `0017_the_trophy_room.sql`, `0017b_milestones_and_ranks.sql`,
    `0018_rivalry.sql`, `0018b_the_catch_tells_the_beaten.sql`, `0018c_the_next_name_to_beat.sql`,
-   `0019_the_anglers_rating.sql`, `0020_the_tackle_trade.sql`, `0020b_the_catch_uses_the_tackle.sql`, `0021_rigs_and_bait.sql`, `0022_the_farms.sql`, `0022b_fish_in_bulk.sql`, `0023_the_ticket_book.sql`, `0023b_buy_a_ticket.sql`, `0024_the_shoals.sql`, `0024b_a_fish_gets_its_name.sql`, `0025_the_big_water.sql`, `0026_the_make_up_of_a_water.sql`, `0026b_the_booking_diary.sql`, `0026c_book_a_peg.sql`, `0027_honours.sql`, `0027b_the_awards.sql`, `0027c_the_bounties.sql`, `0027d_paying_the_prize.sql`, `0027e_settling_a_bounty.sql`, `0027f_the_catch_takes_the_bounty.sql`, `0027g_prizes_and_the_till.sql`, `0028_the_fish_market_closes.sql`.
+   `0019_the_anglers_rating.sql`, `0020_the_tackle_trade.sql`, `0020b_the_catch_uses_the_tackle.sql`, `0021_rigs_and_bait.sql`, `0022_the_farms.sql`, `0022b_fish_in_bulk.sql`, `0023_the_ticket_book.sql`, `0023b_buy_a_ticket.sql`, `0024_the_shoals.sql`, `0024b_a_fish_gets_its_name.sql`, `0025_the_big_water.sql`, `0026_the_make_up_of_a_water.sql`, `0026b_the_booking_diary.sql`, `0026c_book_a_peg.sql`, `0027_honours.sql`, `0027b_the_awards.sql`, `0027c_the_bounties.sql`, `0027d_paying_the_prize.sql`, `0027e_settling_a_bounty.sql`, `0027f_the_catch_takes_the_bounty.sql`, `0027g_prizes_and_the_till.sql`, `0028_the_fish_market_closes.sql`, `0029_the_water_as_found.sql`, `0030_no_competition_between_players.sql` (drops the match and bounty tables and their functions — history and all).
    Paste each one and press Run.
 4. Authentication → URL Configuration:
    - Site URL: `http://localhost:5173` for now (change to the live domain after deploying — `https://carp-mania.com` for the real game).
@@ -59,7 +59,7 @@ Open http://localhost:5173, sign in with Google. Every player starts with £100,
 1. Import the GitHub repo in Vercel. Framework is detected as SvelteKit; no build settings to change.
 2. Add the three environment variables above under Settings → Environment Variables.
 3. After the first deploy, put the Vercel URL into Supabase Site URL and add `https://<your-app>.vercel.app/auth/callback` to Redirect URLs.
-4. If pg_cron is not enabled, add a fourth variable, `CRON_SECRET` (any long random string). `vercel.json` schedules `GET /cron/close-matches` and `GET /cron/close-bounties` every minute; Vercel sends the secret as `Authorization: Bearer …`, and the routes call `close_ended_matches()` and `close_ended_bounties()` through the service-role client. Without the variable the routes answer 401 to every call, so they are harmless when pg_cron is doing the job.
+4. `CRON_SECRET` is no longer needed: nothing runs on a Vercel cron since matches and bounties left the game (`0030_no_competition_between_players.sql`).
 
 ## 5. The domain
 

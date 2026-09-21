@@ -39,7 +39,7 @@ export function runListScenarios() {
 	assert.deepEqual(anglerFiltersFrom(new URLSearchParams('sort=landed&region=france')), { region: 'france', sort: 'landed', search: '', page: 1 });
 	assert.deepEqual(anglerParamsOf({ region: null, sort: 'skill', search: 'ne', page: 3 }), { region: null, sort: null, search: 'ne' });
 
-	assert.equal(feedGroupFrom('matches'), 'matches');
+	assert.equal(feedGroupFrom('catches'), 'catches');
 	assert.equal(feedGroupFrom('gossip'), null, 'an unknown group is everything');
 	assert.deepEqual(kindsInGroup('catches'), ['big_catch', 'record']);
 	assert.equal(kindsInGroup(null), null);

@@ -7,13 +7,11 @@
 	import WaterShop from '$lib/components/lakes/WaterShop.svelte';
 	import WaterHeadline from '$lib/components/lakes/WaterHeadline.svelte';
 	import OnTheBankNow from '$lib/components/lakes/OnTheBankNow.svelte';
-	import BountyPill from '$lib/components/lakes/BountyPill.svelte';
-	import BountyCard from '$lib/components/world/BountyCard.svelte';
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
 	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
-	import FishHereButton from '$lib/components/matches/FishHereButton.svelte';
-	import MatchesAtWater from '$lib/components/matches/MatchesAtWater.svelte';
+	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
+	import { formatMoney } from '$lib/format/money';
 	import { worldUrlForLake } from '$lib/game/world/worldUrl';
 
 	let { data } = $props();
@@ -27,7 +25,7 @@
 	const hasADiary = $derived(lake.is_booking_on || isASyndicate);
 	const now = $derived(new Date(data.loadedAt));
 	const isOwnWater = $derived(lake.owner_id === data.user?.id);
-	const openBounty = $derived(data.bounties.find((bounty) => bounty.status === 'open') ?? null);
+	const fishHereWords = $derived(isOwnWater ? 'Go fishing' : `Fish here for ${formatMoney(Number(lake.day_ticket_fee))}`);
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
@@ -40,20 +38,18 @@
 		</p>
 	</div>
 	<div class="flex w-full flex-wrap items-center gap-3 sm:ml-auto sm:w-auto">
-		{#if openBounty}<BountyPill bounty={openBounty} />{/if}
 		<FavouriteStar lakeId={lake.id} isFavourite={data.isFavourite} isLabelled />
-		<FishHereButton {lake} runningMatch={data.runningMatch} {isOwnWater} />
+		<GoFishingButton lakeId={lake.id} words={fishHereWords} />
 	</div>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
-	<LakeCanvas {lake} {swims} {carp} {shoals} bountySwimId={openBounty?.swimId ?? null} />
+	<LakeCanvas {lake} {swims} {carp} {shoals} />
 	<section class="panel space-y-4">
 		<h2 class="text-xl text-volt-300">The water</h2>
 		<WaterHeadline {lake} {carp} {shoals} book={diary.book} diary={diary.days} {now} />
 		<OnTheBankNow anglers={data.onTheBank} {now} myId={data.user?.id ?? null} />
 		<FacilitiesRow built={lake.layout.facilities} emptyWords="No facilities on the bank yet." />
-		{#if openBounty}<BountyCard bounty={openBounty} isOnTheWater />{/if}
 		<DifficultyReading {lake} {carp} {shoals} />
 		{#if hasADiary}<a href="/lakes/{lake.id}/book" class="button-secondary inline-block text-base">The booking diary</a>{/if}
 		<WaterShop {lake} />
@@ -67,5 +63,4 @@
 		<StockTable {carp} limit={15} />
 	</section>
 	<RecentCatchesPanel catches={water.catches} {carpNames} />
-	<div class="lg:col-span-2"><MatchesAtWater lakeId={lake.id} matches={data.matches} {now} /></div>
 </div>

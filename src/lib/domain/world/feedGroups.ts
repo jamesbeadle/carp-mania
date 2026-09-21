@@ -1,7 +1,7 @@
 import type { WorldActivity } from '../../contracts/WorldActivity';
 import type { WorldEventKind } from '../worldTypes';
 
-export type FeedGroup = 'anglers' | 'catches' | 'market' | 'waters' | 'matches' | 'bounties' | 'lines';
+export type FeedGroup = 'anglers' | 'catches' | 'market' | 'waters' | 'lines';
 
 export interface FeedGroupChoice {
 	group: FeedGroup;
@@ -10,15 +10,13 @@ export interface FeedGroupChoice {
 }
 
 export const AnglersGroup: FeedGroup = 'anglers';
-export const AnglersDoings: WorldEventKind[] = ['handover', 'match_announced', 'match_won', 'award', 'prototype_lost'];
+export const AnglersDoings: WorldEventKind[] = ['handover', 'award', 'prototype_lost'];
 
 export const FeedGroups: FeedGroupChoice[] = [
 	{ group: AnglersGroup, label: 'Anglers', kinds: [] },
 	{ group: 'catches', label: 'Catches', kinds: ['big_catch', 'record'] },
 	{ group: 'market', label: 'Sales', kinds: ['sale'] },
 	{ group: 'waters', label: 'Waters', kinds: ['new_water', 'island_built'] },
-	{ group: 'matches', label: 'Matches', kinds: ['match_announced', 'match_won'] },
-	{ group: 'bounties', label: 'Bounties', kinds: ['bounty_posted', 'bounty_won'] },
 	{ group: 'lines', label: 'Lives', kinds: ['fish_died', 'handover'] }
 ];
 

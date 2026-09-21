@@ -1,4 +1,3 @@
-import { isBookedOut } from '../matches/bookings';
 import type { RandomFraction } from '../random';
 import { stockDrawOf } from '../water/stockDraw';
 import { pegsPerDayFor } from '../water/demand';
@@ -11,7 +10,6 @@ import { driftWaterForOneDay } from './driftWater';
 import { driftTeamForOneDay } from '../bailiffs/performance';
 import { wagesOf } from '../bailiffs/bailiffTeam';
 import { runningCostOf } from '../groundworks/facilities';
-import { bountyOfTheDay } from './bountyOfTheDay';
 import { waterAfterDay } from './waterAfterDay';
 import { feedTheLakeForOneDay } from './feedTheLake';
 import { isHeatwaveToday, sufferHeatwave } from './heatwave';
@@ -19,7 +17,7 @@ import { lapseTransfersForOneDay } from './lapseTransfers';
 import { driftFertilityForOneDay } from './naturalFood';
 import { letPikeHuntForOneDay } from './pikePredation';
 import { shoalsAfterTheDay } from './shoalsAfterTheDay';
-import { noAnglersToday, simulateVisitingAnglers } from './visitingAnglers';
+import { simulateVisitingAnglers } from './visitingAnglers';
 import type { DayContext, DayOutcome } from './dayTypes';
 
 export type { DayContext, DayOutcome } from './dayTypes';
@@ -44,9 +42,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 	const isHeatwave = isHeatwaveToday(hunted.lake, context.season, random);
 	const shoalsToday = shoalsAfterTheDay(hunted.lake, hunted.shoals, lapsed.carp, context, isHeatwave, random);
 	const today = visitingDayOf(hunted.lake, context, lapsed.carp, shoalsToday.shoals);
-	const anglers = isBookedOut(context.bookings, context.dayStart, context.dayEnd)
-		? noAnglersToday(context.records)
-		: simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, today);
+	const anglers = simulateVisitingAnglers(hunted.lake, lapsed.carp, swims, random, today);
 	const survivors = isHeatwave ? sufferHeatwave(hunted.lake, lapsed.carp) : lapsed.carp;
 	const aged = ageCarpIfNewYear(survivors, context.dayStart, context.dayEnd, random);
 
@@ -71,8 +67,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		namedFromShoals: shoalsToday.named,
 		shoalFishTakenByPike: hunted.shoalFishTakenByPike,
 		bailiffs: driftTeamForOneDay(context.bailiffs, random),
-		turnedAway: anglers.turnedAway,
-		bountyDrawn: bountyOfTheDay(hunted.lake, lapsed.carp, swims, random, context)
+		turnedAway: anglers.turnedAway
 	};
 }
 

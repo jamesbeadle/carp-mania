@@ -9,7 +9,6 @@ import { SellFishToDealer } from '$lib/server/commands/SellFishToDealer';
 import { SellShoalFish } from '$lib/server/commands/SellShoalFish';
 import { StockCoarseFish } from '$lib/server/commands/StockCoarseFish';
 import { NetTheSilvers } from '$lib/server/commands/NetTheSilvers';
-import { PostBounty } from '$lib/server/commands/PostBounty';
 import { TurnOnAdvanceBooking } from '$lib/server/commands/TurnOnAdvanceBooking';
 import { SellSyndicatePlaces } from '$lib/server/commands/SellSyndicatePlaces';
 import { AddTicketProduct } from '$lib/server/commands/AddTicketProduct';
@@ -23,7 +22,6 @@ import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
 import { GetBailiffs } from '$lib/server/queries/GetBailiffs';
-import { loadBountiesOnTheWater } from '$lib/server/queries/GetBounties';
 import { loadSpeciesOf } from '$lib/server/queries/GetLakeSpecies';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
@@ -32,8 +30,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const whileAway = await SimulateElapsedTime(locals);
 	const [fishery, profile, groundworks, waters] = await Promise.all([GetMyFishery(locals), loadProfile(locals), GetMyGroundworks(locals), loadMyWaters(locals, user.id)]);
 	const lakeId = fishery.lake.id;
-	const [book, bailiffs, species, bounties] = await Promise.all([GetTicketBook(locals, lakeId), GetBailiffs(locals), loadSpeciesOf(locals, lakeId), loadBountiesOnTheWater(locals.supabase, lakeId)]);
-	return { fishery, profile, whileAway, groundworks, waters, book, bailiffs, species, bounties, loadedAt: new Date().toISOString() };
+	const [book, bailiffs, species] = await Promise.all([GetTicketBook(locals, lakeId), GetBailiffs(locals), loadSpeciesOf(locals, lakeId)]);
+	return { fishery, profile, whileAway, groundworks, waters, book, bailiffs, species, loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {
@@ -44,7 +42,6 @@ export const actions: Actions = {
 	netTheSilvers: ({ locals }) => NetTheSilvers(locals),
 	turnOnBooking: ({ locals, request }) => request.formData().then((formData) => TurnOnAdvanceBooking(locals, formData)),
 	sellSyndicate: ({ locals, request }) => request.formData().then((formData) => SellSyndicatePlaces(locals, formData)),
-	postBounty: ({ locals, request }) => request.formData().then((formData) => PostBounty(locals, formData)),
 	stockPike: ({ locals, request }) => request.formData().then((formData) => StockPike(locals, formData)),
 	stockPikeFood: ({ locals, request }) => request.formData().then((formData) => StockPikeFood(locals, formData)),
 	hireBailiff: ({ locals, request }) => request.formData().then((formData) => HireBailiff(locals, formData)),

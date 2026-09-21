@@ -6,7 +6,7 @@
 	import ScopeTabs from '$lib/components/hall/ScopeTabs.svelte';
 	import Skeleton from '$lib/components/loading/Skeleton.svelte';
 	import { HallBoard } from '$lib/contracts/HallOfFame';
-	import { anglerHonours, matchHonours, waterHonours } from '$lib/game/world/honourRolls';
+	import { anglerHonours, waterHonours } from '$lib/game/world/honourRolls';
 
 	let { data } = $props();
 
@@ -33,7 +33,6 @@
 		<div class="grid gap-6">
 			<Skeleton title="Most fish landed" rows={5} />
 			<Skeleton title="Waters of legend" rows={5} />
-			<Skeleton title="Match winners" rows={5} />
 		</div>
 	</div>
 {:then hall}
@@ -43,7 +42,6 @@
 		<div class="grid gap-6">
 			<HonourRoll title="Most fish landed" blurb="Anglers by fish on the bank, for life." honours={anglerHonours(hall.mostFishLanded)} emptyWords="Nobody has wet a line here yet." viewerId={data.viewerId} />
 			<HonourRoll title="Waters of legend" blurb="Waters by the best fish an angler ever had there, owner credited." honours={waterHonours(hall.watersOfLegend)} emptyWords="No angler has had a fish worth remembering here yet." />
-			<HonourRoll title="Match winners" blurb="Anglers by trophies won in matches, across every generation of their line." honours={matchHonours(hall.matchWinners)} emptyWords="No match has been fished yet." viewerId={data.viewerId} />
 			<PrototypesBoard prototypes={hall.prototypes} />
 		</div>
 	</div>

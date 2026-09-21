@@ -33,14 +33,6 @@ export interface WaterOfLegend {
 	catches: number;
 }
 
-export interface MatchWinner {
-	anglerId: string;
-	anglerName: string;
-	trophies: number;
-	prizeMoney: number;
-	latestTitle: string;
-}
-
 export interface AnglerStanding {
 	rank: number;
 	bestLb: number;
@@ -64,6 +56,5 @@ export interface HallOfFame {
 	legends: CarpMemorial[];
 	mostFishLanded: ProlificAngler[];
 	watersOfLegend: WaterOfLegend[];
-	matchWinners: MatchWinner[];
 	prototypes: PrototypeOnTheBoard[];
 }

@@ -4,7 +4,7 @@
 	const Arms = [
 		{ y: 22, label: 'THE WORLD', isPointingRight: true },
 		{ y: 40, label: 'HALL OF FAME', isPointingRight: false },
-		{ y: 58, label: 'MATCHES', isPointingRight: true }
+		{ y: 58, label: 'ANGLERS', isPointingRight: true }
 	];
 	const Arm = { Width: 70, Height: 14, Nose: 8, FontSize: 7.5, LetterSpacing: 0.3 } as const;
 </script>

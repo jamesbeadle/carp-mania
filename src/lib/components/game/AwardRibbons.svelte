@@ -1,21 +1,10 @@
 <script lang="ts">
-	import type { BountyWon } from '$lib/contracts/Bounties';
-	import { BountyKindCatalogue } from '$lib/domain/bounties/bountyKinds';
-	import { PrizeWords } from '$lib/domain/bounties/prizeTackle';
 	import { AwardCatalogue, type AwardKey } from '$lib/domain/trophies/awards';
-	import { formatMoney } from '$lib/format/money';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
 
-	let { awards, bountyWon }: { awards: AwardKey[]; bountyWon: BountyWon | null } = $props();
+	let { awards }: { awards: AwardKey[] } = $props();
 
-	const hasSomething = $derived(awards.length > 0 || bountyWon !== null);
-	const bountyWords = $derived(bountyWon ? bountyLine(bountyWon) : '');
-
-	function bountyLine(won: BountyWon) {
-		const isMoney = won.prizeKind === 'money' || won.prizeKind === 'brand_credit';
-		const prize = isMoney ? `${formatMoney(won.prizeMoney)} ${PrizeWords[won.prizeKind]}` : PrizeWords[won.prizeKind];
-		return `Bounty taken — ${BountyKindCatalogue[won.kind].label.toLowerCase()}: ${prize}`;
-	}
+	const hasSomething = $derived(awards.length > 0);
 
 	$effect(() => {
 		if (hasSomething) sound.play('record');
@@ -29,7 +18,6 @@
 				Award: {AwardCatalogue[key].label}
 			</span>
 		{/each}
-		{#if bountyWon}<span class="award rounded-full border-2 px-4 py-1 font-display text-lg font-extrabold tracking-wide uppercase italic">{bountyWords}</span>{/if}
 	</div>
 {/if}
 

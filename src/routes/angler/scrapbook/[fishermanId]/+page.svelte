@@ -1,7 +1,6 @@
 <script lang="ts">
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
 	import KnownFishList from '$lib/components/legacy/KnownFishList.svelte';
-	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
 	import StatRow from '$lib/components/stats/StatRow.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
@@ -48,7 +47,6 @@
 		<section class="panel">
 			<StatRow stats={lifetimeStats} />
 		</section>
-		<TrophyCabinet trophies={book.trophies} />
 		<KnownFishList fishKnown={book.fishKnown} />
 	</div>
 	<section class="panel">

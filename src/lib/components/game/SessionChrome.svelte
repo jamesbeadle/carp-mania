@@ -12,11 +12,10 @@
 		lake: Lake;
 		session: SessionState;
 		isAlarmMuted: boolean;
-		matchBoardHref: string | null;
 		onHowToPlay: () => void;
 	}
 
-	let { lake, session, isAlarmMuted = $bindable(), matchBoardHref, onHowToPlay }: Props = $props();
+	let { lake, session, isAlarmMuted = $bindable(), onHowToPlay }: Props = $props();
 
 	const isOnTheBank = $derived(session.phase !== 'choose_swim');
 </script>
@@ -25,7 +24,6 @@
 	<div class="short:flex-row short:items-center short:gap-3 order-1 flex min-w-0 flex-1 flex-col items-start gap-1.5">
 		<a href="/lakes" class="rounded-full bg-carbon-950/45 px-3 py-1 text-xs whitespace-nowrap text-mist-200 backdrop-blur transition hover:text-volt-300">← Leave the water</a>
 		<h1 class="short:text-xl max-w-full truncate text-2xl leading-none text-mist-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)] lg:text-4xl">{lake.name}</h1>
-		{#if matchBoardHref}<a href={matchBoardHref} class="rounded-full border border-volt-500/60 bg-carbon-950/45 px-3 py-1 text-xs whitespace-nowrap text-volt-300 backdrop-blur transition hover:bg-volt-500/15">Match in play · the board</a>{/if}
 	</div>
 	<div class="short:order-3 order-2 flex shrink-0 items-center gap-2">
 		<button class="flex h-9 w-9 items-center justify-center rounded-full border border-carbon-600 bg-carbon-900/80 font-display text-lg font-bold text-mist-200 transition hover:border-volt-400 hover:text-volt-300 active:scale-95" onclick={onHowToPlay} aria-label="How to play" title="How to play">?</button>

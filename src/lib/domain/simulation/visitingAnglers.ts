@@ -44,10 +44,6 @@ export interface AnglerDay {
 	turnedAway: number;
 }
 
-export function noAnglersToday(standing: StandingRecords): AnglerDay {
-	return { visits: [], catches: [], records: standing, lodgeTakings: 0, turnedAway: 0 };
-}
-
 export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, today: VisitingDay): AnglerDay {
 	const wanting = anglersArrivingToday(lake, today.season, today.book, today.stockDraw);
 	const count = Math.min(wanting, Math.round(today.pegsPerDay));

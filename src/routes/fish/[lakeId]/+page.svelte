@@ -9,9 +9,6 @@
 	const water = $derived(data.water);
 	const carpInTheLake = $derived(water.carp.filter(isFishable));
 	const knownCarpCount = $derived(carpInTheLake.filter((fish) => fish.is_catalogued).length);
-	const runningMatch = $derived(data.runningMatch);
-	const enteredMatchId = $derived(runningMatch?.isEntered ? runningMatch.match.id : null);
-	const matchBoardHref = $derived(enteredMatchId ? `/matches/${enteredMatchId}` : null);
 	const waterAsFound = $derived(data.visit?.waterAsFound ?? water);
 	const setup = $derived({ ...waterAsFound, carp: waterAsFound.carp.filter(isFishable), profile: data.profile, visit: data.visit, bar: data.bar });
 </script>
@@ -19,8 +16,8 @@
 <svelte:head><title>Fishing {water.lake.name} · Carp Mania</title></svelte:head>
 
 {#if data.visit && data.bar}
-	<FishingGame setup={{ ...setup, visit: data.visit, bar: data.bar }} swims={water.swims} owned={data.owned} {matchBoardHref} />
+	<FishingGame setup={{ ...setup, visit: data.visit, bar: data.bar }} swims={water.swims} owned={data.owned} />
 {:else}
 	<ActionMessage {form} />
-	<DayTicketOffice {water} profile={data.profile} book={data.book} {runningMatch} {knownCarpCount} streakIfFishedToday={data.streakIfFishedToday} />
+	<DayTicketOffice {water} profile={data.profile} book={data.book} {knownCarpCount} streakIfFishedToday={data.streakIfFishedToday} />
 {/if}

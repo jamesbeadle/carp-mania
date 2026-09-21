@@ -39,7 +39,7 @@ select test.assert_that(
 select test.assert_that(not exists (select 1 from public.records_held_by(test.player(172))), 'a twenty behind a thirty-one holds nothing');
 select test.assert_that(
 	(select bool_and(reached_at is not null) from public.milestones_of(test.player(171)) where kind in ('twenty', 'thirty', 'first_record'))
-		and (select bool_and(reached_at is null) from public.milestones_of(test.player(171)) where kind in ('forty', 'fifty', 'hundred_fish', 'five_hundred_fish', 'first_trophy')),
+		and (select bool_and(reached_at is null) from public.milestones_of(test.player(171)) where kind in ('forty', 'fifty', 'hundred_fish', 'five_hundred_fish')),
 	'milestones: the first twenty and thirty and the first record are reached, nothing beyond'
 );
 select test.assert_that(

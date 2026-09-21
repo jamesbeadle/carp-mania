@@ -20,7 +20,6 @@ import { runGroundworksScenarios } from './testGroundworks';
 import { runLightScenarios } from './testLight';
 import { runListScenarios } from './testLists';
 import { runMarketScenarios } from './testMarket';
-import { runMatchScenarios } from './testMatches';
 import { runPikeScenarios } from './testPike';
 import { runRivalryScenarios } from './testRivalry';
 import { runSiteScenarios } from './testSites';
@@ -50,7 +49,7 @@ function contextForDay(dayIndex: number, currentLake: Lake): DayContext {
 	const dayStart = new Date(start.getTime() + dayIndex * FisheryClock.RealMillisecondsPerFisheryDay);
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
 	const book = defaultBookFor(currentLake.id, Number(currentLake.day_ticket_fee)).map((product, index) => ({ ...product, id: `ticket-${index}` }));
-	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], bookings: [], book, bailiffs: [], species: [], swimCount: 7, pegsBooked: 0, hasOpenBounty: false };
+	return { dayStart, dayEnd, season: seasonFor(currentLake, dayStart), records: noRecordsYet(), works: [], book, bailiffs: [], species: [], swimCount: 7, pegsBooked: 0 };
 }
 
 const fedLake: Lake = { ...lake, feed_stock: { ...lake.feed_stock, fishmeal_boilies: 40 } };
@@ -86,7 +85,6 @@ runAgeingScenarios();
 runDiaryScenarios();
 runEstateScenarios();
 runFarmScenarios();
-runMatchScenarios();
 runGroundworksScenarios();
 runPikeScenarios();
 runStreakScenarios();

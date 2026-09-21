@@ -33,7 +33,7 @@
 	{#if isWeighed}
 		<h2 class="text-3xl text-volt-300">{landed.carp.name}</h2>
 		<HonourRibbons honours={landed.honours} />
-		{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} bountyWon={catchOutcome.bountyWon} />{/if}
+		{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} />{/if}
 	{/if}
 	<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
 	<p class="text-xs text-mist-400">{anglerName} at {lakeName}</p>
