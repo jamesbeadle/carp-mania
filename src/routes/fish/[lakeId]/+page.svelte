@@ -16,7 +16,7 @@
 <svelte:head><title>Fishing {water.lake.name} · Carp Mania</title></svelte:head>
 
 {#if data.visit && data.bar}
-	<FishingGame setup={{ ...setup, visit: data.visit, bar: data.bar }} swims={water.swims} owned={data.owned} />
+	<FishingGame setup={{ ...setup, visit: data.visit, bar: data.bar }} swims={water.swims} owned={data.owned} rodSets={data.rodSets} />
 {:else}
 	<ActionMessage {form} />
 	<DayTicketOffice {water} profile={data.profile} book={data.book} {knownCarpCount} streakIfFishedToday={data.streakIfFishedToday} />

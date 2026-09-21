@@ -8,6 +8,7 @@ import { GetLake } from '$lib/server/queries/GetLake';
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
 import { loadOwnedTackle } from '$lib/server/queries/GetTackleBox';
+import { loadRodSets } from '$lib/server/queries/loadRodSets';
 
 const VisitParam = 'visit';
 const ProductField = 'productId';
@@ -25,8 +26,9 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const isOnTheWater = visit !== null;
 	const barLoad = visit ? GetTheBar(locals, water.lake, visit.visitedAt) : null;
 	const ownedLoad = visit ? loadOwnedTackle(locals, profile.id) : [];
-	const [bar, owned] = await Promise.all([barLoad, ownedLoad]);
-	return { water, profile, visit, bar, owned, book, streakIfFishedToday, isStage: isOnTheWater, isImmersive: isOnTheWater };
+	const rodSetsLoad = visit ? loadRodSets(locals, profile.id) : [];
+	const [bar, owned, rodSets] = await Promise.all([barLoad, ownedLoad, rodSetsLoad]);
+	return { water, profile, visit, bar, owned, rodSets, book, streakIfFishedToday, isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {

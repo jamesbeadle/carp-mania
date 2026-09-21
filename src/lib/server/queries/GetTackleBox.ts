@@ -3,6 +3,7 @@ import type { RodSetup } from '$lib/domain/tackle/rodSetup';
 import type { OwnedTackle } from '$lib/domain/tackle/tackleBox';
 import { requireUser } from '../gates/requireUser';
 import { loadRatingOf } from './loadAnglerRating';
+import { loadRodSets } from './loadRodSets';
 
 interface OwnedRow {
 	item_id: string;
@@ -12,9 +13,9 @@ interface OwnedRow {
 
 export async function GetTackleBox(locals: App.Locals): Promise<TackleBox> {
 	const user = requireUser(locals);
-	const loads = [loadOwnedTackle(locals, user.id), loadSavedRods(locals, user.id), loadRatingOf(locals, user.id)] as const;
-	const [owned, savedRods, rating] = await Promise.all(loads);
-	return { owned, savedRods, rating };
+	const loads = [loadOwnedTackle(locals, user.id), loadSavedRods(locals, user.id), loadRodSets(locals, user.id), loadRatingOf(locals, user.id)] as const;
+	const [owned, savedRods, rodSets, rating] = await Promise.all(loads);
+	return { owned, savedRods, rodSets, rating };
 }
 
 export async function loadOwnedTackle(locals: App.Locals, profileId: string): Promise<OwnedTackle[]> {

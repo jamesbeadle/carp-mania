@@ -20,7 +20,7 @@
 </PlaceBanner>
 
 <div class="grid gap-4 lg:grid-cols-2">
-	<div class="lg:col-span-2"><SavedRodsList savedRods={data.box.savedRods} /></div>
+	<div class="lg:col-span-2"><SavedRodsList savedRods={data.box.savedRods} rodSets={data.box.rodSets} /></div>
 	{#each TackleKinds as kind (kind)}
 		<OwnedList {kind} owned={ownedOrSpoiled(kind)} />
 	{/each}
