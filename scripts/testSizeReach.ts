@@ -31,7 +31,7 @@ export function runSizeReachScenarios() {
 	assert.ok(isInsideTheBand(landed), `a competent angler lands ${landed.toFixed(1)} in 24 hours, inside ${band}`);
 	for (const window of [DayTicket, NightTicket]) {
 		const shortLanded = landedFromTakes(meanTakesPerSession(lake, CompetentRating, defaultRodSetup(), window));
-		assert.ok(isInsideShortBand(shortLanded), `a day or night ticket lands ${shortLanded.toFixed(1)}, one to six`);
+		assert.ok(isInsideShortBand(shortLanded), `a day or night ticket lands ${shortLanded.toFixed(1)}, two to nine`);
 	}
 	for (const rating of Ratings) {
 		for (const setup of [SupermarketSetup, defaultRodSetup()]) {
