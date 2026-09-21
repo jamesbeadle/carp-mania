@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bailiffCapFor, feeCollectionOf, teamClearingShare, whyCannotHire } from '../src/lib/domain/bailiffs/bailiffTeam';
+import { acresUntilAnotherBailiff, bailiffCapFor, feeCollectionOf, teamClearingShare, teamRoomWords, whyCannotHire } from '../src/lib/domain/bailiffs/bailiffTeam';
 import { candidatesThisWeek } from '../src/lib/domain/bailiffs/candidates';
 import { FacilityCatalogue, whyFacilityCannotBeBuilt } from '../src/lib/domain/groundworks/facilities';
 import { driftWaterForOneDay } from '../src/lib/domain/simulation/driftWater';
@@ -12,6 +12,9 @@ export function bailiffScenario() {
 	assert.equal(bailiffCapFor(10), 1);
 	assert.equal(bailiffCapFor(60), 4);
 	assert.equal(bailiffCapFor(200), 14, 'fourteen bailiffs on two hundred acres');
+	assert.equal(acresUntilAnotherBailiff(10), 5, 'ten acres is five short of a second bailiff');
+	assert.ok(teamRoomWords([{ id: 'a' }], 10).includes('Another 5 acres'), 'a full team says how much water would make room');
+	assert.ok(teamRoomWords([], 10).includes('1 more can be hired'), 'an empty team says how many can be hired');
 	const good = { performance: 80 };
 	assert.ok(teamClearingShare([good, good], 60) > teamClearingShare([good], 60), 'two bailiffs on sixty acres clear more than one');
 	assert.ok(teamClearingShare([good], 60) > teamClearingShare([good], 200), 'and one on two hundred acres clears less still');

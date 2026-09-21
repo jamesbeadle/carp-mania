@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { BailiffsPanel } from '$lib/contracts/BailiffsPanel';
-	import { BailiffTerms } from '$lib/domain/bailiffs/bailiffTeam';
+	import { BailiffTerms, teamRoomWords } from '$lib/domain/bailiffs/bailiffTeam';
 	import type { Lake } from '$lib/domain/types';
 	import WaterQualityBars from '../WaterQualityBars.svelte';
 	import AboutToggle from '../stats/AboutToggle.svelte';
@@ -13,6 +13,7 @@
 	const team = $derived(bailiffs.team);
 	const isFull = $derived(team.length >= bailiffs.cap);
 	const hasTeam = $derived(team.length > 0);
+	const roomWords = $derived(teamRoomWords(team, Number(lake.acres)));
 </script>
 
 <section class="panel">
@@ -26,6 +27,7 @@
 		</ul>
 	{/if}
 	<h4 class="mt-5 mb-1 text-sm font-medium text-mist-100">Looking for work this week</h4>
+	<p class="mb-2 text-xs" class:text-mist-400={!isFull} class:text-warning-500={isFull}>{roomWords}</p>
 	<ul class="divide-y divide-carbon-700/60">
 		{#each bailiffs.candidates as candidate (candidate.id)}<CandidateCard {candidate} {isFull} />{/each}
 	</ul>
