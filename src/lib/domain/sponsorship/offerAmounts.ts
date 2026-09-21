@@ -16,8 +16,9 @@ export function isWaterWorthSponsoring(waterRating: number) {
 }
 
 export function perTermFor(waterRating: number) {
-	const share = Math.min(1, Math.max(0, (waterRating - OfferMoney.LeastWaterRating) / (100 - OfferMoney.LeastWaterRating)));
-	const money = OfferMoney.LeastPerTerm + Math.pow(share, OfferMoney.Curve) * (OfferMoney.MostPerTerm - OfferMoney.LeastPerTerm);
+	const { LeastWaterRating, LeastPerTerm, MostPerTerm, Curve } = OfferMoney;
+	const share = Math.min(1, Math.max(0, (waterRating - LeastWaterRating) / (100 - LeastWaterRating)));
+	const money = LeastPerTerm + Math.pow(share, Curve) * (MostPerTerm - LeastPerTerm);
 	return Math.round(money / OfferMoney.RoundTo) * OfferMoney.RoundTo;
 }
 
