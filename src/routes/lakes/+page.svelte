@@ -18,7 +18,6 @@
 
 <PlaceBanner kind="jetty" title="Waters to fish" blurb="Every open fishery in the game. Day tickets go to the owner.">
 	{#snippet actions()}
-		<a href="/matches" class="button-secondary text-base">Matches</a>
 		<a href="/world" class="button-secondary text-base">Spin the globe</a>
 	{/snippet}
 </PlaceBanner>

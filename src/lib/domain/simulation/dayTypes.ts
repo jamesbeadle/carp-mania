@@ -1,8 +1,6 @@
 import type { Bailiff } from '../bailiffs/bailiffTeam';
-import type { NewBounty } from '../bounties/bountyDraw';
 import type { TicketProduct } from '../fishing/ticketBook';
 import type { StandingRecords } from '../market/records';
-import type { BookedWindow } from '../matches/bookings';
 import type { Carp, Lake } from '../types';
 import type { Season } from '../world/seasons';
 import type { LakeSpecies } from '../water/species';
@@ -17,13 +15,11 @@ export interface DayContext {
 	season: Season;
 	records: StandingRecords;
 	works: LakeWork[];
-	bookings: BookedWindow[];
 	book: TicketProduct[];
 	bailiffs: Bailiff[];
 	species: LakeSpecies[];
 	swimCount: number;
 	pegsBooked: number;
-	hasOpenBounty: boolean;
 }
 
 export interface DayOutcome {
@@ -48,6 +44,5 @@ export interface DayOutcome {
 	shoalFishTakenByPike: number;
 	bailiffs: Bailiff[];
 	turnedAway: number;
-	bountyDrawn: NewBounty | null;
 }
 

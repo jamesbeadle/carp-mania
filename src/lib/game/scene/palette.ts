@@ -21,8 +21,6 @@ export const BankPalette = {
 	PegLift: 'hsla(42 60% 92% / 0.55)',
 	PegChosenRing: 'hsla(42 90% 68% / 0.55)',
 	PegChosenGlow: 'hsla(42 90% 68% / 0.22)',
-	BountyMarker: 'hsl(42 90% 58%)',
-	BountyMarkerFace: 'hsl(120 14% 3%)',
 	Label: 'hsl(42 40% 92%)',
 	LabelBackdrop: 'hsla(0 0% 0% / 0.45)'
 } as const;

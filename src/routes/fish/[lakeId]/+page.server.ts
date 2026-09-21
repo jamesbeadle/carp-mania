@@ -5,7 +5,6 @@ import { loadProfile } from '$lib/server/gates/requireMoney';
 import { GetFishingVisit } from '$lib/server/queries/GetFishingVisit';
 import { loadStreakIfFishedNow } from '$lib/server/queries/loadStreak';
 import { GetLake } from '$lib/server/queries/GetLake';
-import { GetMatchesAtWater, runningMatchAmong } from '$lib/server/queries/GetMatchesAtWater';
 import { GetTheBar } from '$lib/server/queries/GetTheBar';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
 import { loadOwnedTackle } from '$lib/server/queries/GetTackleBox';
@@ -16,10 +15,9 @@ const HttpStatus = { BadRequest: 400 } as const;
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const visitId = url.searchParams.get(VisitParam);
-	const [water, profile, matches, visit, book] = await Promise.all([
+	const [water, profile, visit, book] = await Promise.all([
 		GetLake(locals, params.lakeId),
 		loadProfile(locals),
-		GetMatchesAtWater(locals, params.lakeId),
 		visitId ? GetFishingVisit(locals, params.lakeId, visitId) : null,
 		GetTicketBook(locals, params.lakeId)
 	]);
@@ -28,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const barLoad = visit ? GetTheBar(locals, water.lake, visit.visitedAt) : null;
 	const ownedLoad = visit ? loadOwnedTackle(locals, profile.id) : [];
 	const [bar, owned] = await Promise.all([barLoad, ownedLoad]);
-	return { water, profile, visit, bar, owned, book, streakIfFishedToday, runningMatch: runningMatchAmong(matches), isStage: isOnTheWater, isImmersive: isOnTheWater };
+	return { water, profile, visit, bar, owned, book, streakIfFishedToday, isStage: isOnTheWater, isImmersive: isOnTheWater };
 };
 
 export const actions: Actions = {

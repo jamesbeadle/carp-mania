@@ -17,7 +17,6 @@ export interface RunningWater {
 	bailiffs: Bailiff[];
 	records: StandingRecords;
 	works: LakeWork[];
-	hasOpenBounty: boolean;
 }
 
 export function startOfDay(lake: Lake, day: number) {
@@ -29,9 +28,9 @@ export function dayContextFor(life: LakeLife, running: RunningWater, dayStart: D
 	const dayEnd = new Date(dayStart.getTime() + FisheryClock.RealMillisecondsPerFisheryDay);
 	const season = seasonFor(running.lake, dayStart);
 	const pegsBooked = life.pegsBookedByDay[fisheryDayNumber(dayStart)] ?? 0;
-	const { bookings, book, species, swims } = life;
-	const { records, works, bailiffs, hasOpenBounty } = running;
-	return { dayStart, dayEnd, season, records, works, bookings, book, bailiffs, species, swimCount: swims.length, pegsBooked, hasOpenBounty };
+	const { book, species, swims } = life;
+	const { records, works, bailiffs } = running;
+	return { dayStart, dayEnd, season, records, works, book, bailiffs, species, swimCount: swims.length, pegsBooked };
 }
 
 export function waterAfter(outcome: DayOutcome, running: RunningWater, day: number): RunningWater {
@@ -42,8 +41,7 @@ export function waterAfter(outcome: DayOutcome, running: RunningWater, day: numb
 		shoals: [...outcome.shoals, ...fryAsRows(outcome, day)],
 		bailiffs: outcome.bailiffs,
 		records: outcome.records,
-		works: running.works.filter((work) => !completedIds.has(work.id)),
-		hasOpenBounty: running.hasOpenBounty || outcome.bountyDrawn !== null
+		works: running.works.filter((work) => !completedIds.has(work.id))
 	};
 }
 

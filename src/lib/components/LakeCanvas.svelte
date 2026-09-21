@@ -25,7 +25,6 @@
 		shoals?: Shoal[];
 		camera?: CameraState;
 		selectedSwimId?: string | null;
-		bountySwimId?: string | null;
 		castReach?: CastReach | null;
 		rods?: RodOnBank[];
 		isAnglerOnBank?: boolean;
@@ -37,7 +36,7 @@
 		onCastBlockedByIsland?: () => void;
 	}
 
-	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, bountySwimId = null, castReach = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
+	let { lake, swims, carp, shoals = [], camera = new CameraState(), selectedSwimId = null, castReach = null, rods = [], isAnglerOnBank = false, drafts = [], showingAt = [], onSwimClick, onWaterClick, onBankClick, onCastBlockedByIsland }: Props = $props();
 
 	const SchoolSeedStride = 7919;
 
@@ -53,7 +52,7 @@
 		const drawScene = createSceneDrawer(layout);
 		return startRenderLoop(canvas, (context, secondsElapsed, timeSeconds) => {
 			const pixelsPerScenePixel = camera.pixelsPerScenePixel(canvas);
-			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel, bountySwimId, castReach }, secondsElapsed, timeSeconds);
+			drawScene(context, { lake, swims, school, selectedSwimId, hoveredSwimId, rods, isAnglerOnBank, drafts, showingAt, pixelsPerScenePixel, castReach }, secondsElapsed, timeSeconds);
 		}, () => camera.camera);
 	});
 

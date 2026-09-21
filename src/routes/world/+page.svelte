@@ -80,7 +80,6 @@
 <PlaceBanner kind="signpost" title="The world" blurb="Every open water in the game, pinned where it is · spin, zoom, tap a pin">
 	{#snippet actions()}
 		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>
-		<a href="/matches" class="button-secondary text-base">Matches</a>
 		<a href="/anglers" class="button-secondary text-base">Anglers</a>
 		<button class="button-secondary text-base lg:hidden" onclick={() => (isRailOpen = !isRailOpen)}>{isRailOpen ? 'Hide filters' : 'Filters'}</button>
 	{/snippet}

@@ -13,7 +13,7 @@
 
 <section class="panel">
 	<h2 class="text-xl text-volt-300">The prototypes</h2>
-	<p class="mb-3 text-xs text-mist-400">One of one, each. Won on a bounty, never sold, and struck from the board the day one snaps.</p>
+	<p class="mb-3 text-xs text-mist-400">One of one, each. Never sold, and struck from the board the day one snaps.</p>
 	{#if prototypes.length === 0}
 		<p class="text-sm text-mist-400">None has been won yet.</p>
 	{:else}

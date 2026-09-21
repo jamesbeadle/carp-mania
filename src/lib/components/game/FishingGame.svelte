@@ -27,10 +27,9 @@
 		setup: SessionSetup;
 		swims: Swim[];
 		owned: OwnedTackle[];
-		matchBoardHref?: string | null;
 	}
 
-	let { setup, swims, owned, matchBoardHref = null }: Props = $props();
+	let { setup, swims, owned }: Props = $props();
 
 	const session = new SessionState(untrack(() => setup));
 	const { lake, profile, visit } = untrack(() => setup);
@@ -87,7 +86,7 @@
 		onStayPut={() => stayOnThisSwim(session)}
 	>
 		{#snippet overTheSky()}
-			<SessionChrome {lake} {session} {matchBoardHref} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />
+			<SessionChrome {lake} {session} bind:isAlarmMuted onHowToPlay={() => (isHowToPlayOpen = true)} />
 		{/snippet}
 	</WaterScreen>
 	<HowToPlay isOpen={isHowToPlayOpen} onClose={() => (isHowToPlayOpen = false)} />

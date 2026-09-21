@@ -1,4 +1,4 @@
-import { HallBoard, type HallOfFame, type HallOfFameCatch, type MatchWinner, type ProlificAngler, type WaterOfLegend } from '$lib/contracts/HallOfFame';
+import { HallBoard, type HallOfFame, type HallOfFameCatch, type ProlificAngler, type WaterOfLegend } from '$lib/contracts/HallOfFame';
 import { WorldScope, type LeaderboardScope } from '$lib/contracts/Leaderboards';
 import type { CarpMemorial } from '$lib/domain/memorialTypes';
 import { requireUser } from '../gates/requireUser';
@@ -25,21 +25,19 @@ type BiggestRow = {
 };
 type ProlificRow = { angler_id: string; angler_name: string; catches: number; heaviest_lb: number };
 type WaterRow = { lake_id: string; lake_name: string; owner_name: string; heaviest_lb: number; catches: number };
-type WinnerRow = { angler_id: string; angler_name: string; trophies: number; prize_money: number; latest_title: string };
 
 export async function GetHallOfFame(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFame> {
 	requireUser(locals);
-	const [biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners, prototypes] = await Promise.all([
+	const [biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, prototypes] = await Promise.all([
 		loadBiggestByAnAngler(locals, scope),
 		loadAnglerStanding(locals, scope),
 		loadVisitorsBest(locals, scope),
 		loadLegends(locals, scope),
 		loadMostFishLanded(locals, scope),
 		loadWatersOfLegend(locals, scope),
-		loadMatchWinners(locals, scope),
 		GetPrototypes(locals.supabase)
 	]);
-	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, matchWinners, prototypes };
+	return { scope, biggestEver, standing, visitorsBest, legends, mostFishLanded, watersOfLegend, prototypes };
 }
 
 async function loadBiggestByAnAngler(locals: App.Locals, scope: LeaderboardScope): Promise<HallOfFameCatch[]> {
@@ -79,11 +77,6 @@ async function loadMostFishLanded(locals: App.Locals, scope: LeaderboardScope): 
 async function loadWatersOfLegend(locals: App.Locals, scope: LeaderboardScope): Promise<WaterOfLegend[]> {
 	const { data } = await locals.supabase.rpc('waters_of_legend', { scope, top: BoardLength });
 	return ((data ?? []) as WaterRow[]).map((row) => ({ lakeId: row.lake_id, lakeName: row.lake_name, ownerName: row.owner_name, heaviestLb: Number(row.heaviest_lb), catches: Number(row.catches) }));
-}
-
-async function loadMatchWinners(locals: App.Locals, scope: LeaderboardScope): Promise<MatchWinner[]> {
-	const { data } = await locals.supabase.rpc('match_winners', { scope, top: BoardLength });
-	return ((data ?? []) as WinnerRow[]).map((row) => ({ anglerId: row.angler_id, anglerName: row.angler_name, trophies: Number(row.trophies), prizeMoney: Number(row.prize_money), latestTitle: row.latest_title }));
 }
 
 function withinScope<Query extends { eq(column: string, value: string): Query }>(query: Query, regionColumn: string, scope: LeaderboardScope): Query {

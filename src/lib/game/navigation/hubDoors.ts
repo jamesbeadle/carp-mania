@@ -1,4 +1,4 @@
-export type HubDoorId = 'fish_my_lake' | 'run_fishery' | 'find_water' | 'matches' | 'tackle_shop';
+export type HubDoorId = 'fish_my_lake' | 'run_fishery' | 'find_water' | 'the_world' | 'tackle_shop';
 
 export interface HubDoor {
 	id: Exclude<HubDoorId, 'fish_my_lake'>;
@@ -11,7 +11,7 @@ export const FinishSettingUpDoor: HubDoor = { id: 'run_fishery', label: 'Finish 
 
 export const HubDoors: HubDoor[] = [
 	{ id: 'find_water', label: 'Find water to fish', href: '/lakes' },
-	{ id: 'matches', label: 'Matches', href: '/matches' },
+	{ id: 'the_world', label: 'The world', href: '/world' },
 	{ id: 'tackle_shop', label: 'Tackle shop', href: '/market' }
 ];
 

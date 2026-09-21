@@ -5,7 +5,6 @@
 	import RivalCard from '$lib/components/angler/RivalCard.svelte';
 	import SkillsPanel from '$lib/components/angler/SkillsPanel.svelte';
 	import FamilyLine from '$lib/components/legacy/FamilyLine.svelte';
-	import TrophyCabinet from '$lib/components/legacy/TrophyCabinet.svelte';
 	import Pager from '$lib/components/lists/Pager.svelte';
 	import Skeleton from '$lib/components/loading/Skeleton.svelte';
 	import AnglerRanksLine from '$lib/components/trophy/AnglerRanksLine.svelte';
@@ -72,7 +71,6 @@
 			<Pager page={catches} noun="catch" plural="catches" {hrefFor} />
 			<a href="/angler/scrapbook/{current.id}" class="mt-3 inline-block text-sm text-surge-400 hover:underline">The scrapbook so far →</a>
 		</section>
-		<div class="lg:col-span-2"><TrophyCabinet trophies={angler.trophies} /></div>
 		<div class="lg:col-span-2"><Diary entries={data.diary} /></div>
 		<div class="lg:col-span-2"><FamilyLine line={diary.line} currentId={current.id} /></div>
 	</div>

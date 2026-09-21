@@ -40,8 +40,8 @@ async function simulateWater(locals: App.Locals, lake: Lake, profile: Profile): 
 function runDays(lake: Lake, life: LakeLife, days: number, records: StandingRecords) {
 	const random = seededRandom(new Date(lake.simulated_until).getTime());
 	const outcomes: DayOutcome[] = [];
-	const { carp, shoals, bailiffs, works, hasOpenBounty } = life;
-	let running: RunningWater = { lake, carp, shoals, bailiffs, records, works, hasOpenBounty };
+	const { carp, shoals, bailiffs, works } = life;
+	let running: RunningWater = { lake, carp, shoals, bailiffs, records, works };
 	for (let day = 0; day < days; day++) {
 		const context = dayContextFor(life, running, startOfDay(lake, day));
 		const outcome = simulateOneDay(running.lake, running.carp, life.swims, random, context, running.shoals);

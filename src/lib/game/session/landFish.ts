@@ -72,7 +72,7 @@ export interface CatchReportOutcome extends CatchHonours {
 }
 
 const NoReasonGiven = 'the bailiff gave no reason';
-const NoHonours: CatchHonours = { awards: [], bountyWon: null };
+const NoHonours: CatchHonours = { awards: [] };
 
 export async function reportLandedFish(lakeId: string, visitId: string, profile: Profile, landed: LandedFish): Promise<CatchReportOutcome> {
 	const response = await fetch(`/fish/${lakeId}/catch`, {
@@ -86,7 +86,7 @@ export async function reportLandedFish(lakeId: string, visitId: string, profile:
 
 async function savedIn(response: Response) {
 	const body = (await response.json().catch(() => null)) as ({ carp?: Carp } & Partial<CatchHonours>) | null;
-	return { carp: body?.carp ?? null, awards: body?.awards ?? NoHonours.awards, bountyWon: body?.bountyWon ?? NoHonours.bountyWon };
+	return { carp: body?.carp ?? null, awards: body?.awards ?? NoHonours.awards };
 }
 
 async function reasonIn(response: Response) {

@@ -5,7 +5,6 @@ import type { Shoal } from '$lib/domain/stock/shoals';
 import { kitFor } from '$lib/domain/tackle/rodSetup';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import type { CatchHonours } from '$lib/contracts/CatchReport';
-import { loadBountyWonBy } from '../queries/GetBounties';
 import { RaiseAwards } from './RaiseAwards';
 
 const HttpStatus = { BadRequest: 400 } as const;
@@ -56,8 +55,6 @@ async function latestCatchOf(carpId: string) {
 }
 
 export async function honoursAfterTheCatch(anglerId: string, catchId: string): Promise<CatchHonours> {
-	const trusted = trustedSupabase();
-	const [awards, bounty] = await Promise.all([RaiseAwards(anglerId, catchId), loadBountyWonBy(trusted, catchId)]);
-	const bountyWon = bounty ? { kind: bounty.kind, prizeKind: bounty.prizeKind, prizeMoney: bounty.prizeMoney } : null;
-	return { awards, bountyWon };
+	const awards = await RaiseAwards(anglerId, catchId);
+	return { awards };
 }

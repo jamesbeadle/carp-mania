@@ -23,19 +23,19 @@ export const TermsOfService: LegalDocument = {
 			heading: 'Fair play',
 			paragraphs: [
 				`Play the game yourself. No bots, scripts or automated play; no exploiting bugs (tell us about them instead, and we'll thank you); no pretending to be someone else; no trying to get at other players' data or the game's servers.`,
-				`The names you give things — waters, fish, islands, matches, heirs — are seen by every player, so keep them decent: nothing abusive, obscene, hateful, or aimed at a real person. We can rename or remove anything that breaks this, and we can suspend or close an account that does.`
+				`The names you give things — waters, fish, islands, heirs — are seen by every player, so keep them decent: nothing abusive, obscene, hateful, or aimed at a real person. We can rename or remove anything that breaks this, and we can suspend or close an account that does.`
 			]
 		},
 		{
 			heading: 'The shared world',
 			paragraphs: [
-				`What you do affects other players. When you sell a fish, host a match or open your water to anglers, you are making a deal with them inside the game, and the game's rules settle it: a sale that goes through goes through, and a match pot goes to whoever the rules say won. We don't referee disputes between players, but we will act on cheating.`
+				`What you do affects other players. When you sell a fish or open your water to anglers, you are making a deal with them inside the game, and the game's rules settle it: a sale that goes through goes through, and a ticket sold is a ticket sold. We don't referee disputes between players, but we will act on cheating.`
 			]
 		},
 		{
 			heading: 'Things will change',
 			paragraphs: [
-				`Carp Mania is being built in the open and it changes often. Rules, prices, weights, seasons, the way fish grow and die, the way matches pay out — all of it may change, and sometimes a change will alter your water, your fish or your money. We'll be as fair as we can about it and we'll tell you about the big ones, but we can't promise the game stays as it is or that your progress keeps its value.`
+				`Carp Mania is being built in the open and it changes often. Rules, prices, weights, seasons, the way fish grow and die — all of it may change, and sometimes a change will alter your water, your fish or your money. We'll be as fair as we can about it and we'll tell you about the big ones, but we can't promise the game stays as it is or that your progress keeps its value.`
 			]
 		},
 		{

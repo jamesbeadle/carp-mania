@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import LiveFeed from '$lib/components/world/LiveFeed.svelte';
-	import OpenBounties from '$lib/components/world/OpenBounties.svelte';
+	import BiggestFishPanel from '$lib/components/world/BiggestFishPanel.svelte';
 	import type { WorldActivity } from '$lib/contracts/WorldActivity';
 	import { olderFeedPathFor, type FeedGroup } from '$lib/domain/world/feedGroups';
 	import { LiveWorld } from '$lib/game/world/liveWorld.svelte';
@@ -31,12 +31,11 @@
 	{#snippet actions()}
 		<a href="/world" class="button-secondary text-base">Spin the globe</a>
 		<a href="/world/hall-of-fame" class="button-secondary text-base">Hall of fame</a>
-		<a href="/matches" class="button-secondary text-base">Matches</a>
 		<a href="/anglers" class="button-secondary text-base">Anglers</a>
 	{/snippet}
 </PlaceBanner>
 
 <div class="mx-auto max-w-3xl space-y-6">
-	<OpenBounties bounties={data.bounties} biggestFish={data.biggestFish} />
+	<BiggestFishPanel biggestFish={data.biggestFish} />
 	<LiveFeed feed={live.feed} onPick={(lakeId) => goto(worldUrlForLake(lakeId))} onLoadOlder={loadOlder} />
 </div>

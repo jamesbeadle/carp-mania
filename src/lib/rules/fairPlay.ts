@@ -8,7 +8,7 @@ export const FairPlay: RuleChapter = {
 	questions: [
 		{
 			question: 'Why can I not trade fish or tackle with another player?',
-			answer: `Because a second account could be used to feed a first one. Fish leave a water through the dealer only, tackle is bought from the shops only, and prize money comes from matches and bounties that any angler can win. Everything you own, you earned in the game.`
+			answer: `Because a second account could be used to feed a first one. Fish leave a water through the dealer only, tackle is bought from the shops only, and there are no matches, bounties or prize pots between players. Everything you own, you earned in the game.`
 		},
 		{
 			question: 'Is there anything to buy with real money?',

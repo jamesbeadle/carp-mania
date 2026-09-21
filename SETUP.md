@@ -5,7 +5,7 @@ Three services: Supabase (database + Google login), Google Cloud (the OAuth clie
 ## 1. Supabase project
 
 1. Create a project at supabase.com. Note the **Project URL**, the **anon (public) key** and the **service_role key** from Project Settings → API.
-2. Database → Extensions: enable **pg_cron**. It closes ended matches and bounties every minute and purges the live feed hourly. If you enable it later, re-run `0014d_closing_a_match.sql` afterwards; without it, Vercel crons call `close_ended_matches()` and `close_ended_bounties()` through the service-role client (`/cron/close-matches`, `/cron/close-bounties`) — the functions are the contract, the scheduler is interchangeable.
+2. Database → Extensions: enable **pg_cron**. It purges the live feed hourly. If you enable it later, re-run `0009j_the_schedules.sql` afterwards.
 3. Open the SQL editor and run the files in `supabase/migrations/`, in name order — each one is safe on a live database with players in it:
    `0001_tables.sql`, `0002_policies.sql`, `0003_functions.sql`, `0004_saved_rods.sql`,
    `0005_the_money_once.sql` (run it exactly once: it gifts every existing player £95,000), `0005b_the_fish.sql`, `0005c_trusted_writes.sql`, `0005d_the_guide_price.sql`, `0005e_the_farm_order_checks.sql`, `0005f_the_fish_farm.sql`, `0005g_the_dealer.sql`,
@@ -59,7 +59,7 @@ Open http://localhost:5173, sign in with Google. Every player starts with £100,
 1. Import the GitHub repo in Vercel. Framework is detected as SvelteKit; no build settings to change.
 2. Add the three environment variables above under Settings → Environment Variables.
 3. After the first deploy, put the Vercel URL into Supabase Site URL and add `https://<your-app>.vercel.app/auth/callback` to Redirect URLs.
-4. If pg_cron is not enabled, add a fourth variable, `CRON_SECRET` (any long random string). `vercel.json` schedules `GET /cron/close-matches` and `GET /cron/close-bounties` every minute; Vercel sends the secret as `Authorization: Bearer …`, and the routes call `close_ended_matches()` and `close_ended_bounties()` through the service-role client. Without the variable the routes answer 401 to every call, so they are harmless when pg_cron is doing the job.
+4. `CRON_SECRET` is no longer needed: nothing runs on a Vercel cron since matches and bounties left the game (`0030_no_competition_between_players.sql`).
 
 ## 5. The domain
 

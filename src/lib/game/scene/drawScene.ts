@@ -17,7 +17,6 @@ import { drawDrafts, type DraftShape } from '../render/drawUnderConstruction';
 import { drawClusters } from '../render/drawClusters';
 import { clusterSwims, isClustered } from './clusterSwims';
 import { drawWater } from '../render/drawWater';
-import { drawBountyMarker } from '../render/drawBountyMarker';
 import { drawCastReach } from '../render/drawCastReach';
 import { drawFacilities } from '../render/drawFacilities';
 import type { CastReach } from '../session/castReach';
@@ -40,7 +39,6 @@ export interface SceneInput {
 	drafts?: DraftShape[];
 	showingAt?: LayoutPoint[];
 	pixelsPerScenePixel?: number;
-	bountySwimId?: string | null;
 	castReach?: CastReach | null;
 }
 
@@ -84,7 +82,6 @@ export function createSceneDrawer(layout: LakeLayout) {
 		if (isLabelled) drawSwimLabels(context, loosePegs, input.selectedSwimId, facingTheWaterFrom);
 		drawDrafts(context, input.drafts ?? []);
 		drawShowingFish(context, input.showingAt ?? [], timeSeconds);
-		drawBountyMarker(context, loosePegs, input.bountySwimId ?? null, timeSeconds);
 	};
 
 	function drawAnglerAndRods(context: CanvasRenderingContext2D, input: SceneInput, timeSeconds: number, facingTheWaterFrom: (peg: Point) => number) {

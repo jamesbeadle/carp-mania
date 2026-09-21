@@ -1,5 +1,4 @@
 import { BaseCastFeet } from '$lib/domain/tackle/castDistance';
-import { PrototypesPerBrandPerFisheryYear } from '$lib/domain/tackle/prototypes';
 import { ReelCatalogue } from '$lib/domain/tackle/reels';
 import { RodLengthCastFactor } from '$lib/domain/tackle/rods';
 import { SponsorshipTerms } from '$lib/domain/tackle/sponsorship';
@@ -43,11 +42,11 @@ export const TackleAndBait: RuleChapter = {
 		},
 		{
 			question: 'What is a sponsorship?',
-			answer: `A brand backing you. Win a brand's bounty and the whole of its tier opens to you with ${discountPercent}% off everything for a fishery year. Some bounties pay brand credit to spend at that shelf instead.`
+			answer: `A brand backing an angler: the whole of its tier open to them with ${discountPercent}% off everything for a fishery year, or brand credit to spend at that shelf. Sponsorships and credit were won on the bounties the game used to run; anyone still holding one keeps it until it runs out.`
 		},
 		{
 			question: 'What is a prototype?',
-			answer: `A one-of-one piece of kit a brand builds by hand — better than anything on sale, with a number and the brand's name on it. Each brand makes ${PrototypesPerBrandPerFisheryYear} a fishery year and puts them up as bounty prizes. The Hall of Fame lists who holds them.`
+			answer: `A one-of-one piece of kit a brand built by hand — better than anything on sale, with a number and the brand's name on it. They were the prizes on the bounties the game used to run; the Hall of Fame lists who holds the ones that exist, and a prototype that snaps is struck from the board.`
 		}
 	]
 };

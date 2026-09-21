@@ -19,15 +19,9 @@ export type NotificationKind =
 	| 'record_set'
 	| 'big_catch_on_your_water'
 	| 'fish_died'
-	| 'match_booked'
-	| 'match_cancelled'
-	| 'match_won'
-	| 'match_over'
 	| 'record_lost'
 	| 'board_place_lost'
 	| 'award_won'
-	| 'bounty_posted'
-	| 'bounty_won'
 	| 'prototype_lost';
 
 export interface Notification {
@@ -42,8 +36,7 @@ export interface Notification {
 }
 
 export type WorldEventKind =
-	| 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died' | 'handover' | 'match_announced' | 'match_won'
-	| 'award' | 'bounty_posted' | 'bounty_won' | 'prototype_lost';
+	| 'big_catch' | 'sale' | 'record' | 'new_water' | 'island_built' | 'fish_died' | 'handover' | 'award' | 'prototype_lost';
 
 export interface WorldEvent {
 	id: string;
