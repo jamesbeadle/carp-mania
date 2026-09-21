@@ -68,5 +68,5 @@ function visibilityWords(diameterMm: number) {
 
 function wireWords(straightensAboveLb: number, snapsAboveLb: number) {
 	if (!Number.isFinite(straightensAboveLb)) return `never straightens, snaps above ${snapsAboveLb} lb`;
-	return `opens above ${straightensAboveLb} lb`;
+	return `can open above ${straightensAboveLb} lb`;
 }

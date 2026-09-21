@@ -68,7 +68,7 @@ export class FightState {
 		if (isHookPulled(this.tension, this.band)) return 'hook_pulled';
 		if (this.secondsRemaining > 0) return null;
 		const hook = this.kit.hook.hook;
-		const hasOpened = doesHookOpen(hook, Number(this.carp.weight_lb));
+		const hasOpened = doesHookOpen(hook, Number(this.carp.weight_lb), Math.random());
 		return hasOpened ? 'hook_opened' : 'landed';
 	}
 }
