@@ -7,10 +7,12 @@
 	import FacilitiesRow from '../facilities/FacilitiesRow.svelte';
 	import GoFishingButton from '../game/GoFishingButton.svelte';
 	import FavouriteStar from './FavouriteStar.svelte';
+	import SponsorLine from './SponsorLine.svelte';
 
 	let { summary, isFavourite }: { summary: PublicLakeSummary; isFavourite: boolean } = $props();
 
 	const isOnTheGlobe = $derived(summary.lake.latitude !== null);
+	const now = new Date();
 	const stats = $derived([
 		{ label: 'Reputation', value: String(Math.round(Number(summary.lake.reputation))) },
 		{ label: 'Stock', value: String(summary.carpCount) },
@@ -39,6 +41,7 @@
 		{/each}
 	</dl>
 	<FacilitiesRow built={summary.lake.layout.facilities} />
+	<SponsorLine lake={summary.lake} {now} />
 	<p class="flex flex-wrap gap-x-2 text-sm text-mist-400">
 		<span>{facts.join(' · ')}</span>
 		{#if isOnTheGlobe}<a href={worldUrlForLake(summary.lake.id)} class="text-surge-400 hover:underline">See on the globe</a>{/if}

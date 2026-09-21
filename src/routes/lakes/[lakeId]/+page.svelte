@@ -10,6 +10,7 @@
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
 	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
+	import SponsorLine from '$lib/components/lakes/SponsorLine.svelte';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
 	import { worldUrlForLake } from '$lib/game/world/worldUrl';
@@ -48,6 +49,7 @@
 	<section class="panel space-y-4">
 		<h2 class="text-xl text-volt-300">The water</h2>
 		<WaterHeadline {lake} {carp} {shoals} book={diary.book} diary={diary.days} {now} />
+		<SponsorLine {lake} {now} />
 		<OnTheBankNow anglers={data.onTheBank} {now} myId={data.user?.id ?? null} />
 		<FacilitiesRow built={lake.layout.facilities} emptyWords="No facilities on the bank yet." />
 		<DifficultyReading {lake} {carp} {shoals} />

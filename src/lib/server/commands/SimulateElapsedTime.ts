@@ -12,6 +12,7 @@ import { requireUser } from '../gates/requireUser';
 import { GetStandingRecords } from '../queries/GetStandingRecords';
 import { loadMyWaters } from '../queries/loadMyWaters';
 import { loadLakeLife, type LakeLife } from '../queries/loadLakeLife';
+import { offerSponsorships } from './offerSponsorships';
 import { persistSimulatedDays } from './persistSimulatedDays';
 import { dayContextFor, startOfDay, waterAfter, type RunningWater } from './runFisheryDays';
 import { summariseDays } from './summariseDays';
@@ -34,6 +35,7 @@ async function simulateWater(locals: App.Locals, lake: Lake, profile: Profile): 
 	const outcomes = runDays(lake, life, daysToSimulate, records);
 	const finalLake = { ...outcomes[outcomes.length - 1].lake, simulated_until: simulatedUntilAfter(lake.simulated_until, daysToSimulate) };
 	await persistSimulatedDays(trusted, finalLake, outcomes, profile, { carp: life.carp, shoals: life.shoals });
+	await offerSponsorships(locals, trusted, finalLake, daysToSimulate, new Date(lake.simulated_until));
 	return summariseDays(outcomes);
 }
 

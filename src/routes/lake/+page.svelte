@@ -10,6 +10,7 @@
 	import PredatorPanel from '$lib/components/lake/PredatorPanel.svelte';
 	import StockPanel from '$lib/components/lake/StockPanel.svelte';
 	import TicketBookPanel from '$lib/components/lake/TicketBookPanel.svelte';
+	import SponsorshipPanel from '$lib/components/lake/SponsorshipPanel.svelte';
 	import SpeciesPanel from '$lib/components/lake/SpeciesPanel.svelte';
 	import GroundworksTab from '$lib/components/lake/GroundworksTab.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
@@ -22,7 +23,7 @@
 
 	let { data, form } = $props();
 
-	const tabs = ['Stock', 'Tickets', 'Feed', 'Predators', 'Water', 'Groundworks', 'Ledger'] as const;
+	const tabs = ['Stock', 'Tickets', 'Sponsors', 'Feed', 'Predators', 'Water', 'Groundworks', 'Ledger'] as const;
 	let activeTab = $state<(typeof tabs)[number]>('Stock');
 	const fishery = $derived(data.fishery);
 	const { lake, carp, shoals, swims } = $derived(fishery);
@@ -32,6 +33,7 @@
 	const worksUnderway = $derived(inProgressShapesFor(groundworks.inProgress, lake));
 	const stockDraw = $derived(stockDrawOf(carp, shoals));
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
+	const offerCount = $derived(data.sponsorship.offers.length);
 
 </script>
 
@@ -54,13 +56,14 @@
 
 <nav class="mt-8 mb-4 flex flex-wrap gap-2">
 	{#each tabs as tab (tab)}
-		<button class="rounded-full px-4 py-1.5 text-sm font-medium transition" class:bg-volt-500={activeTab === tab} class:text-carbon-950={activeTab === tab} class:bg-carbon-800={activeTab !== tab} onclick={() => (activeTab = tab)}>{tab}</button>
+		<button class="rounded-full px-4 py-1.5 text-sm font-medium transition" class:bg-volt-500={activeTab === tab} class:text-carbon-950={activeTab === tab} class:bg-carbon-800={activeTab !== tab} onclick={() => (activeTab = tab)}>{tab}{#if tab === 'Sponsors' && offerCount > 0}<span class="ml-1 rounded-full bg-warning-500 px-1.5 text-xs text-carbon-950">{offerCount}</span>{/if}</button>
 	{/each}
 </nav>
 
 {#if activeTab === 'Stock'}<StockPanel {carp} {shoals} {lake} waters={data.waters} />{/if}
 {#if activeTab === 'Stock'}<div class="mt-6"><SpeciesPanel {lake} species={data.species} /></div>{/if}
 {#if activeTab === 'Tickets'}<TicketBookPanel {lake} book={data.book} swimCount={swims.length} {stockDraw} />{/if}
+{#if activeTab === 'Sponsors'}<SponsorshipPanel sponsorship={data.sponsorship} />{/if}
 {#if activeTab === 'Feed'}<FeedPanel {lake} carpCount={carp.length} />{/if}
 {#if activeTab === 'Predators'}<PredatorPanel {lake} {sickCarpCount} />{/if}
 {#if activeTab === 'Water'}<BailiffTeamPanel {lake} bailiffs={data.bailiffs} />{/if}

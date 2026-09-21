@@ -5,6 +5,7 @@ import { drawCanvasLabel } from './drawCanvasLabel';
 
 const Resting = { Length: 22, LeanBack: 0.55, LineWidth: 2.5 } as const;
 const Halo = { Radius: 7, Swell: 2, Speed: 4 } as const;
+const FullTurn = Math.PI * 2;
 
 export function drawRestingRods(context: CanvasRenderingContext2D, rests: Point[], facing: number, rods: RodOnBank[], timeSeconds: number) {
 	rods.forEach((rod, index) => {
@@ -18,7 +19,8 @@ export function drawRestingRods(context: CanvasRenderingContext2D, rests: Point[
 
 function drawRestingRod(context: CanvasRenderingContext2D, rest: Point, facing: number, isNext: boolean) {
 	const angle = facing + Math.PI * Resting.LeanBack;
-	const butt = { x: rest.x - Math.cos(angle) * Resting.Length, y: rest.y - Math.sin(angle) * Resting.Length };
+	const back = Resting.Length;
+	const butt = { x: rest.x - Math.cos(angle) * back, y: rest.y - Math.sin(angle) * back };
 	context.strokeStyle = isNext ? AnglerPalette.CastingNext : AnglerPalette.RestingRod;
 	context.lineWidth = Resting.LineWidth;
 	context.lineCap = 'round';
@@ -29,9 +31,9 @@ function drawRestingRod(context: CanvasRenderingContext2D, rest: Point, facing: 
 }
 
 function drawHalo(context: CanvasRenderingContext2D, rest: Point, timeSeconds: number) {
-	const radius = Halo.Radius + Math.sin(timeSeconds * Halo.Speed) * Halo.Swell;
+	const swell = Math.sin(timeSeconds * Halo.Speed) * Halo.Swell;
 	context.fillStyle = AnglerPalette.CastingNextHalo;
 	context.beginPath();
-	context.arc(rest.x, rest.y, radius, 0, Math.PI * 2);
+	context.arc(rest.x, rest.y, Halo.Radius + swell, 0, FullTurn);
 	context.fill();
 }

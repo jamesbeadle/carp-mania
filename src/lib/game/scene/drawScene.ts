@@ -19,6 +19,7 @@ import { clusterSwims, isClustered } from './clusterSwims';
 import { drawWater } from '../render/drawWater';
 import { drawCastReach } from '../render/drawCastReach';
 import { drawFacilities } from '../render/drawFacilities';
+import { drawSponsorBoard } from '../render/drawSponsorBoard';
 import type { CastReach } from '../session/castReach';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { createFacingTheWater } from './facingTheWater';
@@ -70,6 +71,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawSnags(context, layout);
 		drawReeds(context, layout, timeSeconds);
 		drawSanctuaries(context, layout);
+		drawSponsorBoard(context, input.lake, new Date());
 		const scale = input.pixelsPerScenePixel ?? FullDetail;
 		const isLabelled = scale >= LabelsFromPixelsPerScenePixel;
 		drawFacilities(context, layout, isLabelled);
