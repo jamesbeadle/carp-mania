@@ -4,7 +4,7 @@ import type { Lake } from '../types';
 import { overallWaterQuality, WaterScale } from '../waterQuality';
 import { timeOfDayBiteFactor } from './sessionClock';
 
-export const BaseBitesPerRodHour = 0.135;
+export const BaseBitesPerRodHour = 0.2;
 export const CountPull = { CompetentRating: 50, CompetentMatch: 0.55, CraftSwing: 0.06, TackleSwing: 0.08 } as const;
 const MaximumChancePerHour = 0.9;
 const SmallestAcres = 0.1;
