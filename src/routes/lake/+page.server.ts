@@ -3,6 +3,7 @@ import { CancelGroundworks } from '$lib/server/commands/CancelGroundworks';
 import { FeedLake } from '$lib/server/commands/FeedLake';
 import { HireBailiff } from '$lib/server/commands/HireBailiff';
 import { SackBailiff } from '$lib/server/commands/SackBailiff';
+import { AcceptSponsorshipOffer, RejectSponsorshipOffer } from '$lib/server/commands/AnswerSponsorshipOffer';
 import { MoveFishToMyWater } from '$lib/server/commands/MoveFishToMyWater';
 import { RenameLake } from '$lib/server/commands/RenameLake';
 import { SellFishToDealer } from '$lib/server/commands/SellFishToDealer';
@@ -22,6 +23,7 @@ import { GetMyFishery } from '$lib/server/queries/GetMyFishery';
 import { GetMyGroundworks } from '$lib/server/queries/GetMyGroundworks';
 import { GetTicketBook } from '$lib/server/queries/GetTicketBook';
 import { GetBailiffs } from '$lib/server/queries/GetBailiffs';
+import { GetLakeSponsorship } from '$lib/server/queries/GetLakeSponsorship';
 import { loadSpeciesOf } from '$lib/server/queries/GetLakeSpecies';
 import { loadMyWaters } from '$lib/server/queries/loadMyWaters';
 
@@ -30,8 +32,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const whileAway = await SimulateElapsedTime(locals);
 	const [fishery, profile, groundworks, waters] = await Promise.all([GetMyFishery(locals), loadProfile(locals), GetMyGroundworks(locals), loadMyWaters(locals, user.id)]);
 	const lakeId = fishery.lake.id;
-	const [book, bailiffs, species] = await Promise.all([GetTicketBook(locals, lakeId), GetBailiffs(locals), loadSpeciesOf(locals, lakeId)]);
-	return { fishery, profile, whileAway, groundworks, waters, book, bailiffs, species, loadedAt: new Date().toISOString() };
+	const [book, bailiffs, species, sponsorship] = await Promise.all([GetTicketBook(locals, lakeId), GetBailiffs(locals), loadSpeciesOf(locals, lakeId), GetLakeSponsorship(locals)]);
+	return { fishery, profile, whileAway, groundworks, waters, book, bailiffs, species, sponsorship, loadedAt: new Date().toISOString() };
 };
 
 export const actions: Actions = {
@@ -46,6 +48,8 @@ export const actions: Actions = {
 	stockPikeFood: ({ locals, request }) => request.formData().then((formData) => StockPikeFood(locals, formData)),
 	hireBailiff: ({ locals, request }) => request.formData().then((formData) => HireBailiff(locals, formData)),
 	sackBailiff: ({ locals, request }) => request.formData().then((formData) => SackBailiff(locals, formData)),
+	acceptOffer: ({ locals, request }) => request.formData().then((formData) => AcceptSponsorshipOffer(locals, formData)),
+	rejectOffer: ({ locals, request }) => request.formData().then((formData) => RejectSponsorshipOffer(locals, formData)),
 	addTicket: ({ locals, request }) => request.formData().then((formData) => AddTicketProduct(locals, formData)),
 	removeTicket: ({ locals, request }) => request.formData().then((formData) => RemoveTicketProduct(locals, formData)),
 	setBarbedRule: ({ locals, request }) => request.formData().then((formData) => SetBarbedRule(locals, formData)),

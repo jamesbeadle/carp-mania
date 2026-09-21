@@ -1,5 +1,5 @@
 import type { LakeLayout } from './layout/layoutTypes';
-import type { Tier } from './tackle/brands';
+import type { BrandName, Tier } from './tackle/brands';
 import type { RodSetup } from './tackle/rodSetup';
 import type { RegionCode } from './world/regionCodes';
 
@@ -60,6 +60,8 @@ export interface Lake {
 	is_booking_on: boolean;
 	syndicate_places_for_sale: number;
 	syndicate_price: number;
+	sponsor_brand: BrandName | null;
+	sponsored_until: string | null;
 }
 
 export interface Swim {

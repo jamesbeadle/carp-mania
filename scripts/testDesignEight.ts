@@ -2,6 +2,7 @@ import { runFightScenarios } from './testFight';
 import { runRatingScenarios } from './testRating';
 import { runRigScenarios } from './testRigs';
 import { runSizeReachScenarios } from './testSizeReach';
+import { runSponsorshipScenarios } from './testSponsorship';
 import { runTackleScenarios } from './testTackle';
 import { runBigWaterScenarios } from './testBigWater';
 import { runCameraScenarios } from './testCamera';
@@ -15,6 +16,7 @@ export function runDesignEightScenarios() {
 	runSizeReachScenarios();
 	runFightScenarios();
 	runTackleScenarios();
+	runSponsorshipScenarios();
 	runRigScenarios();
 	runTicketScenarios();
 	runShoalScenarios();
