@@ -24,8 +24,11 @@ const Ranges: RodRange[] = [
 	{ brand: 'bankside_basics', basePrice: 60, curves: [2.75, 3], lengths: [12], isFullDuplon: false },
 	{ brand: 'tench_and_sons', basePrice: 110, curves: [2.75, 3], lengths: [10, 12], isFullDuplon: true },
 	{ brand: 'marlow', basePrice: 180, curves: [2.75, 3, 3.5], lengths: [10, 12, 13], isFullDuplon: false },
+	{ brand: 'fenwater', basePrice: 150, curves: [2.75, 3], lengths: [12, 13], isFullDuplon: false },
 	{ brand: 'ironwood', basePrice: 420, curves: [3, 3.5], lengths: [12, 13], isFullDuplon: true },
-	{ brand: 'blackmere', basePrice: 900, curves: [2.75, 3, 3.5], lengths: [10, 12, 13], isFullDuplon: true }
+	{ brand: 'north_ridge', basePrice: 520, curves: [3, 3.5], lengths: [12, 13], isFullDuplon: true },
+	{ brand: 'blackmere', basePrice: 900, curves: [2.75, 3, 3.5], lengths: [10, 12, 13], isFullDuplon: true },
+	{ brand: 'silvermere', basePrice: 1100, curves: [3, 3.5], lengths: [12, 13], isFullDuplon: true }
 ];
 
 export const RodsOnSale: RodItem[] = Ranges.flatMap(rodsInRange);

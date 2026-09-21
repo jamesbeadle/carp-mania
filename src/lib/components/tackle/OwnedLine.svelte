@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { doesKindRunOut, UnitWords } from '$lib/domain/tackle/kinds';
 	import type { OwnedItem } from '$lib/domain/tackle/tackleBox';
-	import { keepingWordsFor, statsWordsFor } from './itemWords';
+	import { itemWordsOf } from '$lib/domain/tackle/itemEffects';
+	import { keepingWordsFor } from './itemWords';
 
 	let { line }: { line: OwnedItem } = $props();
 
@@ -13,7 +14,7 @@
 <li class="flex flex-wrap items-center gap-x-3 border-t border-carbon-700 py-2 text-sm first:border-t-0">
 	<div class="min-w-0 flex-1">
 		<p class="font-medium text-mist-100">{line.item.label}</p>
-		<p class="text-xs text-mist-400">{statsWordsFor(line.item)}</p>
+		<p class="text-xs text-mist-400">{itemWordsOf(line.item)}</p>
 	</div>
 	<span class:text-volt-300={!line.isSpoiled} class:text-danger-400={line.isSpoiled}>{quantityWords}{keepingWords}</span>
 </li>

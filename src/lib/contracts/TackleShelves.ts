@@ -1,4 +1,5 @@
 import type { BaitBrandName, BrandName, Tier } from '$lib/domain/tackle/brands';
+import type { KitInUse } from '$lib/domain/tackle/kitInUse';
 import type { TackleItem } from '$lib/domain/tackle/tackleItem';
 
 export interface Shelf {
@@ -8,6 +9,7 @@ export interface Shelf {
 	story: string;
 	minimumRating: number;
 	isUnlocked: boolean;
+	isStocked: boolean;
 	isSponsored: boolean;
 	credit: number;
 	items: TackleItem[];
@@ -18,4 +20,6 @@ export interface TackleShelves {
 	rating: number;
 	stocksUpTo: Tier;
 	money: number;
+	inUse: KitInUse;
+	ownedQuantities: Record<string, number>;
 }

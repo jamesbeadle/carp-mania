@@ -12,15 +12,18 @@ const RigMakers: Maker[] = [
 	{ brand: 'bankside_basics', pricePerPack: 6 },
 	{ brand: 'marlow', pricePerPack: 10 },
 	{ brand: 'halcyon', pricePerPack: 18 },
+	{ brand: 'north_ridge', pricePerPack: 20 },
 	{ brand: 'vellum_and_steel', pricePerPack: 35 }
 ];
 const LeadMakers: Maker[] = [
 	{ brand: 'bankside_basics', pricePerPack: 8 },
-	{ brand: 'quarryman', pricePerPack: 12 }
+	{ brand: 'quarryman', pricePerPack: 12 },
+	{ brand: 'silvermere', pricePerPack: 16 }
 ];
 const TubingMakers: Maker[] = [
 	{ brand: 'bankside_basics', pricePerPack: 5 },
-	{ brand: 'marlow', pricePerPack: 8 }
+	{ brand: 'marlow', pricePerPack: 8 },
+	{ brand: 'fenwater', pricePerPack: 7 }
 ];
 const TubingColourWords: Record<TubingColour, string> = { black: 'black', yellow: 'yellow', brown: 'brown', green: 'green' };
 
