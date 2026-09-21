@@ -38,8 +38,17 @@ export function hookHoldChance(hook: Pick<HookStats, 'size' | 'barb'>, rating: n
 	return HookHoldChance[hook.size] * barbHoldFor(hook.barb, rating);
 }
 
-export function doesHookOpen(hook: Pick<HookStats, 'straightensAboveLb'>, fishLb: number) {
-	return fishLb > hook.straightensAboveLb;
+export const HookOpening = { ChancePerShareOverTheLimit: 3, MostChance: 0.6 } as const;
+
+export function hookOpeningChance(hook: Pick<HookStats, 'straightensAboveLb'>, fishLb: number) {
+	const isWithinTheLimit = fishLb <= hook.straightensAboveLb;
+	if (isWithinTheLimit) return 0;
+	const shareOverTheLimit = (fishLb - hook.straightensAboveLb) / hook.straightensAboveLb;
+	return Math.min(HookOpening.MostChance, shareOverTheLimit * HookOpening.ChancePerShareOverTheLimit);
+}
+
+export function doesHookOpen(hook: Pick<HookStats, 'straightensAboveLb'>, fishLb: number, roll: number) {
+	return roll < hookOpeningChance(hook, fishLb);
 }
 
 export function doesHookSnap(hook: Pick<HookStats, 'snapsAboveLb'>, fishLb: number) {
