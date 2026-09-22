@@ -44,6 +44,7 @@ export interface SceneInput {
 }
 
 const LabelsFromPixelsPerScenePixel = 0.5;
+const FacilityLabelsFromPixelsPerScenePixel = 1.6;
 const FullDetail = 1;
 
 export function createSceneDrawer(layout: LakeLayout) {
@@ -74,7 +75,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawSponsorBoard(context, input.lake, new Date());
 		const scale = input.pixelsPerScenePixel ?? FullDetail;
 		const isLabelled = scale >= LabelsFromPixelsPerScenePixel;
-		drawFacilities(context, layout, isLabelled);
+		drawFacilities(context, layout, input.swims, scale >= FacilityLabelsFromPixelsPerScenePixel);
 		drawCastReach(context, lakePath, input.castReach ?? null, timeSeconds);
 		const clusters = clusterSwims(input.swims, scale);
 		const loosePegs = clusters.filter((cluster) => !isClustered(cluster)).flatMap((cluster) => cluster.swims);
