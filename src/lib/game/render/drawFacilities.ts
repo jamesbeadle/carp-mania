@@ -1,5 +1,6 @@
 import { FacilityCatalogue } from '$lib/domain/groundworks/facilities';
 import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
+import type { Swim } from '$lib/domain/types';
 import { facilitySpotsOf, type FacilitySpot } from '../scene/facilitySpots';
 import { BankPalette } from '../scene/palette';
 import { drawCanvasLabel } from './drawCanvasLabel';
@@ -7,8 +8,8 @@ import { FacilityGlyphBox, FacilityGlyphFillRule, FacilityGlyphPaths } from './f
 
 const Badge = { Size: 26, Radius: 7, GlyphScale: 1.1 } as const;
 
-export function drawFacilities(context: CanvasRenderingContext2D, layout: LakeLayout, isLabelled: boolean) {
-	for (const spot of facilitySpotsOf(layout)) {
+export function drawFacilities(context: CanvasRenderingContext2D, layout: LakeLayout, swims: Swim[], isLabelled: boolean) {
+	for (const spot of facilitySpotsOf(layout, swims)) {
 		drawBadge(context, spot);
 		if (isLabelled) drawCanvasLabel(context, spot.point, FacilityCatalogue[spot.facility].label, BankPalette.FacilityLabel, false);
 	}
