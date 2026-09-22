@@ -27,21 +27,23 @@
 	});
 </script>
 
-<section class="panel space-y-4">
-	<p class="stat-label">In the net at {formatFishingHour(landed.hour)}</p>
-	<ScalesReadout weightLb={Number(landed.carp.weight_lb)} onSettled={() => (isWeighed = true)} />
+<section class="panel grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
+	<div class="space-y-2">
+		<p class="stat-label">In the net at {formatFishingHour(landed.hour)}</p>
+		<ScalesReadout weightLb={Number(landed.carp.weight_lb)} onSettled={() => (isWeighed = true)} />
+		<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
+		<p class="text-xs text-mist-400">{anglerName} at {lakeName}</p>
+	</div>
 	{#if isWeighed}
-		<h2 class="text-3xl text-volt-300">{landed.carp.name}</h2>
-		<HonourRibbons honours={landed.honours} />
-		{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} />{/if}
-	{/if}
-	<canvas bind:this={canvas} width={PhotoSize.Width} height={PhotoSize.Height} class="w-full rounded-xl border-4 border-mist-100"></canvas>
-	<p class="text-xs text-mist-400">{anglerName} at {lakeName}</p>
-	{#if isWeighed}
-		<CatchPhotoStats {landed} />
-		<p class="text-xs text-mist-400">
-			{#if catchOutcome === null}Saving the catch report…{:else if catchOutcome.isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}<span class="text-danger-400">The catch report could not be saved: {catchOutcome.reason}.</span>{/if}
-		</p>
-		<button class="button-primary" disabled={isSettling} onclick={onContinue}>Back to the rods</button>
+		<div class="space-y-4 lg:pt-6">
+			<h2 class="text-3xl text-volt-300">{landed.carp.name}</h2>
+			<HonourRibbons honours={landed.honours} />
+			{#if catchOutcome}<AwardRibbons awards={catchOutcome.awards} />{/if}
+			<CatchPhotoStats {landed} />
+			<p class="text-xs text-mist-400">
+				{#if catchOutcome === null}Saving the catch report…{:else if catchOutcome.isSaved}Catch report posted — your skills and the fishery's reputation went up.{:else}<span class="text-danger-400">The catch report could not be saved: {catchOutcome.reason}.</span>{/if}
+			</p>
+			<button class="button-primary" disabled={isSettling} onclick={onContinue}>Back to the rods</button>
+		</div>
 	{/if}
 </section>

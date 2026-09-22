@@ -30,8 +30,8 @@
 	<ScreenOverlay><FightMeter fight={session.fight} onFinished={onFightFinished} /></ScreenOverlay>
 {/if}
 {#if isOnTheMat && session.lastLanded}
-	<ScreenOverlay><SessionCatchPhoto {session} landed={session.lastLanded} {lake} {profile} {catchOutcome} {onContinue} /></ScreenOverlay>
+	<ScreenOverlay isWide><SessionCatchPhoto {session} landed={session.lastLanded} {lake} {profile} {catchOutcome} {onContinue} /></ScreenOverlay>
 {/if}
 {#if isDayOver}
-	<ScreenOverlay><SessionDayOver {session} {lake} /></ScreenOverlay>
+	<ScreenOverlay isWide><SessionDayOver {session} {lake} /></ScreenOverlay>
 {/if}
