@@ -3,7 +3,7 @@ import { hourOfDay } from './sessionWindow';
 export const FishingDay = { RealSecondsPerFishingHour: 22 } as const;
 
 const BiteHours = { DawnBefore: 8, DuskFrom: 18, MiddayFrom: 11, MiddayTo: 15 } as const;
-const BiteFactor = { DawnAndDusk: 1.3, Midday: 0.7, Ordinary: 1 } as const;
+const BiteFactor = { DawnAndDusk: 1.3, Midday: 0.85, Ordinary: 1 } as const;
 
 export function timeOfDayBiteFactor(hour: number) {
 	const clockHour = hourOfDay(hour);
