@@ -24,13 +24,26 @@
 	const bestHonourOf = (fish: LandedFish) => honourKindsOf(fish.honours)[0] ?? null;
 </script>
 
-<section class="panel space-y-4">
-	<p class="stat-label">{endWords}</p>
-	<h2 class="text-3xl text-volt-300">{isABlank ? 'Rods in — a blank' : 'Rods in'}</h2>
-	<DayOverStats {landed} {lost} {nuisance} />
-	{#if isABlank}<p class="text-sm text-mist-200">It happens to everyone — try a different swim or bait tomorrow.</p>{/if}
-	<NuisanceBite {nuisance} />
-	<ul class="grid gap-2 text-sm sm:grid-cols-2">
+<section class="panel grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start">
+	<div class="space-y-4">
+		<p class="stat-label">{endWords}</p>
+		<h2 class="text-3xl text-volt-300">{isABlank ? 'Rods in — a blank' : 'Rods in'}</h2>
+		<DayOverStats {landed} {lost} {nuisance} />
+		{#if isABlank}<p class="text-sm text-mist-200">It happens to everyone — try a different swim or bait tomorrow.</p>{/if}
+		<NuisanceBite {nuisance} />
+		<div class="flex flex-wrap gap-3">
+			{#if hasAnotherSession}
+				<form method="POST" action="?/nextSession">
+					<input type="hidden" name="visit" value={visitId} />
+					<button class="button-primary">Sit the next day · {sessionsLeft - 1} left on the ticket</button>
+				</form>
+			{/if}
+			<GoFishingButton {lakeId} words="Fish another day here" buttonClass={hasAnotherSession ? 'button-secondary' : 'button-primary'} />
+			<a href="/lakes" class="button-secondary">Choose another water</a>
+			<a href="/angler" class="button-secondary">My angler</a>
+		</div>
+	</div>
+	<ul class="grid gap-2 text-sm lg:grid-cols-2">
 		{#each landed as fish, index (index)}
 			{@const honour = bestHonourOf(fish)}
 			{@const { carp, swim } = fish}
@@ -42,15 +55,4 @@
 			</li>
 		{/each}
 	</ul>
-	<div class="flex flex-wrap gap-3">
-		{#if hasAnotherSession}
-			<form method="POST" action="?/nextSession">
-				<input type="hidden" name="visit" value={visitId} />
-				<button class="button-primary">Sit the next day · {sessionsLeft - 1} left on the ticket</button>
-			</form>
-		{/if}
-		<GoFishingButton {lakeId} words="Fish another day here" buttonClass={hasAnotherSession ? 'button-secondary' : 'button-primary'} />
-		<a href="/lakes" class="button-secondary">Choose another water</a>
-		<a href="/angler" class="button-secondary">My angler</a>
-	</div>
 </section>
