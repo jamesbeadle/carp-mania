@@ -4,14 +4,14 @@ import type { Lake } from '../types';
 import { overallWaterQuality, WaterScale } from '../waterQuality';
 import { timeOfDayBiteFactor } from './sessionClock';
 
-export const BaseBitesPerRodHour = 0.3;
+export const BaseBitesPerRodHour = 0.22;
 export const CountPull = { CompetentRating: 50, CompetentMatch: 0.55, CraftSwing: 0.06, TackleSwing: 0.08 } as const;
 const MaximumChancePerHour = 0.9;
 const SmallestAcres = 0.1;
 const ConfidenceFloor = 0.5;
 const Feeding = {
 	HeavyAboveKilogramsPerAcre: 8,
-	HeavilyFedFactor: 0.9,
+	HeavilyFedFactor: 0.875,
 	HungryFactor: 1.15,
 	MostFullness: 0.3,
 	FullnessPerKilogram: 0.04

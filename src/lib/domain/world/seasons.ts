@@ -12,7 +12,7 @@ export interface Season {
 	isWinter: boolean;
 }
 
-const BiteSwing = { Floor: 0.7, Range: 0.3 } as const;
+const BiteSwing = { Floor: 0.6, Range: 0.4 } as const;
 const AnglerSwing = { Floor: 0.6, Range: 0.4 } as const;
 
 export function seasonFor(lake: Pick<Lake, 'region' | 'latitude'>, now: Date): Season {
