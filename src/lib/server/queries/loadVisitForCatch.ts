@@ -25,15 +25,3 @@ export async function countCarpIn(lakeId: string): Promise<number> {
 	const { count } = await trustedSupabase().from('carp').select('id', { count: 'exact', head: true }).eq('lake_id', lakeId);
 	return count ?? 0;
 }
-
-export async function hasCaughtDuringVisit(anglerId: string, visit: VisitOnRecord, carpId: string) {
-	const { data: earlier } = await trustedSupabase()
-		.from('catches')
-		.select('id')
-		.eq('angler_id', anglerId)
-		.eq('lake_id', visit.lake_id)
-		.eq('carp_id', carpId)
-		.gte('caught_at', visit.visited_at)
-		.limit(1);
-	return (earlier ?? []).length > 0;
-}

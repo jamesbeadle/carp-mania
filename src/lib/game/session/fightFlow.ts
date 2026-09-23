@@ -9,10 +9,7 @@ import { landedFishFor } from './landFish';
 import { fishOnTheEnd } from './sessionFlow';
 import type { SessionState } from './sessionState.svelte';
 
-const StrikeWords = {
-	Pulled: 'The hook pulled on the strike — too small a hook for a carp.',
-	Again: (name: string) => `${name} again — once on the bank is enough for one day. It shed the hook and went.`
-} as const;
+const StrikeWords = { Pulled: 'The hook pulled on the strike — too small a hook for a carp.' } as const;
 
 const LossOfOutcome: Partial<Record<FightOutcome, TackleLossKind>> = { snapped: 'line_snapped', rod_snapped: 'rod_snapped', hook_opened: 'hook_opened' };
 const HookPulledWords = 'Slack line and the hook fell out. Keep it tight.';
@@ -29,8 +26,6 @@ export function strike(session: SessionState) {
 	if (doesHookSnap(hook, weightLb)) return loseTackle(session, rod, 'hook_snapped');
 	const isHookHolding = Math.random() < hookHoldChance(hook, session.rating);
 	if (!isHookHolding) return dropTheFish(session, rod, StrikeWords.Pulled);
-	const isAgain = !isNuisanceFish(carp) && session.hasLandedToday(carp);
-	if (isAgain) return dropTheFish(session, rod, StrikeWords.Again(carp.name));
 	const isOnASnag = rod.terrain.feature === 'snag';
 	if (isOnASnag && Math.random() < SnagLoss.Chance) return loseTackle(session, rod, 'rig_in_snag');
 	rod.phase = 'fighting';
