@@ -7,6 +7,7 @@ import { WorksInProgress } from '$lib/domain/groundworks/catalogue';
 import { DealerTerms } from '$lib/domain/market/dealer';
 import { FarmCatalogue } from '$lib/domain/market/farms';
 import { FarmWantsWaterRating } from '$lib/domain/market/farmStanding';
+import { SponsorsWant } from '$lib/domain/sponsorship/waterStanding';
 import { OpenWater } from '$lib/domain/stock/stockedToOpen';
 import { BookingWindow } from '$lib/domain/water/bookings';
 import type { RuleChapter } from './ruleBookTypes';
@@ -55,6 +56,10 @@ export const RunningAWater: RuleChapter = {
 		{
 			question: 'What are groundworks?',
 			answer: `The editor for shaping the water: islands, gravel bars, deep holes, margin shelves, reed beds, lily pads, snags, sanctuaries, the swims and the shoreline itself. To change the bank, Redraw is the easy way: click the shoreline where the new bank starts, click along the new line or nowhere at all, and click the shoreline again — the stretch between is replaced by a rounded bank. Shore and Extend drag single points. Each work has a price and takes fishery days to finish; up to ${WorksInProgress.MaximumEarthworks} earthworks run at once, and cancelling one early refunds ${refundShare}%. A swim the new bank would leave in the water, or too far from it, has to be moved with Select or taken out first.`
+		},
+		{
+			question: 'How do I get a sponsor?',
+			answer: `Brands write to a water with standing: rated ${SponsorsWant.WaterRating} or more, open at least ${SponsorsWant.FisheryDaysOpen} fishery days, and holding ${SponsorsWant.Fish} fish. A brand pays a lump sum on signing to put its name on the boards, the better the water the bigger the name and the money. The Sponsors tab at the lodge says what the water still lacks and shows the offers on the table.`
 		},
 		{
 			question: 'What happens while I am away?',

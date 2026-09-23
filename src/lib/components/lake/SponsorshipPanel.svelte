@@ -16,7 +16,7 @@
 <section class="panel space-y-4">
 	<div>
 		<h3 class="text-xl text-volt-300">Sponsors</h3>
-		<p class="text-sm text-mist-400">{whatOffersDependOn(sponsorship.waterRating)}</p>
+		<p class="text-sm text-mist-400">{whatOffersDependOn(sponsorship.standing)}</p>
 	</div>
 	{#if sponsorship.deal}<DealCard deal={sponsorship.deal} {now} />{/if}
 	<div>
@@ -26,7 +26,7 @@
 				{#each sponsorship.offers as offer (offer.id)}<OfferCard {offer} {now} />{/each}
 			</ul>
 		{:else}
-			<p class="text-sm text-mist-400">None right now. Brands write when the water is worth their name — keep the reputation climbing and the water clear.</p>
+			<p class="text-sm text-mist-400">None right now. Brands write when the water is worth their name — keep the reputation climbing, the water clear and the stock up.</p>
 		{/if}
 	</div>
 	<AboutToggle title="About sponsorship">

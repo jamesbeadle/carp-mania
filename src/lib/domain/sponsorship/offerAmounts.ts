@@ -1,7 +1,8 @@
 import { BrandCatalogue, TierRank, type BrandName, type Tier } from '../tackle/brands';
 import { SponsorshipTerm, termsOf } from './lakeSponsorship';
+import { SponsorsWant } from './waterStanding';
 
-export const OfferMoney = { LeastWaterRating: 30, LeastPerTerm: 2000, MostPerTerm: 60000, Curve: 1.6, RoundTo: 100, LongerDealBonusPerTerm: 0.04 } as const;
+export const OfferMoney = { LeastWaterRating: SponsorsWant.WaterRating, LeastPerTerm: 2000, MostPerTerm: 60000, Curve: 1.6, RoundTo: 100, LongerDealBonusPerTerm: 0.04 } as const;
 export const BrandMoneyFactor: Record<Tier, number> = { starter: 0.8, club: 1, specialist: 1.15, custom: 1.35 };
 const TierForRating: { atLeast: number; tier: Tier }[] = [
 	{ atLeast: 82, tier: 'custom' },
@@ -9,10 +10,6 @@ const TierForRating: { atLeast: number; tier: Tier }[] = [
 	{ atLeast: 40, tier: 'club' },
 	{ atLeast: 0, tier: 'starter' }
 ];
-
-export function isWaterWorthSponsoring(waterRating: number) {
-	return waterRating >= OfferMoney.LeastWaterRating;
-}
 
 export function perTermFor(waterRating: number) {
 	const { LeastWaterRating, LeastPerTerm, MostPerTerm, Curve } = OfferMoney;

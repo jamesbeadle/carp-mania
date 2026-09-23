@@ -2,6 +2,10 @@ import type { LakeSponsorshipPanel } from '$lib/contracts/LakeSponsorshipPanel';
 import { isOfferOpen, isSponsorshipRunning, type LakeSponsorship, type SponsorshipOffer } from '$lib/domain/sponsorship/lakeSponsorship';
 import type { BrandName } from '$lib/domain/tackle/brands';
 import { waterRatingOfLake } from '$lib/domain/water/waterRating';
+import { fisheryDaysOpenSince, type WaterStanding } from '$lib/domain/sponsorship/waterStanding';
+import type { Lake } from '$lib/domain/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { loadFishInTheWater } from './loadFishInTheWater';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
 
 type OfferRow = { id: string; lake_id: string; brand: BrandName; term_months: number; amount: number; offered_at: string; expires_at: string; status: SponsorshipOffer['status'] };
@@ -9,8 +13,13 @@ type DealRow = { id: string; lake_id: string; brand: BrandName; term_months: num
 
 export async function GetLakeSponsorship(locals: App.Locals, now = new Date()): Promise<LakeSponsorshipPanel> {
 	const lake = await requireOwnedLake(locals);
-	const [deal, offers] = await Promise.all([loadRunningDeal(locals, lake.id, now), loadOpenOffers(locals, lake.id, now)]);
-	return { deal, offers, waterRating: waterRatingOfLake(lake), loadedAt: now.toISOString() };
+	const [deal, offers, standing] = await Promise.all([loadRunningDeal(locals, lake.id, now), loadOpenOffers(locals, lake.id, now), loadStandingOf(locals.supabase, lake, now)]);
+	return { deal, offers, standing, loadedAt: now.toISOString() };
+}
+
+export async function loadStandingOf(supabase: SupabaseClient, lake: Lake, now: Date): Promise<WaterStanding> {
+	const fishCount = await loadFishInTheWater(supabase, lake.id);
+	return { waterRating: waterRatingOfLake(lake), fisheryDaysOpen: fisheryDaysOpenSince(lake, now), fishCount };
 }
 
 export async function loadRunningDeal(locals: App.Locals, lakeId: string, now: Date): Promise<LakeSponsorship | null> {

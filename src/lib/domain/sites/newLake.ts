@@ -26,8 +26,7 @@ export function newLakeFor(profile: ProfileWithPlot, site: SiteType, chosenAcres
 		day_ticket_fee: NewWater.DayTicketFee,
 		reputation: siteProfile.startingReputation,
 		...untendedWater(),
-		is_public: false,
-		simulated_until: now.toISOString(),
+		...gatesNotYetOpen(now),
 		region: plot.region,
 		latitude: plot.latitude,
 		longitude: plot.longitude,
@@ -35,9 +34,12 @@ export function newLakeFor(profile: ProfileWithPlot, site: SiteType, chosenAcres
 		plot_acres: plotAcres,
 		layout,
 		fertility: siteProfile.startingFertility,
-		disturbance: NewWater.Disturbance,
-		is_setup_complete: false
+		disturbance: NewWater.Disturbance
 	};
+}
+
+function gatesNotYetOpen(now: Date) {
+	return { is_public: false, is_setup_complete: false, simulated_until: now.toISOString(), opened_at: null };
 }
 
 export function defaultWaterNameFor(displayName: string) {

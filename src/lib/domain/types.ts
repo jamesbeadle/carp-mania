@@ -55,6 +55,7 @@ export interface Lake {
 	fertility: number;
 	disturbance: number;
 	is_setup_complete: boolean;
+	opened_at: string | null;
 	shop_tier: Tier;
 	is_barbed_banned: boolean;
 	is_booking_on: boolean;
