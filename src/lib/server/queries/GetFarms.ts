@@ -1,7 +1,9 @@
 import type { FarmOnShelf, FarmShelves } from '$lib/contracts/FarmShelves';
 import { StockingDensity, biomassPerAcre } from '$lib/domain/market/density';
 import { farmQuoteFor } from '$lib/domain/market/farmQuote';
+import { doesFarmSellTo, farmStandingWords } from '$lib/domain/market/farmStanding';
 import { FarmCatalogue, type Farm } from '$lib/domain/market/farms';
+import { waterRatingOfLake } from '$lib/domain/water/waterRating';
 import type { Carp, Lake } from '$lib/domain/types';
 import { loadProfile } from '../gates/requireMoney';
 import { requireUser } from '../gates/requireUser';
@@ -18,7 +20,9 @@ export async function GetFarms(locals: App.Locals, now = new Date()): Promise<Fa
 
 async function shelfFor(farm: Farm, water: Lake | null, now: Date): Promise<FarmOnShelf> {
 	const packs = await GetFarmPacks(farm, now);
-	return { farm, packs, quote: water ? farmQuoteFor(farm, water) : null };
+	if (!water) return { farm, packs, quote: null, standing: null, isSellingToYou: false };
+	const waterRating = waterRatingOfLake(water);
+	return { farm, packs, quote: farmQuoteFor(farm, water), standing: farmStandingWords(farm, waterRating), isSellingToYou: doesFarmSellTo(farm.grade, waterRating) };
 }
 
 async function roomLeftIn(locals: App.Locals, water: Lake) {

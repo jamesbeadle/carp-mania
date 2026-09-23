@@ -6,6 +6,7 @@ import { TicketPrice } from '$lib/domain/fishing/ticketBook';
 import { WorksInProgress } from '$lib/domain/groundworks/catalogue';
 import { DealerTerms } from '$lib/domain/market/dealer';
 import { FarmCatalogue } from '$lib/domain/market/farms';
+import { FarmWantsWaterRating } from '$lib/domain/market/farmStanding';
 import { OpenWater } from '$lib/domain/stock/stockedToOpen';
 import { BookingWindow } from '$lib/domain/water/bookings';
 import type { RuleChapter } from './ruleBookTypes';
@@ -29,7 +30,7 @@ export const RunningAWater: RuleChapter = {
 		},
 		{
 			question: 'Where do fish come from?',
-			answer: `The farms. ${FarmCatalogue.length} fish farms around the world sell carp by the pack — a stock farm sells small fish by the hundred, a record grower one or two big old fish a week. Transport, transit time and quarantine are quoted from the farm's gate, and fish lose a little condition on the road. A water also grows its own: fish put on weight with feed, age, and are named the first time an angler lands them.`
+			answer: `The farms. ${FarmCatalogue.length} fish farms around the world sell carp by the pack — a stock farm sells small fish by the hundred, a record grower one or two big old fish a week. Transport, transit time and quarantine are quoted from the farm's gate, and fish lose a little condition on the road. The better farms want a water with a rating before they deal: a stock farm sells to anyone, a good farm to a water rated ${FarmWantsWaterRating.good} or more, a specialist ${FarmWantsWaterRating.specialist}, a record grower ${FarmWantsWaterRating.record}. The rating is the one the tackle shop and the sponsors go by — reputation and water quality together. A water also grows its own: fish put on weight with feed, age, and are named the first time an angler lands them.`
 		},
 		{
 			question: 'How do I sell fish?',

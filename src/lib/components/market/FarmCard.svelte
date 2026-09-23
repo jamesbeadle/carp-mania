@@ -37,6 +37,7 @@
 		<span class="rounded-full bg-carbon-800 px-3 py-0.5 text-xs text-mist-200">{grade.label} · {region.label}</span>
 	</div>
 	<p class="text-sm text-mist-300">{shelf.farm.story} {grade.words}.</p>
+	{#if shelf.standing}<p class="mt-1 text-xs" class:text-mist-400={shelf.isSellingToYou} class:text-warning-500={!shelf.isSellingToYou}>{shelf.standing}.</p>{/if}
 	{#if quote}
 		<div class="my-4"><StatRow stats={quoteStats} /></div>
 	{:else}
@@ -47,7 +48,7 @@
 	{:else}
 		<ul class="divide-y divide-carbon-700/60">
 			{#each shelf.packs as pack (pack.id)}
-				<PackRow farm={shelf.farm} {pack} transportCost={quote?.cost ?? 0} {money} />
+				<PackRow farm={shelf.farm} {pack} transportCost={quote?.cost ?? 0} {money} isForSale={shelf.isSellingToYou} />
 			{/each}
 		</ul>
 	{/if}

@@ -1,9 +1,7 @@
 import type { LakeSponsorshipPanel } from '$lib/contracts/LakeSponsorshipPanel';
 import { isOfferOpen, isSponsorshipRunning, type LakeSponsorship, type SponsorshipOffer } from '$lib/domain/sponsorship/lakeSponsorship';
-import { waterRatingOf } from '$lib/domain/sponsorship/offerAmounts';
 import type { BrandName } from '$lib/domain/tackle/brands';
-import type { Lake } from '$lib/domain/types';
-import { overallWaterQuality } from '$lib/domain/waterQuality';
+import { waterRatingOfLake } from '$lib/domain/water/waterRating';
 import { requireOwnedLake } from '../gates/requireOwnedLake';
 
 type OfferRow = { id: string; lake_id: string; brand: BrandName; term_months: number; amount: number; offered_at: string; expires_at: string; status: SponsorshipOffer['status'] };
@@ -13,11 +11,6 @@ export async function GetLakeSponsorship(locals: App.Locals, now = new Date()): 
 	const lake = await requireOwnedLake(locals);
 	const [deal, offers] = await Promise.all([loadRunningDeal(locals, lake.id, now), loadOpenOffers(locals, lake.id, now)]);
 	return { deal, offers, waterRating: waterRatingOfLake(lake), loadedAt: now.toISOString() };
-}
-
-export function waterRatingOfLake(lake: Pick<Lake, 'reputation' | 'transparency' | 'weed' | 'silt'>) {
-	const quality = overallWaterQuality(Number(lake.transparency), Number(lake.weed), Number(lake.silt));
-	return waterRatingOf(Number(lake.reputation), quality);
 }
 
 export async function loadRunningDeal(locals: App.Locals, lakeId: string, now: Date): Promise<LakeSponsorship | null> {

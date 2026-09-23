@@ -1,5 +1,4 @@
 import { BrandCatalogue, TierRank, type BrandName, type Tier } from '../tackle/brands';
-import { waterRatingFor } from '../tackle/shopTier';
 import { SponsorshipTerm, termsOf } from './lakeSponsorship';
 
 export const OfferMoney = { LeastWaterRating: 30, LeastPerTerm: 2000, MostPerTerm: 60000, Curve: 1.6, RoundTo: 100, LongerDealBonusPerTerm: 0.04 } as const;
@@ -36,8 +35,4 @@ export function sponsorTierFor(waterRating: number): Tier {
 export function brandsThatWouldSponsor(waterRating: number): BrandName[] {
 	const ceiling = TierRank[sponsorTierFor(waterRating)];
 	return (Object.keys(BrandCatalogue) as BrandName[]).filter((brand) => TierRank[BrandCatalogue[brand].tier] <= ceiling);
-}
-
-export function waterRatingOf(reputation: number, waterQuality: number) {
-	return waterRatingFor(reputation, waterQuality);
 }

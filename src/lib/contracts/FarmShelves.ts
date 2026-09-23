@@ -10,6 +10,8 @@ export interface FarmOnShelf {
 	farm: Farm;
 	packs: PackOnShelf[];
 	quote: TransportQuote | null;
+	standing: string | null;
+	isSellingToYou: boolean;
 }
 
 export interface FarmShelves {
