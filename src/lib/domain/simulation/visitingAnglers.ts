@@ -21,6 +21,7 @@ export { anglersArrivingToday } from './anglerDemand';
 export { willingnessToPayFor } from './ticketChoice';
 
 const GoodAnglerCatchesPerDay = 19;
+const NobodyComes = 0;
 
 export type NewCatch = Omit<Catch, 'id' | 'caught_at' | 'owner_name'>;
 export type NewVisit = Omit<LakeVisit, 'id' | 'visited_at'>;
@@ -34,6 +35,7 @@ export interface VisitingDay {
 	bailiffs: Bailiff[];
 	stockDraw: number;
 	pegsPerDay: number;
+	isClosedForRestocking: boolean;
 }
 
 export interface AnglerDay {
@@ -45,7 +47,7 @@ export interface AnglerDay {
 }
 
 export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, today: VisitingDay): AnglerDay {
-	const wanting = anglersArrivingToday(lake, today.season, today.book, today.stockDraw);
+	const wanting = today.isClosedForRestocking ? NobodyComes : anglersArrivingToday(lake, today.season, today.book, today.stockDraw);
 	const count = Math.min(wanting, Math.round(today.pegsPerDay));
 	const day: AnglerDay = { visits: [], catches: [], records: today.standing, lodgeTakings: 0, turnedAway: wanting - count };
 	const fishable = carp.filter(isFishable);

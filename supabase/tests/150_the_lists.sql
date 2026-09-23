@@ -8,8 +8,8 @@ insert into public.swims (lake_id, name, position_x, position_y) values (:'lake'
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(
-	(select carp_count = 2 and heaviest_lb = 27.5 and swim_count = 3 and owner_name = 'Player 150' and name = 'Listed Water' from public.lake_summaries where id = :'lake'),
-	'a lake summary carries the stock count, the heaviest fish, the pegs and the owner'
+	(select carp_count = 102 and heaviest_lb = 27.5 and swim_count = 3 and owner_name = 'Player 150' and name = 'Listed Water' from public.lake_summaries where id = :'lake'),
+	'a lake summary counts every fish in the water, shoal fish included, with the heaviest fish, the pegs and the owner'
 );
 select public.pay_day_ticket(:'lake') as visit \gset
 reset role;

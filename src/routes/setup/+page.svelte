@@ -10,6 +10,7 @@
 	import SurveyStep from '$lib/components/setup/SurveyStep.svelte';
 	import WhereStep from '$lib/components/setup/WhereStep.svelte';
 	import { WizardStep } from '$lib/contracts/SetupProgress';
+	import { fishInTheWater } from '$lib/domain/stock/stockedToOpen';
 	import { AnotherWaterStory, SetupStory } from '$lib/game/setup/setupStory';
 
 	let { data, form } = $props();
@@ -17,6 +18,7 @@
 	const isBuyingAnother = $derived(data.progress.openWaters.length > 0);
 	const chapter = $derived(isBuyingAnother && data.step === WizardStep.ChoosePlot ? AnotherWaterStory : SetupStory[data.step]);
 	const backWords = $derived(data.progress.openWaters.length === 1 ? data.progress.openWaters[0].name : 'my waters');
+	const fishCount = $derived(data.fishery ? fishInTheWater(data.fishery.carp, data.fishery.shoals) : 0);
 </script>
 
 <svelte:head><title>{isBuyingAnother ? 'Buy another water' : 'Find your water'} · Carp Mania</title></svelte:head>
@@ -43,5 +45,5 @@
 {:else if data.step === WizardStep.Stock && data.fishery}
 	<StockStep fishery={data.fishery} />
 {:else if data.step === WizardStep.OpenTheGates && data.progress.lake}
-	<OpenTheGatesStep lake={data.progress.lake} />
+	<OpenTheGatesStep lake={data.progress.lake} {fishCount} />
 {/if}

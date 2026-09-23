@@ -10,6 +10,8 @@
 	import FavouriteStar from '$lib/components/lakes/FavouriteStar.svelte';
 	import RecentCatchesPanel from '$lib/components/lakes/RecentCatchesPanel.svelte';
 	import GoFishingButton from '$lib/components/game/GoFishingButton.svelte';
+	import ClosedForRestocking from '$lib/components/lake/ClosedForRestocking.svelte';
+	import { fishInTheWater } from '$lib/domain/stock/stockedToOpen';
 	import SponsorLine from '$lib/components/lakes/SponsorLine.svelte';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
@@ -27,6 +29,7 @@
 	const now = $derived(new Date(data.loadedAt));
 	const isOwnWater = $derived(lake.owner_id === data.user?.id);
 	const fishHereWords = $derived(isOwnWater ? 'Go fishing' : `Fish here for ${formatMoney(Number(lake.day_ticket_fee))}`);
+	const fishCount = $derived(fishInTheWater(carp, shoals));
 </script>
 
 <div class="mb-6 flex flex-wrap items-end gap-4">
@@ -43,6 +46,7 @@
 		<GoFishingButton lakeId={lake.id} words={fishHereWords} />
 	</div>
 </div>
+<div class="mb-6"><ClosedForRestocking {fishCount} isOwner={isOwnWater} /></div>
 
 <div class="grid gap-6 lg:grid-cols-[3fr_2fr]">
 	<LakeCanvas {lake} {swims} {carp} {shoals} />
