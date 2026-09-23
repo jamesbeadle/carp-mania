@@ -1,4 +1,4 @@
-export const CatchSettleSeconds = 1.2;
+export const CatchSettleSeconds = 3;
 
 export function isSettledAfter(secondsSinceTheMat: number) {
 	return secondsSinceTheMat >= CatchSettleSeconds;

@@ -48,7 +48,7 @@
 	$effect(() => settleAfterTheCatch(session.isSettlingAfterCatch));
 </script>
 
-<svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
+<svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} onkeyupcapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
 
 {#snippet water()}
 	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />

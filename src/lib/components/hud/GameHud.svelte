@@ -28,7 +28,7 @@
 			<NewsLink />
 			<RuleBookLink />
 			<div class="hidden sm:block"><SoundToggle /></div>
-			<div class="hidden sm:block"><FullscreenToggle /></div>
+			<FullscreenToggle />
 			<a href="/angler" class="hidden h-9 w-9 overflow-hidden rounded-full border border-volt-500/60 bg-carbon-900 transition hover:border-volt-400 active:scale-95 lg:block" aria-label="My angler">
 				{#if avatarUrl}<img src={avatarUrl} alt="" class="h-full w-full object-cover" referrerpolicy="no-referrer" />{/if}
 			</a>

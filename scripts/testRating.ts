@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { anglerRatingOf, craftOf, pedigreeOf, whatHoldsRatingBack, type Skills } from '../src/lib/domain/anglerRating';
 import { feedingWindowOf, isInsideFeedingWindow } from '../src/lib/domain/fishing/feedingWindow';
 import { strikeWindowFor } from '../src/lib/domain/fishing/strikeWindow';
-import { isSettledAfter } from '../src/lib/domain/fishing/catchSettle';
+import { CatchSettleSeconds, isSettledAfter } from '../src/lib/domain/fishing/catchSettle';
 
 const Maxed: Skills = { line_selection: 100, rig_selection: 100, bait_selection: 100, watercraft: 100 };
 const Middling: Skills = { line_selection: 71, rig_selection: 71, bait_selection: 71, watercraft: 71 };
@@ -17,8 +17,8 @@ export function runRatingScenarios() {
 	assert.ok(whatHoldsRatingBack(anglerRatingOf(Middling, 50), { ...Middling, watercraft: 40 }).includes('watercraft'), 'the page names the weakest skill');
 	assert.equal(strikeWindowFor(0), 4, 'a novice gets four seconds to strike');
 	assert.equal(strikeWindowFor(100), 5.5, 'full watercraft gets a beat longer');
-	assert.ok(!isSettledAfter(1), 'the session is still settling a second after the mat');
-	assert.ok(isSettledAfter(1.2), 'and settled after the delay');
+	assert.ok(!isSettledAfter(CatchSettleSeconds - 1), 'the session is still settling a second before the delay is up');
+	assert.ok(isSettledAfter(CatchSettleSeconds), 'and settled after the delay');
 	const window = feedingWindowOf({ id: 'carp-1' });
 	assert.equal(feedingWindowOf({ id: 'carp-1' }), window, 'a fish keeps its feeding window');
 	assert.ok(isInsideFeedingWindow('night', 26), 'the night window runs past midnight');
