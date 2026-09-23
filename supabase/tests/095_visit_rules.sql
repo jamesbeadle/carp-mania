@@ -10,15 +10,12 @@ select public.pay_day_ticket(:'lake') as visit \gset
 
 set role service_role;
 select public.record_catch(test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
-select test.assert_refused(
-	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie'),
-	'already been on the bank today'
-);
+select public.record_catch(test.player(96), :'visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 select public.record_catch(test.player(96), :'visit', :'another', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 reset role;
-select test.assert_that((select times_caught from public.carp where id = :'repeat') = 1, 'the same fish is recorded once a visit');
+select test.assert_that((select times_caught from public.carp where id = :'repeat') = 2, 'the same fish can be caught twice on one visit');
 select test.assert_that((select times_caught from public.carp where id = :'another') = 1, 'a different fish on the same visit still counts');
-select test.assert_that((select fish_caught from public.lake_visits where id = :'visit') = 2, 'two fish on the ticket');
+select test.assert_that((select fish_caught from public.lake_visits where id = :'visit') = 3, 'three fish on the ticket');
 
 set role service_role;
 insert into public.lake_visits (lake_id, angler_id, angler_name, fee_paid, visited_at, seed)
@@ -36,4 +33,4 @@ select public.pay_day_ticket(:'lake') as next_visit \gset
 set role service_role;
 select public.record_catch(test.player(96), :'next_visit', :'repeat', 'The Peg', 'hair rig', 'boilie', 6, 0, 0, 0, 0, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 reset role;
-select test.assert_that((select times_caught from public.carp where id = :'repeat') = 2, 'a new day ticket lets the same fish be caught again');
+select test.assert_that((select times_caught from public.carp where id = :'repeat') = 3, 'a new day ticket lets the same fish be caught again');

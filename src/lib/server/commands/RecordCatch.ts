@@ -13,7 +13,7 @@ import { seasonFor } from '$lib/domain/world/seasons';
 import { weatherFor } from '$lib/domain/world/weather';
 import { readCatchReport } from '../gates/readCatchReport';
 import { requireUser } from '../gates/requireUser';
-import { countCarpIn, hasCaughtDuringVisit, loadVisitOf, type VisitOnRecord } from '../queries/loadVisitForCatch';
+import { countCarpIn, loadVisitOf, type VisitOnRecord } from '../queries/loadVisitForCatch';
 import { loadRecentCapturesBefore } from '../queries/loadRecentCaptures';
 import { loadStreakDays } from '../queries/loadStreak';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
@@ -32,9 +32,7 @@ export async function RecordCatch(locals: App.Locals, body: unknown) {
 	if (!visit) error(HttpStatus.BadRequest, 'No day ticket for this visit');
 	if (!isDayTicketStillValid(visit.visited_at, new Date())) error(HttpStatus.BadRequest, 'That day ticket was for another day');
 
-	const hadItAlready = report.shoalId === null && hasCaughtDuringVisit(user.id, visit, report.carpId);
-	const [day, hasHadItToday] = await Promise.all([loadTheDayAsFound(locals, user.id, visit), hadItAlready]);
-	if (hasHadItToday) error(HttpStatus.BadRequest, 'You have already had that fish today');
+	const day = await loadTheDayAsFound(locals, user.id, visit);
 	const taker = takerThatWasRolled(report, visit, day);
 	if (!taker) error(HttpStatus.BadRequest, NotTheFish);
 	if (taker.kind === 'named') return recordTheNamedFish(user.id, report, taker.carp);

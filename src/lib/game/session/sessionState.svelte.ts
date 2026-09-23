@@ -53,11 +53,6 @@ export class SessionState {
 		return this.phase === 'landed' && !isSettledAfter(this.secondsSinceTheMat);
 	}
 
-	hasLandedToday(carp: Carp) {
-		const landedIds = this.landedToday.map((landed) => landed.carp.id);
-		return landedIds.includes(carp.id);
-	}
-
 	tick(secondsElapsed: number) {
 		advanceTheSession(this, secondsElapsed);
 	}
