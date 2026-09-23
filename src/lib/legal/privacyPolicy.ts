@@ -14,7 +14,7 @@ export const PrivacyPolicy: LegalDocument = {
 		{
 			heading: 'What we hold about you',
 			paragraphs: [
-				`When you sign in with Google, Google tells us the email address, the name and the profile picture on your Google account. We keep all three: the email address identifies your account, the name becomes your angler's name in the game, and the picture becomes your avatar. We never see your Google password.`,
+				`When you sign in with Google, Google tells us the email address, the name and the profile picture on your Google account. We keep all three: the email address identifies your account, your first name becomes your angler's starting name in the game (you can change it on My angler at any time, and only the angler name is ever shown to other players), and the picture becomes your avatar. We never see your Google password.`,
 				`Everything you do in the game is stored so it can carry on where you left off: your waters and their layouts, the fish in them and what happens to them, your catches, day tickets, sales, your in-game money, the notes on your noticeboard, the waters you favourite, the region you chose for your fishery, and the spot where you pinned it on the globe. The region and the pin are places you pick for your water; the game never reads your device's location.`,
 				`Our hosting providers keep ordinary server logs — the address your connection comes from, the browser you use and the pages you ask for — for security and to keep the service running. We don't run analytics, advertising or tracking scripts.`
 			]
@@ -51,14 +51,14 @@ export const PrivacyPolicy: LegalDocument = {
 		{
 			heading: 'How long we keep it',
 			paragraphs: [
-				`For as long as you have an account. The game's history is part of a shared world — a record set on someone else's water, a fish sold between fisheries, a line in the hall of fame — so when you ask us to delete your account we remove the account, your profile, your waters and everything private to you, while catch reports and records that other players already saw stay in the world with the angler's name as it appeared at the time. If you'd rather they didn't carry your name, say so and we'll change it to "a retired angler".`,
+				`For as long as you have an account. The game's history is part of a shared world — a record set on someone else's water, a fish sold between fisheries, a line in the hall of fame — so when you ask us to delete your account we remove the account, your profile, your waters and everything private to you, while catch reports and records that other players already saw stay in the world under your angler name. If you'd rather they didn't carry it, say so and we'll change it to "a retired angler".`,
 				`Server logs are kept by our providers for a limited time on their standard schedules and then dropped.`
 			]
 		},
 		{
 			heading: 'Your rights',
 			paragraphs: [
-				`You can ask us for a copy of what we hold about you, ask us to correct it (your angler's name, for instance, which comes from Google and doesn't update by itself), ask us to delete your account, object to how we use your data, or ask for it in a form you can take elsewhere. Write to ${email}.`,
+				`You can ask us for a copy of what we hold about you, ask us to correct it (your angler's name you can change yourself on My angler), ask us to delete your account, object to how we use your data, or ask for it in a form you can take elsewhere. Write to ${email}.`,
 				`If you think we've got something wrong, you can also complain to the Information Commissioner's Office at ico.org.uk — though we'd rather you gave us the chance to put it right first.`
 			]
 		},

@@ -19,7 +19,7 @@ select test.assert_that((select fish_caught from public.lake_visits where id = :
 
 set role service_role;
 insert into public.lake_visits (lake_id, angler_id, angler_name, fee_paid, visited_at, seed)
-values (:'lake', test.player(96), 'Player 96', 20, now() - interval '3 hours', 1) returning id as stale_visit \gset
+values (:'lake', test.player(96), 'Player96', 20, now() - interval '3 hours', 1) returning id as stale_visit \gset
 select test.assert_refused(
 	format('select public.record_catch(%L, %L, %L, %L, %L, %L, 6, 0, 0, 0, 0, %L, %L, %L)', test.player(96), :'stale_visit', :'another', 'The Peg', 'hair rig', 'boilie', 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie'),
 	'That day ticket has expired'

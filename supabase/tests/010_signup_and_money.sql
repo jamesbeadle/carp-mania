@@ -1,6 +1,6 @@
 select test.sign_up(10);
 select test.assert_that(test.money_of(test.player(10)) = 100000, 'a new player starts with £100,000');
-select test.assert_that((select display_name from public.profiles where id = test.player(10)) = 'Player 10', 'the trigger names the profile');
+select test.assert_that((select display_name from public.profiles where id = test.player(10)) = 'Player10', 'the trigger names the profile');
 select test.assert_that((select home_region from public.profiles where id = test.player(10)) is null, 'a new player has not chosen a region yet');
 
 select test.assert_that(test.money_of(test.player(1)) = 99200, 'the grandfathered player got £95,000 on top of what they held');

@@ -4,7 +4,7 @@ select test.give_lake(test.player(270), 'Honours Pit', 'uk_ireland', 51.5, -0.5,
 select test.give_carp(:'lake', 'Big Bertha', 'mirror', 48, 80, 0) as bertha \gset
 select test.give_carp(:'lake', 'A Twenty', 'common', 22, 80, 0) as twenty \gset
 insert into public.catches (lake_id, carp_id, angler_id, angler_name, weight_lb, swim_name, rig, bait, hook_size, caught_at) values
-	(:'lake', :'twenty', test.player(271), 'Player 271', 22, 'The Peg', 'hair', 'boilie', 4, now() - interval '3 days');
+	(:'lake', :'twenty', test.player(271), 'Player271', 22, 'The Peg', 'hair', 'boilie', 4, now() - interval '3 days');
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(271)::text, false);

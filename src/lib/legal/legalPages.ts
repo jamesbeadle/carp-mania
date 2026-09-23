@@ -19,7 +19,7 @@ export const LegalContact = {
 	email: 'consulting@yourbusiness.today',
 	site: 'carp-mania.com',
 	minimumAge: 13,
-	updatedOn: '21 September 2026'
+	updatedOn: '23 September 2026'
 } as const;
 
 export const LegalPages: LegalPageLink[] = [

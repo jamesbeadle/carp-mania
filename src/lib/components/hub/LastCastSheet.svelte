@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { AnglerName } from '$lib/domain/anglerName';
 	import { enhance } from '$app/forms';
 	import type { FishermanDiary } from '$lib/contracts/FishermanDiary';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
@@ -6,7 +7,7 @@
 
 	let { diary, lakeName, failure, isOpen, onClose }: { diary: FishermanDiary; lakeName: string; failure: string | null; isOpen: boolean; onClose: () => void } = $props();
 
-	const HeirNameLength = { Shortest: 2, Longest: 40 } as const;
+	const pattern = AnglerName.Allowed.source.slice(1, -1);
 	const old = $derived(diary.current);
 </script>
 
@@ -20,7 +21,7 @@
 	<form method="POST" action="/home?/nameHeir" use:enhance class="space-y-3">
 		<label>
 			<span class="stat-label">Name the heir</span>
-			<input class="field" name="heirName" minlength={HeirNameLength.Shortest} maxlength={HeirNameLength.Longest} placeholder="Who takes the rods?" required autocomplete="off" />
+			<input class="field" name="heirName" minlength={AnglerName.ShortestLength} maxlength={AnglerName.LongestLength} {pattern} placeholder="Who takes the rods? One word, like YoungTom" required autocomplete="off" />
 		</label>
 		{#if failure}<p class="text-sm text-danger-400">{failure}</p>{/if}
 		<button class="button-primary w-full">Hand it all down</button>

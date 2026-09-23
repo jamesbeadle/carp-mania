@@ -2,6 +2,7 @@ import { Pedigree } from '$lib/domain/anglerRating';
 import { SkillLabels, SkillNames } from '$lib/domain/anglerSkills';
 import { DiaryClock } from '$lib/domain/legacy/diary';
 import { AwardKeys } from '$lib/domain/trophies/awards';
+import { AnglerName } from '$lib/domain/anglerName';
 import type { RuleChapter } from './ruleBookTypes';
 
 const skillLines = SkillNames.map((skill) => SkillLabels[skill].toLowerCase()).join(', ');
@@ -11,6 +12,10 @@ export const YourAngler: RuleChapter = {
 	title: 'Your angler',
 	blurb: 'Rating, skills, records, awards, and the life of a fisherman.',
 	questions: [
+		{
+			question: 'What name do I fish under?',
+			answer: `Your angler name — one word, ${AnglerName.ShortestLength} to ${AnglerName.LongestLength} letters and numbers, and nobody else's. You start as your first name (numbered if someone got there first) and can change it on My angler; the new name follows you onto every catch, record and piece of news. The heir who takes the rods when a fisherman retires gets a name of the same kind.`
+		},
 		{
 			question: 'What is my rating?',
 			answer: `The lesser of two numbers. Your craft is the average of your four skills — ${skillLines}. Your pedigree is ${Pedigree.PointsPerPound} points for every pound of the heaviest carp you have landed, so a ${Pedigree.CapLb}-pounder is the lot. A skilful angler with small fish and a lucky angler with one big fish are both held back by the number they are short on.`

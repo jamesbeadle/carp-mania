@@ -8,7 +8,7 @@ insert into public.swims (lake_id, name, position_x, position_y) values (:'lake'
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(
-	(select carp_count = 102 and heaviest_lb = 27.5 and swim_count = 3 and owner_name = 'Player 150' and name = 'Listed Water' from public.lake_summaries where id = :'lake'),
+	(select carp_count = 102 and heaviest_lb = 27.5 and swim_count = 3 and owner_name = 'Player150' and name = 'Listed Water' from public.lake_summaries where id = :'lake'),
 	'a lake summary counts every fish in the water, shoal fish included, with the heaviest fish, the pegs and the owner'
 );
 select public.pay_day_ticket(:'lake') as visit \gset
@@ -17,7 +17,7 @@ select public.record_catch(test.player(151), :'visit', :'two', 'Peg 1', 'hair ri
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(
-	(select personal_best_lb = 27.5 and catches = 1 and rating > 25 and display_name = 'Player 151' from public.angler_summaries where id = test.player(151)),
+	(select personal_best_lb = 27.5 and catches = 1 and rating > 25 and display_name = 'Player151' from public.angler_summaries where id = test.player(151)),
 	'an angler summary carries the personal best, the catch count and the rating'
 );
 reset role;
@@ -44,7 +44,7 @@ reset role;
 select current_fisherman_id as fisherman from public.profiles where id = test.player(151) \gset
 select public.record_catch(test.player(151), :'visit', :'one', 'Peg 2', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie');
 insert into public.catches (lake_id, carp_id, angler_id, angler_name, weight_lb, swim_name, rig, bait, hook_size, fisherman_id, caught_at)
-values (:'lake', :'two', test.player(151), 'Player 151', 26, 'Peg 3', 'hair rig', 'boilie', 6, :'fisherman', now() - interval '3 days');
+values (:'lake', :'two', test.player(151), 'Player151', 26, 'Peg 3', 'hair rig', 'boilie', 6, :'fisherman', now() - interval '3 days');
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(151)::text, false);
 select test.assert_that(

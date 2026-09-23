@@ -1,5 +1,7 @@
 <script lang="ts">
+	import ActionMessage from '$lib/components/ActionMessage.svelte';
 	import CatchReportList from '$lib/components/CatchReportList.svelte';
+	import AnglerNameForm from '$lib/components/angler/AnglerNameForm.svelte';
 	import RatingDial from '$lib/components/angler/RatingDial.svelte';
 	import Diary from '$lib/components/angler/Diary.svelte';
 	import RivalCard from '$lib/components/angler/RivalCard.svelte';
@@ -17,7 +19,7 @@
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const MyAnglerPath = '/angler';
 	const angler = $derived(data.angler);
@@ -35,9 +37,10 @@
 
 <svelte:head><title>My angler · Carp Mania</title></svelte:head>
 
+<ActionMessage {form} />
 <div class="mb-6 flex flex-wrap items-end gap-4">
 	<div>
-		<h1 class="text-4xl text-volt-300">{angler.profile.display_name}</h1>
+		<AnglerNameForm name={angler.profile.display_name} />
 		<p class="text-sm text-mist-400">Aged {diary.age} · {placeInTheLine(current.generation)}{#if diary.isSlowingDown} · slowing down now{/if}</p>
 		<AnglerRanksLine ranks={room.ranks} />
 	</div>
