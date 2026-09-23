@@ -2,6 +2,7 @@ import type { RandomFraction } from '../random';
 import { stockDrawOf } from '../water/stockDraw';
 import { pegsPerDayFor } from '../water/demand';
 import type { Shoal } from '../stock/shoals';
+import { fishInTheWater, isStockedToOpen } from '../stock/stockedToOpen';
 import type { Carp, Lake, Swim } from '../types';
 import { weatherFor } from '../world/weather';
 import { ageCarpIfNewYear } from './ageing';
@@ -29,7 +30,8 @@ function visitingDayOf(lake: Lake, context: DayContext, carp: Carp[], shoals: Sh
 	const { season, records, book, bailiffs } = context;
 	const stockDraw = stockDrawOf(carp, shoals);
 	const pegsPerDay = Math.max(0, pegsPerDayFor(context.swimCount) - context.pegsBooked);
-	return { season, standing: records, weather: weatherFor(lake, context.dayStart), book, shoals, bailiffs, stockDraw, pegsPerDay };
+	const isClosedForRestocking = !isStockedToOpen(fishInTheWater(carp, shoals));
+	return { season, standing: records, weather: weatherFor(lake, context.dayStart), book, shoals, bailiffs, stockDraw, pegsPerDay, isClosedForRestocking };
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext, shoals: Shoal[] = NoShoals): DayOutcome {

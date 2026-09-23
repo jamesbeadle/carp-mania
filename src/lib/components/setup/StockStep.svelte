@@ -2,6 +2,7 @@
 	import StockTable from '$lib/components/StockTable.svelte';
 	import { WizardStep } from '$lib/contracts/SetupProgress';
 	import { FarmCatalogue, GradeCatalogue } from '$lib/domain/market/farms';
+	import { fishInTheWater, isStockedToOpen, OpenWater } from '$lib/domain/stock/stockedToOpen';
 	import type { MyFishery } from '$lib/server/queries/GetMyFishery';
 	import AboutToggle from '../stats/AboutToggle.svelte';
 	import StatRow from '../stats/StatRow.svelte';
@@ -16,9 +17,12 @@
 		{ label: 'Farms', value: String(FarmCatalogue.length), caption: 'worldwide' },
 		{ label: 'In your region', value: String(farmsNearby.length), tone: 'volt' as const }
 	]);
+	const fishCount = $derived(fishInTheWater(fishery.carp, fishery.shoals));
+	const isStocked = $derived(isStockedToOpen(fishCount));
 	const stockStats = $derived([
 		{ label: 'Known carp', value: String(catalogued.length), tone: 'volt' as const },
-		{ label: 'Uncatalogued', value: String(unknownCount), caption: 'by word of mouth' }
+		{ label: 'Uncatalogued', value: String(unknownCount), caption: 'by word of mouth' },
+		{ label: 'To open', value: `${fishCount} / ${OpenWater.FewestFish}`, caption: isStocked ? 'enough to open' : 'shoal fish count', tone: isStocked ? ('mist' as const) : ('danger' as const) }
 	]);
 </script>
 
@@ -35,7 +39,7 @@
 		{/if}
 		<a href="/market/farms" class="button-primary mt-4 inline-block">Open the farms →</a>
 		<div class="mt-4">
-			<AboutToggle title="About the farms">Fish come in packs — small fish by the hundred from a stock farm, a fifty from a record grower. Transport and quarantine are quoted from the farm's gate, so a farm in your own region is the cheap way to start.</AboutToggle>
+			<AboutToggle title="About the farms">Fish come in packs — small fish by the hundred from a stock farm, a fifty from a record grower. Transport and quarantine are quoted from the farm's gate, so a farm in your own region is the cheap way to start. A water needs {OpenWater.FewestFish} fish in it before the gates open.</AboutToggle>
 		</div>
 	</section>
 	<section class="panel">

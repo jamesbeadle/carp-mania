@@ -6,6 +6,7 @@ import { TicketPrice } from '$lib/domain/fishing/ticketBook';
 import { WorksInProgress } from '$lib/domain/groundworks/catalogue';
 import { DealerTerms } from '$lib/domain/market/dealer';
 import { FarmCatalogue } from '$lib/domain/market/farms';
+import { OpenWater } from '$lib/domain/stock/stockedToOpen';
 import { BookingWindow } from '$lib/domain/water/bookings';
 import type { RuleChapter } from './ruleBookTypes';
 
@@ -21,6 +22,10 @@ export const RunningAWater: RuleChapter = {
 		{
 			question: 'How do I set up my fishery?',
 			answer: `Six steps: pick a region and drop a pin, choose a site (an old gravel pit, a quarry, a clay pit and so on — each starts with something and comes with a problem), name it, walk the bank to lay out the swims, stock it, and open the gates. Everything after that happens at the lodge, under Run fishery.`
+		},
+		{
+			question: 'How many fish does a water need?',
+			answer: `${OpenWater.FewestFish} to open, counting every fish in it — named carp and shoal fish alike, once they are off the lorry. A water that falls below ${OpenWater.FewestFish} closes for restocking: no tickets are sold and nobody fishes it, its owner included, until the farms have brought it back up. Fish on the lorry do not count until they arrive.`
 		},
 		{
 			question: 'Where do fish come from?',

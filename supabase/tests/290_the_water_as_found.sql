@@ -10,7 +10,7 @@ select public.pay_day_ticket(:'water') as visit \gset
 reset role;
 select test.assert_that((select water_as_found -> 'lake' ->> 'name' = 'Frozen Water' from public.lake_visits where id = :'visit'), 'the visit freezes the lake as the angler found it');
 select test.assert_that((select jsonb_array_length(water_as_found -> 'carp') = 1 and water_as_found -> 'carp' -> 0 ->> 'name' = 'Old Timer' from public.lake_visits where id = :'visit'), 'the visit freezes the carp as found');
-select test.assert_that((select (select (kind ->> 'count')::integer from jsonb_array_elements(water_as_found -> 'species') as kind where kind ->> 'species' = 'bream') = 30 and jsonb_array_length(water_as_found -> 'shoals') = 0 from public.lake_visits where id = :'visit'), 'the visit freezes the species and the shoals');
+select test.assert_that((select (select (kind ->> 'count')::integer from jsonb_array_elements(water_as_found -> 'species') as kind where kind ->> 'species' = 'bream') = 30 and jsonb_array_length(water_as_found -> 'shoals') = 1 from public.lake_visits where id = :'visit'), 'the visit freezes the species and the shoals');
 select test.assert_that((select (skills_at_start ->> 'watercraft')::numeric = 25 from public.lake_visits where id = :'visit'), 'the visit freezes the angler''s skills at the start');
 
 set role service_role;

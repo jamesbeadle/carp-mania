@@ -14,6 +14,8 @@ begin
 	values (owner, lake_name, water_acres, 40, 60, 20, 20, 60, 20, 20, '{}'::jsonb,
 		region_code, pin_latitude, pin_longitude, 'gravel_pit', water_acres * 2, test.square_layout())
 	returning id into new_lake;
+	insert into public.carp_shoals (lake_id, size_band, count, average_weight_lb, weight_spread_lb, age_years, condition, origin)
+	values (new_lake, 'fry', 100, 0.01, 0, 1, 80, 'farm');
 	return new_lake;
 end;
 $$;

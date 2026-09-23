@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PublicLakeSummary } from '$lib/contracts/PublicLakeSummary';
+	import { ClosedForRestocking, isStockedToOpen } from '$lib/domain/stock/stockedToOpen';
 	import { RegionCatalogue } from '$lib/domain/world/regions';
 	import { formatMoney } from '$lib/format/money';
 	import { formatWeight } from '$lib/format/weight';
@@ -12,6 +13,7 @@
 	let { summary, isFavourite }: { summary: PublicLakeSummary; isFavourite: boolean } = $props();
 
 	const isOnTheGlobe = $derived(summary.lake.latitude !== null);
+	const isClosedForRestocking = $derived(!isStockedToOpen(summary.carpCount));
 	const now = new Date();
 	const stats = $derived([
 		{ label: 'Reputation', value: String(Math.round(Number(summary.lake.reputation))) },
@@ -48,6 +50,10 @@
 	</p>
 	<div class="mt-auto flex flex-wrap justify-end gap-3">
 		<a href="/lakes/{summary.lake.id}" class="button-secondary">Look around</a>
-		<GoFishingButton lakeId={summary.lake.id} words="Fish here" />
+		{#if isClosedForRestocking}
+			<p class="self-center text-sm text-danger-400">{ClosedForRestocking}</p>
+		{:else}
+			<GoFishingButton lakeId={summary.lake.id} words="Fish here" />
+		{/if}
 	</div>
 </article>
