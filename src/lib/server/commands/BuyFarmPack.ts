@@ -4,12 +4,12 @@ import { arrivesAsAShoal, farmFishFor, farmShoalFor } from '$lib/domain/market/f
 import { packFishPrice } from '$lib/domain/market/farmPacks';
 import { farmDeliveryTermsFor, type FarmDeliveryTerms } from '$lib/domain/market/farmQuote';
 import type { PackOnShelf } from '$lib/contracts/FarmShelves';
-import { farmById } from '$lib/domain/market/farms';
+import { farmById, type Farm } from '$lib/domain/market/farms';
 import { doesFarmSellTo, farmStandingWords } from '$lib/domain/market/farmStanding';
 import { waterRatingOfLake } from '$lib/domain/water/waterRating';
 import { seededRandom } from '$lib/domain/random';
 import type { Shoal } from '$lib/domain/stock/shoals';
-import type { Carp } from '$lib/domain/types';
+import type { Carp, Lake } from '$lib/domain/types';
 import { formatMoney } from '$lib/format/money';
 import { trustedSupabase } from '$lib/supabase/createTrustedSupabase';
 import { readFormNumber } from '../gates/readFormNumber';
@@ -24,9 +24,8 @@ export async function BuyFarmPack(locals: App.Locals, formData: FormData) {
 	const lake = await requireOwnedLake(locals);
 	const farm = farmById(String(formData.get(Fields.Farm) ?? ''));
 	if (!farm) return fail(400, { message: 'No farm of that name' });
-	const waterRating = waterRatingOfLake(lake);
-	const isSellingToYou = doesFarmSellTo(farm.grade, waterRating);
-	if (!isSellingToYou) return fail(400, { message: farmStandingWords(farm, waterRating) });
+	const refusal = refusalFromFarmStanding(farm, lake);
+	if (refusal) return refusal;
 	const count = readFormNumber(formData, Fields.Count, OrderCount.Fewest, OrderCount.Most);
 	if (count.failure) return count.failure;
 	const now = new Date();
@@ -51,6 +50,13 @@ export async function BuyFarmPack(locals: App.Locals, formData: FormData) {
 	if (error) return fail(400, { message: error });
 	const { cost, transitDays } = terms.quote;
 	return { message: `${wanted} fish ordered from ${farm.name} for ${formatMoney(fishPrice + cost)} — ${transitDays} days on the lorry` };
+}
+
+function refusalFromFarmStanding(farm: Farm, lake: Lake) {
+	const waterRating = waterRatingOfLake(lake);
+	const isSellingToYou = doesFarmSellTo(farm.grade, waterRating);
+	if (isSellingToYou) return null;
+	return fail(400, { message: farmStandingWords(farm, waterRating) });
 }
 
 function deliveryArguments(player: string, pack: string, fishPrice: number, terms: FarmDeliveryTerms) {
