@@ -26,7 +26,7 @@ select test.assert_that(
 	'the holder hears once when one catch takes every record they held'
 );
 select test.assert_that(
-	(select title = 'Player 182 has taken your world record at Rivalry Water' and body = '46 lb to your 45 lb. It is there to be taken back.' and link = '/anglers/' || test.player(182)
+	(select title = 'Player182 has taken your world record at Rivalry Water' and body = '46 lb to your 45 lb. It is there to be taken back.' and link = '/anglers/' || test.player(182)
 		from public.notifications where profile_id = test.player(181) and kind = 'record_lost'),
 	'the note names the taker, the widest record taken, the water and both weights, and leads to the taker''s page'
 );
@@ -41,7 +41,7 @@ select test.assert_that(
 
 select public.record_catch(test.player(183), :'third_visit', :'third', 'Peg 1', 'hair rig', 'boilie', 6, 2, 2, 2, 2, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie') as third_catch \gset
 select test.assert_that(
-	(select title = 'You''ve dropped to No. 3 on the world board' and body = 'Player 183''s 47 lb went in above you.' and link = '/world/hall-of-fame'
+	(select title = 'You''ve dropped to No. 3 on the world board' and body = 'Player183''s 47 lb went in above you.' and link = '/world/hall-of-fame'
 		from public.notifications where profile_id = test.player(181) and kind = 'board_place_lost'),
 	'an angler pushed down the world board hears where they stand now and whose fish did it'
 );
@@ -68,7 +68,7 @@ select test.assert_that(
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(181)::text, false);
 select test.assert_that(
-	(select angler_id = test.player(182) and display_name = 'Player 182' and best_lb = 46 and rank = 2 from public.board_neighbours(test.player(181)) where side = 'above'),
+	(select angler_id = test.player(182) and display_name = 'Player182' and best_lb = 46 and rank = 2 from public.board_neighbours(test.player(181)) where side = 'above'),
 	'the one to beat is the angler one place above on the world board'
 );
 select test.assert_that(

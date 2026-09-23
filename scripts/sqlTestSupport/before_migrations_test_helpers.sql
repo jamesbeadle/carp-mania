@@ -9,7 +9,7 @@ $$;
 create function test.sign_up(player_number integer) returns uuid
 language sql as $$
 	insert into auth.users (id, email, raw_user_meta_data)
-	values (test.player(player_number), 'player' || player_number || '@example.com', jsonb_build_object('full_name', 'Player ' || player_number))
+	values (test.player(player_number), 'player' || player_number || '@example.com', jsonb_build_object('full_name', 'Player' || player_number || ' Tester'))
 	returning id;
 $$;
 

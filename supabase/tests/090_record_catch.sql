@@ -36,7 +36,7 @@ select test.assert_that((select fee_paid = 0 from public.lake_visits where id = 
 set role service_role;
 select public.record_catch(test.player(91), :'visit', :'twenty', 'The Peg', 'hair rig', 'boilie', 6, 1, 0.5, 3, 1, 'bankside_basics-rod-2.75-12', 'bankside_basics-reel-carp_large', 'meadowmill-bait-shelf_life_boilie') as first_catch \gset
 reset role;
-select test.assert_that((select angler_id = test.player(91) and weight_lb = 20 and angler_name = 'Player 91' from public.catches where id = :'first_catch'), 'the catch is the angler''s');
+select test.assert_that((select angler_id = test.player(91) and weight_lb = 20 and angler_name = 'Player91' from public.catches where id = :'first_catch'), 'the catch is the angler''s');
 select test.assert_that((select fame = 15 and times_caught = 1 from public.carp where id = :'twenty'), 'fame: 3 for a player, 10 for the lake record (the visitor''s 45 does not count), 2 for a personal best');
 select test.assert_that(
 	(select line_selection = 26 and rig_selection = 25.5 and bait_selection = 27 and watercraft = 26 and experience = 1 from public.profiles where id = test.player(91)),
@@ -61,7 +61,7 @@ select test.assert_that((select fame from public.carp where id = :'thirtytwo') =
 select test.assert_that((select fame = 3 and is_catalogued from public.carp where id = :'hidden'), 'an unknown original is catalogued on its first capture');
 select test.assert_that((select count(*) from public.world_events where lake_id = :'lake' and kind = 'record') = 2, 'two records set on the water');
 select test.assert_that(
-	(select count(*) from public.world_events where lake_id = :'lake' and kind = 'big_catch' and payload ->> 'anglerName' = 'Player 91' and (payload ->> 'weightLb')::numeric = 32) = 1,
+	(select count(*) from public.world_events where lake_id = :'lake' and kind = 'big_catch' and payload ->> 'anglerName' = 'Player91' and (payload ->> 'weightLb')::numeric = 32) = 1,
 	'a thirty by a player is a big catch'
 );
 select test.assert_that((select count(*) from public.notifications where profile_id = test.player(90) and kind = 'big_catch_on_your_water') = 1, 'the owner hears of the thirty');
@@ -86,7 +86,7 @@ select test.assert_that((select count(*) from pg_proc where proname = 'record_ca
 set role authenticated;
 select set_config('request.jwt.claim.sub', test.player(91)::text, false);
 select test.assert_that(
-	(select heaviest_lb = 33 and anglers_on_bank_now = 1 and listing_count = 0 and owner_name = 'Player 90' and region = 'uk_ireland' from public.world_pins where id = :'lake'),
+	(select heaviest_lb = 33 and anglers_on_bank_now = 1 and listing_count = 0 and owner_name = 'Player90' and region = 'uk_ireland' from public.world_pins where id = :'lake'),
 	'the globe shows the water, its best fish and the angler on the bank'
 );
 select test.assert_that((select count(*) from public.world_pins where id = :'private_lake') = 0, 'a private water is not on the globe');
