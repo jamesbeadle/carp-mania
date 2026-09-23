@@ -38,6 +38,7 @@ export function classicLake(ownerId: string, name: string, now: Date): Omit<Lake
 		...untendedWater(),
 		is_public: true,
 		simulated_until: now.toISOString(),
+		opened_at: null,
 		region: 'uk_ireland',
 		latitude: null,
 		longitude: null,
