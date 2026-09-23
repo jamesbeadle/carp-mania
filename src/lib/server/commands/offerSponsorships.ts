@@ -2,7 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { seededRandom } from '$lib/domain/random';
 import { offersOverDays, type NewOffer } from '$lib/domain/sponsorship/offerDraw';
 import type { Lake } from '$lib/domain/types';
-import { loadOpenOffers, loadRunningDeal, waterRatingOfLake } from '../queries/GetLakeSponsorship';
+import { waterRatingOfLake } from '$lib/domain/water/waterRating';
+import { loadOpenOffers, loadRunningDeal } from '../queries/GetLakeSponsorship';
 
 const OfferSalt = 7919;
 

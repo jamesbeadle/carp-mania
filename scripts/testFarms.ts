@@ -4,6 +4,8 @@ import { farmFishFor } from '../src/lib/domain/market/farmDelivery';
 import { packPriceFor, packsFor, SizeBands, type FarmPack } from '../src/lib/domain/market/farmPacks';
 import { farmQuoteFor } from '../src/lib/domain/market/farmQuote';
 import { FarmCatalogue, farmById, GradeCatalogue } from '../src/lib/domain/market/farms';
+import { doesFarmSellTo, farmStandingWords, FarmWantsWaterRating } from '../src/lib/domain/market/farmStanding';
+import { waterRatingOfLake } from '../src/lib/domain/water/waterRating';
 import { seededRandom } from '../src/lib/domain/random';
 import { stockBySize } from '../src/lib/domain/stock/stockBySize';
 import { RegionCodes } from '../src/lib/domain/world/regionCodes';
@@ -11,6 +13,19 @@ import { RegionCodes } from '../src/lib/domain/world/regionCodes';
 const QuartersPerPound = 4;
 const now = new Date('2026-09-19T12:00:00Z');
 const ukWater = { latitude: 51.5, longitude: -0.5, region: 'uk_ireland' as const };
+
+function standingScenario() {
+	const freshGravelPit = { reputation: 10, transparency: 80, weed: 25, silt: 10 };
+	const rating = waterRatingOfLake(freshGravelPit);
+	assert.ok(rating < FarmWantsWaterRating.specialist, `a fresh gravel pit is rated ${rating.toFixed(0)}, under a specialist's bar`);
+	assert.ok(doesFarmSellTo('stock', 0), 'a stock farm sells to any water');
+	assert.ok(!doesFarmSellTo('record', FarmWantsWaterRating.record - 1), 'a record grower will not sell a point under its bar');
+	assert.ok(doesFarmSellTo('record', FarmWantsWaterRating.record), 'and sells at it');
+	const donau = farmById('donau-karpfenhof')!;
+	assert.ok(farmStandingWords(donau, rating).includes('will not take your order yet'), 'the refusal is said in words');
+	assert.equal(farmStandingWords(farmById('meadow-fisheries')!, rating), 'Sells to any water', 'a stock farm says so');
+	console.log('farm standing:', { freshGravelPit: rating.toFixed(1), bars: FarmWantsWaterRating });
+}
 
 function farmsScenario() {
 	assert.equal(FarmCatalogue.length, 12, 'twelve farms');
@@ -83,6 +98,7 @@ function dealerAndSizesScenario() {
 
 export function runFarmScenarios() {
 	farmsScenario();
+	standingScenario();
 	packsScenario();
 	deliveryScenario();
 	dealerAndSizesScenario();

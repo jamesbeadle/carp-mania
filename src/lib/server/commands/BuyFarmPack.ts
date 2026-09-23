@@ -5,6 +5,8 @@ import { packFishPrice } from '$lib/domain/market/farmPacks';
 import { farmDeliveryTermsFor, type FarmDeliveryTerms } from '$lib/domain/market/farmQuote';
 import type { PackOnShelf } from '$lib/contracts/FarmShelves';
 import { farmById } from '$lib/domain/market/farms';
+import { doesFarmSellTo, farmStandingWords } from '$lib/domain/market/farmStanding';
+import { waterRatingOfLake } from '$lib/domain/water/waterRating';
 import { seededRandom } from '$lib/domain/random';
 import type { Shoal } from '$lib/domain/stock/shoals';
 import type { Carp } from '$lib/domain/types';
@@ -22,6 +24,9 @@ export async function BuyFarmPack(locals: App.Locals, formData: FormData) {
 	const lake = await requireOwnedLake(locals);
 	const farm = farmById(String(formData.get(Fields.Farm) ?? ''));
 	if (!farm) return fail(400, { message: 'No farm of that name' });
+	const waterRating = waterRatingOfLake(lake);
+	const isSellingToYou = doesFarmSellTo(farm.grade, waterRating);
+	if (!isSellingToYou) return fail(400, { message: farmStandingWords(farm, waterRating) });
 	const count = readFormNumber(formData, Fields.Count, OrderCount.Fewest, OrderCount.Most);
 	if (count.failure) return count.failure;
 	const now = new Date();
