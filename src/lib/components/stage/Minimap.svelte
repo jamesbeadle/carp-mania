@@ -3,6 +3,7 @@
 	import { viewportOf } from '$lib/game/scene/camera';
 	import type { CameraState } from '$lib/game/scene/cameraState.svelte';
 	import { SceneSize } from '$lib/game/scene/palette';
+	import { MinimapPlacement } from './minimapPlacement.svelte';
 
 	let { layout, camera }: { layout: LakeLayout; camera: CameraState } = $props();
 
@@ -12,6 +13,9 @@
 	const scaleX = MapSize.Width / SceneSize.Width;
 	const scaleY = MapSize.Height / SceneSize.Height;
 	const box = $derived(scaledBox(viewport));
+
+	const placement = new MinimapPlacement();
+	let panel: HTMLDivElement;
 
 	const ZoomStep = 1.5;
 	const viewBox = `0 0 ${MapSize.Width} ${MapSize.Height}`;
@@ -38,12 +42,14 @@
 	}
 </script>
 
-<div class="absolute right-3 bottom-3 flex flex-col items-end gap-1">
-	<svg viewBox={viewBox} class="h-20 w-[120px] rounded-lg border border-carbon-700 bg-carbon-950/80 backdrop-blur" role="button" tabindex="0" aria-label="Minimap — click to move the view" onclick={jumpTo} onkeydown={(event) => event.key === 'Enter' && camera.reset()}>
+<div bind:this={panel} class="absolute flex flex-col items-end gap-1" style:right="{placement.right}px" style:bottom="{placement.bottom}px">
+	{#if placement.isMapShown}<svg viewBox={viewBox} class="h-20 w-[120px] rounded-lg border border-carbon-700 bg-carbon-950/80 backdrop-blur" role="button" tabindex="0" aria-label="Minimap — click to move the view" onclick={jumpTo} onkeydown={(event) => event.key === 'Enter' && camera.reset()}>
 		<polygon points={outline} fill="hsl(200 40% 30%)" stroke="hsl(200 30% 55%)" stroke-width="1" />
 		<rect {...box} fill="none" stroke="hsl(72 90% 60%)" stroke-width="1.5" />
-	</svg>
+	</svg>{/if}
 	<div class="flex gap-1">
+		<button class="cursor-grab touch-none rounded bg-carbon-950/80 px-2 text-xs text-mist-200 active:cursor-grabbing" onpointerdown={(event) => placement.pickUp(event)} onpointermove={(event) => placement.carry(event, panel)} onpointerup={() => placement.putDown()} onpointercancel={() => placement.putDown()} aria-label="Drag to move the minimap">⠿</button>
+		<button class="rounded bg-carbon-950/80 px-2 text-xs text-mist-200" onclick={() => placement.toggleMap()} aria-label={placement.isMapShown ? 'Hide the minimap' : 'Show the minimap'}>{placement.isMapShown ? 'hide' : 'map'}</button>
 		<button class="rounded bg-carbon-950/80 px-2 text-xs text-mist-200" onclick={() => zoomBy(1 / ZoomStep)} aria-label="Zoom out">−</button>
 		<button class="rounded bg-carbon-950/80 px-2 text-xs text-mist-200" onclick={() => camera.reset()} aria-label="Fit the water">fit</button>
 		<button class="rounded bg-carbon-950/80 px-2 text-xs text-mist-200" onclick={() => zoomBy(ZoomStep)} aria-label="Zoom in">+</button>
