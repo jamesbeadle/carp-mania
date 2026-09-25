@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from ..checks import file_length
 from ..source_files import SourceFile, matchesAny
-from .function_usage import FunctionUsage, blockOwning
+from .block_ownership import blockOwning
+from .function_usage import FunctionUsage
 from .markup_blocks import componentCandidates
 
 STYLESHEET_SUFFIX = ".css"
@@ -28,8 +29,8 @@ def functionRows(sourceFile: SourceFile, usage: FunctionUsage, blocks: list[dict
         owner = blockOwning(function, sourceFile.lines, blocks)
         rows.append({
             "name": function.name, "line": function.line, "lines": function.lines,
-            "usedByOtherFiles": usage.usedByOtherFiles(function),
-            "alsoDeclaredIn": usage.alsoDeclaredIn(function),
+            "importedBy": usage.importedBy(function),
+            "sameBodyIn": usage.sameBodyIn(function),
             "movesWithBlockAtLine": owner["firstLine"] if owner else None,
         })
     return rows

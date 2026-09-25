@@ -15,18 +15,50 @@
     "src/app.d.ts",
     "src/lib/data/legal/**"
   ],
-  "booleanPrefixes": ["is", "has", "should", "can", "was", "will", "must", "allows"],
+  "booleanPrefixes": [
+    "is",
+    "has",
+    "should",
+    "can",
+    "was",
+    "will",
+    "must",
+    "allows"
+  ],
   "bannedAbbreviations": [
-    "usr", "btn", "cfg", "tmp", "req", "res", "ctx", "idx", "err", "msg", "num", "val", "cnt", "arr", "obj2", "fn"
+    "usr",
+    "btn",
+    "cfg",
+    "tmp",
+    "req",
+    "res",
+    "ctx",
+    "idx",
+    "err",
+    "msg",
+    "num",
+    "val",
+    "cnt",
+    "arr",
+    "obj2",
+    "fn"
   ],
   "commentMarkers": {
     "line": "//",
-    "documentation": ["/**", "*", "*/"],
+    "documentation": [
+      "/**",
+      "*",
+      "*/"
+    ],
     "markup": "<!--"
   },
   "duplication": {
     "minTokens": 70,
-    "ignoreGlobs": ["**/node_modules/**", "**/.svelte-kit/**", "**/migrations/**"]
+    "ignoreGlobs": [
+      "**/node_modules/**",
+      "**/.svelte-kit/**",
+      "**/migrations/**"
+    ]
   },
   "inventory": {
     "pagesGlob": "src/routes/**/+page.svelte",
@@ -43,7 +75,10 @@
     }
   },
   "styleTokens": {
-    "markupGlobs": ["src/**/*.svelte", "src/**/*.css"],
+    "markupGlobs": [
+      "src/**/*.svelte",
+      "src/**/*.css"
+    ],
     "forbidInlineHexColours": true,
     "forbidInlineStyleAttributes": true
   },
@@ -52,7 +87,17 @@
     "maxLineLength": 160,
     "maxIndentDepth": 5,
     "indentWidth": 4,
-    "indentedFileGlobs": ["src/**/*.ts", "src/**/*.svelte"]
+    "indentedFileGlobs": [
+      "src/**/*.ts",
+      "src/**/*.svelte"
+    ],
+    "maxMemberChainDepth": 1,
+    "freeChainPrefixes": [
+      "this.",
+      "base.",
+      "self.",
+      "import.meta."
+    ]
   },
   "functionNames": {
     "maxWords": 5,
@@ -166,5 +211,69 @@
   },
   "score": {
     "elements": {}
+  },
+  "frameworkHandlers": {
+    "namePatterns": [
+      "^on[A-Z]",
+      "^handle[A-Z]",
+      "^On[A-Z]",
+      "^Handle[A-Z]"
+    ],
+    "names": [],
+    "coincidenceLines": 12
+  },
+  "siteDefinition": {
+    "viewGlobs": [
+      "**/*.svelte"
+    ],
+    "routeGlobs": [
+      "**/routes/**/+page.svelte"
+    ],
+    "ignoredTags": [],
+    "catalogue": [],
+    "handRolled": [
+      {
+        "element": "table",
+        "ownedBy": "RecordsTable"
+      },
+      {
+        "element": "input",
+        "ownedBy": "FormField",
+        "unlessAttributes": [
+          "type=\"checkbox\"",
+          "type=\"radio\"",
+          "type=\"file\"",
+          "type=\"hidden\""
+        ]
+      },
+      {
+        "element": "select",
+        "ownedBy": "FormField"
+      },
+      {
+        "element": "textarea",
+        "ownedBy": "FormField"
+      },
+      {
+        "element": "h1",
+        "ownedBy": "PageHeader"
+      },
+      {
+        "element": "h2",
+        "ownedBy": "SectionHeader"
+      },
+      {
+        "element": "h3",
+        "ownedBy": "SectionHeader"
+      }
+    ],
+    "horizontalClasses": [
+      "flex",
+      "inline-flex"
+    ],
+    "verticalClasses": [
+      "flex-col"
+    ],
+    "document": "tools/refactor/site-definition.md"
   }
 }
