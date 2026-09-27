@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ActionMessage from '$lib/components/ActionMessage.svelte';
 	import Bench from '$lib/components/builder/Bench.svelte';
-	import BuilderCanvas from '$lib/components/builder/BuilderCanvas.svelte';
+	import BuilderStage from '$lib/components/builder/BuilderStage.svelte';
 	import LayerToggles from '$lib/components/builder/LayerToggles.svelte';
 	import PropertiesPanel from '$lib/components/builder/PropertiesPanel.svelte';
 	import ToolRail from '$lib/components/builder/ToolRail.svelte';
@@ -56,7 +56,7 @@
 <div class="grid gap-4 lg:grid-cols-[auto_1fr_20rem]">
 	<ToolRail {builder} />
 	<div>
-		<BuilderCanvas {builder} {lake} {sceneLake} swims={data.fishery.swims} {sceneSwims} carp={data.fishery.carp} {drafts} />
+		<BuilderStage {builder} {lake} {sceneLake} swims={data.fishery.swims} {sceneSwims} carp={data.fishery.carp} {drafts} />
 		<Bench {builder} failures={quote?.failures ?? []} {lake} swims={data.fishery.swims} onDetails={() => (isSheetOpen = true)} />
 		<LayerToggles bind:layers />
 	</div>

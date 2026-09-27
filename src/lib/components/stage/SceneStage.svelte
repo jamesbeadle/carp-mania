@@ -6,6 +6,7 @@
 	import { lakeLightingFor } from '$lib/game/stage/lakeLighting';
 	import LightingOverlays from './LightingOverlays.svelte';
 	import SkyCanvas from './SkyCanvas.svelte';
+	import StageDeck from './StageDeck.svelte';
 
 	interface Props {
 		conditions: StageConditions;
@@ -15,9 +16,10 @@
 		belowTheBank?: Snippet;
 		deck?: Snippet;
 		deckPlacement?: DeckPlacement;
+		isImmersive?: boolean;
 	}
 
-	let { conditions, water, overTheLake, overTheSky, belowTheBank, deck, deckPlacement = 'below' }: Props = $props();
+	let { conditions, water, overTheLake, overTheSky, belowTheBank, deck, deckPlacement = 'below', isImmersive = false }: Props = $props();
 
 	const lighting = $derived(lakeLightingFor(conditions));
 	const ground = `linear-gradient(180deg, ${BankPalette.GrassFar}, ${BankPalette.GrassNear})`;
@@ -26,19 +28,23 @@
 </script>
 
 <div class="stage relative flex h-full w-full flex-col overflow-hidden">
-	<SkyCanvas {conditions} layer="backdrop" />
-	<div class="sky short:min-h-10 relative z-10 min-h-20 shrink-0 bg-gradient-to-b from-carbon-950/45 to-carbon-950/0">{@render overTheSky?.()}</div>
-	<div class="ground relative flex min-h-0" class:flex-1={!isDeckBelow} class:flex-row={isDeckBeside} class:water-band={isDeckBelow}>
-		<div class="water-area relative flex min-h-0 min-w-0 flex-1 items-center justify-center" style="background: {ground}; filter: {lighting.seasonFilter}">
-			<div class="lake-frame">{@render water()}</div>
-			<LightingOverlays {lighting} />
-			<div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-				<div class="lake-frame relative">{@render overTheLake?.()}</div>
+	{#if !isImmersive}<SkyCanvas {conditions} layer="backdrop" />{/if}
+	<div class="sky short:min-h-10 z-10 min-h-20 shrink-0 bg-gradient-to-b from-carbon-950/45 to-carbon-950/0" class:relative={!isImmersive} class:immersive-sky={isImmersive}>{@render overTheSky?.()}</div>
+	<div class="ground relative flex min-h-0" class:flex-1={!isDeckBelow || isImmersive} class:flex-row={isDeckBeside} class:water-band={isDeckBelow && !isImmersive}>
+		{#if isImmersive}
+			<div class="relative min-h-0 min-w-0 flex-1">{@render water()}</div>
+		{:else}
+			<div class="water-area relative flex min-h-0 min-w-0 flex-1 items-center justify-center" style="background: {ground}; filter: {lighting.seasonFilter}">
+				<div class="lake-frame">{@render water()}</div>
+				<LightingOverlays {lighting} />
+				<div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+					<div class="lake-frame relative">{@render overTheLake?.()}</div>
+				</div>
 			</div>
-		</div>
-		{#if isDeckBeside}<div class="deck deck-beside relative z-10 min-h-0 shrink-0 overflow-y-auto border-l border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+		{/if}
+		{#if isDeckBeside && deck}<StageDeck {deck} isBeside {isImmersive} />{/if}
 	</div>
-	{#if isDeckBelow}<div class="deck relative z-10 min-h-0 flex-1 overflow-y-auto border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render deck?.()}</div>{/if}
+	{#if isDeckBelow && deck}<StageDeck {deck} isBeside={false} {isImmersive} />{/if}
 	{#if belowTheBank}<div class="relative z-10 shrink-0 border-t border-carbon-700 bg-carbon-950/85 backdrop-blur">{@render belowTheBank()}</div>{/if}
 	<SkyCanvas {conditions} layer="overhead" />
 </div>
@@ -58,11 +64,9 @@
 	.water-band {
 		height: min(calc((100cqw - 1rem) * 2 / 3 + 1rem), 55cqh);
 	}
-	.deck-beside {
-		width: min(24rem, 40cqw);
-	}
-	.deck {
-		padding-bottom: env(safe-area-inset-bottom);
+	.immersive-sky {
+		position: absolute;
+		inset: 0 0 auto 0;
 	}
 	@media (min-width: 640px) {
 		.water-area {
@@ -73,11 +77,6 @@
 		}
 		.water-band {
 			height: min(calc((100cqw - 1.5rem) * 2 / 3 + 1.5rem), 55cqh);
-		}
-	}
-	@media (min-width: 1536px) {
-		.deck-beside {
-			width: min(27rem, 40cqw);
 		}
 	}
 </style>

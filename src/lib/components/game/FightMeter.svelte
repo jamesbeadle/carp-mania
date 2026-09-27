@@ -14,7 +14,8 @@
 	const GuessRoundingLb = 5;
 	const MostSecondsPerFrame = 0.1;
 	const MillisecondsPerSecond = 1000;
-	const guessedWeight = $derived(Math.round(Number(fight.carp.weight_lb) / GuessRoundingLb) * GuessRoundingLb);
+	const carp = $derived(fight.carp);
+	const guessedWeight = $derived(Math.round(Number(carp.weight_lb) / GuessRoundingLb) * GuessRoundingLb);
 
 	$effect(() => {
 		let handle = 0;
@@ -37,10 +38,18 @@
 
 <svelte:window onkeydown={(event) => reel.answerTheKey(event, true)} onkeyup={(event) => reel.answerTheKey(event, false)} onblur={() => reel.release()} />
 
-<section class="panel space-y-4">
-	<h3 class="text-xl text-volt-300">Fish on! Something around {formatWeight(guessedWeight)}</h3>
-	<RunWarning isRunning={fight.isRunning} isRunComing={fight.isRunComing} />
+<section class="fight-hud hud-glass fixed left-1/2 z-40 w-[min(40rem,calc(100%-1.5rem))] -translate-x-1/2 px-4 py-3 sm:px-5">
+	<div class="grid grid-cols-[auto_1fr_auto] items-baseline gap-3">
+		<span class="hud-label text-mist-100">Line tension</span>
+		<RunWarning isRunning={fight.isRunning} isRunComing={fight.isRunComing} />
+		<span class="hud-label whitespace-nowrap">~{formatWeight(guessedWeight)} · {Math.ceil(fight.secondsRemaining)}s</span>
+	</div>
 	<TensionBar tension={fight.tension} band={fight.band} />
-	<ReelZone {reel} />
-	<p class="text-center text-sm text-mist-400">{Math.ceil(fight.secondsRemaining)}s until it's in the net</p>
 </section>
+<ReelZone {reel} />
+
+<style>
+	.fight-hud {
+		bottom: calc(max(1.25rem, env(safe-area-inset-bottom)) + 5rem);
+	}
+</style>

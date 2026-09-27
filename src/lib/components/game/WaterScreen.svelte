@@ -10,7 +10,10 @@
 	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
+	import { isWebGlAvailable } from '$lib/game/lake3d/lakeRenderer';
 	import LakeCanvas from '../LakeCanvas.svelte';
+	import LakeView3D from '../lake3d/LakeView3D.svelte';
+	import ViewToggle from './ViewToggle.svelte';
 	import SceneStage from '../stage/SceneStage.svelte';
 	import SessionDeck from './SessionDeck.svelte';
 	import SessionMoments from './SessionMoments.svelte';
@@ -44,6 +47,14 @@
 	const fishShowingAt = $derived(canReadTheWater(session.watercraft) ? showingAt : []);
 	const castReach = $derived(castReachOf(session));
 
+	const CastProblemWords = { on_the_bank: 'That would land on the bank — aim for the water.', through_an_island: "You can't cast through the island — pick a spot with a clear line from your swim." } as const;
+	let isIn3d = $state(false);
+	let canShow3d = $state(false);
+
+	$effect(() => {
+		canShow3d = isWebGlAvailable();
+		isIn3d = canShow3d;
+	});
 	$effect(() => orientation.watch());
 	$effect(() => settleAfterTheCatch(session.isSettlingAfterCatch));
 </script>
@@ -51,12 +62,17 @@
 <svelte:window onkeydowncapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} onkeyupcapture={(event) => swallowKeysWhileSettling(event, session.isSettlingAfterCatch)} />
 
 {#snippet water()}
-	<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
+	{#if isIn3d}
+		<LakeView3D {session} {lake} {swims} {carp} shoals={session.shoals} {conditions} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} onCastBlocked={(problem) => (session.notice = CastProblemWords[problem])} />
+	{:else}
+		<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
+	{/if}
+	{#if canShow3d}<ViewToggle bind:isIn3d />{/if}
 {/snippet}
 
 {#snippet deck()}
 	<SessionDeck {session} {swims} isBesideTheWater={isDeckBeside} onPickSwim={onSwimClick} {onReelIn} {onSetOff} {onStayPut} />
 {/snippet}
 
-<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} />
-<SessionMoments {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} />
+<SceneStage {conditions} {overTheSky} {water} {deck} deckPlacement={orientation.deckPlacement} isImmersive={isIn3d} />
+<SessionMoments {session} {lake} {profile} {catchOutcome} {onStrike} {onFightFinished} {onContinue} isImmersive={isIn3d} />

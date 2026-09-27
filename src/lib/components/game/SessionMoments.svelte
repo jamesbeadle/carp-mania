@@ -2,6 +2,7 @@
 	import type { Lake, Profile } from '$lib/domain/types';
 	import type { CatchReportOutcome } from '$lib/game/session/landFish';
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
+	import CatchCard from './CatchCard.svelte';
 	import FightMeter from './FightMeter.svelte';
 	import ScreenOverlay from './ScreenOverlay.svelte';
 	import SessionCatchPhoto from './SessionCatchPhoto.svelte';
@@ -16,9 +17,10 @@
 		onStrike: () => void;
 		onFightFinished: () => void;
 		onContinue: () => void;
+		isImmersive?: boolean;
 	}
 
-	let { session, lake, profile, catchOutcome, onStrike, onFightFinished, onContinue }: Props = $props();
+	let { session, lake, profile, catchOutcome, onStrike, onFightFinished, onContinue, isImmersive = false }: Props = $props();
 
 	const isFighting = $derived(session.phase === 'fighting' && session.fight !== null);
 	const isOnTheMat = $derived(session.phase === 'landed' && session.lastLanded !== null);
@@ -27,9 +29,11 @@
 
 {#if session.bite}<StrikeButton bite={session.bite} {onStrike} />{/if}
 {#if isFighting && session.fight}
-	<ScreenOverlay><FightMeter fight={session.fight} onFinished={onFightFinished} /></ScreenOverlay>
+	<FightMeter fight={session.fight} onFinished={onFightFinished} />
 {/if}
-{#if isOnTheMat && session.lastLanded}
+{#if isOnTheMat && session.lastLanded && isImmersive}
+	<CatchCard landed={session.lastLanded} lakeName={lake.name} {catchOutcome} isSettling={session.isSettlingAfterCatch} {onContinue} />
+{:else if isOnTheMat && session.lastLanded}
 	<ScreenOverlay isWide><SessionCatchPhoto {session} landed={session.lastLanded} {lake} {profile} {catchOutcome} {onContinue} /></ScreenOverlay>
 {/if}
 {#if isDayOver}
