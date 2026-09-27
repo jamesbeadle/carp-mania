@@ -1,5 +1,6 @@
 const CornerGapPixels = 12;
 const NoRoom = 0;
+const RoomyScreenQuery = '(min-width: 768px)';
 
 interface Grab {
 	pointerId: number;
@@ -15,7 +16,7 @@ function keptWithin(offset: number, room: number) {
 export class MinimapPlacement {
 	right = $state(CornerGapPixels);
 	bottom = $state(CornerGapPixels);
-	isMapShown = $state(true);
+	isOpen = $state(false);
 	private grab: Grab | null = null;
 
 	pickUp(event: PointerEvent) {
@@ -40,7 +41,15 @@ export class MinimapPlacement {
 		this.grab = null;
 	}
 
-	toggleMap() {
-		this.isMapShown = !this.isMapShown;
+	openOnRoomyScreen() {
+		this.isOpen = window.matchMedia(RoomyScreenQuery).matches;
+	}
+
+	open() {
+		this.isOpen = true;
+	}
+
+	minimise() {
+		this.isOpen = false;
 	}
 }
