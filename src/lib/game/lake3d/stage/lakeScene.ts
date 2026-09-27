@@ -17,6 +17,7 @@ export interface LakeScenePlan {
 	swims: Swim[];
 	fish: FishToShow[];
 	conditions: StageConditions;
+	isDiorama?: boolean;
 }
 
 const LakeSeedStride = 7919;
@@ -40,7 +41,7 @@ export class LakeScene {
 		const { lake, swims } = plan;
 		const layout = lake.layout;
 		const { season } = plan.conditions;
-		const worldPlan = { layout, plotAcres: Number(lake.plot_acres), transparencyPercent: Number(lake.transparency), season, pegs: swims.map((swim) => swimPoint(swim)), seed: seedOf(lake.id) };
+		const worldPlan = { layout, plotAcres: Number(lake.plot_acres), transparencyPercent: Number(lake.transparency), season, pegs: swims.map((swim) => swimPoint(swim)), seed: seedOf(lake.id), isDiorama: plan.isDiorama ?? false };
 		this.world = new LakeWorld(worldPlan, canvas.clientWidth, canvas.clientHeight);
 		this.rig = new CameraRig(this.world.camera);
 		const swimPegs = createSwimPegs(swims, this.world.frame);
@@ -50,7 +51,7 @@ export class LakeScene {
 		this.director = new SceneDirector(this.world, this.rig, swims, this.pegs);
 		this.director.listen({ onSplash: (point) => this.life.plop(point, Strength.CastSplash), onThrash: (point) => this.life.plop(point, Strength.Thrash), onSwirl: (point) => this.life.ripple(point, Strength.Swirl) });
 		this.world.scene.add(swimPegs.group, this.life.group, this.roaming.group, this.director.group, this.aimMarker.group);
-		this.renderer = startLakeRenderer(canvas, this.world.scene, this.world.camera, (secondsElapsed, timeSeconds) => this.frame(readView(), secondsElapsed, timeSeconds), (width, height) => this.world.water.resize(width, height));
+		this.renderer = startLakeRenderer(canvas, this.world.scene, this.world.camera, (secondsElapsed, timeSeconds) => this.frame(readView(), secondsElapsed, timeSeconds), (width, height) => this.world.water.resize(width, height), worldPlan.isDiorama);
 		this.setConditions(plan.conditions);
 	}
 

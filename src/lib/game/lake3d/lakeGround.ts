@@ -1,4 +1,4 @@
-import { BackSide, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, ShapeGeometry } from 'three';
+import { BackSide, BoxGeometry, ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, ShapeGeometry } from 'three';
 import type { BedType } from '$lib/domain/types';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import { bedSpeckling, grassSpeckling, ShoreLook } from './groundLook';
@@ -6,10 +6,11 @@ import type { WorldPoint } from './lakeFrame';
 import { speckledTexture } from './speckledTexture';
 import { rectangleAround, shapeOf, shapeWithHoles } from './worldShapes';
 
-export const Heights = { Bank: 0.45, Island: 0.9, BedDeepest: 3.2, ShallowestBed: 0.8, LandBeyondThePlot: 3 } as const;
+export const Heights = { Bank: 0.45, Island: 0.9, BedDeepest: 3.2, ShallowestBed: 0.8, LandBeyondThePlot: 3, SlabBelowTheBed: 4, SlabTopGap: 0.01 } as const;
 
 export interface GroundPlan {
 	outline: WorldPoint[];
+	plotEdge: WorldPoint | null;
 	islands: WorldPoint[][];
 	plotReach: number;
 	season: SeasonName;
@@ -28,9 +29,21 @@ function grassMaterial(season: SeasonName) {
 	return new MeshStandardMaterial({ map: speckledTexture(grassSpeckling(season)), roughness: 0.95 });
 }
 
-function bank(plan: GroundPlan) {
+function landAround(plan: GroundPlan) {
 	const halfSpan = plan.plotReach * Heights.LandBeyondThePlot;
-	const geometry = new ShapeGeometry(shapeWithHoles(rectangleAround(halfSpan, halfSpan), [plan.outline]));
+	return plan.plotEdge ? rectangleAround(plan.plotEdge.x, plan.plotEdge.z) : rectangleAround(halfSpan, halfSpan);
+}
+
+function slabSides(edge: WorldPoint, bedDepth: number) {
+	const depth = Heights.Bank + bedDepth + Heights.SlabBelowTheBed;
+	const earth = new MeshStandardMaterial({ color: ShoreLook.Earth, roughness: 1 });
+	const slab = new Mesh(new BoxGeometry(edge.x * 2, depth, edge.z * 2), [earth, earth, new MeshBasicMaterial({ visible: false }), earth, earth, earth]);
+	slab.position.setY(Heights.Bank - depth / 2 - Heights.SlabTopGap);
+	return slab;
+}
+
+function bank(plan: GroundPlan) {
+	const geometry = new ShapeGeometry(shapeWithHoles(landAround(plan), [plan.outline]));
 	return flatOnTheGround(new Mesh(geometry, grassMaterial(plan.season)), Heights.Bank);
 }
 
@@ -58,6 +71,7 @@ function island(points: WorldPoint[], plan: GroundPlan) {
 export function createLakeGround(plan: GroundPlan) {
 	const group = new Group();
 	group.add(bank(plan), shoreWall(plan), lakeBed(plan));
+	if (plan.plotEdge) group.add(slabSides(plan.plotEdge, plan.bedDepth));
 	plan.islands.forEach((points) => group.add(island(points, plan)));
 	return group;
 }

@@ -7,6 +7,7 @@ const MillisecondsPerSecond = 1000;
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
 export const Exposure = { Day: 0.55, Night: 1.3 } as const;
+const FieldOfView = { Landscape: 50, Portrait: 72 } as const;
 
 export interface LakeRenderer {
 	expose: (daylight: number) => void;
@@ -18,8 +19,8 @@ export function isWebGlAvailable() {
 	return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
 }
 
-function rendererOn(canvas: HTMLCanvasElement) {
-	const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+function rendererOn(canvas: HTMLCanvasElement, isSeeThrough: boolean) {
+	const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: isSeeThrough, powerPreference: 'high-performance' });
 	renderer.setPixelRatio(Math.min(MostPixelRatio, window.devicePixelRatio || 1));
 	renderer.outputColorSpace = SRGBColorSpace;
 	renderer.toneMapping = ACESFilmicToneMapping;
@@ -37,12 +38,13 @@ function fitTo(canvas: HTMLCanvasElement, renderer: WebGLRenderer, camera: Persp
 	if (size.x === width && size.y === height) return;
 	renderer.setSize(width, height, false);
 	camera.aspect = width / Math.max(1, height);
+	camera.fov = camera.aspect < 1 ? FieldOfView.Portrait : FieldOfView.Landscape;
 	camera.updateProjectionMatrix();
 	onResize(width, height);
 }
 
-export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, step: FrameStep, onResize: (width: number, height: number) => void): LakeRenderer {
-	const renderer = rendererOn(canvas);
+export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, step: FrameStep, onResize: (width: number, height: number) => void, isSeeThrough = false): LakeRenderer {
+	const renderer = rendererOn(canvas, isSeeThrough);
 	let frameHandle = 0;
 	let last: number | null = null;
 	let start = 0;

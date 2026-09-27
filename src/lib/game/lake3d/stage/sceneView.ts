@@ -29,3 +29,7 @@ export interface SceneView {
 export function isLookingOverTheLake(view: SceneView) {
 	return view.phase === 'choose_swim' || view.isPickingSwim || view.swimId === null;
 }
+
+export function lookingOverTheLake(showingAt: LayoutPoint[]): SceneView {
+	return { phase: 'choose_swim', swimId: null, hoveredSwimId: null, isPickingSwim: false, rods: [], fight: null, landed: null, showingAt };
+}

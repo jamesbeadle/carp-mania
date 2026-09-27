@@ -17,6 +17,7 @@ export interface PlantingGround {
 	islands: WorldPoint[][];
 	keepClear: ClearSpot[];
 	plotReach: number;
+	plotEdge: WorldPoint | null;
 	seed: number;
 }
 
@@ -46,10 +47,10 @@ function bankTreeKind(distanceFromWater: number, random: () => number): TreeKind
 }
 
 function plantTheBank(ground: PlantingGround, random: () => number) {
-	const span = ground.plotReach * Planting.SpreadOfPlot;
+	const edge = ground.plotEdge ?? { x: (ground.plotReach * Planting.SpreadOfPlot) / 2, z: (ground.plotReach * Planting.SpreadOfPlot) / 2 };
 	const trees: PlantedTree[] = [];
 	for (let attempt = 0; attempt < Planting.Attempts && trees.length < Planting.MostTrees; attempt++) {
-		const point = { x: (random() - 0.5) * span, z: (random() - 0.5) * span };
+		const point = { x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z };
 		if (isInsideOutline(point, ground.outline)) continue;
 		const distanceFromWater = distanceToOutline(point, ground.outline);
 		const isTooClose = distanceFromWater < Planting.SetbackFromWater || !isClearOfBankside(point, ground.keepClear);

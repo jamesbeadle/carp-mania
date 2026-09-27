@@ -40,10 +40,12 @@ export class SkyAndLight {
 	private readonly skyLight = new HemisphereLight(SkyTint, GroundBounce);
 	private readonly fog = new FogExp2(0xffffff);
 
-	constructor(scene: Scene, shadowReach: number) {
+	constructor(scene: Scene, shadowReach: number, isOpenSky: boolean) {
 		this.sky.scale.setScalar(SkyScale);
 		this.sun = shadowCastingSun(shadowReach);
-		this.group.add(this.sky, this.sun, this.sun.target, this.skyLight);
+		this.group.add(this.sun, this.sun.target, this.skyLight);
+		if (!isOpenSky) return;
+		this.group.add(this.sky);
 		scene.fog = this.fog;
 	}
 

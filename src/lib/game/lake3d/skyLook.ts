@@ -13,8 +13,8 @@ const Moods: Record<WeatherKind, Omit<SkyMood, 'fogTint'> & { fogTint: string }>
 	clear: { turbidity: 3, rayleigh: 1.2, sunStrength: 1, fogDensity: 0.0009, fogTint: '#ffffff' },
 	heat: { turbidity: 6, rayleigh: 0.9, sunStrength: 1.15, fogDensity: 0.0012, fogTint: '#fff2dc' },
 	overcast: { turbidity: 14, rayleigh: 3, sunStrength: 0.35, fogDensity: 0.0022, fogTint: '#c8ccd0' },
-	rain: { turbidity: 18, rayleigh: 4, sunStrength: 0.22, fogDensity: 0.0035, fogTint: '#9aa3aa' },
-	mist: { turbidity: 10, rayleigh: 2, sunStrength: 0.55, fogDensity: 0.0075, fogTint: '#e4e2dc' }
+	rain: { turbidity: 18, rayleigh: 4, sunStrength: 0.22, fogDensity: 0.0026, fogTint: '#9aa3aa' },
+	mist: { turbidity: 10, rayleigh: 2, sunStrength: 0.55, fogDensity: 0.0038, fogTint: '#e4e2dc' }
 };
 
 export function skyMoodFor(weather: WeatherKind): SkyMood {
