@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import type { TicketProduct } from '../src/lib/domain/fishing/ticketBook';
+import { chooseTicket } from '../src/lib/domain/simulation/ticketChoice';
+import { seededRandom } from '../src/lib/domain/random';
 import { acresUntilAnotherBailiff, bailiffCapFor, feeCollectionOf, teamClearingShare, teamRoomWords, whyCannotHire } from '../src/lib/domain/bailiffs/bailiffTeam';
 import { candidatesThisWeek } from '../src/lib/domain/bailiffs/candidates';
-import { FacilityCatalogue, whyFacilityCannotBeBuilt } from '../src/lib/domain/groundworks/facilities';
+import { FacilityCatalogue, whyFacilityCannotBeBuilt, builtAfter, upgradeOf, multiDayFactorOf } from '../src/lib/domain/groundworks/facilities';
 import { driftWaterForOneDay } from '../src/lib/domain/simulation/driftWater';
 import { classicLake } from '../src/lib/domain/sites/classicSite';
 import type { Lake } from '../src/lib/domain/types';
@@ -31,9 +34,32 @@ export function bailiffScenario() {
 }
 
 export function facilitiesScenario() {
-	assert.equal(Object.keys(FacilityCatalogue).length, 8);
+	assert.equal(Object.keys(FacilityCatalogue).length, 11);
 	assert.ok(whyFacilityCannotBeBuilt([], 'restaurant')?.includes('bar'), 'the restaurant needs the bar');
 	assert.equal(whyFacilityCannotBeBuilt(['bar'], 'restaurant'), null);
 	assert.ok(whyFacilityCannotBeBuilt(['bar'], 'bar') !== null, 'nothing is built twice');
+	comfortLadderScenario();
+}
+
+function comfortLadderScenario() {
+	assert.ok(whyFacilityCannotBeBuilt([], 'washrooms')?.includes('toilets'), 'the washrooms need the toilets');
+	assert.equal(whyFacilityCannotBeBuilt(['toilets'], 'washrooms'), null);
+	assert.ok(whyFacilityCannotBeBuilt(['toilets'], 'estate_house')?.includes('club house'), 'the estate house needs the club house');
+	assert.deepEqual(builtAfter(['car_park', 'toilets'], 'washrooms'), ['car_park', 'washrooms'], 'the washrooms replace the toilets');
+	assert.deepEqual(builtAfter(['bar'], 'restaurant'), ['bar', 'restaurant'], 'the restaurant sits beside the bar');
+	assert.ok(whyFacilityCannotBeBuilt(['club_house'], 'toilets')?.includes('club house'), 'no going back down the ladder');
+	assert.equal(upgradeOf(['estate_house'], 'washrooms'), 'estate_house');
+	assert.ok(multiDayFactorOf(['estate_house']) > multiDayFactorOf(['club_house']), 'each rung fills the long sits more');
+	stayingOnScenario();
+}
+
+function stayingOnScenario() {
+	const ticket = (kind: TicketProduct['kind']): TicketProduct => ({ id: kind, lake_id: 'lake-1', kind, days: 1, price: 20, is_on_sale: true });
+	const book = [ticket('day'), ticket('twenty_four_hours')];
+	const stayersWith = (factor: number) => {
+		const random = seededRandom(11);
+		return Array.from({ length: 400 }, () => chooseTicket(book, 40, random, factor)).filter((chosen) => chosen?.kind === 'twenty_four_hours').length;
+	};
+	assert.ok(stayersWith(multiDayFactorOf(['estate_house'])) > stayersWith(1), 'an estate house sells more 24-hour sits than a bare bank');
 }
 

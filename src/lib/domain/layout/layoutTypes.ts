@@ -53,8 +53,8 @@ export interface Snag {
 export type LakeFeature = AreaFeature | ReedLine | Snag | Sanctuary;
 export type LakeFeatureKind = LakeFeature['kind'];
 
-export type Facility = 'car_park' | 'lodge' | 'aerator' | 'toilets' | 'tackle_shop' | 'bar' | 'restaurant' | 'hotel';
-export const Facilities: Facility[] = ['car_park', 'lodge', 'aerator', 'toilets', 'tackle_shop', 'bar', 'restaurant', 'hotel'];
+export type Facility = 'car_park' | 'lodge' | 'aerator' | 'toilets' | 'washrooms' | 'club_house' | 'estate_house' | 'tackle_shop' | 'bar' | 'restaurant' | 'hotel';
+export const Facilities: Facility[] = ['car_park', 'lodge', 'aerator', 'toilets', 'washrooms', 'club_house', 'estate_house', 'tackle_shop', 'bar', 'restaurant', 'hotel'];
 
 export interface LakeLayout {
 	version: 1;

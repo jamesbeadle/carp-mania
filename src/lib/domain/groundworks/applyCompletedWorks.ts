@@ -6,7 +6,7 @@ import { waterAcres } from '../layout/waterArea';
 import type { BedType, Lake } from '../types';
 import { clampToScale } from '../waterQuality';
 import { WorkPrices } from './catalogue';
-import { isFacility } from './facilities';
+import { builtAfter, isFacility } from './facilities';
 import { dredgingEffectOf } from './dredging';
 import { islandPolygonFor } from './islandTemplates';
 import { shelfPolygonFor } from './shelfStrip';
@@ -56,7 +56,7 @@ function withFeature(layout: LakeLayout, feature: LakeFeature): LakeLayout {
 
 function withFacility(layout: LakeLayout, kind: WorkDraft['kind']): LakeLayout {
 	if (!isFacility(kind) || layout.facilities.includes(kind)) return layout;
-	return { ...layout, facilities: [...layout.facilities, kind] };
+	return { ...layout, facilities: builtAfter(layout.facilities, kind) };
 }
 
 function waterChangesFor(lake: Lake, draft: WorkDraft): Partial<Lake> {

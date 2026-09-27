@@ -43,6 +43,10 @@ function islandScenarios() {
 	const fourth = validateDraft(lake.layout, plotAcres, swims, threeEarthworks, island);
 	assert.ok(fourth.some((failure) => failure.includes('already in progress')), `a fourth earthwork fails: ${fourth.join('; ')}`);
 	assert.deepEqual(validateDraft(lake.layout, plotAcres, swims, threeEarthworks, { kind: 'lodge' }), [], 'facilities do not count as earthworks');
+	const skipped = validateDraft(lake.layout, plotAcres, swims, [], { kind: 'club_house' });
+	assert.ok(skipped.some((failure) => failure.includes('needs the washrooms')), `the service refuses a club house without the washrooms: ${skipped.join('; ')}`);
+	const withWashrooms = { ...lake, layout: { ...lake.layout, facilities: ['toilets' as const] } };
+	assert.deepEqual(applyCompletedWork(withWashrooms, { kind: 'washrooms' }, 'work-washrooms').layout.facilities, ['washrooms'], 'finished washrooms replace the toilets');
 }
 
 function dredgeScenarios() {

@@ -1,5 +1,5 @@
 import { feeCollectionOf, type Bailiff } from '../bailiffs/bailiffTeam';
-import { takingsPerAnglerOf } from '../groundworks/facilities';
+import { multiDayFactorOf, takingsPerAnglerOf } from '../groundworks/facilities';
 import { ShopSpendPerAngler } from '../tackle/shopTier';
 import type { StandingRecords } from '../market/records';
 import type { TicketProduct } from '../fishing/ticketBook';
@@ -64,13 +64,18 @@ function simulateOneAngler(lake: Lake, carp: Carp[], swims: Swim[], random: Rand
 	const fishCaught = Math.round(goodDay * randomBetween(random, 0.4, 1.1));
 	for (let index = 0; index < fishCaught; index++) recordNpcCatch(lake, carp, swims, random, anglerName, rating, today, day);
 	const isFeePaid = random() < feeCollectionOf(today.bailiffs);
-	const ticket = chooseTicket(today.book, willingnessAt(lake, today.stockDraw), random);
+	const ticket = chooseTicket(today.book, willingnessAt(lake, today.stockDraw), random, multiDayFactorOf(builtAt(lake)));
 	const fee = feeFor(ticket, Number(lake.day_ticket_fee));
 	return { lake_id: lake.id, angler_id: null, angler_name: anglerName, fee_paid: isFeePaid ? fee : 0, fish_caught: fishCaught };
 }
 
+function builtAt(lake: Lake) {
+	const { layout } = lake;
+	return layout.facilities;
+}
+
 function takingsPerHeadAt(lake: Lake) {
-	const facilities = lake.layout.facilities;
+	const facilities = builtAt(lake);
 	const shop = facilities.includes('tackle_shop') ? ShopSpendPerAngler[lake.shop_tier] : 0;
 	return takingsPerAnglerOf(facilities) + shop;
 }

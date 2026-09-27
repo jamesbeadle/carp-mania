@@ -19,10 +19,17 @@ export function bookAffordability(book: TicketProduct[], willingness: number) {
 	return Math.max(...onSale.map((product) => affordabilityOf(product, willingness)));
 }
 
-export function chooseTicket(book: TicketProduct[], willingness: number, random: RandomFraction): TicketProduct | null {
+const StayingOnKinds: TicketProduct['kind'][] = ['twenty_four_hours', 'multi_day'];
+
+function appealOf(product: TicketProduct, willingness: number, stayingOnFactor: number) {
+	const isStayingOn = StayingOnKinds.includes(product.kind);
+	return affordabilityOf(product, willingness) * (isStayingOn ? stayingOnFactor : 1);
+}
+
+export function chooseTicket(book: TicketProduct[], willingness: number, random: RandomFraction, stayingOnFactor = 1): TicketProduct | null {
 	const wanted = book.filter((product) => product.is_on_sale && affordabilityOf(product, willingness) >= TicketDemand.NobodyBuysBelow);
 	if (wanted.length === 0) return null;
-	const weights = wanted.map((product) => affordabilityOf(product, willingness));
+	const weights = wanted.map((product) => appealOf(product, willingness, stayingOnFactor));
 	const total = weights.reduce((sum, weight) => sum + weight, 0);
 	let roll = random() * total;
 	for (const [index, product] of wanted.entries()) {

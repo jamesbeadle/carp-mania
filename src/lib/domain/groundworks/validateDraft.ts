@@ -2,6 +2,7 @@ import type { LakeLayout } from '../layout/layoutTypes';
 import { doPolygonsOverlap } from '../layout/pointInPolygon';
 import type { Swim } from '../types';
 import { GroundworksCatalogue, WorksInProgress } from './catalogue';
+import { isFacility, whyFacilityCannotBeBuilt } from './facilities';
 import { footprintOf, isAreaDraft, isBankDraft, isFacilityDraft } from './draftFootprint';
 import { planFor, type Plan } from './plan';
 import { validateArea, validateSnag } from './validateArea';
@@ -21,11 +22,18 @@ function capacityFailures(plan: Plan, draft: WorkDraft): string[] {
 	return isCrewBusy ? [`${WorksInProgress.MaximumEarthworks} earthworks are already in progress — wait for one to finish`] : [];
 }
 
+function builtOn(plan: Plan) {
+	const { layout } = plan;
+	return layout.facilities;
+}
+
 function facilityFailures(plan: Plan, draft: WorkDraft): string[] {
 	const label = GroundworksCatalogue[draft.kind].label.toLowerCase();
-	if (plan.layout.facilities.some((facility) => facility === draft.kind)) return [`You already have a ${label}`];
+	const built = builtOn(plan);
+	if (built.some((facility) => facility === draft.kind)) return [`You already have a ${label}`];
 	if (plan.worksInProgress.some((work) => work.kind === draft.kind)) return [`A ${label} is already being built`];
-	return [];
+	const refusal = isFacility(draft.kind) ? whyFacilityCannotBeBuilt(built, draft.kind) : null;
+	return refusal ? [refusal] : [];
 }
 
 function shapeFailures(plan: Plan, draft: WorkDraft): string[] {
