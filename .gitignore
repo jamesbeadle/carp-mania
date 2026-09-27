@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 
 # previews the Claude desktop app drops into the repo folder
 Claude outputs/
+
+# Python bytecode from the audit and process tools
+__pycache__/
