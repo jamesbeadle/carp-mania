@@ -93,6 +93,17 @@
 	.stat-label {
 		@apply font-display text-sm tracking-widest text-mist-400 uppercase;
 	}
+	.hud-glass {
+		@apply rounded-2xl border border-mist-100/10 shadow-xl shadow-carbon-950/50 backdrop-blur-md;
+		background: rgba(6, 8, 6, 0.62);
+	}
+	.hud-label {
+		@apply font-display text-xs font-bold tracking-[0.2em] text-mist-200/80 uppercase not-italic sm:text-sm;
+	}
+	.hud-figure {
+		@apply font-display leading-none font-extrabold tracking-tight text-volt-500 uppercase italic;
+		text-shadow: 0 0 22px rgba(62, 232, 58, 0.35);
+	}
 	.glow-text {
 		text-shadow: 0 0 18px rgba(62, 232, 58, 0.45);
 	}
