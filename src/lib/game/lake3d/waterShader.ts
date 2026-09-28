@@ -39,7 +39,8 @@ vec3 rippledNormal(vec2 position, float distanceAway, float calm) {
 	float calming = calm / (1.0 + distanceAway / 60.0);
 	vec3 fine = rippleAt(position, 3.5, vec2(0.021, 0.013));
 	vec3 broad = rippleAt(position, 11.0, vec2(-0.009, 0.017));
-	vec3 slope = (fine + broad * 1.4) * choppiness * calming;
+	vec3 finest = rippleAt(position, 1.3, vec2(-0.031, -0.022)) * (1.0 - smoothstep(8.0, 40.0, distanceAway));
+	vec3 slope = (fine + broad * 1.4 + finest * 0.45) * choppiness * calming;
 	return normalize(vec3(slope.x, 1.0, slope.z));
 }
 
