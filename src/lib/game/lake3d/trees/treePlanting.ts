@@ -1,16 +1,12 @@
 import { seededRandom } from '$lib/domain/random';
 import type { ClearSpot } from '../bank/facilityGrounds';
 import { metresBetween, type WorldPoint } from '../lakeFrame';
+import type { Country } from '../terrain/lakeLand';
 import { distanceToOutline, isInsideOutline } from '../worldGeometry';
-
-export type TreeKind = 'poplar' | 'broadleaf' | 'willow';
-
-export interface PlantedTree {
-	kind: TreeKind;
-	point: WorldPoint;
-	height: number;
-	turn: number;
-}
+import { plantTheCountry } from './countryTrees';
+import { treeAt, type PlantedTree, type TreeKind } from './plantedTree';
+import { plantTheUnderstorey } from './understorey';
+import { woodlandDensityAt } from './woodlandDensity';
 
 export interface PlantingGround {
 	outline: WorldPoint[];
@@ -22,20 +18,7 @@ export interface PlantingGround {
 }
 
 const Planting = { SetbackFromWater: 9, WillowReach: 7, ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 5200, MostTrees: 1100, IslandTreesPerSquareMetre: 0.004, IslandEdgeSetback: 2.5 } as const;
-const TreeHeights: Record<TreeKind, { least: number; range: number }> = { poplar: { least: 16, range: 10 }, broadleaf: { least: 9, range: 8 }, willow: { least: 7, range: 4 } };
 const PoplarShare = 0.28;
-
-const Clumping = { Wavelength: 45, Clearing: 0.35 } as const;
-
-function woodlandDensityAt(point: WorldPoint) {
-	const wave = Math.sin(point.x / Clumping.Wavelength) * Math.cos(point.z / (Clumping.Wavelength * 0.7)) + Math.sin((point.x + point.z) / (Clumping.Wavelength * 1.9));
-	return Math.min(1, Math.max(0, wave * 0.5 + Clumping.Clearing));
-}
-
-function treeAt(kind: TreeKind, point: WorldPoint, random: () => number): PlantedTree {
-	const heights = TreeHeights[kind];
-	return { kind, point, height: heights.least + random() * heights.range, turn: random() * Math.PI * 2 };
-}
 
 function isClearOfBankside(point: WorldPoint, keepClear: ClearSpot[]) {
 	return keepClear.every((spot) => metresBetween(spot.point, point) > spot.radius + Planting.ClearOfBankside);
@@ -46,8 +29,12 @@ function bankTreeKind(distanceFromWater: number, random: () => number): TreeKind
 	return random() < PoplarShare ? 'poplar' : 'broadleaf';
 }
 
+function edgeOf(ground: PlantingGround) {
+	return ground.plotEdge ?? { x: (ground.plotReach * Planting.SpreadOfPlot) / 2, z: (ground.plotReach * Planting.SpreadOfPlot) / 2 };
+}
+
 function plantTheBank(ground: PlantingGround, random: () => number) {
-	const edge = ground.plotEdge ?? { x: (ground.plotReach * Planting.SpreadOfPlot) / 2, z: (ground.plotReach * Planting.SpreadOfPlot) / 2 };
+	const edge = edgeOf(ground);
 	const trees: PlantedTree[] = [];
 	for (let attempt = 0; attempt < Planting.Attempts && trees.length < Planting.MostTrees; attempt++) {
 		const point = { x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z };
@@ -70,7 +57,8 @@ function plantAnIsland(points: WorldPoint[], random: () => number) {
 	for (let attempt = 0; attempt < attempts; attempt++) {
 		const point = { x: least.x + random() * size.x, z: least.z + random() * size.z };
 		const isOnTheIsland = isInsideOutline(point, points) && distanceToOutline(point, points) > Planting.IslandEdgeSetback;
-		if (isOnTheIsland) trees.push(treeAt(random() < PoplarShare ? 'poplar' : 'broadleaf', point, random));
+		if (!isOnTheIsland) continue;
+		trees.push(treeAt(random() < PoplarShare ? 'poplar' : 'broadleaf', point, random));
 	}
 	return trees;
 }
@@ -78,9 +66,12 @@ function plantAnIsland(points: WorldPoint[], random: () => number) {
 export interface Woodland {
 	onTheBank: PlantedTree[];
 	onTheIslands: PlantedTree[];
+	inTheCountry: PlantedTree[];
 }
 
-export function plantTrees(ground: PlantingGround): Woodland {
+export function plantTrees(ground: PlantingGround, country: Country | null): Woodland {
 	const random = seededRandom(ground.seed);
-	return { onTheBank: plantTheBank(ground, random), onTheIslands: ground.islands.flatMap((points) => plantAnIsland(points, random)) };
+	const inTheCountry = country ? plantTheCountry(country, ground.seed) : [];
+	const onTheBank = [...plantTheBank(ground, random), ...plantTheUnderstorey({ outline: ground.outline, keepClear: ground.keepClear, edge: edgeOf(ground) }, random)];
+	return { onTheBank, onTheIslands: ground.islands.flatMap((points) => plantAnIsland(points, random)), inTheCountry };
 }

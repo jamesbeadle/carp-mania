@@ -2,10 +2,9 @@ import { PerspectiveCamera, Scene, type Object3D } from 'three';
 import type { LakeLayout, LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { StageConditions } from '../sky/stageConditions';
-import { createFacilities } from './bank/facilities3d';
-import { plotFacilities } from './bank/facilityGrounds';
-import { createLakeFeatures } from './bank/lakeFeatures3d';
-import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
+import { lightTheWindows } from './bank/windowGlow';
+import { createBankside } from './lakeBankside';
+import { lakeFrameFor, plotReachOf, type LakeFrame, type WorldPoint } from './lakeFrame';
 import { Heights } from './lakeGround';
 import { createLakeLand } from './terrain/lakeLand';
 import { LakeWater } from './lakeWater';
@@ -13,7 +12,6 @@ import { SkyAndLight } from './skyAndLight';
 import { Vegetation } from './vegetation';
 import { Clouds } from './clouds';
 import { NearDetailLayer } from './renderQuality';
-import { plantTrees } from './trees/treePlanting';
 import { smoothWorldOutline } from './worldShapes';
 
 export interface LakeWorldPlan {
@@ -29,7 +27,6 @@ export interface LakeWorldPlan {
 const Lens = { FieldOfViewDegrees: 50, Nearest: 0.1, Farthest: 12000 } as const;
 const MetresPerFootOfDepth = 0.3048;
 const DepthShown = 0.45;
-const PegClearing = 10;
 const ShadowShareOfPlot = 0.75;
 
 export function bedDepthFor(layout: LakeLayout) {
@@ -57,20 +54,16 @@ export class LakeWorld {
 		this.islands = layout.islands.map((island) => smoothWorldOutline(this.frame, island.points));
 		this.camera = new PerspectiveCamera(Lens.FieldOfViewDegrees, width / Math.max(1, height), Lens.Nearest, Lens.Farthest);
 		this.sky = new SkyAndLight(this.scene, plotReach * ShadowShareOfPlot, !plan.isDiorama);
-		const wholePlot = { x: this.frame.metresAcross / 2, z: this.frame.metresDown / 2 };
-		const plotEdge = plan.isDiorama ? wholePlot : null;
-		this.water = new LakeWater(this.outline, this.islands, plan.transparencyPercent, width, height);
-		this.water.keepOutOfTheReflection(this.camera, NearDetailLayer);
-		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout) });
+		const plotEdge = plan.isDiorama ? { x: this.frame.metresAcross / 2, z: this.frame.metresDown / 2 } : null;
+		const bedDepth = bedDepthFor(layout);
+		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth, seed: plan.seed });
 		this.groundAt = land.groundAt;
-		const pegs = plan.pegs.map((peg) => worldPointOf(this.frame, peg));
-		const plots = plotFacilities(layout, this, pegs, wholePlot);
-		const facilities = createFacilities(plots, this.groundAt);
-		this.facilityLabels = facilities.labels;
-		const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((plot) => ({ point: plot.point, radius: plot.footprintMetres / 2 }))];
-		const woodland = plantTrees({ outline: this.outline, islands: this.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
-		this.vegetation = new Vegetation({ woodland, outline: this.outline, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
-		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group, createLakeFeatures(layout, this.frame, season, plan.seed));
+		this.water = new LakeWater({ islands: this.islands, bed: { outline: this.outline, deepest: bedDepth, groundAt: this.groundAt }, transparencyPercent: plan.transparencyPercent }, width, height);
+		this.water.keepOutOfTheReflection(this.camera, NearDetailLayer);
+		const bankside = createBankside(this, { layout, pegs: plan.pegs, season, seed: plan.seed, plotReach, plotEdge, country: land.country });
+		this.facilityLabels = bankside.labels;
+		this.vegetation = bankside.vegetation;
+		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, bankside.group);
 	}
 
 	get daylight() {
@@ -91,5 +84,6 @@ export class LakeWorld {
 		const { weather } = conditions;
 		this.clouds.cover(weather.cloudCover, sunlight.colour, sunlight.daylight, weather.windStrength);
 		this.water.light(this.sky.sunlight);
+		lightTheWindows(sunlight.daylight);
 	}
 }

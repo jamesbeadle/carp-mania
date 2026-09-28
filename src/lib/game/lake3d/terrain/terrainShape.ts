@@ -23,6 +23,13 @@ function rollingHills(point: WorldPoint) {
 	return (wave * 0.5 + 0.5) * Hills.Height;
 }
 
+export interface GroundSample {
+	height: number;
+	fromBank: number;
+}
+
+const NotOnTheBank = Number.POSITIVE_INFINITY;
+
 export interface Bounds {
 	least: WorldPoint;
 	most: WorldPoint;
@@ -49,13 +56,23 @@ export class TerrainShape {
 	}
 
 	heightAt(point: WorldPoint) {
+		return this.sampleAt(point).height;
+	}
+
+	sampleAt(point: WorldPoint): GroundSample {
 		const { outline, islands } = this.plan;
-		if (distanceOutside(point, this.lakeBounds) > FarFromWater) return this.landHeight(point, FarFromWater, Heights.Bank);
-		if (!isInsideOutline(point, outline)) return this.landHeight(point, distanceToOutline(point, outline), Heights.Bank);
+		if (distanceOutside(point, this.lakeBounds) > FarFromWater) return { height: this.landHeight(point, FarFromWater, Heights.Bank), fromBank: FarFromWater };
+		const fromBank = distanceToOutline(point, outline);
+		if (!isInsideOutline(point, outline)) return { height: this.landHeight(point, fromBank, Heights.Bank), fromBank };
 		const island = islands.find((shape) => isInsideOutline(point, shape));
-		if (island) return this.landHeight(point, distanceToOutline(point, island), Heights.Island);
-		const toShore = Math.min(distanceToOutline(point, outline), ...islands.map((shape) => distanceToOutline(point, shape)));
-		return -Shore.WaterlineDip - this.plan.bedDepth * MathUtils.smoothstep(toShore, 0, Shore.ShelfMetres);
+		if (island) return this.islandSample(point, island);
+		const toShore = Math.min(fromBank, ...islands.map((shape) => distanceToOutline(point, shape)));
+		return { height: -Shore.WaterlineDip - this.plan.bedDepth * MathUtils.smoothstep(toShore, 0, Shore.ShelfMetres), fromBank: NotOnTheBank };
+	}
+
+	private islandSample(point: WorldPoint, island: WorldPoint[]): GroundSample {
+		const fromShore = distanceToOutline(point, island);
+		return { height: this.landHeight(point, fromShore, Heights.Island), fromBank: NotOnTheBank };
 	}
 
 	private landHeight(point: WorldPoint, fromWater: number, top: number) {
