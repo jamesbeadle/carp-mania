@@ -8,4 +8,4 @@ export interface CoverQuality {
 }
 
 export const GenerousCover: CoverQuality = { density: 1, cellPixels: 256, isShadowed: true, isDetailed: true, reach: 1, nearSwimBoost: 3.5 };
-export const ModestCover: CoverQuality = { density: 0.5, cellPixels: 128, isShadowed: false, isDetailed: false, reach: 0.65, nearSwimBoost: 1.6 };
+export const ModestCover: CoverQuality = { density: 0.65, cellPixels: 128, isShadowed: false, isDetailed: false, reach: 0.65, nearSwimBoost: 1.6 };
