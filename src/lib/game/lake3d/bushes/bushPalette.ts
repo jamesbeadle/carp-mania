@@ -16,11 +16,11 @@ const Summer: BushPalette = {
 	leafShare: 1
 };
 
-const Spring: BushPalette = { ...Summer, leaves: ['#3e7024', '#4a7e2a', '#588a32', '#66963a', '#f2f0ea'], fruit: ['#f6f4f0', '#f0eaf0'] };
+const Spring: BushPalette = { ...Summer, leaves: ['#3e7024', '#4a7e2a', '#588a32', '#66963a', '#72a040'], fruit: ['#f6f4f0', '#f0eaf0'] };
 
 const Autumn: BushPalette = {
-	leaves: ['#6a6a28', '#8a6a2a', '#9a5a26', '#5a5a24', '#a87a30'],
-	brambleLeaves: ['#3a4a1e', '#5a3a26', '#6a2e22', '#344418'],
+	leaves: ['#4e6424', '#627028', '#8a7a2e', '#9a6a2a', '#3e5a22', '#a0822e'],
+	brambleLeaves: ['#34501e', '#44562a', '#6a3a26', '#2e4a1c'],
 	canes: ['#5a3a30', '#6a4436', '#4e3428'],
 	fruit: ['#1e1420', '#2a1a2a', '#8a2030', '#140e16'],
 	leafShare: 0.85

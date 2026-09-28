@@ -8,7 +8,7 @@ import type { SurveyedBank } from './coverGround';
 import { dirtTexture } from './dirtTexture';
 import { SwimGround, type SwimClearing } from './swimClearings';
 
-const Patch = { Radius: SwimGround.PodRadius + 0.4, PegRadius: SwimGround.PegRadius + 0.3, PathRadius: SwimGround.PathRadius, SolidShare: 0.4, CellMetres: 0.33, Lift: 0.035, NoiseWavelength: 0.9, Raggedness: 0.9, TextureMetres: 2.2 } as const;
+const Patch = { Radius: SwimGround.PodRadius + 0.4, PegRadius: SwimGround.PegRadius + 0.3, PathRadius: SwimGround.PathRadius, SolidShare: 0.4, CellMetres: 0.45, Lift: 0.035, NoiseWavelength: 0.9, Raggedness: 0.9, TextureMetres: 2.2 } as const;
 const Water = { FadeFrom: 0.15, FadeTo: 0.8 } as const;
 const Offset = { Factor: -2, Units: -4 } as const;
 const Channels = 4;

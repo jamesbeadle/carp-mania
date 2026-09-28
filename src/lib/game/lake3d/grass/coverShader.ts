@@ -10,7 +10,7 @@ uniform float coverGrowth;
 
 export const CoverFragmentUniforms = `
 uniform float coverSheen;
-uniform vec2 coverSheenReach;
+uniform vec3 coverSheenReach;
 `;
 
 export const CoverAtlasVertex = `
@@ -37,7 +37,7 @@ diffuseColor.a = min(1.0, diffuseColor.a * (1.0 + coverMip * 0.35));
 `;
 
 export const CoverSheenFragment = `
-float coverSheenNow = mix(coverSheen, 1.0, smoothstep(coverSheenReach.x, coverSheenReach.y, length(vViewPosition)));
+float coverSheenNow = mix(coverSheen, coverSheenReach.z, smoothstep(coverSheenReach.x, coverSheenReach.y, length(vViewPosition)));
 material.specularF90 = coverSheenNow;
 material.specularColor *= coverSheenNow;
 material.specularColorBlended *= coverSheenNow;

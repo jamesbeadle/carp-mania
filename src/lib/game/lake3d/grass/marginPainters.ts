@@ -6,7 +6,8 @@ import { paintTuft, pixelsPer, type CellBrush } from './grassPainters';
 const Rush = { Stems: 60, Fan: 0.55, Shortest: 0.55, Width: 2.6, FlowerShare: 0.18, FlowerColour: '#7a6440', FlowerAt: 0.72, FlowerRadius: 3.2 } as const;
 const Sedge = { Leaves: 26, Widest: 7, Droop: 0.45 } as const;
 const Sides = [-1, 1];
-const Spike = { Stems: 7, Florets: 22, SpikeShare: 0.4 } as const;
+const Floret = { Largest: 2.8, Taper: 1.4 } as const;
+const Spike = { Stems: 6, Florets: 18, SpikeShare: 0.35 } as const;
 
 function paintRushFlower(brush: CellBrush, at: { x: number; y: number }) {
 	paintDot(brush.context, at, Rush.FlowerRadius * pixelsPer(brush), Rush.FlowerColour);
@@ -43,7 +44,7 @@ function paintFlowerSpike(brush: CellBrush, from: { x: number; y: number }, to: 
 	for (let floret = 0; floret < Spike.Florets; floret++) {
 		const along = floret / Spike.Florets;
 		const centre = { x: from.x + (to.x - from.x) * along + (random() - 0.5) * 5, y: from.y + (to.y - from.y) * along };
-		paintDot(context, centre, (3.4 - along * 1.6) * pixelsPer(brush), pickColour(palette.spikes, random));
+		paintDot(context, centre, (Floret.Largest - along * Floret.Taper) * pixelsPer(brush), pickColour(palette.spikes, random));
 	}
 }
 

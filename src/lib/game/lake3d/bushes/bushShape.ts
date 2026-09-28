@@ -2,7 +2,7 @@ import { BufferAttribute, IcosahedronGeometry, PlaneGeometry, Quaternion, Vector
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { seededRandom } from '$lib/domain/random';
 
-const Blob = { Detail: 0, CardSize: 0.95, CardSizeSwing: 0.4, Placement: 0.5, PlacementSwing: 0.35, LowestCard: -0.5, Squash: 0.8, Lift: 0.55, Seed: 57 } as const;
+const Blob = { Detail: 0, CardSize: 0.95, CardSizeSwing: 0.4, Placement: 0.5, PlacementSwing: 0.35, LowestCard: -0.35, Squash: 0.8, Lift: 0.55, Seed: 57 } as const;
 const Lobes = [
 	{ x: 0, y: 0.15, z: 0, size: 0.75 },
 	{ x: 0.45, y: -0.05, z: 0.2, size: 0.6 },

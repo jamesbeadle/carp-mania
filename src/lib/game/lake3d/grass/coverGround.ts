@@ -19,6 +19,7 @@ export interface BankPlan {
 
 export interface SurveyedBank extends CoverGround {
 	area: FieldArea;
+	edges: WorldPoint[][];
 }
 
 const ReachBeyondTheWater = 95;
@@ -39,5 +40,5 @@ export function surveyBank(plan: BankPlan): SurveyedBank {
 	const shore = new ShoreField(area, water);
 	const sampler = new GroundSampler(area, plan.groundAt, shore);
 	const groundAt = (point: WorldPoint) => sampler.heightAt(point);
-	return { area, shore, swims: swimClearingsFor(plan.pegs, water), facilities, plotEdge: plan.plotEdge, groundAt, season: plan.season, seed: plan.seed };
+	return { area, edges: [plan.outline, ...plan.islands], shore, swims: swimClearingsFor(plan.pegs, water), facilities, plotEdge: plan.plotEdge, groundAt, season: plan.season, seed: plan.seed };
 }

@@ -6,10 +6,11 @@ import type { CoverPlant } from '../grass/coverScatter';
 import { metresFromAnySwim } from '../grass/swimClearings';
 import type { PlantedTree } from '../trees/treePlanting';
 import { BushCells } from './bushAtlas';
+import { watersideSpots } from './watersideBushes';
 
 const Edge = { WoodsWithin: 45, Share: 1, MostPerTree: 4, Outward: [1.5, 7], Sideways: 4 } as const;
 const Scatter = { PerSquareMetre: 0.005, Band: [3, 40], Group: 5, GroupSpread: 3.2 } as const;
-const Keep = { FromWater: 2.2, FromSwim: 4, FromFacility: 2 } as const;
+const Keep = { FromWater: 0.4, FromSwim: 4, FromFacility: 2 } as const;
 const Sizes = { Shrub: { height: [1.1, 2.6], width: [1.1, 2.4] }, Bramble: { height: [0.6, 1.2], width: [1.3, 2.8] } } as const;
 interface BushSizes {
 	height: readonly [number, number];
@@ -52,6 +53,6 @@ function scatteredGroups(bank: SurveyedBank, density: number, random: RandomFrac
 
 export function plantBushes(trees: PlantedTree[], bank: SurveyedBank, density: number, random: RandomFraction) {
 	const edgeTrees = trees.filter((tree) => bank.shore.distanceAt(tree.point) < Edge.WoodsWithin && random() < Edge.Share * density);
-	const points = [...edgeTrees.flatMap((tree) => edgeBushes(tree, bank, random)), ...scatteredGroups(bank, density, random)];
+	const points = [...edgeTrees.flatMap((tree) => edgeBushes(tree, bank, random)), ...scatteredGroups(bank, density, random), ...watersideSpots(bank, density, random)];
 	return points.filter((point) => canGrowAt(point, bank)).map((point) => bushAt(point, random));
 }

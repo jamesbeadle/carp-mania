@@ -10,7 +10,7 @@ import { BushGrid, bushAtlas } from './bushAtlas';
 import { plantBushes } from './bushPlanting';
 import { bushBlob } from './bushShape';
 
-const Look = { Give: 0.12, Roughness: 0.9, Sheen: 0.25, Sink: 0.12, ChunkMetres: 200, Reach: 5 } as const;
+const Look = { Give: 0.12, Roughness: 0.9, Sheen: 0.25, Sink: 0.12, ChunkMetres: 200, Reach: 3 } as const;
 
 export function createBushes(trees: PlantedTree[], bank: SurveyedBank, wind: CoverWind, random: RandomFraction) {
 	const quality = renderQuality();

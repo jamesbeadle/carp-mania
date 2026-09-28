@@ -27,9 +27,9 @@ const Autumn: ReedPalette = {
 };
 
 const Winter: ReedPalette = {
-	stems: ['#b4a27a', '#c2b088', '#a8966e'],
-	leaves: ['#a89670', '#b8a67e', '#9a8a66', '#c4b28a', '#8e8060'],
-	plumes: ['#c0b092', '#d0c0a2', '#b0a084', '#a09076'],
+	stems: ['#948260', '#a08c68', '#887656'],
+	leaves: ['#8a7a58', '#988662', '#7c6e50', '#a28e68', '#72664a'],
+	plumes: ['#a89878', '#b4a484', '#988a6c', '#8a7c62'],
 	maceLeaves: ['#a49470', '#b4a47c', '#948662'],
 	maceHeads: ['#5a3c26', '#644430', '#4c321e']
 };

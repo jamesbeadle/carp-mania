@@ -12,7 +12,7 @@ export interface Planting {
 }
 
 const Bank = { Lip: 0.3, FringeWidth: 2.6, FarFadeFrom: 40, FarFadeTo: 80 } as const;
-const Swim = { Cleared: 0, Trodden: 1.6, BusyWithin: 28, QuietBeyond: 55, Busier: 3 } as const;
+const Swim = { Cleared: 0, Trodden: 1.4, BusyWithin: 18, QuietBeyond: 45, Busier: 5 } as const;
 const Margin = { DeepestShore: -2.2, HighestShore: 1.4, Threshold: 0.36, Density: 6, PodView: 7, Cleared: 1 } as const;
 const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 3.5 } as const;
 const Short = { Density: 1.6, Patchiness: 0.9 } as const;

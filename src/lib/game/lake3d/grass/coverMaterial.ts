@@ -1,4 +1,4 @@
-import { DoubleSide, MeshStandardMaterial, Vector2, Vector3, Vector4, type Texture } from 'three';
+import { DoubleSide, MeshStandardMaterial, Vector3, Vector4, type Texture } from 'three';
 import { CoverAtlasVertex, CoverFragmentUniforms, CoverMipAlphaFragment, CoverSheenFragment, CoverThinningVertex, CoverVertexUniforms, SameNormalBothSides } from './coverShader';
 import { CoverProjectVertex, CoverWindUniforms, type CoverWind } from './coverWind';
 import { Thinning } from './coverThinning';
@@ -15,7 +15,7 @@ export interface CoverLook {
 }
 
 const CutOff = 0.45;
-const SheenReach = { Near: 12, Far: 110 } as const;
+const SheenReach = { Near: 12, Far: 110, Farthest: 0.6 } as const;
 
 function vertexCode(look: CoverLook) {
 	const thinning = look.isThinned ? CoverThinningVertex : '';
@@ -31,7 +31,7 @@ export function coverMaterial(look: CoverLook) {
 		coverThinning: { value: new Vector4(Thinning.FullWithin, Thinning.GoneBeyond, Thinning.Curve, Thinning.Fade) },
 		coverGrowth: { value: Thinning.Growth },
 		coverSheen: { value: look.sheen },
-		coverSheenReach: { value: new Vector2(SheenReach.Near, SheenReach.Far) },
+		coverSheenReach: { value: new Vector3(SheenReach.Near, SheenReach.Far, SheenReach.Farthest) },
 		coverTime: wind.time,
 		coverGust: wind.gust
 	};
