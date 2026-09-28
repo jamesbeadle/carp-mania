@@ -1,7 +1,7 @@
 import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
 import type { WorldPoint } from './lakeFrame';
 import { Heights } from './lakeGround';
-import type { Sightline } from './shadowFocus';
+import type { Sightline } from './shadowRange';
 import { pointToward } from './worldGeometry';
 
 export type CameraShot = { kind: 'overview'; reach: number } | { kind: 'bank'; swim: WorldPoint; heading: number } | { kind: 'follow'; swim: WorldPoint; heading: number; target: Vector3 } | { kind: 'mat'; swim: WorldPoint; heading: number };
@@ -47,7 +47,7 @@ export class CameraRig {
 	}
 
 	get sightline(): Sightline {
-		return { eye: this.eye, focus: this.focus, isOverview: this.shot.kind === 'overview' };
+		return { eye: this.eye, isOverview: this.shot.kind === 'overview' };
 	}
 
 	zoomBy(factor: number) {

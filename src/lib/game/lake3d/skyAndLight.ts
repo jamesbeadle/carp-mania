@@ -3,7 +3,7 @@ import type { StageConditions } from '../sky/stageConditions';
 import { tintHaze, veiled, type HazeColours } from './aerialHaze';
 import { Clouds } from './clouds';
 import { createNightSky } from './nightSky';
-import { shadowFocusOf, type Sightline } from './shadowFocus';
+import { shadowRangeOf, type Sightline } from './shadowRange';
 import { createClearSky, paintSky } from './skyDome';
 import { daylightOf, skyMoodFor, sunColourAt, type SkyMood } from './skyLook';
 import { sunPlacementAt, type SunPlacement } from './sunAndSky';
@@ -42,8 +42,8 @@ export class SkyAndLight {
 
 	constructor(scene: Scene, private readonly wholePlotReach: number, isOpenSky: boolean) {
 		const sun = this.sunShadow.light;
-		this.group.add(sun, sun.target, this.skyLight);
-		this.sunShadow.follow(new Vector3(), wholePlotReach);
+		this.group.add(sun, this.skyLight);
+		this.sunShadow.reachTo(shadowRangeOf({ eye: new Vector3(), isOverview: true }, wholePlotReach));
 		if (!isOpenSky) return;
 		this.group.add(this.sky, this.night.dome, this.clouds.dome);
 		scene.fog = this.fog;
@@ -77,8 +77,7 @@ export class SkyAndLight {
 	}
 
 	followSight(sightline: Sightline) {
-		const { centre, reach } = shadowFocusOf(sightline, this.wholePlotReach);
-		this.sunShadow.follow(centre, reach);
+		this.sunShadow.reachTo(shadowRangeOf(sightline, this.wholePlotReach));
 	}
 
 	advance(secondsElapsed: number) {
