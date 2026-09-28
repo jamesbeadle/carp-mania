@@ -29,21 +29,35 @@ export interface HazeColours {
 	glow: Color;
 }
 
-export const Glow = { Sharpness: 6, ProbeTurn: MathUtils.degToRad(35), LeastFacing: 0.2 } as const;
+export const Glow = { Sharpness: 8, Strength: 0.7, ProbeTurn: MathUtils.degToRad(35), LeastFacing: 0.2 } as const;
 
 const Veil = { Brightening: 1.2, GlowShare: 0.3 } as const;
+const Leaden = new Color('#7f8fa3');
 
-export function veiled(colours: HazeColours, veil: number): HazeColours {
+export interface HazeMood {
+	veil: number;
+	hazeShade: number;
+	leadenness: number;
+}
+
+function leadenLike(colour: Color) {
+	return Leaden.clone().multiplyScalar(brightnessOf(colour) / brightnessOf(Leaden));
+}
+
+export function veiled(colours: HazeColours, mood: HazeMood): HazeColours {
 	const { away, glow } = colours;
+	const { veil, hazeShade, leadenness } = mood;
 	const grey = brightnessOf(glow.clone().multiplyScalar(Veil.GlowShare).add(away)) * Veil.Brightening;
-	return { away: away.clone().lerp(new Color(grey, grey, grey), veil), glow: glow.clone().multiplyScalar(1 - veil) };
+	const veiledAway = away.clone().lerp(new Color(grey, grey, grey), veil);
+	const leadenAway = veiledAway.clone().lerp(leadenLike(veiledAway), leadenness).multiplyScalar(hazeShade);
+	return { away: leadenAway, glow: glow.clone().multiplyScalar((1 - veil) * hazeShade) };
 }
 
 export function tintHaze(fog: FogExp2, colours: HazeColours, sunDirection: Vector3) {
 	const { away, glow } = colours;
 	fog.color.copy(away);
 	sharedSunDirection.set([sunDirection.x, sunDirection.y, sunDirection.z]);
-	sharedGlow.set([glow.r, glow.g, glow.b, Glow.Sharpness]);
+	sharedGlow.set([glow.r * Glow.Strength, glow.g * Glow.Strength, glow.b * Glow.Strength, Glow.Sharpness]);
 }
 
 export function shadeUnderClouds(drift: Vector2, cover: number, strength: number) {

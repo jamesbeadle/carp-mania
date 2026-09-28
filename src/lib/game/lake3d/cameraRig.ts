@@ -47,7 +47,7 @@ export class CameraRig {
 	}
 
 	get sightline(): Sightline {
-		return { eye: this.eye, isOverview: this.shot.kind === 'overview' };
+		return { eye: this.eye, focus: this.focus, isOverview: this.shot.kind === 'overview' };
 	}
 
 	zoomBy(factor: number) {

@@ -8,7 +8,7 @@ import { GradeShader } from './gradeShaders';
 import { GroundContactPass } from './groundContactPass';
 import { renderQuality } from './renderQuality';
 
-const Bloom = { Strength: 0.32, Radius: 0.35, Threshold: 1.8 } as const;
+const Bloom = { Strength: 0.3, Radius: 0.35, Threshold: 2.4 } as const;
 
 export class PostEffects {
 	private readonly composer: EffectComposer;

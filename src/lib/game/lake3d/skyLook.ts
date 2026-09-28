@@ -10,28 +10,36 @@ export interface SkyMood {
 	fogDensity: number;
 	veil: number;
 	skyShade: number;
+	hazeShade: number;
+	leadenness: number;
+	exposureShare: number;
 }
 
 const Moods: Record<WeatherKind, SkyMood> = {
 	clear: {
 		turbidity: 3.2, rayleigh: 1.1, mieCoefficient: 0.0025, mieDirectionalG: 0.84,
-		sunStrength: 1, fogDensity: 0.0009, veil: 0, skyShade: 1
+		sunStrength: 1, fogDensity: 0.0009, veil: 0, skyShade: 1,
+		hazeShade: 1, leadenness: 0, exposureShare: 1
 	},
 	heat: {
 		turbidity: 5.5, rayleigh: 0.9, mieCoefficient: 0.006, mieDirectionalG: 0.86,
-		sunStrength: 1.1, fogDensity: 0.0014, veil: 0.1, skyShade: 1
+		sunStrength: 1.1, fogDensity: 0.0014, veil: 0.1, skyShade: 1,
+		hazeShade: 1, leadenness: 0, exposureShare: 0.97
 	},
 	overcast: {
 		turbidity: 12, rayleigh: 2.2, mieCoefficient: 0.012, mieDirectionalG: 0.7,
-		sunStrength: 0.3, fogDensity: 0.0016, veil: 0.08, skyShade: 0.65
+		sunStrength: 0.3, fogDensity: 0.0015, veil: 0.12, skyShade: 0.65,
+		hazeShade: 0.72, leadenness: 0.3, exposureShare: 1
 	},
 	rain: {
 		turbidity: 16, rayleigh: 3, mieCoefficient: 0.016, mieDirectionalG: 0.65,
-		sunStrength: 0.2, fogDensity: 0.0026, veil: 0.22, skyShade: 0.38
+		sunStrength: 0.2, fogDensity: 0.0013, veil: 0.3, skyShade: 0.38,
+		hazeShade: 0.34, leadenness: 0.55, exposureShare: 0.95
 	},
 	mist: {
 		turbidity: 20, rayleigh: 3, mieCoefficient: 0.01, mieDirectionalG: 0.8,
-		sunStrength: 0.5, fogDensity: 0.005, veil: 0.75, skyShade: 0.95
+		sunStrength: 0.5, fogDensity: 0.005, veil: 0.75, skyShade: 0.95,
+		hazeShade: 0.95, leadenness: 0, exposureShare: 1
 	}
 };
 

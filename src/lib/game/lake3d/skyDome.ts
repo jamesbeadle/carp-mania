@@ -4,7 +4,7 @@ import type { SkyMood } from './skyLook';
 import { sunSkyPositionOf, type SunPlacement } from './sunAndSky';
 
 const SkyScale = 9000;
-const LowSun = { FullDayDegrees: 20, ExtraRayleigh: 1.4, MieShed: 0.4 } as const;
+const LowSun = { FullDayDegrees: 20, ExtraRayleigh: 0.9, MieShed: 0.6 } as const;
 const SkyBrightness = 0.1;
 const FinalColour = 'gl_FragColor = vec4( texColor, 1.0 );';
 

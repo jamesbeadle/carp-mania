@@ -22,7 +22,7 @@ const EnvironmentStrength = 0.55;
 const EnvironmentCapture = { Blur: 0, Nearest: 0.1, Farthest: 20000 } as const;
 
 export interface LakeRenderer {
-	expose: (daylight: number) => void;
+	expose: (daylight: number, share?: number) => void;
 	lightFrom: (skyScene: Scene) => void;
 	readHorizon: (skyScene: Scene, sunDirection: Vector3) => HazeColours;
 	stop: () => void;
@@ -39,9 +39,11 @@ function lookFor(isSeeThrough: boolean) {
 
 function rendererOn(canvas: HTMLCanvasElement, isSeeThrough: boolean) {
 	const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: isSeeThrough, powerPreference: 'high-performance' });
-	renderer.setPixelRatio(Math.min(renderQuality().mostPixelRatio, window.devicePixelRatio || 1));
+	const { mostPixelRatio } = renderQuality();
+	renderer.setPixelRatio(Math.min(mostPixelRatio, window.devicePixelRatio || 1));
 	renderer.outputColorSpace = SRGBColorSpace;
-	renderer.toneMapping = lookFor(isSeeThrough).toneMapping;
+	const { toneMapping } = lookFor(isSeeThrough);
+	renderer.toneMapping = toneMapping;
 	renderer.toneMappingExposure = Exposure.Day;
 	const shadows = renderer.shadowMap;
 	shadows.enabled = true;
@@ -79,7 +81,8 @@ export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camer
 		frameHandle = requestAnimationFrame(frame);
 	};
 	frameHandle = requestAnimationFrame(frame);
-	const expose = (daylight: number) => void (renderer.toneMappingExposure = exposureAt(daylight) * lookFor(isSeeThrough).exposureShare);
+	const { exposureShare } = lookFor(isSeeThrough);
+	const expose = (daylight: number, share = 1) => void (renderer.toneMappingExposure = exposureAt(daylight) * exposureShare * share);
 	const environment = new PMREMGenerator(renderer);
 	const lightFrom = (skyScene: Scene) => {
 		const previous = scene.environment;

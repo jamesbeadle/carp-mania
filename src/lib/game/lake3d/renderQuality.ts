@@ -6,6 +6,7 @@ export interface RenderQuality {
 	hasBloom: boolean;
 	hasAmbientOcclusion: boolean;
 	shadowMapPixels: number;
+	hasCascadedShadows: boolean;
 	cloudOctaves: number;
 	hasCloudShadows: boolean;
 }
@@ -18,6 +19,7 @@ const Generous: RenderQuality = {
 	hasBloom: true,
 	hasAmbientOcclusion: true,
 	shadowMapPixels: 2560,
+	hasCascadedShadows: true,
 	cloudOctaves: 6,
 	hasCloudShadows: true
 };
@@ -29,7 +31,8 @@ const Modest: RenderQuality = {
 	hasBloom: false,
 	hasAmbientOcclusion: false,
 	shadowMapPixels: 1024,
-	cloudOctaves: 3,
+	hasCascadedShadows: false,
+	cloudOctaves: 4,
 	hasCloudShadows: false
 };
 const FewestCoresForGenerous = 6;
