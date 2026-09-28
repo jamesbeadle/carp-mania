@@ -11,8 +11,8 @@ export interface FloatingPad {
 	lift: number;
 }
 
-const Pads = { PerSquareMetre: 4, Most: 4200, Radius: [0.13, 0.36], Large: [0.4, 0.62], LargeShare: 0.1, Lift: 0.016, Stacking: 0.0022, MostTilt: 0.16, TiltShare: 0.3, Layers: 7 } as const;
-const Rafts = { Wavelength: 3.2, BroadWavelength: 9, Threshold: 0.36, Softness: 0.28, NoiseSeed: 91 } as const;
+const Pads = { PerSquareMetre: 7, Most: 24000, Radius: [0.14, 0.36], Large: [0.4, 0.6], LargeShare: 0.12, Lift: 0.016, Stacking: 0.0022, MostTilt: 0.16, TiltShare: 0.3, Layers: 7 } as const;
+const Rafts = { Wavelength: 3.6, BroadWavelength: 10, Threshold: 0.3, Softness: 0.22, NoiseSeed: 91 } as const;
 const Edge = { StrayReach: 1.6, FullDepth: 3, StrayShare: 0.1 } as const;
 
 function boundsOf(area: WorldPoint[]) {
@@ -49,7 +49,7 @@ function raftShare(point: WorldPoint, area: WorldPoint[], noise: CoverNoise) {
 export function scatterPads(area: WorldPoint[], density: number, random: RandomFraction) {
 	const { least, size } = boundsOf(area);
 	const noise = new CoverNoise(Rafts.NoiseSeed);
-	const attempts = Math.min(Pads.Most, Math.round(size.x * size.z * Pads.PerSquareMetre * density));
+	const attempts = Math.round(Math.min(Pads.Most, size.x * size.z * Pads.PerSquareMetre) * density);
 	const points = Array.from({ length: attempts }, () => ({ x: least.x + random() * size.x, z: least.z + random() * size.z }));
 	const floating = points.filter((point) => random() < raftShare(point, area, noise));
 	return floating.map((point, index) => padAt(point, index, random));

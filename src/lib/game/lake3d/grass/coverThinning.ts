@@ -1,9 +1,9 @@
-import { renderQuality } from '../renderQuality';
+import { coverQuality } from '../renderQuality';
 
 export const Thinning = { FullWithin: 14, GoneBeyond: 110, Curve: 1.6, Fade: 0.15, Growth: 0.006 } as const;
 
 export function thinningReach() {
-	const { cover } = renderQuality();
+	const cover = coverQuality();
 	return { fullWithin: Thinning.FullWithin * cover.reach, goneBeyond: Thinning.GoneBeyond * cover.reach };
 }
 

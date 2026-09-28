@@ -18,7 +18,7 @@ export interface TuftShape {
 }
 
 const ReferenceCell = 256;
-const Clump = { Centre: 0.5, Spread: 0.36, BackShade: -0.3, BackShare: 0.45, Edge: 0.06, RaggedRoots: 0.24 } as const;
+const Clump = { Centre: 0.5, Spread: 0.36, BackShade: -0.14, BackShare: 0.45, Edge: 0.06, RaggedRoots: 0.24 } as const;
 const Seeds = { Stems: 11, HeadLength: 0.16, Spikelets: 9, SpikeletLength: 7, StemWidth: 1.4 } as const;
 
 export function pixelsPer(brush: CellBrush) {

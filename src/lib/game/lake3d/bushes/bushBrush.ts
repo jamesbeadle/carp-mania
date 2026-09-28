@@ -16,7 +16,7 @@ export interface BlobSpot {
 }
 
 const ReferenceCell = 256;
-const Shade = { Inner: -0.4, Lowest: -0.32, Highest: 0.08 } as const;
+const Shade = { Inner: -0.24, Lowest: -0.16, Highest: 0.1 } as const;
 const Lobes = { Count: 5, Phase: 1.3, Depth: 0.3 } as const;
 const LeafAspect = 2.6;
 

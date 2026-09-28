@@ -7,7 +7,7 @@ import { coverDepthMaterial } from '../grass/coverDepth';
 import type { SurveyedBank } from '../grass/coverGround';
 import { coverMaterial } from '../grass/coverMaterial';
 import type { CoverWind } from '../grass/coverWind';
-import { renderQuality } from '../renderQuality';
+import { coverQuality } from '../renderQuality';
 import { ReedGrid, reedAtlas } from './reedAtlas';
 import { reedStands } from './reedStands';
 
@@ -26,7 +26,7 @@ export interface ReedBedPlan {
 
 export function createReedBeds(plan: ReedBedPlan) {
 	const { bank } = plan;
-	const { cover } = renderQuality();
+	const cover = coverQuality();
 	const stands = reedStands(plan.lines, bank.shore, bank.seed, plan.random);
 	const atlas = reedAtlas(plan.season, cover.cellPixels);
 	const material = coverMaterial(atlas, ReedGrid, plan.wind, Finish);

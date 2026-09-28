@@ -20,7 +20,7 @@ export interface CoverPlant {
 }
 
 const Tile = { Metres: 8, NearestShore: -6, FarthestShore: 90 } as const;
-const Tint = { Darkest: 0.62, Range: 0.34, DryLift: 0.1, DryPatchShare: 0.5 } as const;
+const Tint = { Darkest: 0.84, Range: 0.24, DryLift: 0.1, DryPatchShare: 0.5 } as const;
 const Growth = { Least: 0.75, PatchSwing: 0.5 } as const;
 const TileDiagonal = Tile.Metres * Math.SQRT2;
 

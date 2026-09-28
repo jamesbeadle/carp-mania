@@ -8,14 +8,14 @@ import { lilyFlowerGeometry, lilyPadGeometry } from './lilyShapes';
 import { lilyPadTexture } from './lilyTexture';
 import { scatterPads, type FloatingPad } from './padScatter';
 
-const Look = { PadRoughness: 0.6, PadSheen: 0.16, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.1, 0.16] } as const;
+const Look = { PadRoughness: 0.5, PadSheen: 0.22, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.17, 0.26] } as const;
 const PadTints: Record<SeasonName, string[]> = {
 	spring: ['#ffffff', '#eef6e0', '#dfeccc', '#f4ecd0'],
 	summer: ['#ffffff', '#e0ecd0', '#c8d8b0', '#f0e2b4', '#d8a888'],
 	autumn: ['#e8e0b0', '#d8c890', '#c89e70', '#f0e8c8', '#b88a60'],
 	winter: ['#b89a70', '#a88a64', '#c8a878']
 };
-const FlowerShare: Record<SeasonName, number> = { spring: 0.05, summer: 0.14, autumn: 0.03, winter: 0 };
+const FlowerShare: Record<SeasonName, number> = { spring: 0.04, summer: 0.1, autumn: 0.02, winter: 0 };
 const FlowerColours = ['#ffffff', '#ffffff', '#fff0f4', '#f6d23a'];
 const Up = new Vector3(0, 1, 0);
 

@@ -54,6 +54,10 @@ export class CoverSites {
 		};
 	}
 
+	noiseAt(point: WorldPoint, wavelength: number) {
+		return this.noise.at(point, wavelength);
+	}
+
 	facilitiesNear(point: WorldPoint, slack: number) {
 		return this.ground.facilities.filter((spot) => metresBetween(spot.point, point) < spot.radius + Clear.FacilityMargin + slack);
 	}

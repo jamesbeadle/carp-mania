@@ -1,7 +1,7 @@
 import { Box3, IcosahedronGeometry, PlaneGeometry, Quaternion, Vector3, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { seededRandom } from '$lib/domain/random';
-import { renderQuality } from '../renderQuality';
+import { coverQuality } from '../renderQuality';
 import { lobesOf, type BushLobe } from './bushLobes';
 import { roundedAndShaded } from './bushShading';
 
@@ -57,7 +57,7 @@ function fittedToUnitBox(geometry: BufferGeometry) {
 
 export function bushBlob() {
 	const random = seededRandom(Blob.Seed);
-	const { cover } = renderQuality();
+	const cover = coverQuality();
 	const lobes = lobesOf(cover.isDetailed ? Lobes.Detailed : Lobes.Light, random);
 	const cards = lobes.flatMap((lobe) => lobeCards(lobe, random));
 	return roundedAndShaded(fittedToUnitBox(mergeGeometries(cards)));

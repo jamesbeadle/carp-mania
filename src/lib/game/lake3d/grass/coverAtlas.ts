@@ -13,7 +13,7 @@ export const CoverGrid = { columns: 4, rows: 2, padding: 0.03 } as const;
 const AtlasSeed = 4127;
 
 const Painters: ((brush: CellBrush) => void)[] = [
-	(brush) => paintTuft(brush, { count: 150, shortest: 0.25, lean: 0.3, widest: 5, dryShare: 0.08, isSpread: true }),
+	(brush) => paintTuft(brush, { count: 260, shortest: 0.25, lean: 0.3, widest: 6, dryShare: 0.08, isSpread: true }),
 	(brush) => paintTuft(brush, { count: 85, shortest: 0.2, lean: 0.7, widest: 6, dryShare: 0.2 }),
 	paintMeadow,
 	paintButtercups,

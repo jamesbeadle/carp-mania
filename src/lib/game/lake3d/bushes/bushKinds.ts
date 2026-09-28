@@ -7,7 +7,7 @@ import { BushCells } from './bushAtlas';
 const Keep = { FromWater: 0.4, ShrubFromSwim: 11, BrambleFromSwim: 3.5, FromFacility: 2 } as const;
 const Sizes = { Shrub: { height: [1, 2.2], width: [1.4, 2.8] }, Bramble: { height: [0.5, 1], width: [1.2, 2.6] } } as const;
 const Lip = { Within: 2.6, TallestBush: 1.2 } as const;
-const Look = { BrambleShare: 0.5, FloweringShare: 0.25, DarkShare: 0.45, Lean: 0.08, Darkest: 0.62, Range: 0.33, MostWarmth: 0.12, Reach: 10 } as const;
+const Look = { BrambleShare: 0.5, FloweringShare: 0.25, DarkShare: 0.45, Lean: 0.08, Darkest: 0.86, Range: 0.2, MostWarmth: 0.1, Reach: 10 } as const;
 
 interface BushSizes {
 	height: readonly [number, number];

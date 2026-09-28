@@ -13,9 +13,9 @@ export interface BushPalette {
 }
 
 const Summer: BushPalette = {
-	leaves: ['#2c4e1a', '#355a1e', '#3f6624', '#2a4618', '#4a6e2a'],
-	darkLeaves: ['#233c18', '#2a4620', '#335026', '#1e3416', '#3a5626'],
-	brambleLeaves: ['#223e18', '#2a481c', '#325220', '#1c3614'],
+	leaves: ['#3d6326', '#476e2a', '#50792f', '#3a5e24', '#5a8436'],
+	darkLeaves: ['#30521f', '#375c24', '#406629', '#2c4a1d', '#46682c'],
+	brambleLeaves: ['#2f5220', '#375c24', '#406428', '#2b4a1c'],
 	canes: ['#4e3628', '#5a4030', '#443024'],
 	brambleCanes: ['#5a3a36', '#4e3230', '#66443c'],
 	fruit: ['#d8d2c8', '#d0c6c6', '#c8c0b8'],
@@ -26,15 +26,15 @@ const Summer: BushPalette = {
 
 const Spring: BushPalette = {
 	...Summer,
-	leaves: ['#3a6a22', '#467628', '#528230', '#3e6420', '#5c8a34'],
-	darkLeaves: ['#2e5020', '#365a24', '#40662a', '#2a481c'],
+	leaves: ['#4a7a2a', '#568630', '#629238', '#4c7428', '#6c9a3e'],
+	darkLeaves: ['#3a6026', '#426a2a', '#4c7630', '#365824'],
 	fruit: ['#e0dcd4', '#dcd4d8']
 };
 
 const Autumn: BushPalette = {
-	leaves: ['#4a5e22', '#5c6a26', '#7c702c', '#8a6026', '#3a5420', '#907a2c'],
-	darkLeaves: ['#3a4a1e', '#4a5222', '#6a4a22', '#5a3a1e'],
-	brambleLeaves: ['#30481c', '#3e4e26', '#5e3424', '#2a421a', '#6a4a26'],
+	leaves: ['#5e7028', '#72782c', '#948032', '#a0702c', '#4c6426', '#a88a34'],
+	darkLeaves: ['#4a5c24', '#5a6228', '#7e5a2a', '#6c4a24'],
+	brambleLeaves: ['#3c5622', '#4c5c2c', '#74422c', '#365020', '#7e5a2e'],
 	canes: ['#4e3628', '#5a4030', '#443024'],
 	brambleCanes: ['#5a3438', '#4e2e32', '#643c3e'],
 	fruit: ['#1a1016', '#22121c', '#3e121c', '#120c10'],
@@ -44,15 +44,15 @@ const Autumn: BushPalette = {
 };
 
 const Winter: BushPalette = {
-	leaves: ['#4e4030', '#5a4a36', '#44392a', '#38402a'],
-	darkLeaves: ['#2a3a22', '#304026', '#26341e'],
-	brambleLeaves: ['#2e3a1e', '#3a3a24', '#4a3626'],
-	canes: ['#4a3a30', '#554234', '#40322a'],
-	brambleCanes: ['#5a3444', '#4a2c38', '#6a3e48', '#553a2e'],
+	leaves: ['#6a5238', '#76603e', '#5c4a32'],
+	darkLeaves: ['#5e4a34', '#6a5a3c', '#54442e'],
+	brambleLeaves: ['#2c4420', '#344a24', '#3c4a26', '#4a3e26'],
+	canes: ['#5a4a3a', '#66523e', '#4c3e32', '#6e5c48'],
+	brambleCanes: ['#5a4034', '#4e3a30', '#664a3a'],
 	fruit: [],
-	leafShare: 0.3,
-	darkLeafShare: 0.75,
-	brambleLeafShare: 0.18
+	leafShare: 0.12,
+	darkLeafShare: 0.18,
+	brambleLeafShare: 0.5
 };
 
 export const BushPalettes: Record<SeasonName, BushPalette> = { spring: Spring, summer: Summer, autumn: Autumn, winter: Winter };

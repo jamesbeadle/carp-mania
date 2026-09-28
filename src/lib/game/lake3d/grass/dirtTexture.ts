@@ -2,11 +2,11 @@ import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import { pickColour } from './coverPalette';
 
-const Dirt = { Pixels: 256, Base: '#4e3e2a', Specks: 1800, Pebbles: 24, Seed: 3319 } as const;
-const Tones = ['#44362a', '#5e4c34', '#3a2e20', '#6a5638', '#524028'];
-const PebbleTones = ['#6e665a', '#7a7064', '#5e584e'];
-const Bits = ['#5a6a34', '#6a7a3c', '#7a7440'];
-const Speck = { Largest: 3, BitShare: 0.2 } as const;
+const Dirt = { Pixels: 256, Base: '#4a4230', Specks: 2600, Pebbles: 24, Seed: 3319 } as const;
+const Tones = ['#40392a', '#554c36', '#363024', '#5e553c', '#4c442f', '#3c3a2a'];
+const PebbleTones = ['#6a665c', '#76706a', '#5a5850'];
+const Bits = ['#4e6030', '#5a6c36', '#66683a', '#4a5a2c'];
+const Speck = { Largest: 3, BitShare: 0.3 } as const;
 const Pebble = { Largest: 4.5, Smallest: 1.5, Flatness: 0.6 } as const;
 
 function scatterSpecks(context: CanvasRenderingContext2D, random: () => number) {

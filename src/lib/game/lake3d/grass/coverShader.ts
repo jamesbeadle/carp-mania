@@ -6,6 +6,7 @@ uniform float coverGive;
 uniform vec3 coverGrid;
 uniform vec4 coverThinning;
 uniform float coverGrowth;
+uniform vec2 coverAbove;
 `;
 
 export const CoverFragmentUniforms = `
@@ -27,6 +28,12 @@ float thinningKeep = pow(thinningShare, coverThinning.z) * (1.0 + coverThinning.
 float thinningShown = smoothstep(thinningKeep, thinningKeep - coverThinning.w, coverPlant.y);
 transformed *= thinningShown;
 transformed.xz *= 1.0 + thinningDistance * coverGrowth;
+`;
+
+export const CoverFromAboveVertex = `
+vec3 aboveRoot = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+vec3 aboveView = normalize(cameraPosition - aboveRoot);
+transformed *= 1.0 - smoothstep(coverAbove.x, coverAbove.y, aboveView.y);
 `;
 
 export const CoverMipAlphaFragment = `

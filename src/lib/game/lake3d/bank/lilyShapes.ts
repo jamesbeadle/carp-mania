@@ -1,9 +1,9 @@
-import { BufferAttribute, CircleGeometry, Color, ConeGeometry, PlaneGeometry, type BufferGeometry } from 'three';
+import { BufferAttribute, BufferGeometry, CircleGeometry, Color, ConeGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-const Pad = { Segments: 22, Notch: 0.42, RimLift: 0.05 } as const;
-const Petals = { Outer: 9, Inner: 7, Length: 0.55, Width: 0.22, OuterTilt: 0.5, InnerTilt: 1.05, InnerScale: 0.75 } as const;
-const Centre = { Radius: 0.14, Height: 0.16, Colour: '#e8b82a' } as const;
+const Pad = { Segments: 14, Notch: 0.42, RimLift: 0.05 } as const;
+const Petals = { Outer: 10, Inner: 8, Length: 0.55, Width: 0.24, Widest: 0.42, OuterTilt: 0.5, InnerTilt: 1.05, InnerScale: 0.75 } as const;
+const Centre = { Radius: 0.14, Height: 0.16, Colour: '#e8b82a', Segments: 8 } as const;
 const PetalRoot = new Color('#ffffff');
 
 function withColour(geometry: BufferGeometry, colour: Color) {
@@ -25,9 +25,18 @@ export function lilyPadGeometry() {
 	return pad;
 }
 
+function pointedPetal(width: number, length: number) {
+	const petal = new BufferGeometry();
+	const corners = [0, 0, 0, width / 2, length * Petals.Widest, 0, 0, length, 0, -width / 2, length * Petals.Widest, 0];
+	petal.setAttribute('position', new BufferAttribute(new Float32Array(corners), 3));
+	petal.setIndex([0, 1, 2, 0, 2, 3]);
+	petal.computeVertexNormals();
+	return petal;
+}
+
 function petalRing(count: number, tilt: number, scale: number, twist: number) {
 	return Array.from({ length: count }, (_, index) => {
-		const petal = new PlaneGeometry(Petals.Width * scale, Petals.Length * scale).translate(0, (Petals.Length * scale) / 2, 0);
+		const petal = pointedPetal(Petals.Width * scale, Petals.Length * scale);
 		return petal.rotateX(-Math.PI / 2 + tilt).rotateY((index / count) * Math.PI * 2 + twist);
 	});
 }
@@ -36,6 +45,7 @@ export function lilyFlowerGeometry() {
 	const outer = petalRing(Petals.Outer, Petals.OuterTilt, 1, 0);
 	const inner = petalRing(Petals.Inner, Petals.InnerTilt, Petals.InnerScale, Math.PI / Petals.Inner);
 	const petals = mergeGeometries([...outer, ...inner].map((petal) => petal.toNonIndexed()));
-	const centre = new ConeGeometry(Centre.Radius, Centre.Height, 8).translate(0, Centre.Height / 2, 0).toNonIndexed();
+	const centre = new ConeGeometry(Centre.Radius, Centre.Height, Centre.Segments).translate(0, Centre.Height / 2, 0).toNonIndexed();
+	centre.deleteAttribute('uv');
 	return mergeGeometries([withColour(petals, PetalRoot), withColour(centre, new Color(Centre.Colour))]);
 }

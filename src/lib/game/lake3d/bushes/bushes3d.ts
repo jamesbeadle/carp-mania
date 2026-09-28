@@ -4,7 +4,7 @@ import { coverDepthMaterial } from '../grass/coverDepth';
 import type { SurveyedBank } from '../grass/coverGround';
 import { coverMaterial } from '../grass/coverMaterial';
 import type { CoverWind } from '../grass/coverWind';
-import { renderQuality } from '../renderQuality';
+import { coverQuality } from '../renderQuality';
 import type { PlantedTree } from '../trees/treePlanting';
 import { BushGrid, bushAtlas } from './bushAtlas';
 import { plantBushes } from './bushPlanting';
@@ -14,7 +14,7 @@ const Finish = { give: 0.12, isThinned: false, roughness: 0.92, sheen: 0.1 } as 
 const Look = { Sink: 0.12, ChunkMetres: 200, Reach: 3 } as const;
 
 export function createBushes(trees: PlantedTree[], bank: SurveyedBank, wind: CoverWind, random: RandomFraction) {
-	const { cover } = renderQuality();
+	const cover = coverQuality();
 	const bushes = plantBushes(trees, bank, cover.density, random);
 	const atlas = bushAtlas(bank.season, cover.cellPixels);
 	const material = coverMaterial(atlas, BushGrid, wind, Finish);

@@ -1,7 +1,7 @@
 import { BufferAttribute, Vector3, type BufferGeometry } from 'three';
 
-const Shade = { Lowest: 0.42, Range: 0.58 } as const;
-const Rounding = { Centre: new Vector3(0, 0.4, 0), UpwardShare: 0.15 } as const;
+const Shade = { Lowest: 0.7, Range: 0.3 } as const;
+const Rounding = { Centre: new Vector3(0, 0.4, 0), UpwardShare: 0.4 } as const;
 const Up = new Vector3(0, 1, 0);
 
 export function roundedAndShaded(geometry: BufferGeometry) {

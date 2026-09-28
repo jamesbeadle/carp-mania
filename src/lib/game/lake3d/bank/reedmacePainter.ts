@@ -15,7 +15,7 @@ function paintSword(brush: ReedBrush) {
 	paintBlade(context, { root: { x: rootX, y: height }, tip, bend: arch, width: swordWidth, colour: pickColour(palette.maceLeaves, random) });
 }
 
-function paintMaceHead(brush: ReedBrush, top: { x: number; y: number }) {
+export function paintMaceHead(brush: ReedBrush, top: { x: number; y: number }) {
 	const { context, height, random, palette } = brush;
 	const headLength = height * Mace.HeadLength;
 	const headWidth = Mace.HeadWidth * pixelsAcross(brush);

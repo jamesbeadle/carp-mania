@@ -4,12 +4,12 @@ export interface RenderQuality {
 	mostPixelRatio: number;
 	multisamples: number;
 	reflectionScale: number;
-	cover: CoverQuality;
+	grassTufts: number;
 	hasBloom: boolean;
 }
 
-const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, cover: GenerousCover, hasBloom: true };
-const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, cover: ModestCover, hasBloom: false };
+const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true };
+const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false };
 const FewestCoresForGenerous = 6;
 
 let chosen: RenderQuality | null = null;
@@ -23,6 +23,10 @@ function isModestDevice() {
 export function renderQuality(): RenderQuality {
 	chosen ??= isModestDevice() ? Modest : Generous;
 	return chosen;
+}
+
+export function coverQuality(): CoverQuality {
+	return renderQuality() === Generous ? GenerousCover : ModestCover;
 }
 
 export const NearDetailLayer = 1;

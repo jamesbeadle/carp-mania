@@ -10,7 +10,7 @@ import { SwimGround, type SwimClearing } from './swimClearings';
 
 const Spill = { Pod: 0.4, Peg: 0.3 } as const;
 const Patch = { Radius: SwimGround.PodRadius + Spill.Pod, PegRadius: SwimGround.PegRadius + Spill.Peg, PathRadius: SwimGround.PathRadius } as const;
-const Ground = { SolidShare: 0.4, CellMetres: 0.45, Lift: 0.035, NoiseWavelength: 0.9, Raggedness: 0.9, TextureMetres: 2.2 } as const;
+const Ground = { SolidShare: 0.3, CellMetres: 0.45, Lift: 0.035, NoiseWavelength: 0.9, Raggedness: 0.9, BroadWavelength: 2.8, BroadRaggedness: 1.4, TextureMetres: 2.2 } as const;
 const Decal = { vertexColors: true, transparent: true, depthWrite: false, roughness: 1 } as const;
 const PulledForward = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 } as const;
 const Water = { FadeFrom: 0.15, FadeTo: 0.8 } as const;
@@ -27,7 +27,8 @@ function wornWithin(metres: number, radius: number) {
 
 function wearAt(point: WorldPoint, clearing: SwimClearing, noise: CoverNoise) {
 	const { peg, pod } = clearing;
-	const ragged = (noise.at(point, Ground.NoiseWavelength) - 1 / 2) * Ground.Raggedness;
+	const fine = (noise.at(point, Ground.NoiseWavelength) - 1 / 2) * Ground.Raggedness;
+	const ragged = fine + (noise.at(point, Ground.BroadWavelength) - 1 / 2) * Ground.BroadRaggedness;
 	const aroundPod = wornWithin(metresBetween(point, pod) + ragged, Patch.Radius);
 	const aroundPeg = wornWithin(metresBetween(point, peg) + ragged, Patch.PegRadius);
 	return Math.max(aroundPod, aroundPeg, wornWithin(distanceToSegment(point, peg, pod) + ragged, Patch.PathRadius));

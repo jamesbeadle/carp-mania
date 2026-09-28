@@ -1,4 +1,4 @@
-import { DoubleSide, MeshStandardMaterial, Vector3, Vector4, type Texture } from 'three';
+import { DoubleSide, MeshStandardMaterial, Vector2, Vector3, Vector4, type Texture } from 'three';
 import { renderQuality } from '../renderQuality';
 import * as Chunks from './coverShader';
 import { Thinning, thinningReach } from './coverThinning';
@@ -14,6 +14,7 @@ export interface AtlasGrid {
 export interface CoverFinish {
 	give: number;
 	isThinned: boolean;
+	isFadedFromAbove?: boolean;
 	roughness: number;
 	sheen: number;
 }
@@ -26,6 +27,7 @@ interface CoverLook extends CoverFinish {
 
 const CutOff = 0.45;
 const SheenReach = { Near: 12, Far: 110, Farthest: 0.6 } as const;
+const SeenFromAbove = { FadeFrom: 0.62, GoneAt: 0.88 } as const;
 
 const FragmentEdits: ShaderEdit[] = [
 	replacing('normal_fragment_begin', Chunks.SameNormalBothSides),
@@ -35,7 +37,8 @@ const FragmentEdits: ShaderEdit[] = [
 
 function vertexEdits(look: CoverLook): ShaderEdit[] {
 	const thinning = look.isThinned ? Chunks.CoverThinningVertex : '';
-	return [including('uv_vertex', Chunks.CoverAtlasVertex), including('begin_vertex', thinning), replacing('project_vertex', CoverProjectVertex)];
+	const fromAbove = look.isFadedFromAbove ? Chunks.CoverFromAboveVertex : '';
+	return [including('uv_vertex', Chunks.CoverAtlasVertex), including('begin_vertex', thinning + fromAbove), replacing('project_vertex', CoverProjectVertex)];
 }
 
 function coverUniforms(look: CoverLook) {
@@ -46,6 +49,7 @@ function coverUniforms(look: CoverLook) {
 		coverGrid: { value: new Vector3(grid.columns, grid.rows, grid.padding) },
 		coverThinning: { value: new Vector4(reach.fullWithin, reach.goneBeyond, Thinning.Curve, Thinning.Fade) },
 		coverGrowth: { value: Thinning.Growth },
+		coverAbove: { value: new Vector2(SeenFromAbove.FadeFrom, SeenFromAbove.GoneAt) },
 		coverSheen: { value: look.sheen },
 		coverSheenReach: { value: new Vector3(SheenReach.Near, SheenReach.Far, SheenReach.Farthest) },
 		coverTime: wind.time,
@@ -65,6 +69,6 @@ export function coverMaterial(atlas: Texture, grid: AtlasGrid, wind: CoverWind, 
 		shader.vertexShader = vertexHead + edited(shader.vertexShader, vertexEdits(look));
 		shader.fragmentShader = Chunks.CoverFragmentUniforms + edited(shader.fragmentShader, FragmentEdits);
 	};
-	material.customProgramCacheKey = () => `cover-${look.isThinned}`;
+	material.customProgramCacheKey = () => `cover-${look.isThinned}-${look.isFadedFromAbove === true}`;
 	return material;
 }

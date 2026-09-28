@@ -1,7 +1,8 @@
+import { coverQuality } from '../renderQuality';
 import type { CoverSite } from './coverSite';
 
 const Bank = { Lip: 0.3, FringeWidth: 2.6, FarFadeFrom: 34, FarFadeTo: 72 } as const;
-const Swim = { Worn: -0.7, Trodden: 2.6, TroddenCurve: 1.7, BusyWithin: 18, QuietBeyond: 45, Busier: 2.2 } as const;
+const Swim = { Worn: -0.7, Trodden: 2.6, TroddenCurve: 1.7, BusyWithin: 12, QuietBeyond: 40, Raggedness: 1.6 } as const;
 const Margin = { DeepestShore: -2.2, HighestShore: 1.4, Threshold: 0.36, Density: 6, PodView: 7, PodViewFade: 3.5, Cleared: 0.3, ClearedFade: 1, Clumping: 0.7, BesidePod: 0.3 } as const;
 const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 3.5, FringeThreshold: 0.22 } as const;
 const Short = { Density: 4, Patchiness: 0.9 } as const;
@@ -16,7 +17,7 @@ function landShare(site: CoverSite) {
 }
 
 function busynessAt(fromPod: number) {
-	return 1 + (Swim.Busier - 1) * (1 - ramp(fromPod, Swim.BusyWithin, Swim.QuietBeyond));
+	return 1 + coverQuality().nearSwimBoost * (1 - ramp(fromPod, Swim.BusyWithin, Swim.QuietBeyond));
 }
 
 function meadowness(site: CoverSite) {
@@ -27,7 +28,8 @@ function meadowness(site: CoverSite) {
 
 export function shortGrassDensity(site: CoverSite) {
 	const patchiness = 1 - Short.Patchiness / 2 + site.patch * Short.Patchiness;
-	const trodden = Math.pow(ramp(site.fromSwim, Swim.Worn, Swim.Trodden), Swim.TroddenCurve);
+	const ragged = (site.patch - 1 / 2) * Swim.Raggedness;
+	const trodden = Math.pow(ramp(site.fromSwim + ragged, Swim.Worn, Swim.Trodden), Swim.TroddenCurve);
 	return Short.Density * patchiness * landShare(site) * trodden * busynessAt(site.fromPod) * (1 - meadowness(site) / 2);
 }
 
@@ -52,6 +54,10 @@ export function marginDensity(site: CoverSite) {
 	const besideThePod = Margin.BesidePod * (1 - site.podView);
 	const clearOfTheSwim = ramp(site.fromSwim, Margin.Cleared, Margin.Cleared + Margin.ClearedFade);
 	return Margin.Density * clump * Math.max(awayFromThePod, besideThePod) * clearOfTheSwim;
+}
+
+export function marginShareAt(site: CoverSite) {
+	return marginDensity(site) / Margin.Density;
 }
 
 export const SwimsReachMetres = Swim.QuietBeyond + Meadow.SwimGap * 2;

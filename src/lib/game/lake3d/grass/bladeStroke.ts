@@ -8,7 +8,7 @@ export interface Blade {
 	colour: string;
 }
 
-const Shading = { RootDarkening: 0.55, TipLightening: 0.12 } as const;
+const Shading = { RootDarkening: 0.3, TipLightening: 0.12 } as const;
 const Lightening = new Color('#fff6d8');
 const Darkening = new Color('#10180a');
 

@@ -38,8 +38,8 @@ const Autumn: CoverPalette = {
 };
 
 const Winter: CoverPalette = {
-	blades: ['#55603e', '#626b48', '#6e7452', '#7c7c5c', '#5a5a40'],
-	dryBlades: ['#9a8c6a', '#a89878', '#8a7c5c'],
+	blades: ['#56663e', '#607048', '#6a7650', '#72785a', '#5c6644'],
+	dryBlades: ['#7e7c5a', '#88845e', '#727252'],
 	seedHeads: ['#8a7a5e', '#9c8c70', '#76684e'],
 	rushes: ['#4c5634', '#58603c', '#646444', '#6c6444'],
 	sedges: ['#8a8058', '#968a62', '#7c7450', '#a0946c'],

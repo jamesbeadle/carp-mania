@@ -4,62 +4,60 @@ import { CoverNoise } from '../grass/coverNoise';
 import type { CoverPlant } from '../grass/coverScatter';
 import type { ShoreField } from '../grass/shoreField';
 import { ReedCells } from './reedAtlas';
-
-const Stand = { StepMetres: 0.16, BandHalfWidth: 3.2, MostInland: 0.9, Gappiness: 0.45, EdgeShare: 0.7, MaceShore: -1 } as const;
-const Heights = { Phragmites: [1.9, 2.9], Reedmace: [1.4, 2.0], Sparse: [1.5, 2.3] } as const;
-const Look = { WidthPerHeight: 0.58, Lean: 0.07, Darkest: 0.6, ClumpRange: 0.32, StandRange: 0.16, MostWarmth: 0.14, Reach: 8 } as const;
-const Mix = { MaceShare: 0.3, LeafyShare: 0.4, LeastHeight: 0.55, HeightSwing: 0.85, StandSwing: 0.3, EmergentShare: 0.07, Emergent: 1.3 } as const;
-const Wavelengths = { Gaps: 7, Height: 6, Tone: 4 } as const;
+import { reedClumpsAlong, type ReedClump } from './reedClumps';
+import { loneReeds } from './loneReeds';
 
 interface StandContext {
 	shore: ShoreField;
-	noise: CoverNoise;
 	random: RandomFraction;
 }
 
-function cellFor(offset: number, shore: number, random: RandomFraction) {
-	if (shore < Stand.MaceShore && random() < Mix.MaceShare) return ReedCells.Reedmace;
-	if (Math.abs(offset) > Stand.BandHalfWidth * Stand.EdgeShare) return ReedCells.Sparse;
+const Stand = { PerSquareMetre: 3.4, MostInland: 0.9, MaceShore: -0.9, MaceClumpShare: 0.35, SparseFrom: 0.75, EdgeDrop: 0.3, Swing: 0.2 } as const;
+const Heights = { Phragmites: [1.9, 2.7], Reedmace: [1.4, 1.9], Sparse: [1.5, 2.2], Emergent: [1.15, 1.35] } as const;
+const Look = { WidthPerHeight: 0.58, NarrowEmergent: 0.4, Darkest: 0.72, Range: 0.22, Reach: 8 } as const;
+const Mix = { LeafyShare: 0.4, EmergentShare: 0.14 } as const;
+
+function isMaceClump(clump: ReedClump, context: StandContext) {
+	return context.shore.distanceAt(clump.centre) < Stand.MaceShore && context.random() < Stand.MaceClumpShare;
+}
+
+function cellFor(reach: number, isMace: boolean, random: RandomFraction) {
+	if (random() < Mix.EmergentShare) return isMace ? ReedCells.MaceStems : ReedCells.Emergent;
+	if (isMace) return ReedCells.Reedmace;
+	if (reach > Stand.SparseFrom) return ReedCells.Sparse;
 	return random() < Mix.LeafyShare ? ReedCells.Leafy : ReedCells.Plumed;
 }
 
-function heightsFor(cell: number): readonly [number, number] {
-	if (cell === ReedCells.Reedmace) return Heights.Reedmace;
-	return cell === ReedCells.Sparse ? Heights.Sparse : Heights.Phragmites;
+function baseHeightFor(cell: number, random: RandomFraction) {
+	if (cell === ReedCells.Reedmace || cell === ReedCells.MaceStems) return randomBetween(random, ...Heights.Reedmace);
+	if (cell === ReedCells.Sparse) return randomBetween(random, ...Heights.Sparse);
+	return randomBetween(random, ...Heights.Phragmites);
 }
 
-function heightSwingAt(point: WorldPoint, context: StandContext) {
-	const { noise, random } = context;
-	const emergent = random() < Mix.EmergentShare ? Mix.Emergent : 1;
-	const clump = Mix.LeastHeight + noise.at(point, Wavelengths.Height) * Mix.HeightSwing;
-	return clump * emergent * (1 + (random() - 1 / 2) * Mix.StandSwing);
+function standIn(clump: ReedClump, isMace: boolean, context: StandContext): CoverPlant | null {
+	const { random } = context;
+	const turn = random() * Math.PI * 2;
+	const reach = Math.sqrt(random());
+	const point = { x: clump.centre.x + Math.cos(turn) * reach * clump.radius, z: clump.centre.z + Math.sin(turn) * reach * clump.radius };
+	if (context.shore.distanceAt(point) > Stand.MostInland) return null;
+	const cell = cellFor(reach, isMace, random);
+	const isEmergent = cell === ReedCells.Emergent || cell === ReedCells.MaceStems;
+	const rise = isEmergent ? randomBetween(random, ...Heights.Emergent) : 1 - Stand.EdgeDrop * reach * reach;
+	const height = baseHeightFor(cell, random) * clump.height * rise * (1 + (random() - 1 / 2) * Stand.Swing);
+	const width = height * (isEmergent ? Look.NarrowEmergent : Look.WidthPerHeight);
+	const tint = { shade: Look.Darkest + clump.fullness * Look.Range * random(), warmth: clump.straw };
+	return { point, cell, height, width, lean: (random() - 1 / 2) * clump.lean * 2, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
 }
 
-function standAt(point: WorldPoint, offset: number, context: StandContext): CoverPlant | null {
-	const { shore, noise, random } = context;
-	const fromWater = shore.distanceAt(point);
-	const isThick = random() < 1 - Stand.Gappiness + noise.at(point, Wavelengths.Gaps) * Stand.Gappiness;
-	if (fromWater > Stand.MostInland || !isThick) return null;
-	const cell = cellFor(offset, fromWater, random);
-	const height = randomBetween(random, ...heightsFor(cell)) * heightSwingAt(point, context);
-	const tint = { shade: Look.Darkest + noise.at(point, Wavelengths.Tone) * Look.ClumpRange + random() * Look.StandRange, warmth: random() * Look.MostWarmth };
-	const lean = (random() - 1 / 2) * Look.Lean * 2;
-	return { point, cell, height, width: height * Look.WidthPerHeight, lean, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
-}
-
-function standsAlong(start: WorldPoint, end: WorldPoint, context: StandContext) {
-	const length = Math.hypot(end.x - start.x, end.z - start.z);
-	const across = { x: -(end.z - start.z) / Math.max(length, Number.EPSILON), z: (end.x - start.x) / Math.max(length, Number.EPSILON) };
-	const steps = Math.ceil(length / Stand.StepMetres);
-	return Array.from({ length: steps }, (_, step) => {
-		const along = step / steps;
-		const offset = (context.random() * 2 - 1) * Stand.BandHalfWidth;
-		const point = { x: start.x + (end.x - start.x) * along + across.x * offset, z: start.z + (end.z - start.z) * along + across.z * offset };
-		return standAt(point, offset, context);
-	}).filter((stand): stand is CoverPlant => stand !== null);
+function standsIn(clump: ReedClump, context: StandContext) {
+	const isMace = isMaceClump(clump, context);
+	const count = Math.max(1, Math.round(Math.PI * clump.radius * clump.radius * Stand.PerSquareMetre));
+	return Array.from({ length: count }, () => standIn(clump, isMace, context)).filter((stand): stand is CoverPlant => stand !== null);
 }
 
 export function reedStands(lines: WorldPoint[][], shore: ShoreField, seed: number, random: RandomFraction) {
-	const context = { shore, noise: new CoverNoise(seed), random };
-	return lines.flatMap((line) => line.slice(1).flatMap((point, index) => standsAlong(line[index], point, context)));
+	const clumpContext = { noise: new CoverNoise(seed), random };
+	const context = { shore, random };
+	const clumps = lines.flatMap((line) => reedClumpsAlong(line, clumpContext));
+	return [...clumps.flatMap((clump) => standsIn(clump, context)), ...lines.flatMap((line) => loneReeds(line, shore, random))];
 }
