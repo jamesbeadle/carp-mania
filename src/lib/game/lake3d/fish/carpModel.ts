@@ -1,15 +1,19 @@
-import { DoubleSide, Group, Mesh, SphereGeometry, MeshStandardMaterial } from 'three';
+import { DoubleSide, Group, Mesh, type MeshStandardMaterial, type Texture } from 'three';
 import type { CarpStrain } from '$lib/domain/types';
 import { FishPalette } from '../../scene/fishPalette';
 import { colourOf } from '../cssColour';
+import { carpHead } from './carpHead';
 import { carpBodyGeometry, FinOutlines, finGeometry } from './carpShape';
 import { carpSkinTexture } from './carpSkin';
+import { finRayTexture } from './finTexture';
 import { swimmingMaterial, type SwimBeat } from './swimmingMaterial';
 
-const Eye = { Radius: 0.018, Along: 0.4, Up: 0.035, Out: 0.052 } as const;
 const PairedFins = { Splay: 0.5, Out: 0.045 } as const;
 const SkinRelief = 1.5;
+const Flesh = { Tone: '#d6c09a', Roughness: 0.42, Metalness: 0.05 } as const;
 const skins = new Map<CarpStrain, ReturnType<typeof carpSkinTexture>>();
+const Fin = { Roughness: 0.6, Opacity: 0.82 } as const;
+let finRays: { upright: Texture; tail: Texture } | null = null;
 
 function skinFor(strain: CarpStrain) {
 	const known = skins.get(strain);
@@ -28,24 +32,25 @@ function pairedFins(outline: [number, number][], material: MeshStandardMaterial)
 	});
 }
 
-function eyes() {
-	const commonCarp = FishPalette.common;
-	const material = new MeshStandardMaterial({ color: colourOf(commonCarp.eye), roughness: 0.2 });
-	return [-1, 1].map((side) => {
-		const eye = new Mesh(new SphereGeometry(Eye.Radius, 10, 8), material);
-		eye.position.set(side * Eye.Out, Eye.Up, Eye.Along);
-		return eye;
-	});
+function raysFor() {
+	finRays ??= { upright: finRayTexture(), tail: finRayTexture(Math.PI / 2) };
+	return finRays;
+}
+
+function finMaterialOf(strain: CarpStrain, rays: Texture, beat: SwimBeat) {
+	const colours = FishPalette[strain];
+	return swimmingMaterial({ color: colourOf(colours.fin), map: rays, roughness: Fin.Roughness, side: DoubleSide, transparent: true, opacity: Fin.Opacity }, beat);
 }
 
 export function createCarp(strain: CarpStrain, beat: SwimBeat) {
-	const colours = FishPalette[strain];
 	const skin = skinFor(strain);
-	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ map: skin, bumpMap: skin, bumpScale: SkinRelief, roughness: 0.38, metalness: 0.12 }, beat));
-	const finMaterial = swimmingMaterial({ color: colourOf(colours.fin), roughness: 0.6, side: DoubleSide, transparent: true, opacity: 0.8 }, beat);
-	const fins = [FinOutlines.tail, FinOutlines.dorsal, FinOutlines.anal].map((outline) => new Mesh(finGeometry(outline), finMaterial));
+	const rays = raysFor();
+	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ color: Flesh.Tone, map: skin, bumpMap: skin, bumpScale: SkinRelief, roughness: Flesh.Roughness, metalness: Flesh.Metalness }, beat));
+	const finMaterial = finMaterialOf(strain, rays.upright, beat);
+	const tail = new Mesh(finGeometry(FinOutlines.tail), finMaterialOf(strain, rays.tail, beat));
+	const fins = [FinOutlines.dorsal, FinOutlines.anal].map((outline) => new Mesh(finGeometry(outline), finMaterial));
 	const group = new Group();
-	group.add(body, ...fins, ...pairedFins(FinOutlines.pectoral, finMaterial), ...pairedFins(FinOutlines.pelvic, finMaterial), ...eyes());
+	group.add(body, tail, ...fins, ...pairedFins(FinOutlines.pectoral, finMaterial), ...pairedFins(FinOutlines.pelvic, finMaterial), carpHead());
 	group.traverse((part) => (part.castShadow = true));
 	return group;
 }

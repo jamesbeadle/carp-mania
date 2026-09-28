@@ -3,6 +3,7 @@ import { kitFor } from '$lib/domain/tackle/rodSetup';
 import type { RodOnBank } from '../../scene/rodState';
 import { Heights } from '../lakeGround';
 import type { WorldPoint } from '../lakeFrame';
+import { bankKit } from './bankKit';
 import { castFlightBetween, hasLanded, leadPositionOf, type CastFlight } from './castFlight';
 import { createFishingLine, type FishingLine } from './fishingLine';
 import type { PodRod } from './podRod';
@@ -40,6 +41,7 @@ export class AnglerSpot {
 		const podGroup = pod.group;
 		podGroup.position.copy(this.podAt);
 		podGroup.rotateY(heading);
+		podGroup.add(bankKit());
 		this.rods = pod.rods;
 		const lines = rods.map(() => createFishingLine());
 		this.tracks = lines.map((line) => ({ line, flight: null, secondsSinceCast: LongSinceACast, wasCast: false }));

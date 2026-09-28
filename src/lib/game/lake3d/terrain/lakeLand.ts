@@ -1,9 +1,13 @@
-import { Group, Mesh, MeshStandardMaterial, Shape, ShapeGeometry, Vector2 } from 'three';
+import { Group } from 'three';
 import type { BedType } from '$lib/domain/types';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
-import { Heights, slabSides } from '../lakeGround';
-import { createFarHills } from './farHills';
+import { slabSides } from '../lakeGround';
+import { createCountryside } from './countryMesh';
+import { CountryShape } from './countryShape';
+import { FieldPattern } from './fieldPattern';
+import { fieldTexture } from './fieldTexture';
+import { meadowOf } from './terrainColours';
 import { createTerrainMesh } from './terrainMesh';
 import { TerrainShape } from './terrainShape';
 
@@ -15,22 +19,23 @@ export interface LandPlan {
 	season: SeasonName;
 	bed: BedType;
 	bedDepth: number;
+	seed: number;
+}
+
+export interface Country {
+	shape: CountryShape;
+	fields: FieldPattern;
 }
 
 const Grid = { ReachShare: 1.6, MetresPerCell: 1.7, MostCells: 420, DioramaMetresPerCell: 1.2 } as const;
-const FarGround = { Size: 10000, Sink: 0.3, Colour: '#4f6e2c', Overlap: 0.98 } as const;
 
-function squareAround(halfWidth: number, halfDepth: number) {
-	return [new Vector2(-halfWidth, -halfDepth), new Vector2(halfWidth, -halfDepth), new Vector2(halfWidth, halfDepth), new Vector2(-halfWidth, halfDepth)];
+function countryAround(plan: LandPlan, edgeHalf: number): Country {
+	return { shape: new CountryShape(edgeHalf), fields: new FieldPattern(plan.seed) };
 }
 
-function farGround(inner: WorldPoint) {
-	const outer = new Shape(squareAround(FarGround.Size, FarGround.Size));
-	outer.holes = [new Shape(squareAround(inner.x * FarGround.Overlap, inner.z * FarGround.Overlap))];
-	const mesh = new Mesh(new ShapeGeometry(outer).rotateX(-Math.PI / 2), new MeshStandardMaterial({ color: FarGround.Colour, roughness: 1 }));
-	mesh.position.setY(Heights.Bank - FarGround.Sink);
-	mesh.receiveShadow = true;
-	return mesh;
+function countrysideOf(country: Country, plan: LandPlan) {
+	const fields = fieldTexture(country.fields, plan.season, plan.seed);
+	return createCountryside(country.shape, fields, meadowOf(plan.season));
 }
 
 export function createLakeLand(plan: LandPlan) {
@@ -39,7 +44,8 @@ export function createLakeLand(plan: LandPlan) {
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
 	const terrain = createTerrainMesh(shape, { width: half.x * 2, depth: half.z * 2, metresPerCell, mostCells: Grid.MostCells }, plan);
 	const group = new Group().add(terrain);
-	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half));
-	if (!plan.plotEdge) group.add(createFarHills(Math.hypot(half.x, half.z), Heights.Bank));
-	return { group, groundAt: (point: WorldPoint) => shape.heightAt(point) };
+	const country = plan.plotEdge ? null : countryAround(plan, half.x);
+	group.add(country ? countrysideOf(country, plan) : slabSides(half, plan.bedDepth));
+	const groundAt = (point: WorldPoint) => (country?.shape.isBeyondThePlot(point) ? country.shape.heightAt(point) : shape.heightAt(point));
+	return { group, groundAt, country };
 }

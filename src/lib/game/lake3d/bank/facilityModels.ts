@@ -1,7 +1,11 @@
 import { Group } from 'three';
 import type { Facility } from '$lib/domain/layout/layoutTypes';
-import { block, BuildingLook, house, windowsAlong } from './buildingParts';
+import { aerator } from './aeratorModel';
+import { BuildingLook } from './buildingLook';
+import { house, type HousePlan } from './buildingParts';
+import { carPark } from './carPark';
 import { clubHouse, estateHouse, washrooms } from './comfortModels';
+import { benchOut, hangingSign, terrace } from './facilityProps';
 
 export interface FacilityModel {
 	build: () => Group;
@@ -9,44 +13,29 @@ export interface FacilityModel {
 	isInTheWater?: boolean;
 }
 
-const CarColours = ['#8a1d1d', '#1d3f8a', '#d9d9d9', '#2a2a2a', '#3f6a3a'];
+const Lodge: HousePlan = { width: 8, depth: 6, wallHeight: 3, walls: BuildingLook.Timber, roof: BuildingLook.GreenRoof, windows: 2, hasChimney: true };
+const Toilets: HousePlan = { width: 5, depth: 3.5, wallHeight: 2.6, walls: BuildingLook.Render, roof: BuildingLook.Slate, windows: 2 };
+const TackleShop: HousePlan = { width: 7, depth: 5, wallHeight: 3, walls: BuildingLook.DarkTimber, roof: BuildingLook.GreenRoof, windows: 2 };
+const Bar: HousePlan = { width: 12, depth: 8, wallHeight: 3.4, walls: BuildingLook.Timber, roof: BuildingLook.Tile, windows: 4, hasChimney: true };
+const Restaurant: HousePlan = { width: 16, depth: 10, wallHeight: 3.8, walls: BuildingLook.Render, roof: BuildingLook.Tile, windows: 6, hasChimney: true };
+const Hotel: HousePlan = { width: 28, depth: 12, wallHeight: 7, walls: BuildingLook.Render, roof: BuildingLook.Slate, windows: 10, storeys: 2, hasChimney: true };
+const Terraces = { BarTables: 3, RestaurantTables: 4 } as const;
+const BenchAcross = 2.4;
 
-function car(colour: string, across: number) {
-	const body = block(1.8, 0.7, 4.2, colour, 0.3);
-	const cabin = block(1.6, 0.6, 2.2, colour, 1);
-	const group = new Group().add(body, cabin);
-	group.position.setX(across);
-	return group;
-}
-
-function carPark() {
-	const pad = block(22, 0.08, 14, BuildingLook.Gravel);
-	const cars = CarColours.slice(0, 3).map((colour, index) => car(colour, -6 + index * 4.5));
-	return new Group().add(pad, ...cars);
-}
-
-function hotel() {
-	const group = new Group().add(house(28, 12, 7, BuildingLook.Render, BuildingLook.Slate, 10));
-	group.add(windowsAlong(28, 3.5, 12, 3.6, 10));
-	return group;
-}
-
-function aerator() {
-	const float = block(1.2, 0.3, 1.2, '#dfe6ea', -0.15);
-	const spray = block(0.25, 1.4, 0.25, '#f2f7f2', 0.1);
-	return new Group().add(float, spray);
+function withProps(plan: HousePlan, props: (front: number) => Group) {
+	return () => new Group().add(house(plan), props(plan.depth / 2));
 }
 
 export const FacilityModels: Record<Facility, FacilityModel> = {
 	car_park: { build: carPark, footprintMetres: 24 },
-	lodge: { build: () => house(8, 6, 3, BuildingLook.Timber, BuildingLook.GreenRoof, 2), footprintMetres: 11 },
-	toilets: { build: () => house(5, 3.5, 2.6, BuildingLook.Render, BuildingLook.Slate, 1), footprintMetres: 7 },
+	lodge: { build: withProps(Lodge, (front) => new Group().add(benchOut(front, -BenchAcross), benchOut(front, BenchAcross))), footprintMetres: 11 },
+	toilets: { build: () => house(Toilets), footprintMetres: 7 },
 	washrooms: { build: washrooms, footprintMetres: 10 },
 	club_house: { build: clubHouse, footprintMetres: 19 },
 	estate_house: { build: estateHouse, footprintMetres: 34 },
-	tackle_shop: { build: () => house(7, 5, 3, BuildingLook.DarkTimber, BuildingLook.GreenRoof, 2), footprintMetres: 9 },
-	bar: { build: () => house(12, 8, 3.4, BuildingLook.Timber, BuildingLook.Tile, 4), footprintMetres: 15 },
-	restaurant: { build: () => house(16, 10, 3.8, BuildingLook.Render, BuildingLook.Tile, 6), footprintMetres: 19 },
-	hotel: { build: hotel, footprintMetres: 31 },
+	tackle_shop: { build: withProps(TackleShop, (front) => new Group().add(hangingSign(front), benchOut(front, -BenchAcross))), footprintMetres: 9 },
+	bar: { build: withProps(Bar, (front) => terrace(front, Terraces.BarTables)), footprintMetres: 15 },
+	restaurant: { build: withProps(Restaurant, (front) => terrace(front, Terraces.RestaurantTables, true)), footprintMetres: 19 },
+	hotel: { build: withProps(Hotel, (front) => new Group().add(benchOut(front, -BenchAcross * 2), benchOut(front, BenchAcross * 2))), footprintMetres: 31 },
 	aerator: { build: aerator, footprintMetres: 3, isInTheWater: true }
 };
