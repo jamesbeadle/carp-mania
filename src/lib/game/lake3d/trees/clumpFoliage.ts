@@ -19,7 +19,7 @@ export interface FoliageContext {
 	tint: () => Color;
 }
 
-const Clump = { Scatter: 0.6, Outward: 0.9, Randomness: 0.75, SmallestReach: 0.75, ReachGain: 0.5 } as const;
+const Clump = { Scatter: 0.6, Outward: 0.9, Randomness: 0.75, SmallestReach: 0.75, ReachGain: 0.5, SizeJitter: 0.5 } as const;
 
 export function clumpShading(context: FoliageContext, centre: Vector3, radius: number, cardNormal: Vector3, tint: Color): ShadeLeaf {
 	const { volume, occlusion } = context;
@@ -28,7 +28,8 @@ export function clumpShading(context: FoliageContext, centre: Vector3, radius: n
 
 export function writeClump(writer: GeometryWriter, site: LeafSite, context: FoliageContext) {
 	const { style, random, volume } = context;
-	const radius = style.clumpRadius * context.growth * (Clump.SmallestReach + (Clump.ReachGain * site.reach) / context.longestReach);
+	const jitter = 1 + (random() - 1 / 2) * Clump.SizeJitter;
+	const radius = style.clumpRadius * context.growth * jitter * (Clump.SmallestReach + (Clump.ReachGain * site.reach) / context.longestReach);
 	const tint = context.tint();
 	const outward = site.at.clone().sub(volume.centre).normalize();
 	for (let card = 0; card < context.cards; card++) {
