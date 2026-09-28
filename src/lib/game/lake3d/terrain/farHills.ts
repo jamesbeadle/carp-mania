@@ -1,7 +1,7 @@
 import { Color, Float32BufferAttribute, Mesh, MeshStandardMaterial, RingGeometry } from 'three';
 
 const Hills = { Inner: 1, Outer: 5.5, Around: 96, Rings: 14, Height: 55, Sink: 0.6, BlueDistance: 0.6 } as const;
-const NearGreen = new Color('#4f6e2c');
+const NearGreen = new Color('#42592a');
 const FarBlue = new Color('#5f7a78');
 
 function hillHeight(angle: number, reach: number) {

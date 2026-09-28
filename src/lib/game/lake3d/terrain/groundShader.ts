@@ -21,6 +21,7 @@ uniform vec3 dryGrass;
 uniform vec3 underwaterTint;
 uniform float shingleShare;
 uniform float wetDarkening;
+uniform float groundLift;
 varying vec3 vGroundPosition;
 varying vec3 vGroundNormal;
 
@@ -59,7 +60,7 @@ vec3 grassColour(vec2 ground, vec4 broad, vec4 fine, float height) {
 
 GroundSurface groundSurface() {
 	vec2 ground = vGroundPosition.xz;
-	float height = vGroundPosition.y;
+	float height = vGroundPosition.y + groundLift;
 	vec4 broad = texture2D(groundNoise, ground / BroadMetres);
 	vec4 fine = texture2D(groundNoise, ground / FineMetres);
 	float steepness = 1.0 - normalize(vGroundNormal).y;

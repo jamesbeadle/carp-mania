@@ -12,6 +12,7 @@ export interface GroundLook {
 	tilePixels: number;
 	wear: { paths: Vector4[]; count: number };
 	clock: { value: number };
+	lift: number;
 }
 
 const ProgramKey = 'lake-ground';
@@ -33,7 +34,8 @@ function groundUniforms(look: GroundLook) {
 		wetDarkening: { value: Waterside.wetDarkening },
 		swimWear: { value: wear.paths },
 		swimCount: { value: wear.count },
-		groundTime: look.clock
+		groundTime: look.clock,
+		groundLift: { value: look.lift }
 	};
 }
 

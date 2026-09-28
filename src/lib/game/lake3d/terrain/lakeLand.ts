@@ -32,7 +32,7 @@ export function createLakeLand(plan: LandPlan) {
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
 	const look = { season: plan.season, bed: plan.bed, wear: swimWearOf(plan.pegs, plan), clock: plan.clock };
 	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: renderQuality().groundCells, plotEdge: plan.plotEdge, look }));
-	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half));
+	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half, look));
 	if (!plan.plotEdge) group.add(createFarHills(Math.hypot(half.x, half.z), Heights.Bank));
 	const shoreMap = bakeShoreMap(shape, renderQuality().shoreSpacingMetres / ShoreMapTexelsPerStation);
 	return { group, groundAt: (point: WorldPoint) => shape.heightAt(point), shoreMap };

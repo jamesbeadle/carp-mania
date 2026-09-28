@@ -13,7 +13,7 @@ export interface GroundPlan {
 	metresPerCell: number;
 	mostCells: number;
 	plotEdge: WorldPoint | null;
-	look: Omit<GroundLook, 'tilePixels'>;
+	look: Omit<GroundLook, 'tilePixels' | 'lift'>;
 }
 
 const FinestSpacingMetres = 0.8;
@@ -30,7 +30,7 @@ export function createGroundMeshes(shape: TerrainShape, plan: GroundPlan) {
 	const size: TerrainSize = { width: half.x * 2, depth: half.z * 2, metresPerCell: plan.metresPerCell, mostCells: plan.mostCells };
 	const cellMetres = Math.max(size.width / cellsAlong(size.width, size), size.depth / cellsAlong(size.depth, size));
 	const band = shoreBandFor(cellMetres);
-	const material = createGroundMaterial({ ...plan.look, tilePixels: quality.groundTilePixels });
+	const material = createGroundMaterial({ ...plan.look, tilePixels: quality.groundTilePixels, lift: 0 });
 	const { outline, islands } = shape.plan;
 	const rings = [{ points: outline, isIsland: false }, ...islands.map((points) => ({ points, isIsland: true }))];
 	const isFine = quality.shoreSpacingMetres <= FinestSpacingMetres;
