@@ -1,0 +1,59 @@
+import type { SeasonName } from '$lib/domain/world/worldClock';
+import type { ClearSpot } from '../bank/facilityGrounds';
+import { metresBetween, type WorldPoint } from '../lakeFrame';
+import { CoverNoise } from './coverNoise';
+import type { ShoreField } from './shoreField';
+import { metresFromAnyPod, metresFromAnySwim, type SwimClearing } from './swimClearings';
+
+export interface CoverGround {
+	shore: ShoreField;
+	swims: SwimClearing[];
+	facilities: ClearSpot[];
+	plotEdge: WorldPoint | null;
+	groundAt: (point: WorldPoint) => number;
+	season: SeasonName;
+	seed: number;
+}
+
+export interface CoverSite {
+	point: WorldPoint;
+	shore: number;
+	fromSwim: number;
+	fromPod: number;
+	meadow: number;
+	patch: number;
+	margin: number;
+	bloom: number;
+}
+
+const Wavelengths = { Meadow: 24, Patch: 7, Margin: 11, Bloom: 5 } as const;
+const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1 } as const;
+
+export class CoverSites {
+	private readonly noise: CoverNoise;
+
+	constructor(private readonly ground: CoverGround) {
+		this.noise = new CoverNoise(ground.seed);
+	}
+
+	siteAt(point: WorldPoint): CoverSite {
+		const { noise } = this;
+		const { swims } = this.ground;
+		return {
+			point,
+			shore: this.ground.shore.distanceAt(point),
+			fromSwim: metresFromAnySwim(point, swims),
+			fromPod: metresFromAnyPod(point, swims),
+			meadow: noise.at(point, Wavelengths.Meadow),
+			patch: noise.at(point, Wavelengths.Patch),
+			margin: noise.at({ x: point.z, z: point.x }, Wavelengths.Margin),
+			bloom: noise.at({ x: -point.x, z: point.z }, Wavelengths.Bloom)
+		};
+	}
+
+	isBuildable(point: WorldPoint) {
+		const edge = this.ground.plotEdge;
+		const isOffThePlot = edge !== null && (Math.abs(point.x) > edge.x - Clear.PlotEdgeMargin || Math.abs(point.z) > edge.z - Clear.PlotEdgeMargin);
+		return !isOffThePlot && this.ground.facilities.every((spot) => metresBetween(spot.point, point) > spot.radius + Clear.FacilityMargin);
+	}
+}

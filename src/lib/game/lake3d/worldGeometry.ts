@@ -1,6 +1,6 @@
 import type { WorldPoint } from './lakeFrame';
 
-function distanceToSegment(point: WorldPoint, start: WorldPoint, end: WorldPoint) {
+export function distanceToSegment(point: WorldPoint, start: WorldPoint, end: WorldPoint) {
 	const spanX = end.x - start.x;
 	const spanZ = end.z - start.z;
 	const lengthSquared = spanX * spanX + spanZ * spanZ;
