@@ -1,8 +1,8 @@
 import type { Bounds } from './landBounds';
 import { shoreCharacterAt, type ShoreCharacter } from './shoreCharacter';
 
-const Field = { SpacingMetres: 3, MarginMetres: 40, Values: 5, EdgeGuard: 1.001 } as const;
-const Slot = { Steepness: 0, Rise: 1, Shelf: 2, Plateau: 3, DropOff: 4 } as const;
+const Field = { SpacingMetres: 3, MarginMetres: 40, Values: 6, EdgeGuard: 1.001 } as const;
+const Slot = { Steepness: 0, Rise: 1, Shelf: 2, Plateau: 3, DropOff: 4, BedShare: 5 } as const;
 
 export class CharacterField {
 	private readonly originX: number;
@@ -22,7 +22,7 @@ export class CharacterField {
 			const x = this.originX + (node % this.across) * Field.SpacingMetres;
 			const z = this.originZ + Math.floor(node / this.across) * Field.SpacingMetres;
 			const character = shoreCharacterAt(x, z);
-			this.values.set([character.steepness, character.riseMetres, character.shelfMetres, character.plateauMetres, character.dropOff], node * Field.Values);
+			this.values.set([character.steepness, character.riseMetres, character.shelfMetres, character.plateauMetres, character.dropOff, character.bedShare], node * Field.Values);
 		}
 	}
 
@@ -40,6 +40,6 @@ export class CharacterField {
 			const lower = this.values[below + value] + (this.values[below + Field.Values + value] - this.values[below + value]) * across;
 			return upper + (lower - upper) * down;
 		};
-		return { steepness: blend(Slot.Steepness), riseMetres: blend(Slot.Rise), shelfMetres: blend(Slot.Shelf), plateauMetres: blend(Slot.Plateau), dropOff: blend(Slot.DropOff) };
+		return { steepness: blend(Slot.Steepness), riseMetres: blend(Slot.Rise), shelfMetres: blend(Slot.Shelf), plateauMetres: blend(Slot.Plateau), dropOff: blend(Slot.DropOff), bedShare: blend(Slot.BedShare) };
 	}
 }
