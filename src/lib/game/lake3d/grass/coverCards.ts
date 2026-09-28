@@ -6,6 +6,7 @@ export interface CardShape {
 	segments: number;
 	upwardNormals: number;
 	rootShade: number;
+	splay: number;
 }
 
 const Up = new Vector3(0, 1, 0);
@@ -28,7 +29,8 @@ function litLikeTheGround(geometry: BufferGeometry, shape: CardShape) {
 
 export function crossedCards(shape: CardShape) {
 	const cards = Array.from({ length: shape.planes }, (_, index) => {
-		const card = new PlaneGeometry(1, 1, 1, shape.segments).translate(0, 1 / 2, 0);
+		const leaning = (index % 2) * 2 - 1;
+		const card = new PlaneGeometry(1, 1, 1, shape.segments).translate(0, 1 / 2, 0).rotateX(shape.splay * leaning);
 		return card.rotateY((index / shape.planes) * Math.PI);
 	});
 	return litLikeTheGround(mergeGeometries(cards), shape);

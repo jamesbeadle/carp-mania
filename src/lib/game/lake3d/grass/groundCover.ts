@@ -10,8 +10,8 @@ import type { CoverWind } from './coverWind';
 import { createWornPatches } from './wornPatches';
 
 const Chunks = { GrassMetres: 56, MarginMetres: 120, Sink: 0.04, GrassReach: 1.25, MarginReach: 1.6 } as const;
-const GrassCards = { planes: 3, segments: 1, upwardNormals: 0.55, rootShade: 0.68 } as const;
-const MarginCards = { planes: 3, segments: 2, upwardNormals: 0.45, rootShade: 0.45 } as const;
+const GrassCards = { planes: 3, segments: 1, upwardNormals: 0.55, rootShade: 0.68, splay: 0.3 } as const;
+const MarginCards = { planes: 3, segments: 2, upwardNormals: 0.45, rootShade: 0.45, splay: 0.12 } as const;
 const Finish = { give: 1, isThinned: true, roughness: 0.95, sheen: 0.12 } as const;
 
 export function createGroundCover(bank: SurveyedBank, wind: CoverWind) {

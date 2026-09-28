@@ -11,7 +11,7 @@ import { renderQuality } from '../renderQuality';
 import { ReedGrid, reedAtlas } from './reedAtlas';
 import { reedStands } from './reedStands';
 
-const ReedCards = { planes: 3, segments: 4, upwardNormals: 0.35, rootShade: 0.4 } as const;
+const ReedCards = { planes: 3, segments: 4, upwardNormals: 0.35, rootShade: 0.4, splay: 0.06 } as const;
 const Finish = { give: 0.55, isThinned: false, roughness: 0.85, sheen: 0.18 } as const;
 const Look = { DeepestRoot: 0.7, Sink: 0.05, ChunkMetres: 60, Reach: 8 } as const;
 
