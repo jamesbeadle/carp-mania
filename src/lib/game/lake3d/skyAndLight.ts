@@ -1,4 +1,4 @@
-import { Color, DirectionalLight, FogExp2, Group, HemisphereLight, Vector3, type Scene } from 'three';
+import { Color, DirectionalLight, FogExp2, Group, HemisphereLight, Scene, Vector3 } from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import type { StageConditions } from '../sky/stageConditions';
 import { daylightOf, horizonColourAt, skyMoodFor, sunColourAt, type SkyMood } from './skyLook';
@@ -47,6 +47,10 @@ export class SkyAndLight {
 		if (!isOpenSky) return;
 		this.group.add(this.sky);
 		scene.fog = this.fog;
+	}
+
+	environmentScene() {
+		return new Scene().add(this.sky.clone());
 	}
 
 	setConditions(conditions: StageConditions) {

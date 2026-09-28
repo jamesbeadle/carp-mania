@@ -1,3 +1,4 @@
+import { Color } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { TreeKind } from './treePlanting';
 
@@ -10,6 +11,8 @@ const Foliage: Record<SeasonName, Record<TreeKind, string[]>> = {
 
 export const BarkColour = '#3b2e22';
 
+const Brighter = 0.1;
+
 export function foliageFor(season: SeasonName, kind: TreeKind) {
-	return Foliage[season][kind];
+	return Foliage[season][kind].map((hex) => new Color(hex).offsetHSL(0, 0, Brighter).getHexString()).map((hex) => `#${hex}`);
 }

@@ -9,6 +9,7 @@ import { bedDepthFor, LakeWorld } from '../lakeWorld';
 import { createAimMarker } from './castAim';
 import { pickedSwimId, pickedWaterPoint } from './scenePicking';
 import { SceneDirector } from './sceneDirector';
+import { SceneLighting } from './sceneLighting';
 import type { SceneView } from './sceneView';
 import { WaterLife } from './waterLife';
 
@@ -36,6 +37,7 @@ export class LakeScene {
 	private readonly life: WaterLife;
 	private readonly roaming: RoamingFish;
 	private readonly renderer: LakeRenderer;
+	private readonly lighting: SceneLighting;
 
 	constructor(private readonly canvas: HTMLCanvasElement, plan: LakeScenePlan, readView: () => SceneView) {
 		const { lake, swims } = plan;
@@ -52,6 +54,7 @@ export class LakeScene {
 		this.director.listen({ onSplash: (point) => this.life.plop(point, Strength.CastSplash), onThrash: (point) => this.life.plop(point, Strength.Thrash), onSwirl: (point) => this.life.ripple(point, Strength.Swirl) });
 		this.world.scene.add(swimPegs.group, this.life.group, this.roaming.group, this.director.group, this.aimMarker.group);
 		this.renderer = startLakeRenderer(canvas, this.world.scene, this.world.camera, (secondsElapsed, timeSeconds) => this.frame(readView(), secondsElapsed, timeSeconds), (width, height) => this.world.water.resize(width, height), worldPlan.isDiorama);
+		this.lighting = new SceneLighting(this.world, this.renderer);
 		this.setConditions(plan.conditions);
 	}
 
@@ -68,8 +71,7 @@ export class LakeScene {
 	}
 
 	setConditions(conditions: StageConditions) {
-		this.world.setConditions(conditions);
-		this.renderer.expose(this.world.daylight);
+		this.lighting.light(conditions);
 	}
 
 	swimIdAt(clientX: number, clientY: number) {
@@ -85,7 +87,7 @@ export class LakeScene {
 	}
 
 	private frame(view: SceneView, secondsElapsed: number, timeSeconds: number) {
-		this.world.advance(timeSeconds);
+		this.world.advance(timeSeconds, secondsElapsed);
 		this.director.direct(view, secondsElapsed, timeSeconds);
 		this.life.showFishAt(view.showingAt);
 		this.life.advance(secondsElapsed);
