@@ -3,6 +3,7 @@ import type { BedType } from '$lib/domain/types';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
 import { Heights, slabSides } from '../lakeGround';
+import { createFarHills } from './farHills';
 import { createTerrainMesh } from './terrainMesh';
 import { TerrainShape } from './terrainShape';
 
@@ -39,5 +40,6 @@ export function createLakeLand(plan: LandPlan) {
 	const terrain = createTerrainMesh(shape, { width: half.x * 2, depth: half.z * 2, metresPerCell, mostCells: Grid.MostCells }, plan);
 	const group = new Group().add(terrain);
 	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half));
+	if (!plan.plotEdge) group.add(createFarHills(Math.hypot(half.x, half.z), Heights.Bank));
 	return { group, groundAt: (point: WorldPoint) => shape.heightAt(point) };
 }

@@ -4,8 +4,10 @@ import { seededRandom } from '$lib/domain/random';
 const Sky = { Count: 26, Seed: 83, LeastDistance: 700, DistanceRange: 1500, LeastHeight: 220, HeightRange: 260, LeastSize: 260, SizeRange: 420, Squash: 0.42 } as const;
 const Puff = { Pixels: 256, Blobs: 22 } as const;
 const Drift = { MetresPerSecondPerWind: 6, Calmest: 0.6 } as const;
-const NightCloud = new Color('#27303d');
+const NightCloud = new Color('#10141b');
+const Opacity = { Night: 0.35, Day: 1 } as const;
 const White = new Color('#ffffff');
+const SunTint = 0.35;
 
 function puffTexture() {
 	const canvas = document.createElement('canvas');
@@ -51,7 +53,8 @@ export class Clouds {
 	cover(cloudCover: number, sunColour: Color, daylight: number, windStrength: number) {
 		const shown = Math.round(cloudCover * Sky.Count);
 		this.puffs.forEach((puff, index) => (puff.visible = index < shown));
-		this.material.color.copy(NightCloud).lerp(White.clone().lerp(sunColour, 0.35), daylight);
+		this.material.color.copy(NightCloud).lerp(White.clone().lerp(sunColour, SunTint), daylight);
+		this.material.opacity = Opacity.Night + (Opacity.Day - Opacity.Night) * daylight;
 		this.drift = Drift.Calmest + windStrength * Drift.MetresPerSecondPerWind;
 	}
 

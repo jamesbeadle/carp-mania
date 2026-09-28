@@ -7,7 +7,7 @@ const MillisecondsPerSecond = 1000;
 
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
-export const Exposure = { Day: 0.55, Night: 1.3 } as const;
+export const Exposure = { Day: 0.55, Night: 1.45 } as const;
 const FieldOfView = { Landscape: 50, Portrait: 72 } as const;
 const EnvironmentStrength = 0.55;
 
