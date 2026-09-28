@@ -46,7 +46,7 @@ export class LakeScene {
 		const worldPlan = { layout, plotAcres: Number(lake.plot_acres), transparencyPercent: Number(lake.transparency), season, pegs: swims.map((swim) => swimPoint(swim)), seed: seedOf(lake.id), isDiorama: plan.isDiorama ?? false };
 		this.world = new LakeWorld(worldPlan, canvas.clientWidth, canvas.clientHeight);
 		this.rig = new CameraRig(this.world.camera);
-		const swimPegs = createSwimPegs(swims, this.world.frame);
+		const swimPegs = createSwimPegs(swims, this.world.frame, this.world);
 		this.pegs = swimPegs.pegs;
 		this.life = new WaterLife(this.world.frame);
 		this.roaming = new RoamingFish(plan.fish, this.world, bedDepthFor(layout));

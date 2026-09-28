@@ -1,12 +1,13 @@
 import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 
-export type Finish = 'boards' | 'render' | 'tiles' | 'gravel';
+export type Finish = 'boards' | 'render' | 'tiles' | 'gravel' | 'bricks';
 
 const Pixels = 256;
-const MetresPerTile: Record<Finish, number> = { boards: 2, render: 3, tiles: 1.6, gravel: 2 };
+const MetresPerTile: Record<Finish, number> = { boards: 2, render: 3, tiles: 1.6, gravel: 2, bricks: 1.1 };
 const Board = { Rows: 12, Gap: 3 } as const;
 const Tile = { Rows: 10, Columns: 8 } as const;
+const Brick = { Rows: 16, Columns: 5 } as const;
 const Speckle = { Count: 2500, Seed: 37 } as const;
 
 function speckle(context: CanvasRenderingContext2D, light: number, spread: number) {
@@ -29,23 +30,32 @@ function boards(context: CanvasRenderingContext2D) {
 	for (let row = 0; row < Board.Rows; row++) context.fillRect(0, row * rowHeight, Pixels, 2);
 }
 
-function tiles(context: CanvasRenderingContext2D) {
-	speckle(context, 215, 50);
-	const rowHeight = Pixels / Tile.Rows;
-	const width = Pixels / Tile.Columns;
-	context.strokeStyle = 'rgba(20, 20, 20, 0.5)';
+function courses(context: CanvasRenderingContext2D, rows: number, columns: number, mortar: string) {
+	const rowHeight = Pixels / rows;
+	const width = Pixels / columns;
+	context.strokeStyle = mortar;
 	context.lineWidth = 2;
-	for (let row = 0; row < Tile.Rows; row++) {
+	for (let row = 0; row < rows; row++) {
 		const offset = (row % 2) * (width / 2);
 		context.beginPath();
 		context.moveTo(0, row * rowHeight);
 		context.lineTo(Pixels, row * rowHeight);
-		for (let column = 0; column <= Tile.Columns; column++) context.moveTo(column * width + offset, row * rowHeight), context.lineTo(column * width + offset, (row + 1) * rowHeight);
+		for (let column = 0; column <= columns; column++) context.moveTo(column * width + offset, row * rowHeight), context.lineTo(column * width + offset, (row + 1) * rowHeight);
 		context.stroke();
 	}
 }
 
-const Painters: Record<Finish, (context: CanvasRenderingContext2D) => void> = { boards, tiles, render: (context) => speckle(context, 236, 14), gravel: (context) => speckle(context, 200, 110) };
+function tiles(context: CanvasRenderingContext2D) {
+	speckle(context, 215, 50);
+	courses(context, Tile.Rows, Tile.Columns, 'rgba(20, 20, 20, 0.5)');
+}
+
+function bricks(context: CanvasRenderingContext2D) {
+	speckle(context, 205, 70);
+	courses(context, Brick.Rows, Brick.Columns, 'rgba(255, 250, 240, 0.75)');
+}
+
+const Painters: Record<Finish, (context: CanvasRenderingContext2D) => void> = { boards, tiles, bricks, render: (context) => speckle(context, 236, 14), gravel: (context) => speckle(context, 200, 110) };
 
 export function finishTexture(finish: Finish) {
 	const canvas = document.createElement('canvas');
