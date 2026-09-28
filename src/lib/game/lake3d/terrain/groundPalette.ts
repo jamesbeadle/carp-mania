@@ -30,7 +30,7 @@ export const GrassPalettes: Record<SeasonName, GrassPalette> = {
 	winter: { soil: '#2f2c20', blades: ['#35412a', '#475636', '#5c6b48', '#6f7556', '#7e7a5c', '#8c8466'], lush: [0.95, 1.02, 0.9], dry: [1.08, 1.0, 0.86] }
 };
 
-export const Earth: SoilPalette = { low: '#3e3021', high: '#6a5439', stones: ['#8a8378', '#6e6a62', '#9c907a', '#5b5147'], litter: '#2b2116' };
+export const Earth: SoilPalette = { low: '#3e3021', high: '#6a5439', stones: ['#6e675c', '#5a564f', '#7a705e', '#4b443c'], litter: '#2b2116' };
 
 export const Shingle: SoilPalette = { low: '#54493a', high: '#7a6c52', stones: ['#80796d', '#948d80', '#655f57', '#9c8a68', '#7c6849', '#56524d', '#a89f8a', '#6f5e46'], litter: '#3a3024' };
 

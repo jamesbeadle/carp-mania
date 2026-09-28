@@ -8,7 +8,7 @@ import { farGround } from './farGround';
 import { createFarHills } from './farHills';
 import { createGroundMeshes } from './groundMeshes';
 import { bakeShoreMap } from './shoreMap';
-import { swimWearOf } from './swimWear';
+import { swimGroundsOf, swimWearOf } from './swimWear';
 import { TerrainShape } from './terrainShape';
 
 export interface LandPlan {
@@ -28,9 +28,11 @@ const ShoreMapTexelsPerStation = 2;
 
 export function createLakeLand(plan: LandPlan) {
 	const half = plan.plotEdge ?? { x: plan.plotReach * Grid.ReachShare, z: plan.plotReach * Grid.ReachShare };
-	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z) });
+	const swims = swimGroundsOf(plan.pegs, plan);
+	const pods = swims.map((swim) => swim.pod);
+	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), pods });
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
-	const look = { season: plan.season, bed: plan.bed, wear: swimWearOf(plan.pegs, plan), clock: plan.clock };
+	const look = { season: plan.season, bed: plan.bed, wear: swimWearOf(swims), clock: plan.clock };
 	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: renderQuality().groundCells, plotEdge: plan.plotEdge, look }));
 	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half, look));
 	if (!plan.plotEdge) group.add(createFarHills(Math.hypot(half.x, half.z), Heights.Bank));

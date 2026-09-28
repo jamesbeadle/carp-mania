@@ -19,8 +19,15 @@ vec3 tileAt(sampler2D tile, vec2 ground, float metres) {
 	return texture2D(tile, ground / metres).rgb;
 }
 
+vec3 facingTile(sampler2D tile, vec3 position, vec3 normal, float metres) {
+	vec3 weights = pow(abs(normal), vec3(4.0));
+	weights /= dot(weights, vec3(1.0));
+	vec3 across = tileAt(tile, position.zy, metres) * weights.x + tileAt(tile, position.xz, metres) * weights.y;
+	return across + tileAt(tile, position.xy, metres) * weights.z;
+}
+
 vec3 marginColour(vec2 ground, vec4 fine, vec3 earth) {
-	vec3 shingle = tileAt(shingleTile, ground, ShingleMetres);
+	vec3 shingle = facingTile(shingleTile, vGroundPosition, normalize(vGroundNormal), ShingleMetres);
 	float stony = smoothstep(0.9 - shingleShare, 1.1 - shingleShare, fine.b);
 	return mix(earth * 0.75, shingle, stony);
 }

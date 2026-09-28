@@ -3,7 +3,8 @@ import type { WorldPoint } from '../lakeFrame';
 import { Heights } from '../lakeGround';
 import { isInsideOutline } from '../worldGeometry';
 import { ShoreIndex, type ShoreHit } from './shoreIndex';
-import { bankHeight, bedHeight } from './shoreProfile';
+import { bankHeight, bedHeight, Shore } from './shoreProfile';
+import { SwimFootings } from './swimFootings';
 
 const FarFromWater = 150;
 const EdgeFadeFrom = 0.7;
@@ -16,6 +17,7 @@ export interface TerrainPlan {
 	bedDepth: number;
 	isFlatBeyond: boolean;
 	edgeMetres: number;
+	pods: WorldPoint[];
 }
 
 function rollingHills(point: WorldPoint) {
@@ -46,10 +48,12 @@ function distanceOutside(point: WorldPoint, bounds: Bounds) {
 export class TerrainShape {
 	readonly lakeBounds: Bounds;
 	private readonly shore: ShoreIndex;
+	private readonly footings: SwimFootings;
 
 	constructor(readonly plan: TerrainPlan) {
 		this.lakeBounds = boundsOf(plan.outline);
 		this.shore = new ShoreIndex(plan.outline, plan.islands, ShoreReach);
+		this.footings = new SwimFootings(plan.pods, (point) => this.shore.nearest(point, ShoreReach)?.distance ?? ShoreReach);
 	}
 
 	nearestShore(point: WorldPoint, reachMetres: number): ShoreHit | null {
@@ -77,8 +81,13 @@ export class TerrainShape {
 		return isWater ? bedHeight(ShoreReach, this.plan.bedDepth) : this.landHeight(point, ShoreReach, false);
 	}
 
+	private dropAt(point: WorldPoint, fromWater: number, isIsland: boolean) {
+		if (isIsland) return Shore.IslandDropMetres;
+		return fromWater > Shore.DropMetres ? Shore.DropMetres : Shore.DropMetres * this.footings.dropShareAt(point);
+	}
+
 	private landHeight(point: WorldPoint, fromWater: number, isIsland: boolean) {
-		const bank = bankHeight(fromWater, isIsland ? Heights.Island : Heights.Bank, point.x, point.z, isIsland);
+		const bank = bankHeight(fromWater, isIsland ? Heights.Island : Heights.Bank, point.x, point.z, this.dropAt(point, fromWater, isIsland));
 		if (this.plan.isFlatBeyond) return bank;
 		const towardsTheEdge = Math.max(Math.abs(point.x), Math.abs(point.z));
 		const edgeFade = 1 - MathUtils.smoothstep(towardsTheEdge, this.plan.edgeMetres * EdgeFadeFrom, this.plan.edgeMetres);

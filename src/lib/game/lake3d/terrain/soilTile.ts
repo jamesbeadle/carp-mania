@@ -6,7 +6,7 @@ import { tileableNoise } from './tileNoise';
 
 const ReferencePixels = 512;
 const Base = { Cells: 6, Octaves: 6, Seed: 23 } as const;
-const Grit = { PerPixel: 1 / 700, SmallestPixels: 1.5, LargestPixels: 6, Seed: 31 } as const;
+const Grit = { PerPixel: 1 / 1400, SmallestPixels: 1.5, LargestPixels: 6, Seed: 31 } as const;
 const Roots = { Count: 26, LongestPixels: 90, WidthPixels: 1.4, Seed: 43, Shade: 0.7 } as const;
 const Litter = { Count: 140, LargestPixels: 5, Seed: 59, Shade: 0.8 } as const;
 
