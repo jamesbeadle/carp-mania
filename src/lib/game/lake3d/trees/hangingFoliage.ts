@@ -6,7 +6,7 @@ import { writeCard, writeStrip } from './leafCards';
 import { deviate, UpAxis } from './limbPaths';
 import type { LeafSite } from './treeSkeleton';
 
-const Curtain = { Strands: 2, TopClumpCards: 2, Floor: 0.05, ShortestHang: 0.45, HangRange: 0.5, Width: 0.034, Steps: 4, Drift: 0.12, Bulge: 0.04, Turn: 0.7, Scatter: 0.5 } as const;
+const Curtain = { Strands: 4, TopClumpCards: 2, Floor: 0.03, ShortestHang: 0.5, HangRange: 0.45, HalfWidth: 0.02, Steps: 4, Drift: 0.12, Bulge: 0.04, Scatter: 0.7 } as const;
 const CurtainLight = { Outward: 0.75, Up: 0.35, Lowest: 0.5 } as const;
 const Spray = { BaseBehind: 0.3, Roll: 0.45 } as const;
 
@@ -31,12 +31,10 @@ export function writeCurtain(writer: GeometryWriter, site: LeafSite, context: Fo
 		const top = site.at.clone().add(new Vector3(random() - 0.5, 0, random() - 0.5).multiplyScalar(style.clumpRadius * Curtain.Scatter));
 		const outward = outwardOf(top);
 		const hang = Math.max(0, top.y - Curtain.Floor) * (Curtain.ShortestHang + random() * Curtain.HangRange);
-		const facing = outward.clone().applyAxisAngle(UpAxis, (random() - 0.5) * Curtain.Turn * 2);
-		const across = new Vector3().crossVectors(UpAxis, facing).multiplyScalar(Curtain.Width * context.growth);
 		const tint = context.tint();
 		const normal = outward.clone().multiplyScalar(CurtainLight.Outward).addScaledVector(UpAxis, CurtainLight.Up).normalize();
 		const shade = (position: Vector3) => ({ normal, colour: tint.clone().multiplyScalar(CurtainLight.Lowest + (1 - CurtainLight.Lowest) * Math.min(1, position.y / volume.top)) });
-		writeStrip(writer, { path: hangPath(top, outward, hang), across, region: AtlasRegions[style.region], order: random() }, shade);
+		writeStrip(writer, { path: hangPath(top, outward, hang), halfWidth: Curtain.HalfWidth * context.growth, region: AtlasRegions[style.region], order: random() }, shade);
 	}
 }
 

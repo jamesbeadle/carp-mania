@@ -10,8 +10,8 @@ const Evergreen = { pine: ['#3c4e2a', '#44562e', '#384a28'], spruce: ['#2c3e28',
 const Foliage: Record<SeasonName, Palette> = {
 	spring: { oak: ['#7d9c3c', '#8aa642', '#709238'], alder: ['#5e8436', '#688c3a'], willow: ['#a6ba5c', '#b2c266'], birch: ['#92b242', '#9ebc4a'], poplar: ['#7c9c3e', '#88a444'], ...Evergreen },
 	summer: { oak: ['#4a5e24', '#52682a', '#435a22'], alder: ['#3a4e22', '#405426'], willow: ['#7a9044', '#84984a'], birch: ['#5e7a30', '#688236'], poplar: ['#465e26', '#4e662a'], ...Evergreen },
-	autumn: { oak: ['#8c6a2a', '#a2722e', '#6f6c2e', '#5f6e2e', '#94582a'], alder: ['#5c6832', '#6a6a34', '#4c5e2e'], willow: ['#b2a244', '#a8a64a', '#8e9a44'], birch: ['#d2a232', '#c8902a', '#baa236', '#8e9a3c'], poplar: ['#caa234', '#b8942e'], ...Evergreen },
-	winter: { oak: ['#7a6e62'], alder: ['#5e544c'], willow: ['#a2904e', '#8e8452'], birch: ['#6a4c42', '#5e463e'], poplar: ['#7a7266'], ...Evergreen }
+	autumn: { oak: ['#8c6a2a', '#a2722e', '#6f6c2e', '#5f6e2e', '#94582a'], alder: ['#6e6a30', '#7c6a2e', '#5e6630'], willow: ['#b2a244', '#a8a64a', '#8e9a44'], birch: ['#d2a232', '#c8902a', '#baa236', '#8e9a3c'], poplar: ['#caa234', '#b8942e'], ...Evergreen },
+	winter: { oak: ['#645c56', '#5c5550'], alder: ['#524a46'], willow: ['#9a8a50', '#8a8054'], birch: ['#5e4640', '#56423e'], poplar: ['#666058'], ...Evergreen }
 };
 
 const TreeShade = { Brightness: 0.35, Hue: 0.012 } as const;

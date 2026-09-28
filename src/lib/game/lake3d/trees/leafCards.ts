@@ -20,7 +20,7 @@ export interface Card {
 
 export interface Strip {
 	path: Vector3[];
-	across: Vector3;
+	halfWidth: number;
 	region: AtlasRegion;
 	order: number;
 }
@@ -75,11 +75,8 @@ export function writeStrip(writer: GeometryWriter, strip: Strip, shade: ShadeLea
 	let previous: number[] = [];
 	path.forEach((point, index) => {
 		const share = index / steps;
-		const pair = [-1, 1].map((side) => {
-			const position = point.clone().addScaledVector(strip.across, side);
-			const shading = shade(position);
-			return writer.vertex(position, shading.normal, atlasU(strip.region, (side + 1) / 2), atlasV(strip.region, share), shading.colour, [share, strip.order, 0, 0]);
-		});
+		const shading = shade(point);
+		const pair = [-1, 1].map((side) => writer.vertex(point, shading.normal, atlasU(strip.region, (side + 1) / 2), atlasV(strip.region, share), shading.colour, [share, strip.order, side * strip.halfWidth, 0]));
 		if (previous.length > 0) writer.quad(previous[0], pair[0], pair[1], previous[1]);
 		previous = pair;
 	});

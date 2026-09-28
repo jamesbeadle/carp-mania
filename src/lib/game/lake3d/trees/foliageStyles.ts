@@ -23,4 +23,4 @@ export const FoliageStyles: Record<TreeKind, FoliageStyle> = {
 	spruce: { form: 'spray', region: 'spray', clumpRadius: 0.5, cards: 2, cardSize: 0.55, flatten: 1, upward: 0.6 }
 };
 
-export const WinterTwigs: FoliageStyle = { form: 'spray', region: 'twigs', clumpRadius: 0.9, cards: 2, cardSize: 1, flatten: 1, upward: 0.5 };
+export const WinterTwigs: FoliageStyle = { form: 'clump', region: 'twigs', clumpRadius: 0.075, cards: 1, cardSize: 1.5, flatten: 1, upward: 0 };

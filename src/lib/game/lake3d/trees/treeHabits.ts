@@ -9,10 +9,15 @@ function trunk(length: number, radius: number, wander: number, segments: number,
 	return { ...Straight, length, radius, wander, segments, taper };
 }
 
-const oval = (along: number) => 0.35 + Math.sin(Math.PI * (0.15 + along * 0.85)) * 0.75;
-const cone = (along: number) => 0.08 + Math.pow(1 - along, 0.85);
-const column = (along: number) => 0.45 + Math.sin(Math.PI * Math.min(1, along * 1.3)) * 0.55;
-const shortening = (along: number) => 1.1 - along * 0.45;
+const Oval = { Least: 0.35, Start: 0.15, Swell: 0.75 } as const;
+const Cone = { Tip: 0.08, Curve: 0.85 } as const;
+const Column = { Least: 0.45, Widest: 1.3, Swell: 0.55 } as const;
+const Shortening = { Base: 1.1, Loss: 0.45 } as const;
+
+const oval = (along: number) => Oval.Least + Math.sin(Math.PI * (Oval.Start + along * (1 - Oval.Start))) * Oval.Swell;
+const cone = (along: number) => Cone.Tip + Math.pow(1 - along, Cone.Curve);
+const column = (along: number) => Column.Least + Math.sin(Math.PI * Math.min(1, along * Column.Widest)) * Column.Swell;
+const shortening = (along: number) => Shortening.Base - along * Shortening.Loss;
 
 export const Habits: Record<TreeKind, Habit> = {
 	oak: {
