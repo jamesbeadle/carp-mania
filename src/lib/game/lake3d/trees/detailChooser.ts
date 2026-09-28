@@ -7,6 +7,7 @@ export interface Distant {
 }
 
 const MovedEnoughSquared = 4;
+const Hysteresis = 0.08;
 
 export class DetailChooser {
 	private readonly lastSeenFrom = new Vector3(Infinity, Infinity, Infinity);
@@ -23,7 +24,10 @@ export class DetailChooser {
 		if (isBelowTheWater || position.distanceToSquared(this.lastSeenFrom) < MovedEnoughSquared) return;
 		this.lastSeenFrom.copy(position);
 		this.distants.forEach((distant, index) => {
-			const detail = this.detailAt(position.distanceTo(distant.position) / distant.scale);
+			const metres = position.distanceTo(distant.position) / distant.scale;
+			const finest = this.detailAt(metres * (1 - Hysteresis));
+			const coarsest = this.detailAt(metres * (1 + Hysteresis));
+			const detail = Math.min(coarsest, Math.max(finest, distant.detail));
 			if (detail === distant.detail) return;
 			distant.detail = detail;
 			this.show(index, detail);

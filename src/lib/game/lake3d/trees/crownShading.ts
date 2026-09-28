@@ -29,6 +29,10 @@ function relativeTo(volume: CrownVolume, position: Vector3) {
 	return position.clone().sub(volume.centre).divide(volume.radii);
 }
 
+export function crownDepth(volume: CrownVolume, position: Vector3) {
+	return relativeTo(volume, position).length();
+}
+
 export function crownNormal(volume: CrownVolume, position: Vector3, clumpCentre: Vector3, cardNormal: Vector3) {
 	const outward = relativeTo(volume, position).divide(volume.radii).normalize();
 	const fromClump = position.clone().sub(clumpCentre).normalize();
@@ -42,7 +46,7 @@ function smoothstep(from: number, to: number, value: number) {
 }
 
 export function crownShade(volume: CrownVolume, position: Vector3, clumpCentre: Vector3, clumpRadius: number) {
-	const depth = relativeTo(volume, position).length();
+	const depth = crownDepth(volume, position);
 	const outer = Occlusion.Innermost + (1 - Occlusion.Innermost) * smoothstep(Occlusion.OuterStart, Occlusion.OuterEnd, depth);
 	const heightShare = Math.min(1, Math.max(0, (position.y - volume.bottom) / (volume.top - volume.bottom)));
 	const lift = Occlusion.Lowest + (1 - Occlusion.Lowest) * heightShare;

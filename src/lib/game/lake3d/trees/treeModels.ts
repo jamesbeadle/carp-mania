@@ -1,17 +1,16 @@
 import type { BufferGeometry } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
-import { woodGeometry, type WoodDetail } from './barkGeometry';
-import { foliageGeometry, type FoliageDetail } from './crownFoliage';
+import { withTwigs } from './bareTwigs';
+import { woodGeometry } from './barkGeometry';
+import { emptyFoliage, foliageGeometry, type FoliageDetail } from './crownFoliage';
 import { FoliageStyles, WinterTwigs } from './foliageStyles';
 import { clumpTintFor, isBare } from './treeColours';
+import { BareDetails, Details, FirstHazeDetail } from './treeDetails';
 import { Habits } from './treeHabits';
 import { TreeKinds, type TreeKind } from './treeKinds';
 import { growSkeleton } from './treeSkeleton';
 
-export interface TreeDetail {
-	foliage: FoliageDetail;
-	wood: WoodDetail;
-}
+export { DetailLevels } from './treeDetails';
 
 export interface TreeModel {
 	kind: TreeKind;
@@ -19,23 +18,27 @@ export interface TreeModel {
 	wood: BufferGeometry[];
 }
 
-const Details: TreeDetail[] = [
-	{ foliage: { siteStride: 1, cardShare: 1 }, wood: { sides: [10, 6, 4, 3], deepestLevel: 3, pointStride: 1, thinnestShare: 0 } },
-	{ foliage: { siteStride: 2, cardShare: 0.55 }, wood: { sides: [6, 4, 3, 3], deepestLevel: 2, pointStride: 2, thinnestShare: 0.2 } },
-	{ foliage: { siteStride: 5, cardShare: 0.55 }, wood: { sides: [5, 3, 3, 3], deepestLevel: 1, pointStride: 2, thinnestShare: 0.5 } },
-	{ foliage: { siteStride: 10, cardShare: 0.4 }, wood: { sides: [4, 3, 3, 3], deepestLevel: 0, pointStride: 4, thinnestShare: 1 } }
-];
-export const DetailLevels = Details.length;
-const SeedsPerKind = 101;
+const Seeds = { PerKind: 101, PerVariant: 7 } as const;
+
+function leafyModel(kind: TreeKind, seed: number, season: SeasonName, cardShare: number): TreeModel {
+	const skeleton = growSkeleton(Habits[kind], seed);
+	const tint = clumpTintFor(season);
+	const leaves = Details.map(({ foliage }) => foliageGeometry(skeleton, FoliageStyles[kind], { ...foliage, cardShare: foliage.cardShare * cardShare }, tint, seed));
+	return { kind, leaves, wood: Details.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
+}
+
+function bareModel(kind: TreeKind, seed: number, season: SeasonName, cardShare: number): TreeModel {
+	const skeleton = growSkeleton(withTwigs(Habits[kind], kind), seed);
+	const tint = clumpTintFor(season);
+	const haze = (foliage: FoliageDetail) => foliageGeometry(skeleton, WinterTwigs, { ...foliage, cardShare: foliage.cardShare * cardShare }, tint, seed);
+	const leaves = BareDetails.map(({ foliage }, level) => (level < FirstHazeDetail ? emptyFoliage() : haze(foliage)));
+	return { kind, leaves, wood: BareDetails.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
+}
 
 function modelOf(kind: TreeKind, variant: number, season: SeasonName, cardShare: number): TreeModel {
-	const seed = (TreeKinds.indexOf(kind) + 1) * SeedsPerKind + variant * 7;
-	const skeleton = growSkeleton(Habits[kind], seed);
-	const style = isBare(season, kind) ? WinterTwigs : FoliageStyles[kind];
-	const tint = clumpTintFor(season);
-	const leaves = Details.map(({ foliage }) => foliageGeometry(skeleton, style, { ...foliage, cardShare: foliage.cardShare * cardShare }, tint, seed));
-	const wood = Details.map((detail) => woodGeometry(kind, skeleton, detail.wood));
-	return { kind, leaves, wood };
+	const seed = (TreeKinds.indexOf(kind) + 1) * Seeds.PerKind + variant * Seeds.PerVariant;
+	const build = isBare(season, kind) ? bareModel : leafyModel;
+	return build(kind, seed, season, cardShare);
 }
 
 export function treeModels(season: SeasonName, variants: number, cardShare: number): TreeModel[] {

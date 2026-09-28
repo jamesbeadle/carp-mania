@@ -45,6 +45,18 @@ export class AtlasPainter {
 		this.colour.stroke();
 	}
 
+	within(region: PixelRegion, paint: (region: PixelRegion) => void) {
+		const contexts = [this.colour, this.mask];
+		contexts.forEach((context) => {
+			context.save();
+			context.beginPath();
+			context.rect(region.left, region.top, region.width, region.height);
+			context.clip();
+		});
+		paint(region);
+		contexts.forEach((context) => context.restore());
+	}
+
 	stroke(points: [number, number][], width: number, tone: Tone, coverage = 1) {
 		this.colour.strokeStyle = toneStyle(tone);
 		this.mask.strokeStyle = `rgba(255,255,255,${coverage})`;

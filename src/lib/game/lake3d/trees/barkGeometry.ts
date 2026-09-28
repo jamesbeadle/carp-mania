@@ -12,7 +12,7 @@ export interface WoodDetail {
 	thinnestShare: number;
 }
 
-const Root = { Sink: 0.03, Flare: 1.35 } as const;
+const Root = { Sink: 0.03, Flare: 1.25 } as const;
 const Texture = { AroundRepeats: 2, AlongPerCircumference: 1 } as const;
 const FullTurn = Math.PI * 2;
 const ReferenceSide = new Vector3(1, 0, 0.3).normalize();
@@ -40,13 +40,13 @@ function writeRing(writer: GeometryWriter, kind: TreeKind, limb: Limb, index: nu
 	const direction = tangentAt(limb.points, index);
 	frame.side.addScaledVector(direction, -frame.side.dot(direction)).normalize();
 	const second = new Vector3().crossVectors(direction, frame.side);
-	const paint = barkPaintAt(kind, limb.level, point.y);
 	const circumference = FullTurn * limb.radii[0];
 	const first = writer.vertexCount;
 	for (let side = 0; side <= sides; side++) {
 		const angle = (side / sides) * FullTurn;
 		const normal = frame.side.clone().multiplyScalar(Math.cos(angle)).addScaledVector(second, Math.sin(angle));
 		const position = point.clone().addScaledVector(normal, limb.radii[index]);
+		const paint = barkPaintAt(kind, limb.level, point.y, angle);
 		writer.vertex(position, normal, (side / sides) * Texture.AroundRepeats, (frame.along / circumference) * Texture.AlongPerCircumference, paint.colour, paint.style);
 	}
 	return first;

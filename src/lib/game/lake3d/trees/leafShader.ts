@@ -1,7 +1,12 @@
-export const LeafVertexDeclarations = `
+import { glslDefines } from './glslConstants';
+
+const LeafTurning = glslDefines({ LEAF_AXIS_LEAST: 0.0001, LEAF_SHORTEST: 0.35 });
+
+export const LeafVertexDeclarations = LeafTurning + `
 attribute float dangle;
 attribute float cardOrder;
 attribute vec2 leafCorner;
+attribute vec3 leafAxis;
 `;
 
 export const LeafFullness = `
@@ -18,11 +23,18 @@ float leafKeep = 1.0;
 export const LeafBillboard = `
 #include <project_vertex>
 #ifdef USE_BATCHING
-float leafScale = length(batchingMatrix[1].xyz);
+mat4 leafPlacement = batchingMatrix;
 #else
-float leafScale = 1.0;
+mat4 leafPlacement = mat4(1.0);
 #endif
-mvPosition.xy += leafCorner * leafScale * leafKeep;
+float leafScale = length(leafPlacement[1].xyz);
+vec3 leafAxisSeen = mat3(modelViewMatrix) * mat3(leafPlacement) * leafAxis;
+float leafAxisAcross = length(leafAxisSeen.xy);
+float leafIsAligned = step(LEAF_AXIS_LEAST, leafAxisAcross);
+vec2 leafUp = mix(vec2(0.0, 1.0), leafAxisSeen.xy / max(leafAxisAcross, LEAF_AXIS_LEAST), leafIsAligned);
+vec2 leafSide = vec2(leafUp.y, -leafUp.x);
+float leafForeshortening = mix(1.0, max(leafAxisAcross / max(length(leafAxisSeen), LEAF_AXIS_LEAST), LEAF_SHORTEST), leafIsAligned);
+mvPosition.xy += (leafSide * leafCorner.x + leafUp * leafCorner.y * leafForeshortening) * leafScale * leafKeep;
 gl_Position = projectionMatrix * mvPosition;
 `;
 

@@ -2,8 +2,8 @@ import type { RandomFraction } from '$lib/domain/random';
 import type { AtlasPainter, PixelRegion } from './atlasPainter';
 import { centredRandom } from './centredRandom';
 
-const Twigs = { Depth: 8, FirstLength: 0.12, Shortening: 0.86, LengthJitter: 0.4, Spread: 0.48, Thickest: 0.007, Thinning: 0.74, Children: 2, ExtraChild: 0.35, Root: 0.8 } as const;
-const Bark = { Darkest: 0.55, Range: 0.3, Warmth: 0.15, Coverage: 0.85 } as const;
+const Twigs = { Depth: 7, FirstLength: 0.17, Shortening: 0.84, LengthJitter: 0.4, Spread: 0.42, Thickest: 0.009, Thinning: 0.72, Children: 2, ExtraChild: 0.3, Root: 0.96 } as const;
+const Bark = { Darkest: 0.5, Range: 0.25, Warmth: 0.05, Coverage: 0.75 } as const;
 
 interface Twig {
 	x: number;

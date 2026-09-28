@@ -9,10 +9,10 @@ type Palette = Record<TreeKind, string[]>;
 const Evergreen = { pine: ['#3c4e2a', '#44562e', '#384a28'], spruce: ['#2c3e28', '#31442c', '#293a26'] };
 
 const Foliage: Record<SeasonName, Palette> = {
-	spring: { oak: ['#7d9c3c', '#8aa642', '#709238'], alder: ['#5e8436', '#688c3a'], willow: ['#a6ba5c', '#b2c266'], birch: ['#92b242', '#9ebc4a'], poplar: ['#7c9c3e', '#88a444'], ...Evergreen },
-	summer: { oak: ['#4a5e24', '#52682a', '#435a22'], alder: ['#3a4e22', '#405426'], willow: ['#7a9044', '#84984a'], birch: ['#5e7a30', '#688236'], poplar: ['#465e26', '#4e662a'], ...Evergreen },
+	spring: { oak: ['#7d9c3c', '#8aa642', '#709238'], alder: ['#5e8436', '#688c3a'], willow: ['#98b058', '#a2b660'], birch: ['#92b242', '#9ebc4a'], poplar: ['#7c9c3e', '#88a444'], ...Evergreen },
+	summer: { oak: ['#4a5e24', '#52682a', '#435a22'], alder: ['#3a4e22', '#405426'], willow: ['#6f8544', '#778b48'], birch: ['#5e7a30', '#688236'], poplar: ['#465e26', '#4e662a'], ...Evergreen },
 	autumn: { oak: ['#8c6a2a', '#a2722e', '#6f6c2e', '#5f6e2e', '#94582a'], alder: ['#6e6a30', '#7c6a2e', '#5e6630'], willow: ['#b2a244', '#a8a64a', '#8e9a44'], birch: ['#d2a232', '#c8902a', '#baa236', '#8e9a3c'], poplar: ['#caa234', '#b8942e'], ...Evergreen },
-	winter: { oak: ['#645c56', '#5c5550'], alder: ['#524a46'], willow: ['#9a8a50', '#8a8054'], birch: ['#5e4640', '#56423e'], poplar: ['#666058'], ...Evergreen }
+	winter: { oak: ['#7c7670', '#76706a'], alder: ['#726a66'], willow: ['#8e8250', '#867c54'], birch: ['#7a625c', '#745e58'], poplar: ['#7a756e'], ...Evergreen }
 };
 
 const TreeShade = { Brightness: 0.35, Hue: 0.012 } as const;
@@ -32,8 +32,10 @@ const ClumpTints: Record<SeasonName, ClumpTint> = {
 	winter: { hue: 0.08, hueRange: 0.06, saturation: 0.08, lightness: 0.86, lightnessRange: 0.1 }
 };
 
+const Seasons = { Bare: 'winter', Thinning: 'autumn' } as const satisfies Record<string, SeasonName>;
+
 export function isBare(season: SeasonName, kind: TreeKind) {
-	return season === 'winter' && !isEvergreen(kind);
+	return season === Seasons.Bare && !isEvergreen(kind);
 }
 
 export function crownColourOf(season: SeasonName, kind: TreeKind, pick: number, shade: number) {
@@ -41,7 +43,7 @@ export function crownColourOf(season: SeasonName, kind: TreeKind, pick: number, 
 	const colour = new Color(palette[Math.floor(pick * palette.length) % palette.length]);
 	const offset = shade - 1 / 2;
 	colour.offsetHSL(offset * TreeShade.Hue * 2, 0, 0).multiplyScalar(1 + offset * TreeShade.Brightness);
-	const isThinning = season === 'autumn' && !isEvergreen(kind);
+	const isThinning = season === Seasons.Thinning && !isEvergreen(kind);
 	const fullness = isThinning ? Fullness.AutumnLeast + Fullness.AutumnRange * ((pick * Fullness.Spread) % 1) : 1;
 	return new Vector4(colour.r, colour.g, colour.b, fullness);
 }

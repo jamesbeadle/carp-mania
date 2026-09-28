@@ -14,16 +14,16 @@ diffuseColor.rgb *= dot(barkTexel * barkGains, vBarkStyle);
 
 const BarkSheen = `
 #include <lights_fragment_end>
-reflectedLight.indirectSpecular *= 0.35;
+reflectedLight.indirectSpecular *= barkSheen;
 `;
 
-const Bark = { Roughness: 0.95, BumpScale: 2.2 } as const;
+const Bark = { Roughness: 0.95, BumpScale: 2.2, Sheen: 0.35 } as const;
 const ChannelGains = new Vector3(1.35, 1, 1.5);
 
 function patchBarkShader(shader: WebGLProgramParametersWithUniforms) {
-	Object.assign(shader.uniforms, { barkGains: { value: ChannelGains } });
+	Object.assign(shader.uniforms, { barkGains: { value: ChannelGains }, barkSheen: { value: Bark.Sheen } });
 	shader.vertexShader = ('attribute vec3 barkStyle;\nvarying vec3 vBarkStyle;\n' + shader.vertexShader).replace('#include <uv_vertex>', BarkVertex);
-	shader.fragmentShader = ('uniform vec3 barkGains;\nvarying vec3 vBarkStyle;\n' + shader.fragmentShader).replace('#include <color_fragment>', BarkFragment).replace('#include <lights_fragment_end>', BarkSheen);
+	shader.fragmentShader = ('uniform vec3 barkGains;\nuniform float barkSheen;\nvarying vec3 vBarkStyle;\n' + shader.fragmentShader).replace('#include <color_fragment>', BarkFragment).replace('#include <lights_fragment_end>', BarkSheen);
 }
 
 export function barkMaterial(bark: Texture, sway: CrownSway) {

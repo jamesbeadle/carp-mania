@@ -1,6 +1,6 @@
-import { Vector3, type Color } from 'three';
+import { Color, Vector3 } from 'three';
 import { GeometryWriter } from './geometryWriter';
-import type { AtlasRegion } from './foliageAtlas';
+import type { AtlasRegion } from './atlasRegions';
 
 export interface LeafShading {
 	normal: Vector3;
@@ -16,6 +16,7 @@ export interface Card {
 	region: AtlasRegion;
 	order: number;
 	spin: number;
+	axis: Vector3;
 }
 
 export interface Strip {
@@ -24,6 +25,8 @@ export interface Strip {
 	region: AtlasRegion;
 	order: number;
 }
+
+const UpAxisOfMarker = new Vector3(0, 1, 0);
 
 const Corners: [number, number][] = [
 	[0, 0],
@@ -36,7 +39,8 @@ export function leafWriter() {
 	return new GeometryWriter([
 		{ name: 'dangle', size: 1 },
 		{ name: 'cardOrder', size: 1 },
-		{ name: 'leafCorner', size: 2 }
+		{ name: 'leafCorner', size: 2 },
+		{ name: 'leafAxis', size: 3 }
 	]);
 }
 
@@ -55,15 +59,16 @@ function spun(across: number, up: number, spin: number) {
 }
 
 export function writeCard(writer: GeometryWriter, card: Card, shade: ShadeLeaf) {
-	const half = card.across.length();
-	const { spin } = card;
-	const corners = Corners.map(([across, down]) => {
-		const offsetAcross = across * 2 - 1;
-		const offsetDown = down * 2 - 1;
-		const resting = card.centre.clone().addScaledVector(card.across, offsetAcross).addScaledVector(card.down, offsetDown);
+	const { across, down, spin, axis } = card;
+	const halfAcross = across.length();
+	const halfDown = down.length();
+	const corners = Corners.map(([acrossShare, downShare]) => {
+		const offsetAcross = acrossShare * 2 - 1;
+		const offsetDown = downShare * 2 - 1;
+		const resting = card.centre.clone().addScaledVector(across, offsetAcross).addScaledVector(down, offsetDown);
 		const shading = shade(resting);
-		const corner = spun(offsetAcross * half, -offsetDown * half, spin);
-		return writer.vertex(card.centre, shading.normal, atlasU(card.region, across), atlasV(card.region, down), shading.colour, [0, card.order, ...corner]);
+		const corner = spun(offsetAcross * halfAcross, -offsetDown * halfDown, spin);
+		return writer.vertex(card.centre, shading.normal, atlasU(card.region, acrossShare), atlasV(card.region, downShare), shading.colour, [0, card.order, ...corner, axis.x, axis.y, axis.z]);
 	});
 	writer.quad(corners[0], corners[3], corners[2], corners[1]);
 }
@@ -75,8 +80,17 @@ export function writeStrip(writer: GeometryWriter, strip: Strip, shade: ShadeLea
 	path.forEach((point, index) => {
 		const share = index / steps;
 		const shading = shade(point);
-		const pair = [-1, 1].map((side) => writer.vertex(point, shading.normal, atlasU(strip.region, (side + 1) / 2), atlasV(strip.region, share), shading.colour, [share, strip.order, side * strip.halfWidth, 0]));
+		const pair = [-1, 1].map((side) => writer.vertex(point, shading.normal, atlasU(strip.region, (side + 1) / 2), atlasV(strip.region, share), shading.colour, [share, strip.order, side * strip.halfWidth, 0, 0, 0, 0]));
 		if (previous.length > 0) writer.quad(previous[0], pair[0], pair[1], previous[1]);
 		previous = pair;
+	});
+}
+
+const Unlit = new Color();
+
+export function markBounds(writer: GeometryWriter, least: Vector3, most: Vector3) {
+	[least, most].forEach((corner) => {
+		const marker = writer.vertex(corner, UpAxisOfMarker, 0, 0, Unlit, [0, 0, 0, 0, 0, 0, 0]);
+		writer.triangle(marker, marker, marker);
 	});
 }

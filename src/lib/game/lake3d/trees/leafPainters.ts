@@ -1,77 +1,76 @@
 import type { RandomFraction } from '$lib/domain/random';
-import type { AtlasPainter, PixelRegion } from './atlasPainter';
+import type { AtlasPainter, PixelRegion, Tone } from './atlasPainter';
 import { centredRandom } from './centredRandom';
 
-const Broadleaf = { Filler: 70, FillerReach: 0.22, Longest: 0.1, Shortest: 0.07, Width: 0.48 } as const;
-const Shading = { Darkest: 0.5, Range: 0.5, Warmth: 0.8, Cool: 0.3, TwigLightness: 0.35, TwigWidth: 0.006, Scatter: 1.4, Steadiest: 0.6 } as const;
+interface Lobe {
+	x: number;
+	y: number;
+	radius: number;
+}
+
+interface PaintedLeaf {
+	x: number;
+	y: number;
+	angle: number;
+	length: number;
+	light: number;
+}
+
+const Lobes = { Fewest: 3, Extra: 3, Smallest: 0.15, RadiusRange: 0.1, Spread: 0.6, Margin: 0.03 } as const;
+const Leaves = { PerLobeArea: 1900, Shortest: 0.058, LengthRange: 0.04, Scatter: 1.1, EdgeBias: 0.65, Room: 0.1 } as const;
+
+interface LeafShape {
+	scale: number;
+	width: number;
+}
+
+const Shapes = { Broad: { scale: 1, width: 0.56 }, FineBroad: { scale: 0.45, width: 0.56 }, Round: { scale: 0.9, width: 0.85 }, FineRound: { scale: 0.42, width: 0.85 } } as const;
+const Light = { Darkest: 0.42, Range: 0.62, Height: 0.35, Order: 0.65, Warmth: 0.7, Cool: 0.28 } as const;
+const Stem = { Width: 0.009, Base: 0.9, BaseSpread: 0.4, Bend: 0.25, Tone: { lightness: 0.3, warmth: 1 } } as const;
 const FullTurn = Math.PI * 2;
 
-function centreOf(region: PixelRegion) {
-	return { x: region.left + region.width / 2, y: region.top + region.height / 2 };
-}
-
-function toneFor(share: number, random: RandomFraction) {
-	return { lightness: Shading.Darkest + Shading.Range * share * (Shading.Steadiest + random() * (1 - Shading.Steadiest)), warmth: random() * Shading.Warmth - Shading.Cool };
-}
-
-function scatterLeaves(painter: AtlasPainter, region: PixelRegion, centre: { x: number; y: number }, reach: number, count: number, brightest: number, random: RandomFraction) {
+function lobeIn(region: PixelRegion, random: RandomFraction): Lobe {
 	const size = region.width;
-	for (let index = 0; index < count; index++) {
-		const angle = random() * FullTurn;
-		const distance = Math.sqrt(random()) * reach * size;
-		const x = centre.x + Math.cos(angle) * distance;
-		const y = centre.y + Math.sin(angle) * distance;
-		const length = (Broadleaf.Shortest + random() * (Broadleaf.Longest - Broadleaf.Shortest)) * size;
-		const pointing = angle + centredRandom(random) * Shading.Scatter * 2;
-		painter.leaf(x, y, pointing, length, length * Broadleaf.Width, toneFor((brightest * (index + 1)) / count, random));
-	}
+	const radius = (Lobes.Smallest + random() * Lobes.RadiusRange) * size;
+	const room = size / 2 - radius - (Lobes.Margin + Leaves.Room) * size;
+	const clamp = (offset: number) => Math.max(-room, Math.min(room, offset));
+	return { x: region.left + size / 2 + clamp(centredRandom(random) * Lobes.Spread * size), y: region.top + size / 2 + clamp(centredRandom(random) * Lobes.Spread * size), radius };
 }
 
-const Sprigs = { Count: 8, Leaves: 8, Reach: 0.33, ShortestReach: 0.7, Start: 0.05, FirstLeaf: 0.2, Longest: 0.11, Shortest: 0.075, Width: 0.5, Splay: 0.55, SplayRange: 0.5, Curl: 0.35, BaseTone: 0.45 } as const;
+function leafInLobe(lobe: Lobe, region: PixelRegion, shape: LeafShape, random: RandomFraction): PaintedLeaf {
+	const heading = random() * FullTurn;
+	const distance = Math.pow(random(), 1 - Leaves.EdgeBias / 2) * lobe.radius;
+	const y = lobe.y + Math.sin(heading) * distance;
+	const height = 1 - (y - region.top) / region.height;
+	const length = (Leaves.Shortest + random() * Leaves.LengthRange) * region.width * shape.scale;
+	return { x: lobe.x + Math.cos(heading) * distance, y, angle: heading + centredRandom(random) * Leaves.Scatter * 2, length, light: random() * Light.Order + height * Light.Height };
+}
 
-function paintSprig(painter: AtlasPainter, region: PixelRegion, heading: number, random: RandomFraction) {
-	const centre = centreOf(region);
+function toneOf(leaf: PaintedLeaf, random: RandomFraction): Tone {
+	return { lightness: Light.Darkest + Light.Range * leaf.light, warmth: random() * Light.Warmth - Light.Cool };
+}
+
+function paintStems(painter: AtlasPainter, region: PixelRegion, lobes: Lobe[], random: RandomFraction) {
 	const size = region.width;
-	const reach = Sprigs.Reach * (Sprigs.ShortestReach + random() * (1 - Sprigs.ShortestReach)) * size;
-	const curl = centredRandom(random) * Sprigs.Curl;
-	const pointAt = (along: number): [number, number] => {
-		const turn = heading + curl * along;
-		const distance = Sprigs.Start * size + along * reach;
-		return [centre.x + Math.cos(turn) * distance, centre.y + Math.sin(turn) * distance];
-	};
-	painter.stroke([pointAt(0), pointAt(1 / 2), pointAt(1)], Shading.TwigWidth * size, { lightness: Shading.TwigLightness, warmth: 1 });
-	for (let leaf = 0; leaf <= Sprigs.Leaves; leaf++) {
-		const along = Sprigs.FirstLeaf + ((1 - Sprigs.FirstLeaf) * leaf) / Sprigs.Leaves;
-		const [x, y] = pointAt(along);
-		const side = leaf === Sprigs.Leaves ? 0 : leaf % 2 === 0 ? 1 : -1;
-		const length = (Sprigs.Shortest + random() * (Sprigs.Longest - Sprigs.Shortest)) * size;
-		const pointing = heading + curl * along + side * (Sprigs.Splay + random() * Sprigs.SplayRange);
-		painter.leaf(x, y, pointing, length, length * Sprigs.Width, toneFor(Sprigs.BaseTone + along * (1 - Sprigs.BaseTone), random));
-	}
+	const base: [number, number] = [region.left + size * (1 / 2 + centredRandom(random) * Stem.BaseSpread), region.top + size * Stem.Base];
+	lobes.forEach((lobe) => {
+		const middle: [number, number] = [(base[0] + lobe.x) / 2 + centredRandom(random) * Stem.Bend * size, (base[1] + lobe.y) / 2];
+		painter.stroke([base, middle, [lobe.x, lobe.y]], Stem.Width * size, Stem.Tone);
+	});
 }
 
-export function paintBroadleaf(painter: AtlasPainter, region: PixelRegion, random: RandomFraction) {
-	scatterLeaves(painter, region, centreOf(region), Broadleaf.FillerReach, Broadleaf.Filler, Shading.Range, random);
-	for (let sprig = 0; sprig < Sprigs.Count; sprig++) paintSprig(painter, region, (sprig / Sprigs.Count) * FullTurn + random() * Shading.Scatter / 2, random);
+function paintLeafMass(painter: AtlasPainter, region: PixelRegion, random: RandomFraction, shape: LeafShape) {
+	const lobes = Array.from({ length: Lobes.Fewest + Math.floor(random() * Lobes.Extra) }, () => lobeIn(region, random));
+	paintStems(painter, region, lobes, random);
+	const leaves = lobes.flatMap((lobe) => {
+		const count = Math.round(((lobe.radius / region.width / shape.scale) ** 2) * Leaves.PerLobeArea);
+		return Array.from({ length: count }, () => leafInLobe(lobe, region, shape, random));
+	});
+	leaves.sort((first, second) => first.light - second.light);
+	leaves.forEach((leaf) => painter.leaf(leaf.x, leaf.y, leaf.angle, leaf.length, leaf.length * shape.width, toneOf(leaf, random)));
 }
 
-const Birch = { Twigs: 13, LeavesPerTwig: 15, Droop: 0.21, TwigLength: 0.36, Longest: 0.06, Shortest: 0.04, Width: 0.55, Spread: 0.3, Fan: 1.1, Splay: 0.6, SplayRange: 0.5, BaseTone: 0.55 } as const;
-
-export function paintBirch(painter: AtlasPainter, region: PixelRegion, random: RandomFraction) {
-	const size = region.width;
-	const start = { x: region.left + size / 2, y: region.top + size * Birch.Spread };
-	for (let twig = 0; twig < Birch.Twigs; twig++) {
-		const heading = Math.PI / 2 + (twig / (Birch.Twigs - 1) - 1 / 2) * Math.PI * Birch.Fan;
-		const points: [number, number][] = [];
-		for (let step = 0; step <= Birch.LeavesPerTwig; step++) {
-			const along = (step / Birch.LeavesPerTwig) * Birch.TwigLength * size;
-			points.push([start.x + Math.cos(heading) * along, start.y + Math.sin(heading) * along + Birch.Droop * size * (step / Birch.LeavesPerTwig) ** 2]);
-		}
-		painter.stroke(points, Shading.TwigWidth * size, { lightness: Shading.TwigLightness, warmth: 1 });
-		points.slice(1).forEach(([x, y], index) => {
-			const length = (Birch.Shortest + random() * (Birch.Longest - Birch.Shortest)) * size;
-			const side = index % 2 === 0 ? 1 : -1;
-			painter.leaf(x, y, heading + side * (Birch.Splay + random() * Birch.SplayRange), length, length * Birch.Width, toneFor(Birch.BaseTone + random() * (1 - Birch.BaseTone), random));
-		});
-	}
-}
+export const paintBroadleaf = (painter: AtlasPainter, region: PixelRegion, random: RandomFraction) => paintLeafMass(painter, region, random, Shapes.Broad);
+export const paintFineBroadleaf = (painter: AtlasPainter, region: PixelRegion, random: RandomFraction) => paintLeafMass(painter, region, random, Shapes.FineBroad);
+export const paintRoundleaf = (painter: AtlasPainter, region: PixelRegion, random: RandomFraction) => paintLeafMass(painter, region, random, Shapes.Round);
+export const paintFineRoundleaf = (painter: AtlasPainter, region: PixelRegion, random: RandomFraction) => paintLeafMass(painter, region, random, Shapes.FineRound);

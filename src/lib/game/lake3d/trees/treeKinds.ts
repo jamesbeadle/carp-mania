@@ -13,7 +13,7 @@ export const TreeHeights: Record<TreeKind, { least: number; range: number }> = {
 	alder: { least: 10, range: 6 },
 	willow: { least: 8, range: 5 },
 	birch: { least: 12, range: 6 },
-	poplar: { least: 20, range: 8 },
+	poplar: { least: 17, range: 4 },
 	pine: { least: 15, range: 7 },
 	spruce: { least: 14, range: 8 }
 };

@@ -8,7 +8,7 @@ const LeanDegrees: Record<TreeKind, { least: number; range: number }> = {
 	willow: { least: 5, range: 9 },
 	alder: { least: 2, range: 5 },
 	oak: { least: 0, range: 3 },
-	birch: { least: 1, range: 5 },
+	birch: { least: 2, range: 7 },
 	poplar: { least: 0, range: 1.5 },
 	pine: { least: 0, range: 4 },
 	spruce: { least: 0, range: 1.5 }

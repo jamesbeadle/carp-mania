@@ -77,10 +77,18 @@ function growLimb(growth: Growth, start: Vector3, heading: Vector3, length: numb
 	}
 }
 
+function crownTheLeader(skeleton: Skeleton) {
+	const { limbs, sites } = skeleton;
+	const tip = sampleLimb(limbs[0], 1);
+	const reach = Math.max(...sites.map((site) => site.reach));
+	sites.unshift({ at: tip.point, heading: tip.direction, reach });
+}
+
 export function growSkeleton(habit: Habit, seed: number): Skeleton {
 	const random = seededRandom(seed);
 	const growth: Growth = { levels: [habit.trunk, ...habit.levels], habit, random, skeleton: { limbs: [], sites: [] }, azimuth: random() * Math.PI * 2 };
 	const { trunk } = habit;
 	growLimb(growth, new Vector3(0, 0, 0), UpAxis.clone(), trunk.length, trunk.radius, 0);
+	if (habit.hasLeader) crownTheLeader(growth.skeleton);
 	return growth.skeleton;
 }

@@ -15,7 +15,7 @@ import { treeModels, DetailLevels } from './treeModels';
 import { placementOf } from './treePlacement';
 import type { PlantedTree, Woodland } from './treePlanting';
 
-const Looks = { Variants: 3, AtlasPixels: 1024, BarkPixels: 512, ReferenceHeight: 16, ShadeSpread: 13.7, VariantSpread: 3.7 } as const;
+const Looks = { Variants: 3, BarkPixels: 512, ReferenceHeight: 16, ShadeSpread: 13.7, VariantSpread: 3.7 } as const;
 const FarDetail = DetailLevels - 1;
 const ReachShares = [1, 2.6, 5];
 
@@ -41,7 +41,7 @@ export class Trees {
 		const quality = renderQuality();
 		const trees = [...woodland.onTheBank, ...woodland.onTheIslands];
 		const models = treeModels(season, Looks.Variants, quality.treeCardShare);
-		const atlas = foliageAtlas(Looks.AtlasPixels);
+		const atlas = foliageAtlas(quality.treeAtlasPixels);
 		this.leaves = new TreeBatch(models.map((model) => model.leaves), leafMaterial(atlas, this.sway, quality.multisamples > 0), trees.length);
 		this.wood = new TreeBatch(models.map((model) => model.wood), barkMaterial(barkTexture(Looks.BarkPixels), this.sway), trees.length);
 		trees.forEach((tree) => this.plant(tree, season, groundAt));

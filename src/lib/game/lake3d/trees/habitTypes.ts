@@ -17,4 +17,5 @@ export interface Habit {
 	levels: BranchLevel[];
 	sitesAlong: number;
 	sitesOnBranches: number;
+	hasLeader?: boolean;
 }
