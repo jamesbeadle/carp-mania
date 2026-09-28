@@ -4,10 +4,12 @@ export interface RenderQuality {
 	reflectionScale: number;
 	grassTufts: number;
 	hasBloom: boolean;
+	shoreSpacingMetres: number;
+	groundTilePixels: number;
 }
 
-const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true };
-const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false };
+const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true, shoreSpacingMetres: 0.5, groundTilePixels: 512 };
+const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false, shoreSpacingMetres: 1.1, groundTilePixels: 256 };
 const FewestCoresForGenerous = 6;
 
 let chosen: RenderQuality | null = null;

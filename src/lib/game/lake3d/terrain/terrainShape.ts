@@ -1,12 +1,14 @@
 import { MathUtils } from 'three';
 import type { WorldPoint } from '../lakeFrame';
 import { Heights } from '../lakeGround';
-import { distanceToOutline, isInsideOutline } from '../worldGeometry';
+import { isInsideOutline } from '../worldGeometry';
+import { ShoreIndex, type ShoreHit } from './shoreIndex';
+import { bankHeight, bedHeight } from './shoreProfile';
 
-const Shore = { DropMetres: 1.1, WaterlineDip: 0.06, ShelfMetres: 9 } as const;
 const FarFromWater = 150;
 const EdgeFadeFrom = 0.7;
 const Hills = { StartMetres: 28, FullMetres: 90, Height: 5.5, Wavelength: 70 } as const;
+const ShoreReach = Hills.FullMetres + 10;
 
 export interface TerrainPlan {
 	outline: WorldPoint[];
@@ -28,7 +30,7 @@ export interface Bounds {
 	most: WorldPoint;
 }
 
-function boundsOf(points: WorldPoint[]): Bounds {
+export function boundsOf(points: WorldPoint[]): Bounds {
 	const xs = points.map((point) => point.x);
 	const zs = points.map((point) => point.z);
 	return { least: { x: Math.min(...xs), z: Math.min(...zs) }, most: { x: Math.max(...xs), z: Math.max(...zs) } };
@@ -42,24 +44,41 @@ function distanceOutside(point: WorldPoint, bounds: Bounds) {
 }
 
 export class TerrainShape {
-	private readonly lakeBounds: Bounds;
+	readonly lakeBounds: Bounds;
+	private readonly shore: ShoreIndex;
 
-	constructor(private readonly plan: TerrainPlan) {
+	constructor(readonly plan: TerrainPlan) {
 		this.lakeBounds = boundsOf(plan.outline);
+		this.shore = new ShoreIndex(plan.outline, plan.islands, ShoreReach);
+	}
+
+	nearestShore(point: WorldPoint, reachMetres: number): ShoreHit | null {
+		return this.shore.nearest(point, reachMetres);
 	}
 
 	heightAt(point: WorldPoint) {
-		const { outline, islands } = this.plan;
-		if (distanceOutside(point, this.lakeBounds) > FarFromWater) return this.landHeight(point, FarFromWater, Heights.Bank);
-		if (!isInsideOutline(point, outline)) return this.landHeight(point, distanceToOutline(point, outline), Heights.Bank);
-		const island = islands.find((shape) => isInsideOutline(point, shape));
-		if (island) return this.landHeight(point, distanceToOutline(point, island), Heights.Island);
-		const toShore = Math.min(distanceToOutline(point, outline), ...islands.map((shape) => distanceToOutline(point, shape)));
-		return -Shore.WaterlineDip - this.plan.bedDepth * MathUtils.smoothstep(toShore, 0, Shore.ShelfMetres);
+		return this.surfaceAt(point).height;
 	}
 
-	private landHeight(point: WorldPoint, fromWater: number, top: number) {
-		const bank = MathUtils.lerp(-Shore.WaterlineDip, top, MathUtils.smoothstep(fromWater, 0, Shore.DropMetres));
+	surfaceAt(point: WorldPoint): { height: number; hit: ShoreHit | null } {
+		if (distanceOutside(point, this.lakeBounds) > FarFromWater) return { height: this.landHeight(point, FarFromWater, false), hit: null };
+		const hit = this.shore.nearest(point, ShoreReach);
+		return { height: hit ? this.heightNear(point, hit) : this.heightFarFromShore(point), hit };
+	}
+
+	heightNear(point: WorldPoint, hit: ShoreHit) {
+		if (hit.isWater) return bedHeight(hit.distance, this.plan.bedDepth);
+		return this.landHeight(point, hit.distance, hit.isIsland);
+	}
+
+	private heightFarFromShore(point: WorldPoint) {
+		const { outline, islands } = this.plan;
+		const isWater = isInsideOutline(point, outline) && !islands.some((island) => isInsideOutline(point, island));
+		return isWater ? bedHeight(ShoreReach, this.plan.bedDepth) : this.landHeight(point, ShoreReach, false);
+	}
+
+	private landHeight(point: WorldPoint, fromWater: number, isIsland: boolean) {
+		const bank = bankHeight(fromWater, isIsland ? Heights.Island : Heights.Bank, point.x, point.z, isIsland);
 		if (this.plan.isFlatBeyond) return bank;
 		const towardsTheEdge = Math.max(Math.abs(point.x), Math.abs(point.z));
 		const edgeFade = 1 - MathUtils.smoothstep(towardsTheEdge, this.plan.edgeMetres * EdgeFadeFrom, this.plan.edgeMetres);

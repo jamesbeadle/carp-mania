@@ -7,6 +7,7 @@ import { plotFacilities } from './bank/facilityGrounds';
 import { createLakeFeatures } from './bank/lakeFeatures3d';
 import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
 import { Heights } from './lakeGround';
+import { fineWorldOutline } from './terrain/fineOutline';
 import { createLakeLand } from './terrain/lakeLand';
 import { LakeWater } from './lakeWater';
 import { SkyAndLight } from './skyAndLight';
@@ -14,7 +15,6 @@ import { Vegetation } from './vegetation';
 import { Clouds } from './clouds';
 import { NearDetailLayer } from './renderQuality';
 import { plantTrees } from './trees/treePlanting';
-import { smoothWorldOutline } from './worldShapes';
 
 export interface LakeWorldPlan {
 	layout: LakeLayout;
@@ -53,17 +53,18 @@ export class LakeWorld {
 		const { layout, season } = plan;
 		this.frame = lakeFrameFor(plan.plotAcres);
 		const plotReach = plotReachOf(this.frame);
-		this.outline = smoothWorldOutline(this.frame, layout.outline);
-		this.islands = layout.islands.map((island) => smoothWorldOutline(this.frame, island.points));
+		this.outline = fineWorldOutline(this.frame, layout.outline);
+		this.islands = layout.islands.map((island) => fineWorldOutline(this.frame, island.points));
 		this.camera = new PerspectiveCamera(Lens.FieldOfViewDegrees, width / Math.max(1, height), Lens.Nearest, Lens.Farthest);
 		this.sky = new SkyAndLight(this.scene, plotReach * ShadowShareOfPlot, !plan.isDiorama);
 		const wholePlot = { x: this.frame.metresAcross / 2, z: this.frame.metresDown / 2 };
 		const plotEdge = plan.isDiorama ? wholePlot : null;
 		this.water = new LakeWater(this.outline, this.islands, plan.transparencyPercent, width, height);
 		this.water.keepOutOfTheReflection(this.camera, NearDetailLayer);
-		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout) });
-		this.groundAt = land.groundAt;
 		const pegs = plan.pegs.map((peg) => worldPointOf(this.frame, peg));
+		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs });
+		this.groundAt = land.groundAt;
+		this.water.useShoreMap(land.shoreMap);
 		const plots = plotFacilities(layout, this, pegs, wholePlot);
 		const facilities = createFacilities(plots, this.groundAt);
 		this.facilityLabels = facilities.labels;
