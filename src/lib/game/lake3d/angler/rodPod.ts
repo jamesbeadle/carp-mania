@@ -1,6 +1,6 @@
-import { Group } from 'three';
+import { Group, Vector3 } from 'three';
 import type { RodKit } from '$lib/domain/tackle/rodSetup';
-import { alarm, AlarmColours, bar, leg, PodSize } from './podParts';
+import { alarm, AlarmColours, bar, buttRest, foot, leg, PodSize, strut } from './podParts';
 import { PodRod } from './podRod';
 import { createRod } from './rodModel';
 
@@ -27,7 +27,7 @@ function podRodFor(kit: RodKit, index: number, count: number, group: Group) {
 	const butt = model.group;
 	butt.position.set(across, PodSize.BackHeight - rise, -back);
 	const parts = alarm(AlarmColours[index % AlarmColours.length], across);
-	group.add(model.group, parts.group, parts.hanger);
+	group.add(model.group, parts.group, parts.hanger, buttRest(across));
 	const rod = new PodRod(model, parts, RestingPitch);
 	rod.pose(RestingPitch);
 	return rod;
@@ -38,6 +38,7 @@ export function createRodPod(kits: RodKit[]): RodPod {
 	const width = Math.max(1, kits.length - 1) * PodSize.RodSpacing + BarOverhang * 2;
 	group.add(bar(width, PodSize.FrontHeight - FrontBarDrop, PodSize.FrontDistance), bar(width, PodSize.BackHeight, 0));
 	group.add(leg(PodSize.FrontHeight, PodSize.FrontDistance, LegSplay.Front), leg(PodSize.BackHeight, 0, LegSplay.Back));
+	group.add(foot(PodSize.FrontDistance, LegSplay.Front), foot(0, LegSplay.Back), strut(new Vector3(0, PodSize.BackHeight, 0), new Vector3(0, PodSize.FrontHeight - FrontBarDrop, PodSize.FrontDistance)));
 	const rods = kits.map((kit, index) => podRodFor(kit, index, kits.length, group));
 	return { group, rods };
 }
