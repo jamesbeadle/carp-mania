@@ -8,14 +8,16 @@ export interface SkyMood {
 	mieDirectionalG: number;
 	sunStrength: number;
 	fogDensity: number;
+	veil: number;
+	skyShade: number;
 }
 
 const Moods: Record<WeatherKind, SkyMood> = {
-	clear: { turbidity: 2.4, rayleigh: 1.1, mieCoefficient: 0.0025, mieDirectionalG: 0.84, sunStrength: 1, fogDensity: 0.0009 },
-	heat: { turbidity: 5.5, rayleigh: 0.9, mieCoefficient: 0.006, mieDirectionalG: 0.86, sunStrength: 1.1, fogDensity: 0.0014 },
-	overcast: { turbidity: 12, rayleigh: 2.2, mieCoefficient: 0.012, mieDirectionalG: 0.7, sunStrength: 0.3, fogDensity: 0.0022 },
-	rain: { turbidity: 16, rayleigh: 3, mieCoefficient: 0.016, mieDirectionalG: 0.65, sunStrength: 0.2, fogDensity: 0.003 },
-	mist: { turbidity: 9, rayleigh: 1.8, mieCoefficient: 0.01, mieDirectionalG: 0.8, sunStrength: 0.5, fogDensity: 0.0045 }
+	clear: { turbidity: 2.4, rayleigh: 1.1, mieCoefficient: 0.0025, mieDirectionalG: 0.84, sunStrength: 1, fogDensity: 0.0009, veil: 0, skyShade: 1 },
+	heat: { turbidity: 5.5, rayleigh: 0.9, mieCoefficient: 0.006, mieDirectionalG: 0.86, sunStrength: 1.1, fogDensity: 0.0014, veil: 0.1, skyShade: 1 },
+	overcast: { turbidity: 12, rayleigh: 2.2, mieCoefficient: 0.012, mieDirectionalG: 0.7, sunStrength: 0.3, fogDensity: 0.0016, veil: 0.08, skyShade: 0.65 },
+	rain: { turbidity: 16, rayleigh: 3, mieCoefficient: 0.016, mieDirectionalG: 0.65, sunStrength: 0.2, fogDensity: 0.0026, veil: 0.22, skyShade: 0.38 },
+	mist: { turbidity: 20, rayleigh: 3, mieCoefficient: 0.01, mieDirectionalG: 0.8, sunStrength: 0.5, fogDensity: 0.005, veil: 0.75, skyShade: 0.95 }
 };
 
 export function skyMoodFor(weather: WeatherKind): SkyMood {

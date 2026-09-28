@@ -1,6 +1,6 @@
 import { Color, FogExp2, Group, HemisphereLight, Scene, Vector3 } from 'three';
 import type { StageConditions } from '../sky/stageConditions';
-import { tintHaze, type HazeColours } from './aerialHaze';
+import { tintHaze, veiled, type HazeColours } from './aerialHaze';
 import { Clouds } from './clouds';
 import { createNightSky } from './nightSky';
 import { shadowFocusOf, type Sightline } from './shadowFocus';
@@ -38,6 +38,7 @@ export class SkyAndLight {
 	private readonly night = createNightSky();
 	private readonly clouds = new Clouds();
 	private lightDirection = new Vector3(0, 1, 0);
+	private mood = skyMoodFor('clear');
 
 	constructor(scene: Scene, private readonly wholePlotReach: number, isOpenSky: boolean) {
 		const sun = this.sunShadow.light;
@@ -55,6 +56,7 @@ export class SkyAndLight {
 	setConditions(conditions: StageConditions) {
 		const { weather } = conditions;
 		const mood = skyMoodFor(weather.kind);
+		this.mood = mood;
 		const placement = sunPlacementAt(conditions.hour, conditions.season);
 		const elevation = placement.elevationDegrees;
 		this.sunlight = { direction: placement.direction, colour: sunColourAt(elevation), windStrength: weather.windStrength, daylight: daylightOf(elevation) };
@@ -66,11 +68,12 @@ export class SkyAndLight {
 		this.fog.density = mood.fogDensity;
 	}
 
-	tintHaze(colours: HazeColours) {
+	tintHaze(measured: HazeColours) {
 		const { direction, colour } = this.sunlight;
 		const sun = this.sunShadow.light;
+		const colours = veiled(measured, this.mood.veil);
 		tintHaze(this.fog, colours, direction);
-		this.clouds.light(this.lightDirection, colour, sun.intensity, colours.away);
+		this.clouds.light(this.lightDirection, colour, sun.intensity, colours.away, this.mood.veil);
 	}
 
 	followSight(sightline: Sightline) {

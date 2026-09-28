@@ -2,14 +2,19 @@ import type { HazeColours } from './aerialHaze';
 import { HorizonProbe } from './horizonProbe';
 import { PostEffects } from './postEffects';
 import { renderQuality } from './renderQuality';
-import { AgXToneMapping, PCFShadowMap, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2, WebGLRenderer, type Scene, type Vector3 } from 'three';
+import { AgXToneMapping, MathUtils, PCFShadowMap, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2, WebGLRenderer, type Scene, type Vector3 } from 'three';
 
 const MostSecondsPerFrame = 0.1;
 const MillisecondsPerSecond = 1000;
 
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
-export const Exposure = { Day: 1.6, Night: 1.45 } as const;
+export const Exposure = { Day: 1.6, Twilight: 1.85, Night: 1.5, TwilightDaylight: 0.35 } as const;
+
+function exposureAt(daylight: number) {
+	if (daylight < Exposure.TwilightDaylight) return MathUtils.lerp(Exposure.Night, Exposure.Twilight, daylight / Exposure.TwilightDaylight);
+	return MathUtils.lerp(Exposure.Twilight, Exposure.Day, (daylight - Exposure.TwilightDaylight) / (1 - Exposure.TwilightDaylight));
+}
 const FieldOfView = { Landscape: 50, Portrait: 72 } as const;
 const EnvironmentStrength = 0.55;
 const EnvironmentCapture = { Blur: 0, Nearest: 0.1, Farthest: 20000 } as const;
@@ -68,7 +73,7 @@ export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camer
 		frameHandle = requestAnimationFrame(frame);
 	};
 	frameHandle = requestAnimationFrame(frame);
-	const expose = (daylight: number) => void (renderer.toneMappingExposure = Exposure.Night + (Exposure.Day - Exposure.Night) * daylight);
+	const expose = (daylight: number) => void (renderer.toneMappingExposure = exposureAt(daylight));
 	const environment = new PMREMGenerator(renderer);
 	const lightFrom = (skyScene: Scene) => {
 		const previous = scene.environment;

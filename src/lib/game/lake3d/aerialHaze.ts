@@ -1,5 +1,6 @@
-import { MathUtils, ShaderChunk, ShaderLib, UniformsLib, type Color, type FogExp2, type Vector3 } from 'three';
+import { Color, MathUtils, ShaderChunk, ShaderLib, UniformsLib, type FogExp2, type Vector3 } from 'three';
 import { HazeFragment, HazeParsFragment, HazeParsVertex, HazeVertex } from './hazeChunks';
+import { brightnessOf } from './skyLook';
 
 const SunDirectionParts = 3;
 const GlowParts = 4;
@@ -27,6 +28,14 @@ export interface HazeColours {
 }
 
 export const Glow = { Sharpness: 6, ProbeTurn: MathUtils.degToRad(35), LeastFacing: 0.2 } as const;
+
+const Veil = { Brightening: 1.2, GlowShare: 0.3 } as const;
+
+export function veiled(colours: HazeColours, veil: number): HazeColours {
+	const { away, glow } = colours;
+	const grey = brightnessOf(glow.clone().multiplyScalar(Veil.GlowShare).add(away)) * Veil.Brightening;
+	return { away: away.clone().lerp(new Color(grey, grey, grey), veil), glow: glow.clone().multiplyScalar(1 - veil) };
+}
 
 export function tintHaze(fog: FogExp2, colours: HazeColours, sunDirection: Vector3) {
 	const { away, glow } = colours;

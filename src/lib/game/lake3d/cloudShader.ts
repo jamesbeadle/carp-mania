@@ -1,3 +1,5 @@
+import { CloudNoise } from './cloudNoise';
+
 export const CloudVertex = `
 varying vec3 vDirection;
 void main() {
@@ -6,50 +8,22 @@ void main() {
 	gl_Position = placed.xyww;
 }`;
 
-export const CloudFragment = `
+export const CloudFragment = `${CloudNoise}
 uniform vec3 sunDirection;
 uniform vec3 litColour;
 uniform vec3 shadeColour;
 uniform vec3 hazeColour;
 uniform float cover;
 uniform float heaviness;
+uniform float veil;
 uniform vec2 drift;
 varying vec3 vDirection;
-
-vec2 gradient(vec2 cell) {
-	vec3 scrambled = fract(cell.xyx * vec3(0.1031, 0.1030, 0.0973));
-	scrambled += dot(scrambled, scrambled.yzx + 33.33);
-	return fract((scrambled.xx + scrambled.yz) * scrambled.zy) * 2.0 - 1.0;
-}
-
-float noise(vec2 point) {
-	vec2 whole = floor(point);
-	vec2 part = fract(point);
-	vec2 blend = part * part * part * (part * (part * 6.0 - 15.0) + 10.0);
-	float a = dot(gradient(whole), part);
-	float b = dot(gradient(whole + vec2(1.0, 0.0)), part - vec2(1.0, 0.0));
-	float c = dot(gradient(whole + vec2(0.0, 1.0)), part - vec2(0.0, 1.0));
-	float d = dot(gradient(whole + vec2(1.0, 1.0)), part - vec2(1.0, 1.0));
-	return mix(mix(a, b, blend.x), mix(c, d, blend.x), blend.y) * 1.6;
-}
-
-float billows(vec2 point, float detail) {
-	float total = 0.5 + 0.5 * noise(point) * 0.5;
-	float amplitude = 0.25 * detail;
-	point = mat2(1.6, 1.2, -1.2, 1.6) * point + vec2(7.3, 3.1);
-	for (int octave = 1; octave < OCTAVES; octave++) {
-		total += amplitude * (abs(noise(point)) - 0.35);
-		point = mat2(1.6, 1.2, -1.2, 1.6) * point + vec2(7.3, 3.1);
-		amplitude *= 0.5;
-	}
-	return total;
-}
 
 float detail = 1.0;
 
 float heightAt(vec2 point) {
 	float heaps = 0.5 + 0.5 * noise(point * 0.19 + vec2(4.1, 8.7));
-	float threshold = mix(0.72, 0.22, cover) + (0.5 - heaps) * 0.4 * (1.0 - cover);
+	float threshold = 0.72 - 0.5 * cover - 0.3 * pow(cover, 4.0) + (0.5 - heaps) * 0.4 * (1.0 - cover);
 	return billows(point, detail) - threshold;
 }
 
@@ -60,25 +34,33 @@ float sunlightAt(vec2 point, float height) {
 	return exp(-(near + far * 0.6 + height * 0.5) * 5.0);
 }
 
-void main() {
-	vec3 direction = normalize(vDirection);
-	float rise = direction.y;
-	if (rise <= 0.0) discard;
+vec4 cloudToward(vec3 direction, float rise) {
 	detail = smoothstep(0.0, 0.25, rise);
 	vec2 layerPoint = direction.xz / (rise + 0.1) * 1.7 + drift;
 	float height = heightAt(layerPoint);
-	if (height <= 0.0) discard;
+	if (height <= 0.0) return vec4(0.0);
 	float thickness = smoothstep(0.0, 0.14 + heaviness * 0.3, height);
-	float sunlight = sunlightAt(layerPoint, height);
 	float side = pow(1.0 - rise, 3.0);
 	float underlit = pow(1.0 - clamp(sunDirection.y, 0.0, 1.0), 6.0);
-	float light = exp(-thickness * 2.4) * 0.5 + sunlight * 0.5;
+	float light = exp(-thickness * 2.4) * 0.5 + sunlightAt(layerPoint, height) * 0.5;
 	light = mix(light, 1.0, max(side * 0.5, underlit * 0.6));
-	vec3 colour = mix(shadeColour, litColour, light * (1.0 - heaviness * 0.6));
+	float mottle = clamp(0.5 + (height - 0.45) * 1.6, 0.0, 1.0) * 0.7;
+	light = mix(light, mottle, heaviness * 0.7);
+	vec3 colour = mix(shadeColour, litColour, light * (1.0 - heaviness * 0.5));
 	float lining = pow(max(dot(direction, sunDirection), 0.0), 10.0) * (1.0 - thickness);
 	colour += litColour * lining * 0.8;
-	float distanceHaze = 1.0 - smoothstep(0.02, 0.3, rise);
-	colour = mix(colour, hazeColour, distanceHaze * 0.7);
+	colour = mix(colour, hazeColour, (1.0 - smoothstep(0.02, 0.3, rise)) * 0.7);
 	float alpha = smoothstep(0.0, 0.09 + heaviness * 0.15, height) * smoothstep(0.0, 0.05, rise);
+	return vec4(colour, alpha);
+}
+
+void main() {
+	vec3 direction = normalize(vDirection);
+	float rise = direction.y;
+	vec4 cloud = rise > 0.0 ? cloudToward(direction, rise) : vec4(0.0);
+	float veiling = veil * (1.0 - 0.5 * smoothstep(0.0, 0.8, rise));
+	float alpha = veiling + (1.0 - veiling) * cloud.a;
+	if (alpha <= 0.002) discard;
+	vec3 colour = (hazeColour * veiling + cloud.rgb * cloud.a * (1.0 - veiling)) / alpha;
 	gl_FragColor = vec4(colour, alpha);
 }`;

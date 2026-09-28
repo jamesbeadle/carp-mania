@@ -23,7 +23,8 @@ export function createClearSky(isSunShown: boolean) {
 
 export function paintSky(sky: Sky, mood: SkyMood, placement: SunPlacement) {
 	const { material } = sky;
-	const { turbidity, rayleigh, mieCoefficient, mieDirectionalG, sunPosition } = material.uniforms;
+	const { turbidity, rayleigh, mieCoefficient, mieDirectionalG, sunPosition, brightness } = material.uniforms;
+	brightness.value = SkyBrightness * mood.skyShade;
 	const lowness = 1 - MathUtils.clamp(placement.elevationDegrees / LowSun.FullDayDegrees, 0, 1);
 	turbidity.value = mood.turbidity;
 	rayleigh.value = mood.rayleigh + LowSun.ExtraRayleigh * lowness;
