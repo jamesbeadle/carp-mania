@@ -10,7 +10,7 @@ const MillisecondsPerSecond = 1000;
 
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
-export const Exposure = { Day: 1.6, Twilight: 1.85, Night: 1.5, TwilightDaylight: 0.35 } as const;
+export const Exposure = { Day: 1.6, Twilight: 1.85, Night: 1.6, TwilightDaylight: 0.35 } as const;
 const Looks = { Graded: { toneMapping: AgXToneMapping, exposureShare: 1 }, SeeThrough: { toneMapping: ACESFilmicToneMapping, exposureShare: 0.8 } } as const;
 
 function exposureAt(daylight: number) {

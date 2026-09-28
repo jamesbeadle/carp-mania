@@ -5,7 +5,7 @@ import { SmallShadowCasters } from './smallShadowCasters';
 import type { SunPlacement } from './sunAndSky';
 import { createSunShadow, type SunShadow } from './sunShadow';
 
-const Light = { SunBrightest: 3.6, MoonBrightest: 0.45, SkyDimmest: 0.1, SkyBrightest: 0.3, TwilightLift: 0.5 } as const;
+const Light = { SunBrightest: 3.6, MoonBrightest: 0.45, SkyDimmest: 0.1, SkyBrightest: 0.3, TwilightLift: 0.35 } as const;
 const SkyTint = new Color('#b4cdf5');
 const GroundBounce = new Color('#46502e');
 const MoonHeight = 0.6;
