@@ -1,6 +1,7 @@
 import { Group } from 'three';
 import type { Facility } from '$lib/domain/layout/layoutTypes';
 import { block, BuildingLook, house, windowsAlong } from './buildingParts';
+import { clubHouse, estateHouse, washrooms } from './comfortModels';
 
 export interface FacilityModel {
 	build: () => Group;
@@ -40,6 +41,9 @@ export const FacilityModels: Record<Facility, FacilityModel> = {
 	car_park: { build: carPark, footprintMetres: 24 },
 	lodge: { build: () => house(8, 6, 3, BuildingLook.Timber, BuildingLook.GreenRoof, 2), footprintMetres: 11 },
 	toilets: { build: () => house(5, 3.5, 2.6, BuildingLook.Render, BuildingLook.Slate, 1), footprintMetres: 7 },
+	washrooms: { build: washrooms, footprintMetres: 10 },
+	club_house: { build: clubHouse, footprintMetres: 19 },
+	estate_house: { build: estateHouse, footprintMetres: 34 },
 	tackle_shop: { build: () => house(7, 5, 3, BuildingLook.DarkTimber, BuildingLook.GreenRoof, 2), footprintMetres: 9 },
 	bar: { build: () => house(12, 8, 3.4, BuildingLook.Timber, BuildingLook.Tile, 4), footprintMetres: 15 },
 	restaurant: { build: () => house(16, 10, 3.8, BuildingLook.Render, BuildingLook.Tile, 6), footprintMetres: 19 },

@@ -58,6 +58,10 @@ export const RunningAWater: RuleChapter = {
 			answer: `The editor for shaping the water: islands, gravel bars, deep holes, margin shelves, reed beds, lily pads, snags, sanctuaries, the swims and the shoreline itself. To change the bank, Redraw is the easy way: click the shoreline where the new bank starts, click along the new line or nowhere at all, and click the shoreline again — the stretch between is replaced by a rounded bank. Shore and Extend drag single points. Each work has a price and takes fishery days to finish; up to ${WorksInProgress.MaximumEarthworks} earthworks run at once, and cancelling one early refunds ${refundShare}%. A swim the new bank would leave in the water, or too far from it, has to be moved with Select or taken out first.`
 		},
 		{
+			question: 'Can I grow the facilities?',
+			answer: 'Yes. The toilets grow into washrooms, the washrooms into a club house and the club house into an estate house. Each upgrade is ordered in groundworks like any other work, takes more ground on the bank, and replaces the building below it when it is finished. Each rung brings more anglers and fills more of the 24-hour and multi-day tickets. The bar, restaurant and hotel stand side by side instead.'
+		},
+		{
 			question: 'How do I get a sponsor?',
 			answer: `Brands write to a water with standing: rated ${SponsorsWant.WaterRating} or more, open at least ${SponsorsWant.FisheryDaysOpen} fishery days, and holding ${SponsorsWant.Fish} fish. A brand pays a lump sum on signing to put its name on the boards, the better the water the bigger the name and the money. The Sponsors tab at the lodge says what the water still lacks and shows the offers on the table.`
 		},
