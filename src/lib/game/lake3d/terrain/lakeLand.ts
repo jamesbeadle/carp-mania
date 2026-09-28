@@ -10,6 +10,7 @@ import { createFarHills } from './farHills';
 import { createGroundMeshes } from './groundMeshes';
 import { bakeShoreMap } from './shoreMap';
 import { swimGroundsOf } from './swimWear';
+import { withSwimTongues } from './swimTongues';
 import { TerrainShape } from './terrainShape';
 
 export interface LandPlan {
@@ -32,7 +33,7 @@ export function createLakeLand(plan: LandPlan) {
 	const half = plan.plotEdge ?? { x: plan.plotReach * Grid.ReachShare, z: plan.plotReach * Grid.ReachShare };
 	const swims = swimGroundsOf(plan.pegs, plan.swimWater);
 	const footings = [...swims.map((swim) => swim.pod), ...plan.pegs];
-	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), footings });
+	const shape = new TerrainShape({ outline: withSwimTongues(plan.outline, swims), islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), footings });
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
 	const shoreMap = bakeShoreMap(shape, renderQuality().shoreSpacingMetres / ShoreMapTexelsPerStation, swims);
 	const look = { season: plan.season, bed: plan.bed, shore: shoreMap, clock: plan.clock };

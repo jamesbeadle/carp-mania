@@ -42,7 +42,7 @@ export class TerrainShape {
 		this.lakeBounds = boundsOf(plan.outline);
 		this.characters = new CharacterField(this.lakeBounds);
 		this.shore = new ShoreIndex(plan.outline, plan.islands, ShoreReach);
-		this.footings = new SwimFootings(plan.footings, (point) => this.shore.nearest(point, ShoreReach)?.distance ?? ShoreReach);
+		this.footings = new SwimFootings(plan.footings);
 	}
 
 	nearestShore(point: WorldPoint, reachMetres: number): ShoreHit | null {
