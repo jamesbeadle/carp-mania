@@ -45,8 +45,9 @@ export class AtlasPainter {
 		this.colour.stroke();
 	}
 
-	stroke(points: [number, number][], width: number, tone: Tone) {
+	stroke(points: [number, number][], width: number, tone: Tone, coverage = 1) {
 		this.colour.strokeStyle = toneStyle(tone);
+		this.mask.strokeStyle = `rgba(255,255,255,${coverage})`;
 		[this.colour, this.mask].forEach((context) => {
 			context.lineWidth = width;
 			context.beginPath();

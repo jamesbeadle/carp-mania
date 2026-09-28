@@ -31,7 +31,14 @@ uniform float leafGlowSpread;
 uniform float leafGlowFocus;
 uniform float leafGlowStrength;
 uniform float leafSheen;
+uniform float leafMipBias;
 uniform vec3 leafGlowTint;
+`;
+
+export const BiasedLeafTexture = `
+#ifdef USE_MAP
+diffuseColor *= texture2D(map, vMapUv, leafMipBias);
+#endif
 `;
 
 export const SoftSheen = `
