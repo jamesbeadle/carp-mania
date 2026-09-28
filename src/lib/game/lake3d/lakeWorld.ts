@@ -71,8 +71,8 @@ export class LakeWorld {
 		const facilities = createFacilities(plots, this.groundAt);
 		this.facilityLabels = facilities.labels;
 		const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((plot) => ({ point: plot.point, radius: plot.footprintMetres / 2 }))];
-		const woodland = plantTrees({ outline: this.outline, islands: this.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
-		this.vegetation = new Vegetation({ woodland, outline: this.outline, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
+		const woodland = plantTrees({ outline: shoreline.outline, islands: shoreline.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
+		this.vegetation = new Vegetation({ woodland, outline: shoreline.outline, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
 		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group, createLakeFeatures(layout, this.frame, season, plan.seed));
 	}
 
