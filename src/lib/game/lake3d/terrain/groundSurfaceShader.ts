@@ -10,6 +10,10 @@ vec3 grassColour(vec2 ground, vec4 broad, vec4 fine, float height) {
 	return blades * mix(lushGrass, dryGrass, dryness) * (0.88 + 0.24 * fine.g);
 }
 
+float drownedShare(float height) {
+	return 1.0 - smoothstep(0.02, 0.22, -height);
+}
+
 vec3 trodden(vec3 grass, vec3 earth, vec2 ground, float wear, inout float shine) {
 	float clumps = texture2D(groundNoise, ground / ClumpMetres).b;
 	float patches = texture2D(groundNoise, Turned * ground / (ClumpMetres * 3.1)).g;
@@ -20,8 +24,8 @@ vec3 trodden(vec3 grass, vec3 earth, vec2 ground, float wear, inout float shine)
 	return mix(flattened, earth * MudTint, muddy);
 }
 
-vec3 bedColour(vec2 ground, vec4 broad, vec4 fine, float height) {
-	vec3 bed = tileAt(bedTile, ground, BedMetres) * SiltFilm;
+vec3 bedColour(vec2 ground, vec4 broad, vec4 fine, float height, vec3 drowned, float gentleness) {
+	vec3 bed = mix(tileAt(bedTile, ground, BedMetres) * SiltFilm, drowned, drownedShare(height) * gentleness);
 	float silt = smoothstep(0.35, 0.75, fine.g * 0.5 + broad.b * 0.5 + smoothstep(0.1, 1.0, -height) * 0.45);
 	bed = mix(bed, SiltColour * (0.75 + 0.5 * fine.a), silt);
 	float weed = smoothstep(0.55, 0.7, texture2D(groundNoise, ground / WeedMetres).a * (0.75 + 0.5 * fine.b));
@@ -41,7 +45,7 @@ GroundSurface groundSurface() {
 	float face = faceBand * smoothstep(0.3, 0.65, shore.steepShore + (fine.r - 0.5) * 0.35);
 	float bare = max(smoothstep(0.2, 0.36, steepness + (fine.a - 0.5) * 0.24), face);
 	float marginTop = mix(0.035, 0.1 + 0.12 * fine.r, shore.steepShore);
-	float margin = 1.0 - smoothstep(marginTop * 0.4, marginTop, height);
+	float margin = (1.0 - smoothstep(marginTop * 0.4, marginTop, height)) * mix(0.35, 1.0, shore.steepShore);
 	float under = 1.0 - smoothstep(-0.12, -0.02, height);
 	float wet = 1.0 - smoothstep(0.01, 0.06 + 0.05 * fine.g, height);
 	float roughness = mix(0.95, 0.88, bare);
@@ -49,7 +53,7 @@ GroundSurface groundSurface() {
 	vec3 grass = grassColour(ground, broad, fine, height);
 	vec3 colour = trodden(mix(grass, earth, bare), earth, ground, shore.wear * (1.0 - margin), shine);
 	colour = mix(colour, marginColour(fine, earth), margin);
-	colour = mix(colour, bedColour(ground, broad, fine, height), under);
+	colour = mix(colour, bedColour(ground, broad, fine, height, grass * DrownedGrass, 1.0 - shore.steepShore), under);
 	float relief = dot(colour, Luminance) * mix(GrassRelief, StoneRelief, max(max(bare, margin), under));
 	colour *= mix(1.0, wetDarkening, wet * (1.0 - under));
 	roughness = mix(roughness, 0.6, wet * (1.0 - under));

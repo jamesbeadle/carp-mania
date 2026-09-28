@@ -15,6 +15,10 @@ const float DeepOpacity = 0.97;
 const float CalmReach = 4.0;
 const float FoamFadeNear = 20.0;
 const float FoamFadeFar = 70.0;
+const float DarkestDepthShare = 0.64;
+const float TintMetres = 97.0;
+const float EdgeMetres = 23.0;
+const float MostEdgeOpacity = 0.3;
 
 struct ShoreSample {
 	float depth;
@@ -35,10 +39,14 @@ float shoreCalm(ShoreSample shore) {
 	return mix(CalmestEdge, 1.0, smoothstep(0.0, CalmReach, shore.fromShore));
 }
 
-WaterBody waterBodyAt(ShoreSample shore, float clarity, float lighting) {
+WaterBody waterBodyAt(ShoreSample shore, vec2 ground, float clarity, float lighting) {
 	float murk = 1.0 - exp(-shore.depth / mix(MurkiestMurkMetres, ClearestMurkMetres, clarity));
-	vec3 colour = mix(shallowColour, deepColour, smoothstep(0.1, 0.9, murk)) * lighting;
-	return WaterBody(colour, mix(EdgeOpacity, DeepOpacity, murk));
+	float depthShare = smoothstep(0.3, 1.0, shore.depth / deepestMetres);
+	float tint = texture2D(waterNoise, ground / TintMetres).b;
+	vec3 colour = mix(shallowColour, deepColour, smoothstep(0.1, 0.9, murk)) * mix(1.0, DarkestDepthShare, depthShare);
+	colour *= mix(vec3(0.9, 0.95, 0.9), vec3(1.07, 1.04, 0.94), tint) * lighting;
+	float edge = mix(EdgeOpacity, MostEdgeOpacity, smoothstep(0.35, 0.75, texture2D(waterNoise, ground / EdgeMetres).a));
+	return WaterBody(colour, mix(edge, DeepOpacity, murk));
 }
 
 float foamAt(vec2 ground, ShoreSample shore) {

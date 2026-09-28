@@ -53,11 +53,12 @@ const vec3 SiltFilm = vec3(0.6, 0.6, 0.46);
 const vec3 SiltColour = vec3(0.075, 0.07, 0.04);
 const vec3 WeedColour = vec3(0.03, 0.05, 0.014);
 const vec3 FlattenedGrass = vec3(0.96, 0.9, 0.66);
+const vec3 DrownedGrass = vec3(0.55, 0.52, 0.34);
 const vec3 MudTint = vec3(0.66, 0.52, 0.38);
 const float CausticLight = 0.75;
 const float DryShine = 0.22;
 const float MuddyShine = 0.4;
-const float WetShine = 0.75;
+const float WetShine = 0.5;
 
 struct GroundSurface {
 	vec3 albedo;

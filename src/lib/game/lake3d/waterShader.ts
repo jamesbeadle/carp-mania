@@ -31,9 +31,11 @@ varying vec3 vWorldPosition;
 ${WaterRippleChunk}
 ${WaterShoreChunk}
 
-const float MostReflection = 0.7;
-const vec3 ReflectionTint = vec3(0.78, 0.87, 0.76);
-const float BodyInReflection = 0.28;
+const float MostReflection = 0.62;
+const vec3 ReflectionTint = vec3(0.74, 0.84, 0.72);
+const float BodyInReflection = 0.3;
+const float ReflectionSaturation = 0.72;
+const vec3 ReflectionLuminance = vec3(0.3, 0.59, 0.11);
 
 void main() {
 	ShoreSample shore = shoreAt(vWorldPosition.xz);
@@ -43,8 +45,10 @@ void main() {
 	float facing = clamp(dot(normal, toEye), 0.0, 1.0);
 	float fresnel = min(MostReflection, 0.02 + 0.98 * pow(1.0 - facing, 5.0));
 	vec2 reflectUv = vReflectCoord.xy / vReflectCoord.w + normal.xz * 0.05;
-	WaterBody body = waterBodyAt(shore, clarity, 0.2 + 0.8 * daylight);
-	vec3 reflected = mix(texture2D(tDiffuse, reflectUv).rgb * ReflectionTint, body.colour, BodyInReflection);
+	WaterBody body = waterBodyAt(shore, vWorldPosition.xz, clarity, 0.2 + 0.8 * daylight);
+	vec3 mirrored = texture2D(tDiffuse, reflectUv).rgb;
+	mirrored = mix(vec3(dot(mirrored, ReflectionLuminance)), mirrored, ReflectionSaturation) * ReflectionTint;
+	vec3 reflected = mix(mirrored, body.colour, BodyInReflection);
 	vec3 bounce = reflect(-sunDirection, normal);
 	float glint = pow(max(dot(bounce, toEye), 0.0), 220.0) * step(0.0, sunDirection.y);
 	vec3 light = reflected * fresnel + sunColour * glint * 1.2;

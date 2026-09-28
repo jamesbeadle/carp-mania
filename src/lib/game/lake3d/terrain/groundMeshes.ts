@@ -18,7 +18,7 @@ export interface GroundPlan {
 }
 
 const FinestSpacingMetres = 0.8;
-const Tiling = { Across: 3, Sectors: 4 } as const;
+const Tiling = { Across: 2, Sectors: 4 } as const;
 
 function tileKey(half: WorldPoint): PieceKey {
 	const tileOf = (value: number, reach: number) => Math.min(Tiling.Across - 1, Math.max(0, Math.floor(((value + reach) / (reach * 2)) * Tiling.Across)));
