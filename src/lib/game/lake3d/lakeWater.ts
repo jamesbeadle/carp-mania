@@ -9,7 +9,7 @@ import { pushedTowardsLand } from './waterEdge';
 import { shapeWithHoles } from './worldShapes';
 import { WaterFragmentShader, WaterVertexShader } from './waterShader';
 
-export const WaterLook = { Tint: '#ffffff', Deep: '#1d463f', Shallow: '#5c6440', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
+export const WaterLook = { Tint: '#ffffff', Deep: '#23493e', Shallow: '#4c5436', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
 
 function shoreUniforms() {
 	return { shoreMap: { value: null }, shoreOrigin: { value: new Vector2() }, shoreSize: { value: new Vector2(1, 1) }, shoreBand: { value: 1 }, deepestMetres: { value: 1 }, shallowColour: { value: new Color(WaterLook.Shallow) } };
@@ -38,6 +38,10 @@ export class LakeWater {
 		this.uniforms = material.uniforms;
 		const { clarity } = this.uniforms;
 		clarity.value = transparencyPercent / WaterLook.ClearestPercent;
+	}
+
+	get clock(): { value: number } {
+		return this.uniforms.time;
 	}
 
 	useShoreMap(map: ShoreMap) {

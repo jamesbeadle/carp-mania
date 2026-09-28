@@ -11,6 +11,7 @@ export interface GroundLook {
 	bed: BedType;
 	tilePixels: number;
 	wear: { paths: Vector4[]; count: number };
+	clock: { value: number };
 }
 
 const ProgramKey = 'lake-ground';
@@ -31,7 +32,8 @@ function groundUniforms(look: GroundLook) {
 		shingleShare: { value: BedLooks[look.bed].shingleShare },
 		wetDarkening: { value: Waterside.wetDarkening },
 		swimWear: { value: wear.paths },
-		swimCount: { value: wear.count }
+		swimCount: { value: wear.count },
+		groundTime: look.clock
 	};
 }
 

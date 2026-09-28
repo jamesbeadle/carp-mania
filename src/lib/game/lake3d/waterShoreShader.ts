@@ -10,7 +10,10 @@ const vec3 FoamColour = vec3(0.78, 0.8, 0.74);
 const float ClearestDepth = 0.8;
 const float MurkiestDepth = 0.12;
 const float CalmestEdge = 0.35;
+const float ClearestOpacity = 0.16;
 const float CalmReach = 4.0;
+const float FoamFadeNear = 25.0;
+const float FoamFadeFar = 80.0;
 
 struct ShoreSample {
 	float depth;
@@ -34,7 +37,7 @@ float shoreCalm(ShoreSample shore) {
 WaterBody waterBodyAt(ShoreSample shore, float clarity, float lighting) {
 	float murk = smoothstep(0.0, mix(MurkiestDepth, ClearestDepth, clarity), shore.depth);
 	vec3 colour = mix(shallowColour, deepColour, murk) * lighting;
-	return WaterBody(colour, mix(0.04, 0.96, murk * murk * (3.0 - 2.0 * murk)));
+	return WaterBody(colour, mix(ClearestOpacity, 0.96, murk * murk * (3.0 - 2.0 * murk)));
 }
 
 float foamAt(vec2 ground, ShoreSample shore) {

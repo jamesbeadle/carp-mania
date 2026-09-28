@@ -37,6 +37,8 @@ const mat2 Turned = mat2(0.8, 0.6, -0.6, 0.8);
 const float GrassRelief = 0.004;
 const float StoneRelief = 0.012;
 const vec3 Luminance = vec3(0.3, 0.59, 0.11);
+const vec3 SiltFilm = vec3(0.7, 0.68, 0.54);
+const float CausticLight = 0.9;
 
 struct GroundSurface {
 	vec3 albedo;
@@ -77,10 +79,11 @@ GroundSurface groundSurface() {
 	vec3 grass = mix(grassColour(ground, broad, fine, height), earth * 1.25, worn * smoothstep(0.25, 0.6, fine.r + worn * 0.5));
 	vec3 colour = mix(grass, earth, bare);
 	colour = mix(colour, marginColour(ground, fine, earth), margin);
-	colour = mix(colour, tileAt(bedTile, ground, BedMetres), under);
+	colour = mix(colour, tileAt(bedTile, ground, BedMetres) * SiltFilm, under);
 	float relief = dot(colour, Luminance) * mix(GrassRelief, StoneRelief, max(max(bare, margin), under));
 	colour *= mix(1.0, wetDarkening, wet * (1.0 - under));
 	float roughness = mix(mix(0.95, 0.88, bare), 0.32, wet * (1.0 - under));
+	colour *= 1.0 + causticsAt(ground, height) * CausticLight;
 	return GroundSurface(seenThroughWater(colour, height), roughness, relief);
 }
 `;

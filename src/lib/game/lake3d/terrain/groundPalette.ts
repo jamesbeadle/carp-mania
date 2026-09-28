@@ -35,8 +35,8 @@ export const Earth: SoilPalette = { low: '#3e3021', high: '#6a5439', stones: ['#
 export const Shingle: SoilPalette = { low: '#54493a', high: '#7a6c52', stones: ['#80796d', '#948d80', '#655f57', '#9c8a68', '#7c6849', '#56524d', '#a89f8a', '#6f5e46'], litter: '#3a3024' };
 
 export const BedLooks: Record<BedType, BedLook> = {
-	gravel: { soil: { low: '#5a4e3a', high: '#86775a', stones: Shingle.stones, litter: '#2f281c' }, isStony: true, shingleShare: 0.9 },
-	rock: { soil: { low: '#56544c', high: '#7e7a70', stones: ['#8a8984', '#6c6b66', '#9e9a90', '#55534f'], litter: '#2e2d29' }, isStony: true, shingleShare: 0.8 },
+	gravel: { soil: { low: '#4f4430', high: '#76684a', stones: ['#7a6c55', '#8c7c60', '#6a5e4c', '#968466', '#5e5446', '#a08d6c'], litter: '#2f281c' }, isStony: true, shingleShare: 0.6 },
+	rock: { soil: { low: '#56544c', high: '#7e7a70', stones: ['#8a8984', '#6c6b66', '#9e9a90', '#55534f'], litter: '#2e2d29' }, isStony: true, shingleShare: 0.55 },
 	clay: { soil: { low: '#5a432c', high: '#86653f', stones: Earth.stones, litter: '#2e2116' }, isStony: false, shingleShare: 0.35 },
 	silt: { soil: { low: '#3a3524', high: '#5a5238', stones: Earth.stones, litter: '#221e14' }, isStony: false, shingleShare: 0.25 }
 };

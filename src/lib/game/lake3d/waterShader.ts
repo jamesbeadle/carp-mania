@@ -45,7 +45,8 @@ vec3 rippledNormal(vec2 position, float distanceAway, float calm) {
 
 void main() {
 	ShoreSample shore = shoreAt(vWorldPosition.xz);
-	vec3 normal = rippledNormal(vWorldPosition.xz, distance(cameraPosition, vWorldPosition), shoreCalm(shore));
+	float distanceAway = distance(cameraPosition, vWorldPosition);
+	vec3 normal = rippledNormal(vWorldPosition.xz, distanceAway, shoreCalm(shore));
 	vec3 toEye = normalize(cameraPosition - vWorldPosition);
 	float facing = clamp(dot(normal, toEye), 0.0, 1.0);
 	float fresnel = clamp((0.06 + 0.94 * pow(1.0 - facing, 4.0)) * 1.1, 0.0, 1.0);
@@ -57,7 +58,7 @@ void main() {
 	vec3 light = reflected * fresnel + sunColour * glint * 2.4;
 	vec3 premultiplied = body.colour * body.opacity * (1.0 - fresnel) + light;
 	float opacity = clamp(body.opacity * (1.0 - fresnel) + fresnel + glint, 0.0, 1.0);
-	float foam = foamAt(vWorldPosition.xz, shore) * (0.35 + 0.65 * daylight);
+	float foam = foamAt(vWorldPosition.xz, shore) * (0.35 + 0.65 * daylight) * (1.0 - smoothstep(FoamFadeNear, FoamFadeFar, distanceAway));
 	premultiplied = mix(premultiplied, FoamColour * (0.25 + 0.75 * daylight), foam);
 	opacity = mix(opacity, 1.0, foam);
 	gl_FragColor = vec4(premultiplied * color / max(opacity, 0.001), opacity);

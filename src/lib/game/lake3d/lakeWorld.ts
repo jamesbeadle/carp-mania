@@ -62,7 +62,7 @@ export class LakeWorld {
 		this.water = new LakeWater(this.outline, this.islands, plan.transparencyPercent, width, height);
 		this.water.keepOutOfTheReflection(this.camera, NearDetailLayer);
 		const pegs = plan.pegs.map((peg) => worldPointOf(this.frame, peg));
-		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs });
+		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs, clock: this.water.clock });
 		this.groundAt = land.groundAt;
 		this.water.useShoreMap(land.shoreMap);
 		const plots = plotFacilities(layout, this, pegs, wholePlot);
