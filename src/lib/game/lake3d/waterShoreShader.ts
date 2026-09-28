@@ -6,14 +6,15 @@ uniform float shoreBand;
 uniform float deepestMetres;
 uniform vec3 shallowColour;
 
-const vec3 FoamColour = vec3(0.78, 0.8, 0.74);
-const float ClearestDepth = 0.8;
-const float MurkiestDepth = 0.12;
+const vec3 FoamColour = vec3(0.72, 0.74, 0.68);
+const float ClearestMurkMetres = 1.0;
+const float MurkiestMurkMetres = 0.2;
 const float CalmestEdge = 0.35;
-const float ClearestOpacity = 0.16;
+const float EdgeOpacity = 0.08;
+const float DeepOpacity = 0.97;
 const float CalmReach = 4.0;
-const float FoamFadeNear = 25.0;
-const float FoamFadeFar = 80.0;
+const float FoamFadeNear = 20.0;
+const float FoamFadeFar = 70.0;
 
 struct ShoreSample {
 	float depth;
@@ -35,9 +36,9 @@ float shoreCalm(ShoreSample shore) {
 }
 
 WaterBody waterBodyAt(ShoreSample shore, float clarity, float lighting) {
-	float murk = smoothstep(0.0, mix(MurkiestDepth, ClearestDepth, clarity), shore.depth);
-	vec3 colour = mix(shallowColour, deepColour, murk) * lighting;
-	return WaterBody(colour, mix(ClearestOpacity, 0.96, murk * murk * (3.0 - 2.0 * murk)));
+	float murk = 1.0 - exp(-shore.depth / mix(MurkiestMurkMetres, ClearestMurkMetres, clarity));
+	vec3 colour = mix(shallowColour, deepColour, smoothstep(0.1, 0.9, murk)) * lighting;
+	return WaterBody(colour, mix(EdgeOpacity, DeepOpacity, murk));
 }
 
 float foamAt(vec2 ground, ShoreSample shore) {
@@ -46,6 +47,6 @@ float foamAt(vec2 ground, ShoreSample shore) {
 	float reach = 0.02 + 0.045 * lap;
 	float line = 1.0 - smoothstep(0.0, reach, shore.depth);
 	float lace = smoothstep(0.42, 0.62, texture2D(ripples, ground / 1.3 - vec2(0.0, time * 0.015)).g);
-	return line * mix(0.25, 0.7, lace) * step(-0.5, shore.fromShore);
+	return line * mix(0.2, 0.6, lace) * step(-0.5, shore.fromShore);
 }
 `;

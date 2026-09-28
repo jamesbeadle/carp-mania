@@ -4,6 +4,7 @@ import type { WorldPoint } from './lakeFrame';
 import type { Sunlight } from './skyAndLight';
 import { renderQuality } from './renderQuality';
 import { rippleNormalTexture } from './rippleTexture';
+import { sharedGroundNoise } from './terrain/groundTiles';
 import type { ShoreMap } from './terrain/shoreMap';
 import { pushedTowardsLand } from './waterEdge';
 import { shapeWithHoles } from './worldShapes';
@@ -16,7 +17,7 @@ function shoreUniforms() {
 }
 
 function waterShader() {
-	const own = { time: { value: 0 }, sunDirection: { value: new Vector3(0, 1, 0) }, sunColour: { value: new Color() }, deepColour: { value: new Color(WaterLook.Deep) }, clarity: { value: 0.5 }, daylight: { value: 1 }, ripples: { value: rippleNormalTexture() }, choppiness: { value: WaterLook.CalmChop }, color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null } };
+	const own = { time: { value: 0 }, sunDirection: { value: new Vector3(0, 1, 0) }, sunColour: { value: new Color() }, deepColour: { value: new Color(WaterLook.Deep) }, clarity: { value: 0.5 }, daylight: { value: 1 }, ripples: { value: rippleNormalTexture() }, waterNoise: { value: sharedGroundNoise() }, choppiness: { value: WaterLook.CalmChop }, color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null } };
 	return { name: 'LakeWater', uniforms: UniformsUtils.merge([UniformsLib.fog, own, shoreUniforms()]), vertexShader: WaterVertexShader, fragmentShader: WaterFragmentShader };
 }
 

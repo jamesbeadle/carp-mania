@@ -1,4 +1,5 @@
 import { GroundDetailFunctions } from './groundDetailShader';
+import { GroundSurfaceFunctions } from './groundSurfaceShader';
 
 export const GroundVertexDeclarations = `
 varying vec3 vGroundPosition;
@@ -16,12 +17,17 @@ uniform sampler2D earthTile;
 uniform sampler2D shingleTile;
 uniform sampler2D bedTile;
 uniform sampler2D groundNoise;
+uniform sampler2D causticTile;
+uniform sampler2D shoreMap;
+uniform vec2 shoreOrigin;
+uniform vec2 shoreSize;
 uniform vec3 lushGrass;
 uniform vec3 dryGrass;
 uniform vec3 underwaterTint;
 uniform float shingleShare;
 uniform float wetDarkening;
 uniform float groundLift;
+uniform float groundTime;
 varying vec3 vGroundPosition;
 varying vec3 vGroundNormal;
 
@@ -31,56 +37,42 @@ const float EarthMetres = 2.1;
 const float ShingleMetres = 1.1;
 const float BedMetres = 2.6;
 const float BroadMetres = 190.0;
+const float MeadowMetres = 43.0;
 const float FineMetres = 17.0;
 const float TussockMetres = 4.1;
+const float ClumpMetres = 1.9;
+const float WeedMetres = 9.0;
+const float CausticMetres = 2.3;
+const float CausticDrift = 0.03;
 const vec3 Absorption = vec3(1.1, 0.42, 0.55);
 const mat2 Turned = mat2(0.8, 0.6, -0.6, 0.8);
-
 const float GrassRelief = 0.004;
 const float StoneRelief = 0.012;
 const vec3 Luminance = vec3(0.3, 0.59, 0.11);
-const vec3 SiltFilm = vec3(0.7, 0.68, 0.54);
-const float CausticLight = 0.9;
+const vec3 SiltFilm = vec3(0.6, 0.6, 0.46);
+const vec3 SiltColour = vec3(0.075, 0.07, 0.04);
+const vec3 WeedColour = vec3(0.03, 0.05, 0.014);
+const vec3 FlattenedGrass = vec3(0.96, 0.9, 0.66);
+const vec3 MudTint = vec3(0.66, 0.52, 0.38);
+const float CausticLight = 0.75;
+const float DryShine = 0.22;
+const float MuddyShine = 0.4;
+const float WetShine = 0.75;
 
 struct GroundSurface {
 	vec3 albedo;
 	float roughness;
 	float relief;
+	float shine;
+};
+
+struct ShoreTexel {
+	float fromWater;
+	float wear;
+	float steepShore;
 };
 ${GroundDetailFunctions}
-vec3 grassColour(vec2 ground, vec4 broad, vec4 fine, float height) {
-	vec3 near = tileAt(grassTile, ground, GrassMetres);
-	vec3 far = tileAt(grassTile, Turned * ground, GrassFarMetres);
-	vec3 blades = mix(near, far, 0.3 + 0.3 * fine.r);
-	float tussock = texture2D(groundNoise, ground / TussockMetres).g * texture2D(groundNoise, Turned * ground / (TussockMetres * 1.63)).a;
-	blades *= mix(0.78, 1.18, smoothstep(0.1, 0.5, tussock));
-	float dryness = clamp(smoothstep(0.35, 0.85, broad.r) + smoothstep(2.0, 6.0, height) * 0.5, 0.0, 1.0);
-	return blades * mix(lushGrass, dryGrass, dryness) * (0.8 + 0.4 * fine.g);
-}
-
-GroundSurface groundSurface() {
-	vec2 ground = vGroundPosition.xz;
-	float height = vGroundPosition.y + groundLift;
-	vec4 broad = texture2D(groundNoise, ground / BroadMetres);
-	vec4 fine = texture2D(groundNoise, ground / FineMetres);
-	float steepness = 1.0 - normalize(vGroundNormal).y;
-	vec3 earth = facingTile(earthTile, vGroundPosition, normalize(vGroundNormal), EarthMetres) * (0.62 + 0.26 * fine.a);
-	float face = smoothstep(0.02, 0.08, height) * (1.0 - smoothstep(0.3, 0.4, height + (fine.g - 0.5) * 0.14)) * smoothstep(0.2, 0.5, fine.r);
-	float bare = max(smoothstep(0.17, 0.33, steepness + (fine.a - 0.5) * 0.24), face);
-	float margin = 1.0 - smoothstep(0.03, 0.1 + 0.12 * fine.r, height);
-	float under = 1.0 - smoothstep(-0.12, -0.02, height);
-	float wet = 1.0 - smoothstep(0.01, 0.07 + 0.06 * fine.g, height);
-	float worn = wearAt(ground, fine.b) * (1.0 - margin) * 0.8;
-	vec3 grass = mix(grassColour(ground, broad, fine, height), earth * 1.05, worn * smoothstep(0.25, 0.6, fine.r + worn * 0.5));
-	vec3 colour = mix(grass, earth, bare);
-	colour = mix(colour, marginColour(ground, fine, earth), margin);
-	colour = mix(colour, tileAt(bedTile, ground, BedMetres) * SiltFilm, under);
-	float relief = dot(colour, Luminance) * mix(GrassRelief, StoneRelief, max(max(bare, margin), under));
-	colour *= mix(1.0, wetDarkening, wet * (1.0 - under));
-	float roughness = mix(mix(0.95, 0.88, bare), 0.32, wet * (1.0 - under));
-	colour *= 1.0 + causticsAt(ground, height) * CausticLight;
-	return GroundSurface(seenThroughWater(colour, height), roughness, relief);
-}
+${GroundSurfaceFunctions}
 `;
 
 export const GroundAlbedo = `
@@ -90,4 +82,9 @@ diffuseColor.rgb *= ground.albedo;
 
 export const GroundRoughness = `
 float roughnessFactor = ground.roughness;
+`;
+
+export const GroundShine = `
+#include <lights_physical_fragment>
+material.specularF90 = ground.shine;
 `;

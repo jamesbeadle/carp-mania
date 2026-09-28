@@ -60,7 +60,7 @@ export function createTerrainGeometry(shape: TerrainShape, size: TerrainSize, ba
 		positions.setY(index, surface.height - sink);
 	}
 	geometry.setAttribute('normal', new Float32BufferAttribute(slopeNormals(heights, columns, rows, { x: size.width / columns, z: size.depth / rows }), 3));
-	const index = geometry.getIndex();
-	if (index) geometry.setIndex(unburiedIndex(index.array, isBuried));
+	const everyCorner = geometry.getIndex()?.array ?? [];
+	geometry.setIndex(unburiedIndex(everyCorner, isBuried));
 	return geometry;
 }

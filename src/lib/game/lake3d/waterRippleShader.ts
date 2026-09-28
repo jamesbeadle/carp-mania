@@ -1,0 +1,33 @@
+export const WaterRippleChunk = `
+uniform sampler2D ripples;
+uniform sampler2D waterNoise;
+
+const mat2 SwellTurn = mat2(0.921, 0.389, -0.389, 0.921);
+const mat2 BroadTurn = mat2(-0.323, 0.946, -0.946, -0.323);
+const mat2 FineTurn = mat2(-0.904, 0.427, -0.427, -0.904);
+const mat2 FinestTurn = mat2(-0.575, -0.818, 0.818, -0.575);
+const float GustMetres = 170.0;
+const float SlickMetres = 460.0;
+const float CalmingDistance = 70.0;
+
+vec2 rippleAt(vec2 position, mat2 turn, float scale, vec2 drift) {
+	vec3 texel = texture2D(ripples, turn * position / scale + drift * time).rgb * 2.0 - 1.0;
+	return texel.xy * turn;
+}
+
+float windOver(vec2 position) {
+	float gust = texture2D(waterNoise, position / GustMetres + vec2(time * 0.004, time * 0.0027)).g;
+	float slick = texture2D(waterNoise, position / SlickMetres - vec2(time * 0.0015, 0.0)).r;
+	return mix(0.3, 1.3, smoothstep(0.2, 0.8, gust * 0.6 + slick * 0.6));
+}
+
+vec3 rippledNormal(vec2 position, float distanceAway, float calm) {
+	float calming = calm * windOver(position) / (1.0 + distanceAway / CalmingDistance);
+	vec2 swell = rippleAt(position, SwellTurn, 23.7, vec2(0.006, -0.009));
+	vec2 broad = rippleAt(position, BroadTurn, 8.9, vec2(-0.011, 0.016));
+	vec2 fine = rippleAt(position, FineTurn, 3.07, vec2(0.024, 0.011)) * (1.0 - smoothstep(12.0, 38.0, distanceAway));
+	vec2 finest = rippleAt(position, FinestTurn, 1.13, vec2(-0.033, -0.021)) * (1.0 - smoothstep(4.0, 16.0, distanceAway));
+	vec2 slope = (swell * 0.8 + broad * 1.1 + fine * 0.8 + finest * 0.4) * choppiness * calming;
+	return normalize(vec3(slope.x, 1.0, slope.y));
+}
+`;

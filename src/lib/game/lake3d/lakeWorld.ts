@@ -15,6 +15,7 @@ import { Vegetation } from './vegetation';
 import { Clouds } from './clouds';
 import { NearDetailLayer } from './renderQuality';
 import { plantTrees } from './trees/treePlanting';
+import { smoothWorldOutline } from './worldShapes';
 
 export interface LakeWorldPlan {
 	layout: LakeLayout;
@@ -53,16 +54,17 @@ export class LakeWorld {
 		const { layout, season } = plan;
 		this.frame = lakeFrameFor(plan.plotAcres);
 		const plotReach = plotReachOf(this.frame);
-		this.outline = fineWorldOutline(this.frame, layout.outline);
-		this.islands = layout.islands.map((island) => fineWorldOutline(this.frame, island.points));
+		this.outline = smoothWorldOutline(this.frame, layout.outline);
+		this.islands = layout.islands.map((island) => smoothWorldOutline(this.frame, island.points));
+		const shoreline = { outline: fineWorldOutline(this.frame, layout.outline), islands: layout.islands.map((island) => fineWorldOutline(this.frame, island.points)) };
 		this.camera = new PerspectiveCamera(Lens.FieldOfViewDegrees, width / Math.max(1, height), Lens.Nearest, Lens.Farthest);
 		this.sky = new SkyAndLight(this.scene, plotReach * ShadowShareOfPlot, !plan.isDiorama);
 		const wholePlot = { x: this.frame.metresAcross / 2, z: this.frame.metresDown / 2 };
 		const plotEdge = plan.isDiorama ? wholePlot : null;
-		this.water = new LakeWater(this.outline, this.islands, plan.transparencyPercent, width, height);
+		this.water = new LakeWater(shoreline.outline, shoreline.islands, plan.transparencyPercent, width, height);
 		this.water.keepOutOfTheReflection(this.camera, NearDetailLayer);
 		const pegs = plan.pegs.map((peg) => worldPointOf(this.frame, peg));
-		const land = createLakeLand({ outline: this.outline, islands: this.islands, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs, clock: this.water.clock });
+		const land = createLakeLand({ ...shoreline, swimWater: { outline: this.outline, islands: this.islands }, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs, clock: this.water.clock });
 		this.groundAt = land.groundAt;
 		this.water.useShoreMap(land.shoreMap);
 		const plots = plotFacilities(layout, this, pegs, wholePlot);

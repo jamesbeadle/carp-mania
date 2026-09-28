@@ -1,16 +1,27 @@
-import { Color, Float32BufferAttribute, Mesh, MeshStandardMaterial, RingGeometry } from 'three';
+import { Color, Float32BufferAttribute, MathUtils, Mesh, RingGeometry } from 'three';
+import { createGroundMaterial, type GroundLook } from './groundMaterial';
 
-const Hills = { Inner: 1, Outer: 5.5, Around: 96, Rings: 14, Height: 55, Sink: 0.6, BlueDistance: 0.6 } as const;
-const NearGreen = new Color('#42592a');
-const FarBlue = new Color('#5f7a78');
+const Hills = { Inner: 1, Outer: 5.5, Around: 256, Rings: 22, Height: 55, Sink: 0.6, FullShare: 0.55 } as const;
+const Ridges = [
+	{ turns: 3, phase: 1.3, weight: 0.36 },
+	{ turns: 7, phase: 0.4, weight: 0.28 },
+	{ turns: 13, phase: 2.1, weight: 0.18 },
+	{ turns: 31, phase: 0.9, weight: 0.1 },
+	{ turns: 67, phase: 1.7, weight: 0.05 },
+	{ turns: 131, phase: 0.2, weight: 0.03 }
+];
+const Folds = { Turns: 5, Waves: 9, Depth: 0.3 } as const;
+const Near = new Color('#ffffff');
+const FarBlue = new Color('#a9bcc0');
 
-function hillHeight(angle: number, reach: number) {
-	const ridge = Math.sin(angle * 3 + 1.3) * 0.4 + Math.sin(angle * 7 + 0.4) * 0.35 + Math.sin(angle * 13) * 0.25;
-	const rise = Math.min(1, Math.max(0, (reach - Hills.Inner) / (Hills.Outer - Hills.Inner) / Hills.BlueDistance));
-	return (ridge * 0.5 + 0.5) * rise * Hills.Height;
+function hillHeight(angle: number, share: number) {
+	const ridge = Ridges.reduce((sum, { turns, phase, weight }) => sum + Math.sin(angle * turns + phase) * weight, 0);
+	const folds = 1 - Folds.Depth * (0.5 + 0.5 * Math.sin(share * Folds.Waves + angle * Folds.Turns));
+	const rise = MathUtils.smootherstep(share, 0, Hills.FullShare);
+	return (ridge * 0.5 + 0.5) * folds * rise * Hills.Height;
 }
 
-export function createFarHills(innerRadius: number, groundHeight: number) {
+export function createFarHills(innerRadius: number, groundHeight: number, look: GroundLook) {
 	const geometry = new RingGeometry(innerRadius * Hills.Inner, innerRadius * Hills.Outer, Hills.Around, Hills.Rings).rotateX(-Math.PI / 2);
 	const positions = geometry.getAttribute('position');
 	const colours = new Float32Array(positions.count * 3);
@@ -18,11 +29,13 @@ export function createFarHills(innerRadius: number, groundHeight: number) {
 	for (let index = 0; index < positions.count; index++) {
 		const x = positions.getX(index);
 		const z = positions.getZ(index);
-		const reach = Math.hypot(x, z) / innerRadius;
-		positions.setY(index, groundHeight - Hills.Sink + hillHeight(Math.atan2(z, x), reach));
-		colour.copy(NearGreen).lerp(FarBlue, Math.min(1, (reach - Hills.Inner) / (Hills.Outer - Hills.Inner))).toArray(colours, index * 3);
+		const share = (Math.hypot(x, z) / innerRadius - Hills.Inner) / (Hills.Outer - Hills.Inner);
+		positions.setY(index, groundHeight - Hills.Sink + hillHeight(Math.atan2(z, x), share));
+		colour.copy(Near).lerp(FarBlue, share).toArray(colours, index * 3);
 	}
 	geometry.setAttribute('color', new Float32BufferAttribute(colours, 3));
 	geometry.computeVertexNormals();
-	return new Mesh(geometry, new MeshStandardMaterial({ vertexColors: true, roughness: 1 }));
+	const material = createGroundMaterial(look);
+	material.vertexColors = true;
+	return new Mesh(geometry, material);
 }

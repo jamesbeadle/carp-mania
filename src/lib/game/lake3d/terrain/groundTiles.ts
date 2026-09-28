@@ -31,13 +31,17 @@ function bedTile(bed: BedType, pixels: number) {
 	return look.isStony ? stoneTile(pixels, look.soil, BedStones) : soilTile(pixels, look.soil);
 }
 
-export function groundTilesFor(season: SeasonName, bed: BedType, pixels: number): GroundTiles {
+export function sharedGroundNoise() {
 	noise ??= groundNoiseTexture();
+	return noise;
+}
+
+export function groundTilesFor(season: SeasonName, bed: BedType, pixels: number): GroundTiles {
 	return {
 		grass: remembered(`grass-${season}-${pixels}`, () => grassTile(pixels, GrassPalettes[season])),
 		earth: remembered(`earth-${pixels}`, () => soilTile(pixels, Earth)),
 		shingle: remembered(`shingle-${pixels}`, () => stoneTile(pixels, Shingle, MarginStones)),
 		bed: remembered(`bed-${bed}-${pixels}`, () => bedTile(bed, pixels)),
-		noise
+		noise: sharedGroundNoise()
 	};
 }

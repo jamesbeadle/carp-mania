@@ -1,6 +1,9 @@
 import { ClampToEdgeWrapping, DataTexture, LinearFilter, RGBAFormat, Vector2 } from 'three';
+import { boundsOf } from './landBounds';
 import { rasteriseShore, type RasterFrame, type ShoreRaster } from './shoreRaster';
 import { Shore } from './shoreProfile';
+import { paintSwimWear } from './swimWearMap';
+import type { SwimGround } from './swimWear';
 import type { TerrainShape } from './terrainShape';
 
 export interface ShoreMap {
@@ -11,11 +14,11 @@ export interface ShoreMap {
 	deepestMetres: number;
 }
 
-const Baking = { MarginMetres: 3, BandMetres: 10, MostTexels: 2048, DeepestSpare: 0.2 } as const;
+const Baking = { MarginMetres: 6, BandMetres: 16, MostTexels: 2048, DeepestSpare: 0.2 } as const;
 const ByteMost = 255;
 
 function frameAround(shape: TerrainShape, texelMetres: number): RasterFrame {
-	const { least, most } = shape.lakeBounds;
+	const { least, most } = boundsOf([...shape.plan.outline, ...shape.plan.footings]);
 	const width = most.x - least.x + Baking.MarginMetres * 2;
 	const depth = most.z - least.z + Baking.MarginMetres * 2;
 	const texel = Math.max(texelMetres, width / Baking.MostTexels, depth / Baking.MostTexels);
@@ -28,25 +31,31 @@ function texelCentre(frame: RasterFrame, texel: number) {
 	return { x: frame.originX + (column + 0.5) * frame.texelMetres, z: frame.originZ + (row + 0.5) * frame.texelMetres };
 }
 
-function encode(shape: TerrainShape, frame: RasterFrame, raster: ShoreRaster, deepest: number) {
+function asByte(share: number) {
+	return Math.min(1, Math.max(0, share)) * ByteMost;
+}
+
+function encode(shape: TerrainShape, frame: RasterFrame, raster: ShoreRaster, wear: Float32Array, deepest: number) {
 	const { distances, nearestRing } = raster;
 	const data = new Uint8Array(frame.across * frame.down * 4);
 	for (let texel = 0; texel < distances.length; texel++) {
 		const isWater = raster.isWater[texel] === 1;
 		const distance = distances[texel];
-		const height = shape.heightNear(texelCentre(frame, texel), { distance, isWater, isIsland: nearestRing[texel] > 0 });
+		const centre = texelCentre(frame, texel);
+		const height = shape.heightNear(centre, { distance, isWater, isIsland: nearestRing[texel] > 0 });
 		const signed = isWater ? distance : -distance;
-		data.set([((signed / Baking.BandMetres) * 0.5 + 0.5) * ByteMost, Math.min(1, Math.max(0, -height / deepest)) * ByteMost, 0, ByteMost], texel * 4);
+		const { steepness } = shape.characters.at(centre.x, centre.z);
+		data.set([asByte((signed / Baking.BandMetres) * 0.5 + 0.5), asByte(-height / deepest), asByte(wear[texel]), asByte(steepness)], texel * 4);
 	}
 	return data;
 }
 
-export function bakeShoreMap(shape: TerrainShape, texelMetres: number): ShoreMap {
+export function bakeShoreMap(shape: TerrainShape, texelMetres: number, swims: SwimGround[]): ShoreMap {
 	const frame = frameAround(shape, texelMetres);
 	const { outline, islands, bedDepth } = shape.plan;
 	const raster = rasteriseShore(frame, [outline, ...islands], Baking.BandMetres);
 	const deepest = bedDepth + Shore.WaterlineDip + Baking.DeepestSpare;
-	const texture = new DataTexture(encode(shape, frame, raster, deepest), frame.across, frame.down, RGBAFormat);
+	const texture = new DataTexture(encode(shape, frame, raster, paintSwimWear(frame, swims), deepest), frame.across, frame.down, RGBAFormat);
 	texture.wrapS = ClampToEdgeWrapping;
 	texture.wrapT = ClampToEdgeWrapping;
 	texture.magFilter = LinearFilter;
