@@ -14,7 +14,7 @@ export interface SkyMood {
 
 const Moods: Record<WeatherKind, SkyMood> = {
 	clear: {
-		turbidity: 2.4, rayleigh: 1.1, mieCoefficient: 0.0025, mieDirectionalG: 0.84,
+		turbidity: 3.2, rayleigh: 1.1, mieCoefficient: 0.0025, mieDirectionalG: 0.84,
 		sunStrength: 1, fogDensity: 0.0009, veil: 0, skyShade: 1
 	},
 	heat: {
