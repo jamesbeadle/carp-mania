@@ -8,8 +8,8 @@ export interface TrunkLie {
 }
 
 const Trunk = { Joints: 5, Wander: 0.25 } as const;
-const Branch = { Count: 7, FirstShare: 0.28, Length: [1.3, 3.4], Radius: 0.09, TipRadius: 0.018, Sides: 6, DrownedShare: 0.2 } as const;
-const Twig = { PerBranch: 2, FromShare: 0.55, Length: [0.5, 1.1], Radius: 0.028, TipRadius: 0.007, Sides: 4 } as const;
+const Branch = { Count: 10, FirstShare: 0.25, Length: [1.3, 3.6], Radius: 0.1, TipRadius: 0.018, Sides: 6, DrownedShare: 0.2 } as const;
+const Twig = { PerBranch: 3, FromShare: 0.55, Length: [0.5, 1.1], Radius: 0.028, TipRadius: 0.007, Sides: 4 } as const;
 const Reach = { Dip: [0.3, 0.7], Rise: [0.5, 1.3], Out: [0.15, 0.6], Side: [0.3, 1.1] } as const;
 const Sides = [-1, 1];
 const Up = new Vector3(0, 1, 0);
@@ -47,6 +47,17 @@ function twigsOf(from: Vector3, to: Vector3, random: RandomFraction) {
 		const start = from.clone().lerp(to, Twig.FromShare + random() * (1 - Twig.FromShare) * 0.7);
 		const end = start.clone().add(reachingDirection(random).multiplyScalar(randomBetween(random, ...Twig.Length)));
 		return limbBetween(start, end, Twig.Radius, Twig.TipRadius, Twig.Sides);
+	});
+}
+
+const Roots = { Count: 11, Reach: [0.7, 1.4], Back: [0.1, 0.5], Radius: 0.11, TipRadius: 0.015, Sides: 5 } as const;
+
+export function rootsOf(base: Vector3, random: RandomFraction) {
+	return Array.from({ length: Roots.Count }, (_, index) => {
+		const turn = (index / Roots.Count) * Math.PI * 2 + random() * (Math.PI / Roots.Count);
+		const reach = randomBetween(random, ...Roots.Reach);
+		const end = base.clone().add(new Vector3(-randomBetween(random, ...Roots.Back), Math.sin(turn) * reach, Math.cos(turn) * reach));
+		return limbBetween(base, end, Roots.Radius, Roots.TipRadius, Roots.Sides);
 	});
 }
 

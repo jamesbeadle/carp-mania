@@ -1,11 +1,12 @@
 import type { WorldPoint } from '../lakeFrame';
 
-const Hashing = { Across: 127.1, Down: 311.7, Spread: 43758.5453, SeedStep: 17.31 } as const;
+const Hashing = { Across: 374761393, Down: 668265263, Seed: 1442695041, Mix: 1274126177, Shift: 13, FinalShift: 16, Range: 4294967296 } as const;
 const Octave = { Detail: 2.03, Weight: 0.35 } as const;
 
 function hash(across: number, down: number, seed: number) {
-	const value = Math.sin(across * Hashing.Across + down * Hashing.Down + seed * Hashing.SeedStep) * Hashing.Spread;
-	return value - Math.floor(value);
+	const mixed = Math.imul(across, Hashing.Across) ^ Math.imul(down, Hashing.Down) ^ Math.imul(seed, Hashing.Seed);
+	const stirred = Math.imul(mixed ^ (mixed >>> Hashing.Shift), Hashing.Mix);
+	return ((stirred ^ (stirred >>> Hashing.FinalShift)) >>> 0) / Hashing.Range;
 }
 
 function eased(share: number) {

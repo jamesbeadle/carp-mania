@@ -1,7 +1,7 @@
 import { Color } from 'three';
 import { pickRandom, randomBetween, seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import { mostPlantsPerSquareMetre, Plantings, type Planting } from './coverPlantings';
+import { mostPlantsPerSquareMetre, Plantings, SwimsReachMetres, type Planting } from './coverPlantings';
 import { CoverPalettes } from './coverPalette';
 import { CoverSites, type CoverGround, type CoverSite } from './coverSite';
 import type { FieldArea } from './shoreField';
@@ -51,12 +51,14 @@ function plantOf(planting: Planting, site: CoverSite, random: RandomFraction): C
 function scatterTile(corner: WorldPoint, scattering: Scattering, into: CoverPlant[]) {
 	const { sites, random } = scattering;
 	const centre = { x: corner.x + Tile.Metres / 2, z: corner.z + Tile.Metres / 2 };
-	scattering.mostDensity = mostPlantsPerSquareMetre(sites.siteAt(centre).fromPod - TileDiagonal);
+	const tile = sites.siteAt(centre);
+	const isFarFromSwims = tile.fromPod - TileDiagonal > SwimsReachMetres;
+	scattering.mostDensity = mostPlantsPerSquareMetre(tile.fromPod - TileDiagonal, tile.shore, TileDiagonal);
 	const candidates = Math.round(Tile.Metres * Tile.Metres * scattering.mostDensity * scattering.density);
 	for (let index = 0; index < candidates; index++) {
 		const point = { x: corner.x + random() * Tile.Metres, z: corner.z + random() * Tile.Metres };
 		if (!sites.isBuildable(point)) continue;
-		const site = sites.siteAt(point);
+		const site = sites.siteAt(point, isFarFromSwims);
 		const planting = chosenPlanting(site, scattering);
 		if (!planting) continue;
 		into.push(plantOf(planting, site, random));

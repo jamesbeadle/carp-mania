@@ -16,7 +16,7 @@ const Summer: CoverPalette = {
 	seedHeads: ['#8a784a', '#766644', '#9c8a58'],
 	rushes: ['#35592a', '#406632', '#4b7236', '#57803e'],
 	sedges: ['#5f8a34', '#6f9a3e', '#7ea848', '#8aa850'],
-	spikes: ['#a8457f', '#bf5c97', '#94396e'],
+	spikes: ['#8e4a78', '#a0588a', '#7a3e66', '#6e4a5a'],
 	flowerShare: 1
 };
 

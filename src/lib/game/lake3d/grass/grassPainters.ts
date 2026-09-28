@@ -18,7 +18,7 @@ export interface TuftShape {
 }
 
 const ReferenceCell = 256;
-const Clump = { Centre: 0.5, Spread: 0.36, BackShade: -0.3, BackShare: 0.45, Edge: 0.06 } as const;
+const Clump = { Centre: 0.5, Spread: 0.36, BackShade: -0.3, BackShare: 0.45, Edge: 0.06, RaggedRoots: 0.16 } as const;
 const Seeds = { Stems: 11, HeadLength: 0.16, Spikelets: 9, SpikeletLength: 7, StemWidth: 1.4 } as const;
 
 export function pixelsPer(brush: CellBrush) {
@@ -41,7 +41,8 @@ export function paintTuft(brush: CellBrush, shape: TuftShape, heightShare = 1) {
 		const lean = (random() - Clump.Centre) * shape.lean * size + fan;
 		const colour = isBack ? shadeOf(base, Clump.BackShade) : base;
 		const width = (1.5 + random() * shape.widest) * pixelsPer(brush);
-		paintBlade(context, { root: { x: rootX, y: size }, tip: { x: rootX + lean, y: size - height }, bend: lean * 0.25, width, colour });
+		const rootY = size * (1 - random() * Clump.RaggedRoots);
+		paintBlade(context, { root: { x: rootX, y: rootY }, tip: { x: rootX + lean, y: rootY * (1 - height / size) }, bend: lean * 0.25, width, colour });
 	}
 }
 

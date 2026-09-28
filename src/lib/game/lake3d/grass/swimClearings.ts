@@ -11,8 +11,17 @@ export function swimClearingsFor(pegs: WorldPoint[], water: WaterShape): SwimCle
 	return pegs.map((peg) => ({ peg, pod: podSpotFacing(peg, headingOverTheWater(peg, water), water) }));
 }
 
+export const SwimGround = { PodRadius: 2.5, PegRadius: 1.8, PathRadius: 0.9 } as const;
+
+function metresBeyond(point: WorldPoint, clearing: SwimClearing) {
+	const { peg, pod } = clearing;
+	const beyondPod = metresBetween(point, pod) - SwimGround.PodRadius;
+	const beyondPeg = metresBetween(point, peg) - SwimGround.PegRadius;
+	return Math.min(beyondPod, beyondPeg, distanceToSegment(point, peg, pod) - SwimGround.PathRadius);
+}
+
 export function metresFromAnySwim(point: WorldPoint, clearings: SwimClearing[]) {
-	return clearings.reduce((nearest, clearing) => Math.min(nearest, distanceToSegment(point, clearing.peg, clearing.pod)), Infinity);
+	return clearings.reduce((nearest, clearing) => Math.min(nearest, metresBeyond(point, clearing)), Infinity);
 }
 
 export function metresFromAnyPod(point: WorldPoint, clearings: SwimClearing[]) {

@@ -3,6 +3,7 @@ import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
 import { crossedCards } from '../grass/coverCards';
 import { coverChunks } from '../grass/coverChunks';
+import { coverDepthMaterial } from '../grass/coverDepth';
 import type { SurveyedBank } from '../grass/coverGround';
 import { coverMaterial } from '../grass/coverMaterial';
 import type { CoverWind } from '../grass/coverWind';
@@ -28,5 +29,5 @@ export function createReedBeds(plan: ReedBedPlan) {
 	const atlas = reedAtlas(plan.season, quality.coverCellPixels);
 	const material = coverMaterial({ atlas, grid: ReedGrid, wind: plan.wind, give: Look.Give, isThinned: false, isSmoothEdged: quality.multisamples > 0, roughness: Look.Roughness, sheen: Look.Sheen });
 	const rootedAt = (point: WorldPoint) => Math.max(bank.groundAt(point), -Look.DeepestRoot);
-	return coverChunks(stands, { name: 'reed-beds', metres: Look.ChunkMetres, geometry: crossedCards(ReedCards), material, groundAt: rootedAt, sink: Look.Sink, mostReach: Look.Reach, seed: bank.seed });
+	return coverChunks(stands, { name: 'reed-beds', metres: Look.ChunkMetres, geometry: crossedCards(ReedCards), material, groundAt: rootedAt, sink: Look.Sink, mostReach: Look.Reach, seed: bank.seed, shadowMaterial: quality.isCoverShadowed ? coverDepthMaterial(atlas, ReedGrid) : undefined });
 }

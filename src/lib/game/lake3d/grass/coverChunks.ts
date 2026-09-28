@@ -3,7 +3,8 @@ import { seededRandom } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
 import { sharingShape } from './coverCards';
 import type { CoverPlant } from './coverScatter';
-import { keptShareAt } from './coverThinning';
+import { hiddenBeyond } from './chunkHiding';
+import { keptShareAt, Thinning } from './coverThinning';
 
 export interface ChunkPlan {
 	name: string;
@@ -14,6 +15,7 @@ export interface ChunkPlan {
 	sink: number;
 	mostReach: number;
 	seed: number;
+	shadowMaterial?: Material;
 }
 
 const Up = new Vector3(0, 1, 0);
@@ -46,6 +48,12 @@ function thinnedByDistance(mesh: InstancedMesh, plan: ChunkPlan, total: number) 
 	};
 }
 
+function castsShadowWith(mesh: InstancedMesh, shadowMaterial: Material | undefined) {
+	if (!shadowMaterial) return;
+	mesh.castShadow = true;
+	mesh.customDepthMaterial = shadowMaterial;
+}
+
 function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	const geometry = sharingShape(plan.geometry);
 	const attribute = new Float32Array(plants.length * AttributeSize);
@@ -59,8 +67,9 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	geometry.setAttribute('coverPlant', new InstancedBufferAttribute(attribute, AttributeSize));
 	mesh.computeBoundingSphere();
 	mesh.receiveShadow = true;
+	castsShadowWith(mesh, plan.shadowMaterial);
 	thinnedByDistance(mesh, plan, plants.length);
-	return mesh;
+	return hiddenBeyond(mesh, Thinning.GoneBeyond * plan.mostReach);
 }
 
 export function coverChunks(plants: CoverPlant[], plan: ChunkPlan) {

@@ -2,6 +2,7 @@ import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { ClearSpot } from '../bank/facilityGrounds';
 import type { WorldPoint } from '../lakeFrame';
 import type { CoverGround } from './coverSite';
+import { GroundSampler } from './groundSampler';
 import { ShoreField, type FieldArea } from './shoreField';
 import { swimClearingsFor } from './swimClearings';
 
@@ -35,5 +36,8 @@ export function surveyBank(plan: BankPlan): SurveyedBank {
 	const water = { outline: plan.outline, islands: plan.islands };
 	const area = areaAround(plan.outline, plan.plotEdge);
 	const facilities = plan.keepClear.filter((spot) => !plan.pegs.includes(spot.point));
-	return { area, shore: new ShoreField(area, water), swims: swimClearingsFor(plan.pegs, water), facilities, plotEdge: plan.plotEdge, groundAt: plan.groundAt, season: plan.season, seed: plan.seed };
+	const shore = new ShoreField(area, water);
+	const sampler = new GroundSampler(area, plan.groundAt, shore);
+	const groundAt = (point: WorldPoint) => sampler.heightAt(point);
+	return { area, shore, swims: swimClearingsFor(plan.pegs, water), facilities, plotEdge: plan.plotEdge, groundAt, season: plan.season, seed: plan.seed };
 }

@@ -1,6 +1,8 @@
 import { Group } from 'three';
+import { seededRandom } from '$lib/domain/random';
 import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
 import { createLakeFeatures } from './bank/lakeFeatures3d';
+import { createBushes } from './bushes/bushes3d';
 import { surveyBank, type BankPlan } from './grass/coverGround';
 import { CoverWind } from './grass/coverWind';
 import { createGroundCover } from './grass/groundCover';
@@ -14,6 +16,8 @@ export interface VegetationPlan extends BankPlan {
 	frame: LakeFrame;
 }
 
+const BushSeedStep = 101;
+
 export class Vegetation {
 	readonly group = new Group();
 	private readonly trees: Trees;
@@ -23,7 +27,9 @@ export class Vegetation {
 		this.trees = new Trees(plan.woodland, plan.season, plan.groundAt);
 		const bank = surveyBank(plan);
 		const features = createLakeFeatures({ layout: plan.layout, frame: plan.frame, bank, wind: this.coverWind });
-		this.group.add(this.trees.group, createGroundCover(bank, this.coverWind), features);
+		const { woodland } = plan;
+		const bushes = createBushes(woodland.onTheBank, bank, this.coverWind, seededRandom(plan.seed + BushSeedStep));
+		this.group.add(this.trees.group, createGroundCover(bank, this.coverWind), features, ...bushes);
 	}
 
 	blow(timeSeconds: number, windStrength: number) {

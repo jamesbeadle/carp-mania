@@ -11,7 +11,7 @@ export interface FieldArea {
 	most: WorldPoint;
 }
 
-const Field = { FewestMetresPerCell: 2, MostCellsAcross: 260 } as const;
+const Field = { FewestMetresPerCell: 2, MostCellsAcross: 260, GradientStep: 0.5 } as const;
 
 function signedShoreDistance(point: WorldPoint, water: WaterEdges) {
 	const toEdge = Math.min(distanceToOutline(point, water.outline), ...water.islands.map((island) => distanceToOutline(point, island)));
@@ -46,6 +46,13 @@ export class ShoreField {
 		const upper = this.valueAt(left, top) * (1 - shareAcross) + this.valueAt(left + 1, top) * shareAcross;
 		const lower = this.valueAt(left, top + 1) * (1 - shareAcross) + this.valueAt(left + 1, top + 1) * shareAcross;
 		return upper * (1 - shareDown) + lower * shareDown;
+	}
+
+	headingTowardTheWater(point: WorldPoint) {
+		const step = Field.GradientStep;
+		const across = this.distanceAt({ x: point.x + step, z: point.z }) - this.distanceAt({ x: point.x - step, z: point.z });
+		const down = this.distanceAt({ x: point.x, z: point.z + step }) - this.distanceAt({ x: point.x, z: point.z - step });
+		return Math.atan2(-down, -across);
 	}
 
 	private valueAt(column: number, row: number) {

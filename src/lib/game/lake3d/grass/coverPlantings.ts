@@ -12,11 +12,11 @@ export interface Planting {
 }
 
 const Bank = { Lip: 0.3, FringeWidth: 2.6, FarFadeFrom: 40, FarFadeTo: 80 } as const;
-const Swim = { Cleared: 2.5, Trodden: 5, BusyWithin: 28, QuietBeyond: 55, Busier: 4 } as const;
-const Margin = { DeepestShore: -2.2, HighestShore: 1.4, Threshold: 0.36, Density: 6, PodView: 7, Cleared: 3 } as const;
-const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 7 } as const;
-const Short = { Density: 1.15, Patchiness: 0.9 } as const;
-const Flowers = { Buttercups: 0.7, Daisies: 0.6, SwimGap: 3.5 } as const;
+const Swim = { Cleared: 0, Trodden: 1.6, BusyWithin: 28, QuietBeyond: 55, Busier: 3 } as const;
+const Margin = { DeepestShore: -2.2, HighestShore: 1.4, Threshold: 0.36, Density: 6, PodView: 7, Cleared: 1 } as const;
+const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 3.5 } as const;
+const Short = { Density: 1.6, Patchiness: 0.9 } as const;
+const Flowers = { Buttercups: 0.7, Daisies: 0.6, SwimGap: 1 } as const;
 
 function ramp(value: number, from: number, to: number) {
 	return Math.min(1, Math.max(0, (value - from) / (to - from)));
@@ -67,7 +67,7 @@ const daisies: Planting = {
 };
 
 const marginals: Planting = {
-	cells: [CoverCells.Rushes, CoverCells.Rushes, CoverCells.Sedge, CoverCells.Sedge, CoverCells.Spikes],
+	cells: [CoverCells.Rushes, CoverCells.Rushes, CoverCells.Rushes, CoverCells.Sedge, CoverCells.Sedge, CoverCells.Sedge, CoverCells.Spikes],
 	heights: [0.7, 1.45],
 	widthPerHeight: [0.75, 1.15],
 	lean: 0.1,
@@ -81,6 +81,11 @@ const marginals: Planting = {
 };
 
 export const Plantings = [shortGrass, meadowGrass, buttercups, daisies, marginals];
-export function mostPlantsPerSquareMetre(fromPod: number) {
-	return Short.Density * (1 + Short.Patchiness / 2) * busynessAt(fromPod) + Margin.Density + Meadow.Density;
+export const SwimsReachMetres = Swim.QuietBeyond + Meadow.SwimGap * 2;
+
+export function mostPlantsPerSquareMetre(fromPod: number, shore: number, slack: number) {
+	const isNearLand = shore + slack > Bank.Lip / 2;
+	const isNearMargin = shore - slack < Margin.HighestShore && shore + slack > Margin.DeepestShore;
+	const land = isNearLand ? Short.Density * (1 + Short.Patchiness / 2) * busynessAt(fromPod) + Meadow.Density * Meadow.Fringe : 0;
+	return land + (isNearMargin ? Margin.Density : 0);
 }

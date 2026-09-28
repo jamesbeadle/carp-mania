@@ -27,6 +27,7 @@ export interface CoverSite {
 }
 
 const Wavelengths = { Meadow: 24, Patch: 7, Margin: 11, Bloom: 5 } as const;
+const FarFromSwims = 1e6;
 const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1 } as const;
 
 export class CoverSites {
@@ -36,14 +37,14 @@ export class CoverSites {
 		this.noise = new CoverNoise(ground.seed);
 	}
 
-	siteAt(point: WorldPoint): CoverSite {
+	siteAt(point: WorldPoint, isFarFromSwims = false): CoverSite {
 		const { noise } = this;
 		const { swims } = this.ground;
 		return {
 			point,
 			shore: this.ground.shore.distanceAt(point),
-			fromSwim: metresFromAnySwim(point, swims),
-			fromPod: metresFromAnyPod(point, swims),
+			fromSwim: isFarFromSwims ? FarFromSwims : metresFromAnySwim(point, swims),
+			fromPod: isFarFromSwims ? FarFromSwims : metresFromAnyPod(point, swims),
 			meadow: noise.at(point, Wavelengths.Meadow),
 			patch: noise.at(point, Wavelengths.Patch),
 			margin: noise.at({ x: point.z, z: point.x }, Wavelengths.Margin),
