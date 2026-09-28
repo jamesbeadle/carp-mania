@@ -36,7 +36,7 @@ export function createFallenTree(point: WorldPoint, shore: ShoreField, random: R
 	const plate = new IcosahedronGeometry(RootPlate.Radius, 1).scale(RootPlate.Thin, 1, 1).translate(0, Tree.RootRise, 0);
 	const wood = [...limbs, ...branchesOf(trunk, random), ...rootsOf(trunk[0], random)];
 	const bark = mergeGeometries(wood.map((limb) => coloured(limb.toNonIndexed(), Bark.Dry.clone().offsetHSL(0, 0, (random() - 1 / 2) * Bark.ToneSwing))));
-	const wholeTree = mergeGeometries([bark, coloured(plate.toNonIndexed(), Bark.Earth)]);
+	const wholeTree = mergeGeometries([bark, coloured(plate, Bark.Earth)]);
 	const mesh = new Mesh(wholeTree, new MeshStandardMaterial({ map: barkTexture(), vertexColors: true, roughness: Bark.Roughness }));
 	const heading = shore.headingTowardTheWater(point);
 	mesh.position.set(point.x - Math.cos(heading) * Tree.Length * Gradient.RootShare, 0, point.z - Math.sin(heading) * Tree.Length * Gradient.RootShare);
