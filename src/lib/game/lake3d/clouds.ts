@@ -76,7 +76,8 @@ export class Clouds {
 		const skyBlue = ShadeBlue.clone().multiplyScalar(brightnessOf(horizon));
 		shadeColour.value.copy(horizon).lerp(skyBlue, Lighting.SkyBlueInShade).multiplyScalar(shadeBrightness);
 		hazeColour.value.copy(horizon);
-		this.shadowStrength = Shadows.Strongest * lighting.daylight * (1 - heaviness.value);
+		const isShading = renderQuality().hasCloudShadows;
+		this.shadowStrength = isShading ? Shadows.Strongest * lighting.daylight * (1 - heaviness.value) : 0;
 	}
 
 	advance(secondsElapsed: number) {

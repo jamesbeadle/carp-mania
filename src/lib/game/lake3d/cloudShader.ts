@@ -30,7 +30,10 @@ float heightAt(vec2 point) {
 float sunlightAt(vec2 point, float height) {
 	vec2 sunward = normalize(sunDirection.xz + vec2(0.0001));
 	float near = max(heightAt(point + sunward * 0.07), 0.0);
-	float far = max(heightAt(point + sunward * 0.2), 0.0);
+	float far = near;
+	#if OCTAVES > 4
+		far = max(heightAt(point + sunward * 0.2), 0.0);
+	#endif
 	return exp(-(near + far * 0.6 + height * 0.5) * 5.0);
 }
 
