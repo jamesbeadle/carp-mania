@@ -71,7 +71,8 @@ GroundSurface groundSurface() {
 	vec4 fine = texture2D(groundNoise, ground / FineMetres);
 	float steepness = 1.0 - normalize(vGroundNormal).y;
 	vec3 earth = tileAt(earthTile, ground, EarthMetres) * (0.62 + 0.26 * fine.a);
-	float bare = smoothstep(0.17, 0.33, steepness + (fine.a - 0.5) * 0.24);
+	float face = smoothstep(0.02, 0.08, height) * (1.0 - smoothstep(0.3, 0.4, height + (fine.g - 0.5) * 0.14)) * smoothstep(0.2, 0.5, fine.r);
+	float bare = max(smoothstep(0.17, 0.33, steepness + (fine.a - 0.5) * 0.24), face);
 	float margin = 1.0 - smoothstep(0.03, 0.1 + 0.12 * fine.r, height);
 	float under = 1.0 - smoothstep(-0.12, -0.02, height);
 	float wet = 1.0 - smoothstep(0.01, 0.07 + 0.06 * fine.g, height);
