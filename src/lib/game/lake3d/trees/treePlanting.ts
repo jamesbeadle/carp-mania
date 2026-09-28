@@ -29,13 +29,15 @@ export interface PlantingGround {
 	seed: number;
 }
 
-const Planting = { ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 16000, MostTrees: 2200, TreeLineReach: 42, TreeLineDensity: 0.95 } as const;
+const Planting = { ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 20000, MostTrees: 2600, TreeLineReach: 42, TreeLineDensity: 0.95, TreeLineFloor: 0.45 } as const;
 const Girth = { Least: 0.82, Range: 0.36 } as const;
-const Density = { Clearing: 0.3, Contrast: 1.6 } as const;
+const Density = { Clearing: 0.3, Contrast: 1.6, DeepWoodsFrom: 110, DeepWoodsShare: 0.6 } as const;
 
 function densityAt(point: WorldPoint, distanceFromWater: number, fields: WoodlandFields) {
-	const woods = (fields.density(point) - Density.Clearing) * Density.Contrast;
-	const treeLine = distanceFromWater < Planting.TreeLineReach ? Planting.TreeLineDensity * fields.treeLine(point) + woods / 2 : 0;
+	const depthShare = distanceFromWater > Density.DeepWoodsFrom ? Density.DeepWoodsShare : 1;
+	const woods = (fields.density(point) - Density.Clearing) * Density.Contrast * depthShare;
+	const lineShare = Planting.TreeLineFloor + (1 - Planting.TreeLineFloor) * fields.treeLine(point);
+	const treeLine = distanceFromWater < Planting.TreeLineReach ? Planting.TreeLineDensity * lineShare + woods / 2 : 0;
 	return Math.min(1, Math.max(0, woods, treeLine));
 }
 

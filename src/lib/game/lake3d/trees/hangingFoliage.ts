@@ -6,7 +6,7 @@ import { writeCard, writeStrip } from './leafCards';
 import { deviate, UpAxis } from './limbPaths';
 import type { LeafSite } from './treeSkeleton';
 
-const Curtain = { Strands: 4, TopClumpCards: 2, Floor: 0.03, ShortestHang: 0.5, HangRange: 0.45, HalfWidth: 0.02, Steps: 4, Drift: 0.12, Bulge: 0.04, Scatter: 0.7 } as const;
+const Curtain = { Strands: 4, TopClumpCards: 3, Floor: 0.03, ShortestHang: 0.5, HangRange: 0.45, HalfWidth: 0.02, Steps: 4, Drift: 0.12, Bulge: 0.04, Scatter: 0.7 } as const;
 const CurtainLight = { Outward: 0.75, Up: 0.35, Lowest: 0.5 } as const;
 const Spray = { BaseBehind: 0.3, Roll: 0.45 } as const;
 

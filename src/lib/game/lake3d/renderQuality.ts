@@ -9,7 +9,7 @@ export interface RenderQuality {
 }
 
 const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true, treeCardShare: 1, nearTreeMetres: 55 };
-const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false, treeCardShare: 0.6, nearTreeMetres: 35 };
+const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false, treeCardShare: 0.5, nearTreeMetres: 35 };
 const FewestCoresForGenerous = 6;
 
 let chosen: RenderQuality | null = null;

@@ -20,7 +20,7 @@ const Looks: Record<TreeKind, BarkLook> = {
 	willow: { trunk: '#4e4538', upper: '#5a5040', upperFrom: 0.5, twig: '#6e6036', style: Furrowed, upperStyle: Furrowed },
 	birch: { trunk: '#35302b', upper: '#cfcbc2', upperFrom: 0.1, twig: '#43332d', style: [0.9, 0.1, 0], upperStyle: [0.05, 0.95, 0] },
 	poplar: { trunk: '#4c483f', upper: '#5c574b', upperFrom: 0.4, twig: '#4e473c', style: Furrowed, upperStyle: Furrowed },
-	pine: { trunk: '#4a3d33', upper: '#9c5230', upperFrom: 0.55, twig: '#7a4a2c', style: [0.4, 0, 0.6], upperStyle: [0, 0, 1] },
+	pine: { trunk: '#4a3d33', upper: '#8e5234', upperFrom: 0.55, twig: '#4e3a2c', style: [0.4, 0, 0.6], upperStyle: [0, 0, 1] },
 	spruce: { trunk: '#4a3a2f', upper: '#52412f', upperFrom: 0.5, twig: '#43352b', style: [0, 0, 1], upperStyle: [0, 0, 1] }
 };
 

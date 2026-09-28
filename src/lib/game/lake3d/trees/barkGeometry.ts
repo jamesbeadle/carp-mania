@@ -9,6 +9,7 @@ export interface WoodDetail {
 	sides: number[];
 	deepestLevel: number;
 	pointStride: number;
+	thinnestShare: number;
 }
 
 const Root = { Sink: 0.03, Flare: 1.35 } as const;
@@ -71,7 +72,9 @@ function thinned(limb: Limb, stride: number): Limb {
 
 export function woodGeometry(kind: TreeKind, skeleton: Skeleton, detail: WoodDetail) {
 	const writer = woodWriter();
-	const limbs = skeleton.limbs.filter((limb) => limb.level <= detail.deepestLevel);
+	const [trunk] = skeleton.limbs;
+	const thinnest = trunk.radii[0] * detail.thinnestShare;
+	const limbs = skeleton.limbs.filter((limb) => limb.level <= detail.deepestLevel && limb.radii[0] >= thinnest);
 	limbs.forEach((limb) => writeLimb(writer, kind, rooted(thinned(limb, detail.pointStride)), detail.sides[limb.level]));
 	return writer.build();
 }

@@ -21,9 +21,9 @@ const shortening = (along: number) => Shortening.Base - along * Shortening.Loss;
 
 export const Habits: Record<TreeKind, Habit> = {
 	oak: {
-		trunk: trunk(0.3, 0.034, 0.12, 4, 0.72),
+		trunk: trunk(0.27, 0.034, 0.12, 4, 0.72),
 		levels: [
-			{ count: 5, from: 0.6, to: 1, angle: degrees(48), length: 1.45, bend: 0.3, wander: 0.35, segments: 5, radius: 0.7, taper: 0.45, reach: shortening },
+			{ count: 5, from: 0.5, to: 1, angle: degrees(50), length: 1.5, bend: 0.3, wander: 0.35, segments: 5, radius: 0.7, taper: 0.45, reach: shortening },
 			{ count: 4, from: 0.25, to: 1, angle: degrees(42), length: 0.55, bend: 0.35, wander: 0.45, segments: 3, radius: 0.6, taper: 0.35, reach: shortening },
 			{ count: 3, from: 0.35, to: 1, angle: degrees(45), length: 0.5, bend: 0.15, wander: 0.5, segments: 2, radius: 0.6, taper: 0.3 }
 		],

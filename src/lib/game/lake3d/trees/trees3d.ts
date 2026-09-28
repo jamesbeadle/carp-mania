@@ -17,7 +17,7 @@ import type { PlantedTree, Woodland } from './treePlanting';
 
 const Looks = { Variants: 3, AtlasPixels: 1024, BarkPixels: 256, ReferenceHeight: 16, ShadeSpread: 13.7, VariantSpread: 3.7 } as const;
 const FarDetail = DetailLevels - 1;
-const ReachShares = [1, 2.6, 5.5];
+const ReachShares = [1, 2.6, 5];
 
 interface Planting extends Distant {
 	model: number;
