@@ -8,7 +8,7 @@ A web game about running a carp fishery and fishing it. Every player finds a wat
 
 SvelteKit · Tailwind · Supabase (Google login, Postgres, Realtime) · Vercel.
 
-See `SETUP.md` to run it, `DOMAIN.md` for carp-mania.com and the sign-in on its own name, `DESIGN.md` for the original stories and rules, and `DESIGN-2.md` for the world, the lake builder and the fish market. `CLAUDE.md` is the coding standard every file follows.
+See `SETUP.md` to run it, `DOMAIN.md` for carp-mania.com and the sign-in on its own name, `DESIGN.md` for the original stories and rules, `DESIGN-2.md` for the world, the lake builder and the fish market, and `DESIGN-10.md` for the balance model behind the long game. `CLAUDE.md` is the coding standard every file follows.
 
 ```
 src/lib/domain      the rules of the game — pure TypeScript, no framework, runnable with npm run test:domain
@@ -25,6 +25,7 @@ src/lib/components  Svelte views
 src/routes          the site map: /setup, /home, /lake, /lake/works, /world, /news, /lakes, /fish, /market, /carp, /anglers, /inbox
 supabase/migrations tables, row-level security, and the security-definer functions that move money and fish
 supabase/tests      SQL scenarios run against a local Postgres by npm run test:sql
+scripts/pace        the balance model: a year of the game for five kinds of player, run by npm run test:pace
 ```
 
 <!-- code-quality:start -->
