@@ -36,9 +36,9 @@ export const Habits: Record<TreeKind, Habit> = {
 		trunk: trunk({ length: 1, radius: 0.02, wander: 0.06, segments: 8, taper: 0.1 }),
 		levels: [
 			{ count: 16, from: 0.16, to: 0.96, angle: degrees(58), length: 0.3, bend: 0.15, wander: 0.35, segments: 3, radius: 0.45, taper: 0.3, reach: oval },
-			{ count: 3, from: 0.3, to: 1, angle: degrees(40), length: 0.45, bend: 0.1, wander: 0.4, segments: 2, radius: 0.55, taper: 0.3 }
+			{ count: 4, from: 0.25, to: 1, angle: degrees(40), length: 0.45, bend: 0.1, wander: 0.4, segments: 2, radius: 0.55, taper: 0.3 }
 		],
-		sitesAlong: 2,
+		sitesAlong: 3,
 		sitesOnBranches: 2
 	},
 	willow: {
@@ -81,8 +81,8 @@ export const Habits: Record<TreeKind, Habit> = {
 	spruce: {
 		trunk: trunk({ length: 1, radius: 0.02, wander: 0.02, segments: 8, taper: 0.05 }),
 		levels: [
-			{ count: 34, from: 0.06, to: 0.985, angle: degrees(100), length: 0.33, bend: -0.1, wander: 0.2, segments: 3, radius: 0.3, taper: 0.2, reach: cone },
-			{ count: 4, from: 0.3, to: 1, angle: degrees(55), length: 0.4, bend: -0.3, wander: 0.3, segments: 1, radius: 0.5, taper: 0.3 }
+			{ count: 52, from: 0.06, to: 0.985, angle: degrees(100), length: 0.31, bend: -0.1, wander: 0.2, segments: 3, radius: 0.3, taper: 0.2, reach: cone },
+			{ count: 3, from: 0.3, to: 1, angle: degrees(55), length: 0.4, bend: -0.3, wander: 0.3, segments: 1, radius: 0.5, taper: 0.3 }
 		],
 		sitesAlong: 1,
 		sitesOnBranches: 2,

@@ -15,6 +15,7 @@ export interface FoliageDetail {
 }
 
 const WidestMargin = 0.08;
+const GrowthPower = 0.4;
 const Bounds = { CardReach: 1.5, Sway: 0.12 } as const;
 const Forms = { clump: writeClump, curtain: writeCurtain } as const;
 
@@ -34,9 +35,10 @@ export function foliageGeometry(skeleton: Skeleton, style: FoliageStyle, detail:
 	const volume = crownVolumeOf(skeleton.sites, Math.min(style.clumpRadius, WidestMargin));
 	const longestReach = Math.max(...skeleton.sites.map((site) => site.reach));
 	const cards = Math.max(1, Math.round(style.cards * detail.cardShare));
-	const occlusion = 1 / Math.cbrt(detail.siteStride);
-	const growth = Math.cbrt(detail.siteStride / detail.cardShare);
-	const sites = strided(skeleton.sites, detail.siteStride);
+	const siteStride = Math.min(detail.siteStride, style.mostStride);
+	const occlusion = 1 / Math.cbrt(siteStride);
+	const growth = Math.pow(siteStride / detail.cardShare, GrowthPower);
+	const sites = strided(skeleton.sites, siteStride);
 	const crowding = siteCrowding(skeleton.sites, style.clumpRadius);
 	const region = detail.hasFineLeaves ? style.fineRegion : style.region;
 	const context: FoliageContext = { style: { ...style, region }, volume, random, cards, growth, longestReach, occlusion, crowding, tint: () => tint(random) };
