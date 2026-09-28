@@ -69,11 +69,12 @@ export class SkyAndLight {
 	}
 
 	tintHaze(measured: HazeColours) {
-		const { direction, colour } = this.sunlight;
-		const sun = this.sunShadow.light;
-		const colours = veiled(measured, this.mood.veil);
+		const { direction, colour, daylight } = this.sunlight;
+		const { intensity } = this.sunShadow.light;
+		const { veil } = this.mood;
+		const colours = veiled(measured, veil);
 		tintHaze(this.fog, colours, direction);
-		this.clouds.light(this.lightDirection, colour, sun.intensity, colours.away, this.mood.veil);
+		this.clouds.light({ direction: this.lightDirection, colour, intensity, horizon: colours.away, veil, daylight });
 	}
 
 	followSight(sightline: Sightline) {

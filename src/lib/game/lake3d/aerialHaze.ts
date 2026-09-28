@@ -1,15 +1,17 @@
-import { Color, MathUtils, ShaderChunk, ShaderLib, UniformsLib, type FogExp2, type Vector3 } from 'three';
+import { Color, MathUtils, ShaderChunk, ShaderLib, UniformsLib, type FogExp2, type Vector2, type Vector3 } from 'three';
 import { HazeFragment, HazeParsFragment, HazeParsVertex, HazeVertex } from './hazeChunks';
 import { brightnessOf } from './skyLook';
 
 const SunDirectionParts = 3;
 const GlowParts = 4;
+const CloudParts = 4;
 
 const sharedSunDirection = new Float32Array(SunDirectionParts);
 const sharedGlow = new Float32Array(GlowParts);
+const sharedClouds = new Float32Array(CloudParts);
 
 function hazeUniforms() {
-	return { hazeSunDirection: { value: sharedSunDirection }, hazeGlow: { value: sharedGlow } };
+	return { hazeSunDirection: { value: sharedSunDirection }, hazeGlow: { value: sharedGlow }, hazeClouds: { value: sharedClouds } };
 }
 
 function installHaze() {
@@ -42,4 +44,8 @@ export function tintHaze(fog: FogExp2, colours: HazeColours, sunDirection: Vecto
 	fog.color.copy(away);
 	sharedSunDirection.set([sunDirection.x, sunDirection.y, sunDirection.z]);
 	sharedGlow.set([glow.r, glow.g, glow.b, Glow.Sharpness]);
+}
+
+export function shadeUnderClouds(drift: Vector2, cover: number, strength: number) {
+	sharedClouds.set([drift.x, drift.y, cover, strength]);
 }
