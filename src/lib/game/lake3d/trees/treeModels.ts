@@ -20,27 +20,34 @@ export interface TreeModel {
 
 const Seeds = { PerKind: 101, PerVariant: 7 } as const;
 
-function leafyModel(kind: TreeKind, seed: number, season: SeasonName, cardShare: number): TreeModel {
+export interface ModelLook {
+	season: SeasonName;
+	cardShare: number;
+	hasTwigHaze: boolean;
+}
+
+function leafyModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 	const skeleton = growSkeleton(Habits[kind], seed);
-	const tint = clumpTintFor(season);
-	const leaves = Details.map(({ foliage }) => foliageGeometry(skeleton, FoliageStyles[kind], { ...foliage, cardShare: foliage.cardShare * cardShare }, tint, seed));
+	const tint = clumpTintFor(look.season);
+	const leaves = Details.map(({ foliage }) => foliageGeometry(skeleton, FoliageStyles[kind], { ...foliage, cardShare: foliage.cardShare * look.cardShare }, tint, seed));
 	return { kind, leaves, wood: Details.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
 }
 
-function bareModel(kind: TreeKind, seed: number, season: SeasonName, cardShare: number): TreeModel {
+function bareModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 	const skeleton = growSkeleton(withTwigs(Habits[kind], kind), seed);
-	const tint = clumpTintFor(season);
-	const haze = (foliage: FoliageDetail) => foliageGeometry(skeleton, WinterTwigs, { ...foliage, cardShare: foliage.cardShare * cardShare }, tint, seed);
-	const leaves = BareDetails.map(({ foliage }, level) => (level < FirstHazeDetail ? emptyFoliage() : haze(foliage)));
+	const tint = clumpTintFor(look.season);
+	const haze = (foliage: FoliageDetail) => foliageGeometry(skeleton, WinterTwigs, foliage, tint, seed);
+	const isHazy = (level: number) => look.hasTwigHaze && level >= FirstHazeDetail;
+	const leaves = BareDetails.map(({ foliage }, level) => (isHazy(level) ? haze(foliage) : emptyFoliage()));
 	return { kind, leaves, wood: BareDetails.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
 }
 
-function modelOf(kind: TreeKind, variant: number, season: SeasonName, cardShare: number): TreeModel {
+function modelOf(kind: TreeKind, variant: number, look: ModelLook): TreeModel {
 	const seed = (TreeKinds.indexOf(kind) + 1) * Seeds.PerKind + variant * Seeds.PerVariant;
-	const build = isBare(season, kind) ? bareModel : leafyModel;
-	return build(kind, seed, season, cardShare);
+	const build = isBare(look.season, kind) ? bareModel : leafyModel;
+	return build(kind, seed, look);
 }
 
-export function treeModels(season: SeasonName, variants: number, cardShare: number): TreeModel[] {
-	return TreeKinds.flatMap((kind) => Array.from({ length: variants }, (_, variant) => modelOf(kind, variant, season, cardShare)));
+export function treeModels(look: ModelLook, variants: number): TreeModel[] {
+	return TreeKinds.flatMap((kind) => Array.from({ length: variants }, (_, variant) => modelOf(kind, variant, look)));
 }

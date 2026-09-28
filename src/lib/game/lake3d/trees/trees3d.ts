@@ -40,9 +40,10 @@ export class Trees {
 	constructor(woodland: Woodland, season: SeasonName, groundAt: (point: WorldPoint) => number) {
 		const quality = renderQuality();
 		const trees = [...woodland.onTheBank, ...woodland.onTheIslands];
-		const models = treeModels(season, Looks.Variants, quality.treeCardShare);
+		const isMultisampled = quality.multisamples > 0;
+		const models = treeModels({ season, cardShare: quality.treeCardShare, hasTwigHaze: isMultisampled }, Looks.Variants);
 		const atlas = foliageAtlas(quality.treeAtlasPixels);
-		this.leaves = new TreeBatch(models.map((model) => model.leaves), leafMaterial(atlas, this.sway, quality.multisamples > 0), trees.length);
+		this.leaves = new TreeBatch(models.map((model) => model.leaves), leafMaterial(atlas, this.sway, isMultisampled), trees.length);
 		this.wood = new TreeBatch(models.map((model) => model.wood), barkMaterial(barkTexture(Looks.BarkPixels), this.sway), trees.length);
 		trees.forEach((tree) => this.plant(tree, season, groundAt));
 		const reaches = ReachShares.map((share) => share * quality.nearTreeMetres);
