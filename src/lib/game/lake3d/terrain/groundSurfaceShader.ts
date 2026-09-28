@@ -1,35 +1,50 @@
+import { GroundCoverFunctions } from './groundCoverShader';
+
 export const GroundSurfaceFunctions = `
-vec3 grassColour(vec2 ground, vec4 broad, vec4 fine, float height) {
-	vec3 near = tileAt(grassTile, ground, GrassMetres);
-	vec3 far = tileAt(grassTile, Turned * ground, GrassFarMetres);
-	vec3 blades = mix(near, far, 0.25 + 0.25 * fine.r);
-	float tussock = texture2D(groundNoise, ground / TussockMetres).g * texture2D(groundNoise, Turned * ground / (TussockMetres * 1.63)).a;
-	float meadow = texture2D(groundNoise, Turned * ground / MeadowMetres).r;
-	blades *= mix(0.9, 1.07, smoothstep(0.1, 0.5, tussock)) * mix(0.88, 1.08, meadow);
-	float dryness = clamp(smoothstep(0.35, 0.85, broad.r) + smoothstep(2.0, 6.0, height) * 0.5, 0.0, 1.0);
-	return blades * mix(lushGrass, dryGrass, dryness) * (0.88 + 0.24 * fine.g);
-}
+${GroundCoverFunctions}
+const float LipMetres = 15.0;
+const float ToeStretchMetres = 29.0;
+const vec2 LipHeight = vec2(0.1, 0.42);
+const vec2 FaceSlope = vec2(0.04, 0.14);
+const float LipFeather = 0.05;
+const float FaceFoot = 0.02;
+const float FaceFootTop = 0.08;
+const vec2 SteepShoreFace = vec2(0.3, 0.65);
+const vec2 BareSlope = vec2(0.2, 0.36);
+const vec2 CliffSlope = vec2(0.42, 0.58);
+const float BankBandTop = 1.1;
+const float CliffRoughness = 0.97;
+const float WetRoughness = 0.6;
+const float CliffShine = 0.08;
+const float WetFaceRise = 0.1;
+const vec2 MarginToeRange = vec2(0.45, 1.5);
+const float FaceSwing = 0.35;
+const float BareSwing = 0.24;
+const vec3 MarginHeight = vec3(0.035, 0.1, 0.12);
+const float MarginFoot = 0.4;
+const float GentleMarginShare = 0.35;
+const vec2 EarthShade = vec2(0.62, 0.26);
+const vec2 UnderwaterFrom = vec2(-0.12, -0.02);
+const vec3 WetHeight = vec3(0.01, 0.06, 0.05);
+const vec2 GroundRoughness = vec2(0.95, 0.88);
 
-float drownedShare(float height) {
-	return 1.0 - smoothstep(0.02, 0.22, -height);
-}
+struct BankFace {
+	float bare;
+	float cliff;
+	float margin;
+	float toe;
+};
 
-vec3 trodden(vec3 grass, vec3 earth, vec2 ground, float wear, inout float shine) {
-	float clumps = texture2D(groundNoise, ground / ClumpMetres).b;
-	float patches = texture2D(groundNoise, Turned * ground / (ClumpMetres * 3.1)).g;
-	float thinned = smoothstep(0.18, 0.6, wear + (clumps - 0.5) * 0.6);
-	float muddy = smoothstep(0.7, 1.0, wear + (clumps - 0.5) * 0.3 + (patches - 0.5) * 0.4);
-	shine = mix(shine, MuddyShine, muddy);
-	vec3 flattened = mix(grass, grass * FlattenedGrass, thinned);
-	return mix(flattened, earth * MudTint, muddy);
-}
-
-vec3 bedColour(vec2 ground, vec4 broad, vec4 fine, float height, vec3 drowned, float gentleness) {
-	vec3 bed = mix(tileAt(bedTile, ground, BedMetres) * SiltFilm, drowned, drownedShare(height) * gentleness);
-	float silt = smoothstep(0.35, 0.75, fine.g * 0.5 + broad.b * 0.5 + smoothstep(0.1, 1.0, -height) * 0.45);
-	bed = mix(bed, SiltColour * (0.75 + 0.5 * fine.a), silt);
-	float weed = smoothstep(0.55, 0.7, texture2D(groundNoise, ground / WeedMetres).a * (0.75 + 0.5 * fine.b));
-	return mix(bed, WeedColour * (0.7 + 0.6 * fine.r), weed * smoothstep(0.06, 0.25, -height));
+BankFace bankFaceAt(vec2 ground, vec4 fine, float height, float steepness, ShoreTexel shore) {
+	float lipTop = mix(LipHeight.x, LipHeight.y, texture2D(groundNoise, ground / LipMetres).r);
+	float toe = texture2D(groundNoise, Turned * ground / ToeStretchMetres).a;
+	float belowLip = 1.0 - smoothstep(lipTop - LipFeather, lipTop + LipFeather, height) * (1.0 - smoothstep(BankBandTop - LipFeather, BankBandTop, height));
+	float faceBand = smoothstep(FaceFoot, FaceFootTop, height) * belowLip * smoothstep(FaceSlope.x, FaceSlope.y, steepness);
+	float face = faceBand * smoothstep(SteepShoreFace.x, SteepShoreFace.y, shore.steepShore + (fine.r - 0.5) * FaceSwing);
+	float bare = max(smoothstep(BareSlope.x, BareSlope.y, steepness + (fine.a - 0.5) * BareSwing) * belowLip, face);
+	float marginTop = mix(MarginHeight.x, MarginHeight.y + MarginHeight.z * fine.r, shore.steepShore) * mix(MarginToeRange.x, MarginToeRange.y, toe);
+	float margin = (1.0 - smoothstep(marginTop * MarginFoot, marginTop, height)) * mix(GentleMarginShare, 1.0, shore.steepShore);
+	return BankFace(bare, smoothstep(CliffSlope.x, CliffSlope.y, steepness), margin, toe);
 }
 
 GroundSurface groundSurface() {
@@ -39,25 +54,21 @@ GroundSurface groundSurface() {
 	vec4 broad = texture2D(groundNoise, ground / BroadMetres);
 	vec4 fine = texture2D(groundNoise, ground / FineMetres);
 	ShoreTexel shore = shoreTexelAt(ground);
-	float steepness = 1.0 - normal.y;
-	vec3 earth = facingTile(earthTile, vGroundPosition, normal, EarthMetres) * (0.62 + 0.26 * fine.a);
-	float faceBand = smoothstep(0.02, 0.08, height) * (1.0 - smoothstep(0.28, 0.4, height + (fine.g - 0.5) * 0.14));
-	float face = faceBand * smoothstep(0.3, 0.65, shore.steepShore + (fine.r - 0.5) * 0.35);
-	float bare = max(smoothstep(0.2, 0.36, steepness + (fine.a - 0.5) * 0.24), face);
-	float marginTop = mix(0.035, 0.1 + 0.12 * fine.r, shore.steepShore);
-	float margin = (1.0 - smoothstep(marginTop * 0.4, marginTop, height)) * mix(0.35, 1.0, shore.steepShore);
-	float under = 1.0 - smoothstep(-0.12, -0.02, height);
-	float wet = 1.0 - smoothstep(0.01, 0.06 + 0.05 * fine.g, height);
-	float roughness = mix(0.95, 0.88, bare);
+	BankFace bank = bankFaceAt(ground, fine, height, 1.0 - normal.y, shore);
+	vec3 earth = facingTile(earthTile, vGroundPosition, normal, EarthMetres) * (EarthShade.x + EarthShade.y * fine.a);
+	float under = 1.0 - smoothstep(UnderwaterFrom.x, UnderwaterFrom.y, height);
+	float wetTop = WetHeight.y + WetHeight.z * fine.g + WetFaceRise * bank.cliff;
+	float wet = (1.0 - smoothstep(WetHeight.x, wetTop, height)) * (1.0 - under);
+	float roughness = mix(mix(GroundRoughness.x, GroundRoughness.y, bank.bare), CliffRoughness, bank.cliff);
 	float shine = DryShine;
 	vec3 grass = grassColour(ground, broad, fine, height);
-	vec3 colour = trodden(mix(grass, earth, bare), earth, ground, shore.wear * (1.0 - margin), shine);
-	colour = mix(colour, marginColour(fine, earth), margin);
+	vec3 colour = trodden(mix(grass, earth, bank.bare), earth, ground, shore.wear * (1.0 - bank.margin), shine);
+	colour = mix(colour, marginColour(fine, earth, bank.toe), bank.margin);
 	colour = mix(colour, bedColour(ground, broad, fine, height, grass * DrownedGrass, 1.0 - shore.steepShore), under);
-	float relief = dot(colour, Luminance) * mix(GrassRelief, StoneRelief, max(max(bare, margin), under));
-	colour *= mix(1.0, wetDarkening, wet * (1.0 - under));
-	roughness = mix(roughness, 0.6, wet * (1.0 - under));
-	shine = mix(shine, WetShine, wet * (1.0 - under));
+	float relief = dot(colour, Luminance) * mix(GrassRelief, StoneRelief, max(max(bank.bare, bank.margin), under));
+	colour *= mix(1.0, wetDarkening, wet);
+	roughness = mix(roughness, mix(WetRoughness, CliffRoughness, bank.cliff), wet);
+	shine = mix(mix(shine, WetShine, wet), CliffShine, bank.cliff);
 	colour *= 1.0 + causticsAt(ground, height) * CausticLight;
 	return GroundSurface(seenThroughWater(colour, height), roughness, relief, shine);
 }

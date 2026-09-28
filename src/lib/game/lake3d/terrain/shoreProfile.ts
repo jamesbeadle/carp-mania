@@ -11,9 +11,10 @@ export interface BankProfile {
 
 const ToeShareOfRise = 0.45;
 const Bed = { PlateauShare: 0.3, DropOffMetres: 1.8 } as const;
+const ToeWaves = { AlongX: 0.23, AlongZ: 0.11, Warp: 1.7, AcrossZ: 0.19, AcrossX: 0.07 } as const;
 
 function toeAt(x: number, z: number) {
-	const swing = Math.sin(x * 0.23 + Math.sin(z * 0.11) * 1.7) * 0.5 + Math.sin(z * 0.19 - x * 0.07) * 0.5;
+	const swing = (Math.sin(x * ToeWaves.AlongX + Math.sin(z * ToeWaves.AlongZ) * ToeWaves.Warp) + Math.sin(z * ToeWaves.AcrossZ - x * ToeWaves.AcrossX)) / 2;
 	return Shore.ToeMetres + (swing * 0.5 + 0.5) * Shore.ToeSwing;
 }
 
@@ -29,5 +30,5 @@ export function bedHeight(toShore: number, bedDepth: number, character: ShoreCha
 	const gradual = MathUtils.smoothstep(toShore, 0, character.shelfMetres);
 	const plateau = MathUtils.smoothstep(toShore, 0, plateauMetres) * Bed.PlateauShare;
 	const stepped = plateau + MathUtils.smoothstep(toShore, plateauMetres, plateauMetres + Bed.DropOffMetres) * (1 - Bed.PlateauShare);
-	return -Shore.WaterlineDip - bedDepth * MathUtils.lerp(gradual, stepped, character.dropOff);
+	return -Shore.WaterlineDip - bedDepth * character.bedShare * MathUtils.lerp(gradual, stepped, character.dropOff);
 }
