@@ -9,12 +9,12 @@ export interface ShoreBand {
 	sinkMetres: number;
 }
 
-const Margin = { Metres: 1, Sink: 1.2 } as const;
+const Margin = { Metres: 1, Sink: 1.2, SunkShelfShare: 0.5 } as const;
 
 export function shoreBandFor(gridCellMetres: number): ShoreBand {
 	const diagonal = gridCellMetres * Math.SQRT2;
 	const landCore = Math.max(Shore.DropMetres, Shore.IslandDropMetres) + diagonal;
-	const waterCore = Shore.ShelfMetres + diagonal;
+	const waterCore = Shore.ShelfMetres * Margin.SunkShelfShare + diagonal;
 	const beyondTheCore = gridCellMetres + diagonal + Margin.Metres;
 	return { landCore, waterCore, fade: gridCellMetres, landReach: landCore + beyondTheCore, waterReach: waterCore + beyondTheCore, sinkMetres: Margin.Sink };
 }

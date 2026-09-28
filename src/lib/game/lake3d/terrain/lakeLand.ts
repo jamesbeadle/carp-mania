@@ -23,7 +23,7 @@ export interface LandPlan {
 	clock: { value: number };
 }
 
-const Grid = { ReachShare: 1.6, MetresPerCell: 1.7, MostCells: 420, DioramaMetresPerCell: 1.2 } as const;
+const Grid = { ReachShare: 1.6, MetresPerCell: 1.7, DioramaMetresPerCell: 1.2 } as const;
 const ShoreMapTexelsPerStation = 2;
 
 export function createLakeLand(plan: LandPlan) {
@@ -31,7 +31,7 @@ export function createLakeLand(plan: LandPlan) {
 	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z) });
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
 	const look = { season: plan.season, bed: plan.bed, wear: swimWearOf(plan.pegs, plan), clock: plan.clock };
-	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: Grid.MostCells, plotEdge: plan.plotEdge, look }));
+	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: renderQuality().groundCells, plotEdge: plan.plotEdge, look }));
 	group.add(plan.plotEdge ? slabSides(plan.plotEdge, plan.bedDepth) : farGround(half));
 	if (!plan.plotEdge) group.add(createFarHills(Math.hypot(half.x, half.z), Heights.Bank));
 	const shoreMap = bakeShoreMap(shape, renderQuality().shoreSpacingMetres / ShoreMapTexelsPerStation);

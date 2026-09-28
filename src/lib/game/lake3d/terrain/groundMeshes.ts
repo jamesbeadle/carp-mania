@@ -16,7 +16,7 @@ export interface GroundPlan {
 	look: Omit<GroundLook, 'tilePixels'>;
 }
 
-const FinestSpacingMetres = 0.6;
+const FinestSpacingMetres = 0.8;
 
 function groundMesh(geometry: BufferGeometry, material: Material) {
 	const mesh = new Mesh(geometry, material);
