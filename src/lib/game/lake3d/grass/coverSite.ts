@@ -3,7 +3,7 @@ import type { ClearSpot } from '../bank/facilityGrounds';
 import { metresBetween, type WorldPoint } from '../lakeFrame';
 import { CoverNoise } from './coverNoise';
 import type { ShoreField } from './shoreField';
-import { metresFromAnyPod, metresFromAnySwim, type SwimClearing } from './swimClearings';
+import { metresFromAnyPod, metresFromAnySwim, viewAheadOfPods, type SwimClearing } from './swimClearings';
 
 export interface CoverGround {
 	shore: ShoreField;
@@ -20,6 +20,7 @@ export interface CoverSite {
 	shore: number;
 	fromSwim: number;
 	fromPod: number;
+	podView: number;
 	meadow: number;
 	patch: number;
 	margin: number;
@@ -45,6 +46,7 @@ export class CoverSites {
 			shore: this.ground.shore.distanceAt(point),
 			fromSwim: isFarFromSwims ? FarFromSwims : metresFromAnySwim(point, swims),
 			fromPod: isFarFromSwims ? FarFromSwims : metresFromAnyPod(point, swims),
+			podView: isFarFromSwims ? 0 : viewAheadOfPods(point, swims),
 			meadow: noise.at(point, Wavelengths.Meadow),
 			patch: noise.at(point, Wavelengths.Patch),
 			margin: noise.at({ x: point.z, z: point.x }, Wavelengths.Margin),

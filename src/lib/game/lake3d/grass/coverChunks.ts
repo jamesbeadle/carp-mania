@@ -1,5 +1,6 @@
 import { Box3, Color, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Camera, type Material } from 'three';
 import { seededRandom } from '$lib/domain/random';
+import { NearDetailLayer } from '../renderQuality';
 import type { WorldPoint } from '../lakeFrame';
 import { sharingShape } from './coverCards';
 import type { CoverPlant } from './coverScatter';
@@ -44,6 +45,7 @@ function thinnedByDistance(mesh: InstancedMesh, plan: ChunkPlan, total: number) 
 	const bounds = new Box3().copy(mesh.boundingBox ?? new Box3());
 	const nearest = new Vector3();
 	mesh.onBeforeRender = (_renderer, _scene, camera: Camera) => {
+		if (!camera.layers.isEnabled(NearDetailLayer)) return;
 		const metres = bounds.clampPoint(camera.position, nearest).distanceTo(camera.position);
 		mesh.count = Math.min(total, Math.ceil(total * keptShareAt(metres / plan.mostReach)));
 	};

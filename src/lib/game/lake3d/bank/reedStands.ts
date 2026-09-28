@@ -7,9 +7,9 @@ import { ReedCells } from './reedAtlas';
 
 const Stand = { StepMetres: 0.16, BandHalfWidth: 3.2, MostInland: 0.9, Gappiness: 0.45, EdgeShare: 0.7, MaceShore: -1 } as const;
 const Heights = { Phragmites: [1.9, 2.9], Reedmace: [1.4, 2.0], Sparse: [1.5, 2.3] } as const;
-const Look = { WidthPerHeight: 0.58, Lean: 0.07, Darkest: 0.76, Range: 0.34, Reach: 8 } as const;
-const Mix = { MaceShare: 0.3, LeafyShare: 0.4, LeastHeight: 0.65, HeightSwing: 0.6 } as const;
-const Wavelengths = { Gaps: 7, Height: 5 } as const;
+const Look = { WidthPerHeight: 0.58, Lean: 0.07, Darkest: 0.6, ClumpRange: 0.32, StandRange: 0.16, MostWarmth: 0.14, Reach: 8 } as const;
+const Mix = { MaceShare: 0.3, LeafyShare: 0.4, LeastHeight: 0.55, HeightSwing: 0.85, StandSwing: 0.3, EmergentShare: 0.07, Emergent: 1.3 } as const;
+const Wavelengths = { Gaps: 7, Height: 6, Tone: 4 } as const;
 
 interface StandContext {
 	shore: ShoreField;
@@ -28,14 +28,21 @@ function heightsFor(cell: number): readonly [number, number] {
 	return cell === ReedCells.Sparse ? Heights.Sparse : Heights.Phragmites;
 }
 
+function heightSwingAt(point: WorldPoint, context: StandContext) {
+	const { noise, random } = context;
+	const emergent = random() < Mix.EmergentShare ? Mix.Emergent : 1;
+	const clump = Mix.LeastHeight + noise.at(point, Wavelengths.Height) * Mix.HeightSwing;
+	return clump * emergent * (1 + (random() - 1 / 2) * Mix.StandSwing);
+}
+
 function standAt(point: WorldPoint, offset: number, context: StandContext): CoverPlant | null {
 	const { shore, noise, random } = context;
 	const fromWater = shore.distanceAt(point);
 	const isThick = random() < 1 - Stand.Gappiness + noise.at(point, Wavelengths.Gaps) * Stand.Gappiness;
 	if (fromWater > Stand.MostInland || !isThick) return null;
 	const cell = cellFor(offset, fromWater, random);
-	const height = randomBetween(random, ...heightsFor(cell)) * (Mix.LeastHeight + noise.at(point, Wavelengths.Height) * Mix.HeightSwing);
-	const tint = { shade: Look.Darkest + random() * Look.Range, warmth: 0 };
+	const height = randomBetween(random, ...heightsFor(cell)) * heightSwingAt(point, context);
+	const tint = { shade: Look.Darkest + noise.at(point, Wavelengths.Tone) * Look.ClumpRange + random() * Look.StandRange, warmth: random() * Look.MostWarmth };
 	const lean = (random() - 1 / 2) * Look.Lean * 2;
 	return { point, cell, height, width: height * Look.WidthPerHeight, lean, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
 }

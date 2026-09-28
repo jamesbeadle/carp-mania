@@ -1,4 +1,4 @@
-import { paintBlade, paintStem } from '../grass/bladeStroke';
+import { paintBlade, paintStem, shadeOf } from '../grass/bladeStroke';
 import { pickColour } from '../grass/coverPalette';
 import type { ReedPalette } from './reedPalette';
 
@@ -24,6 +24,7 @@ interface Point {
 const ReferenceWidth = 256;
 const Stem = { Edge: 0.14, Shortest: 0.62, Lean: 0.1, Width: 2.2, LowestLeaf: 0.08, HighestLeaf: 0.8 } as const;
 const Leaf = { Shortest: 0.16, Longest: 0.34, Width: 6.5, Droop: 0.2, Thinnest: 0.7, WidthSwing: 0.5, Bend: 0.1 } as const;
+const Understorey = { Blades: 30, Tallest: 0.34, Shortest: 0.1, Width: 7, Shade: -0.38, Lean: 0.18 } as const;
 const Plume = { Strands: 55, Length: 0.15, Spread: 0.08, Sway: 0.08, StrandWidth: 1.1, Opacity: 0.6 } as const;
 
 export function pixelsAcross(brush: ReedBrush) {
@@ -64,6 +65,18 @@ function paintReedStem(brush: ReedBrush, shape: StandShape) {
 	if (random() < shape.plumeShare) paintPlume(brush, top);
 }
 
+function paintUnderstorey(brush: ReedBrush) {
+	const { context, width, height, random, palette } = brush;
+	for (let blade = 0; blade < Understorey.Blades; blade++) {
+		const root = { x: width * (Stem.Edge + random() * (1 - Stem.Edge * 2)), y: height };
+		const tall = height * (Understorey.Shortest + random() * (Understorey.Tallest - Understorey.Shortest));
+		const tip = { x: root.x + (random() - 1 / 2) * width * Understorey.Lean * 2, y: height - tall };
+		const colour = shadeOf(pickColour(palette.leaves, random), Understorey.Shade * random());
+		paintBlade(context, { root, tip, bend: (tip.x - root.x) / 2, width: Understorey.Width * pixelsAcross(brush), colour });
+	}
+}
+
 export function paintPhragmites(brush: ReedBrush, shape: StandShape) {
+	paintUnderstorey(brush);
 	for (let stem = 0; stem < shape.stems; stem++) paintReedStem(brush, shape);
 }

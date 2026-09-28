@@ -1,47 +1,41 @@
-import { BufferAttribute, Color, IcosahedronGeometry, Mesh, MeshStandardMaterial, type BufferGeometry } from 'three';
+import { Mesh, MeshStandardMaterial, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import type { ShoreField } from '../grass/shoreField';
+import type { SurveyedBank } from '../grass/coverGround';
 import { barkTexture } from './barkTexture';
-import { branchesOf, limbBetween, trunkPoints } from './fallenLimbs';
-import { rootsOf } from './fallenRoots';
+import { shadedWood, WoodTones } from './barkShading';
+import { branchesOf } from './fallenLimbs';
+import { rootsOf, soilClod } from './fallenRoots';
+import { trunkPoints, trunkTubes } from './fallenTrunk';
 
-const Tree = { Length: 9, RootRise: 0.3, CrownSink: 1.2, TrunkRadius: 0.3, TopRadius: 0.07, Sides: 9 } as const;
-const RootPlate = { Radius: 0.75, Thin: 0.4 } as const;
-const Bark = { Dry: new Color('#5a5046'), Wet: new Color('#262a1c'), Earth: new Color('#3a2c20'), WetBelow: 0.08, Roughness: 0.95, ToneSwing: 0.12 } as const;
-const Gradient = { RootShare: 0.3 } as const;
+const Tree = { Length: 9, CrownSink: 1.1, RootShare: 0.3 } as const;
+const Finish = { Roughness: 0.92 } as const;
 
-function trunkRadiusAt(share: number) {
-	return Tree.TrunkRadius - (Tree.TrunkRadius - Tree.TopRadius) * share;
+function toneAll(parts: BufferGeometry[], tone: (typeof WoodTones)[keyof typeof WoodTones], random: RandomFraction) {
+	return parts.map((part) => shadedWood(part.index ? part.toNonIndexed() : part, tone, random));
 }
 
-function coloured(geometry: BufferGeometry, base: Color) {
-	const positions = geometry.getAttribute('position');
-	const colours = new Float32Array(positions.count * 3);
-	const colour = new Color();
-	for (let index = 0; index < positions.count; index++) {
-		const isWet = positions.getY(index) < Bark.WetBelow;
-		colour.copy(base).lerp(Bark.Wet, isWet ? 1 : 0);
-		colour.toArray(colours, index * 3);
-	}
-	geometry.setAttribute('color', new BufferAttribute(colours, 3));
-	return geometry;
+function rootPointOf(point: WorldPoint, heading: number): WorldPoint {
+	const back = Tree.Length * Tree.RootShare;
+	return { x: point.x - Math.cos(heading) * back, z: point.z - Math.sin(heading) * back };
 }
 
-export function createFallenTree(point: WorldPoint, shore: ShoreField, random: RandomFraction) {
-	const trunk = trunkPoints({ length: Tree.Length, rise: Tree.RootRise, sink: Tree.CrownSink }, random);
-	const radiusAtJoint = (joint: number) => trunkRadiusAt(joint / trunk.length);
-	const limbs = trunk.slice(1).map((end, index) => limbBetween(trunk[index], end, radiusAtJoint(index), radiusAtJoint(index + 1), Tree.Sides));
-	const plate = new IcosahedronGeometry(RootPlate.Radius, 1).scale(RootPlate.Thin, 1, 1).translate(0, Tree.RootRise, 0);
-	const wood = [...limbs, ...branchesOf(trunk, random), ...rootsOf(trunk[0], random)];
-	const bark = mergeGeometries(wood.map((limb) => coloured(limb.toNonIndexed(), Bark.Dry.clone().offsetHSL(0, 0, (random() - 1 / 2) * Bark.ToneSwing))));
-	const wholeTree = mergeGeometries([bark, coloured(plate, Bark.Earth)]);
-	const mesh = new Mesh(wholeTree, new MeshStandardMaterial({ map: barkTexture(), vertexColors: true, roughness: Bark.Roughness }));
-	const heading = shore.headingTowardTheWater(point);
-	mesh.position.set(point.x - Math.cos(heading) * Tree.Length * Gradient.RootShare, 0, point.z - Math.sin(heading) * Tree.Length * Gradient.RootShare);
+export function createFallenTree(point: WorldPoint, bank: SurveyedBank, random: RandomFraction) {
+	const heading = bank.shore.headingTowardTheWater(point);
+	const root = rootPointOf(point, heading);
+	const rootHeight = Math.max(0, bank.groundAt(root));
+	const trunk = trunkPoints({ length: Tree.Length, rootHeight, crownSink: Tree.CrownSink }, random);
+	const [base] = trunk;
+	const bark = toneAll([...trunkTubes(trunk, random), ...branchesOf(trunk, random)], WoodTones.Bark, random);
+	const roots = toneAll(rootsOf(base, random), WoodTones.Root, random);
+	const clod = toneAll([soilClod(base, bank.seed)], WoodTones.Soil, random);
+	const material = new MeshStandardMaterial({ map: barkTexture(), vertexColors: true, roughness: Finish.Roughness });
+	const mesh = new Mesh(mergeGeometries([...bark, ...roots, ...clod]), material);
+	mesh.position.set(root.x, 0, root.z);
 	mesh.rotation.set(0, -heading, 0);
 	mesh.castShadow = true;
 	mesh.receiveShadow = true;
+	mesh.name = 'fallen-tree';
 	return mesh;
 }

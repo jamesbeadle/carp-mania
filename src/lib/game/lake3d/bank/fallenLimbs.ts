@@ -1,33 +1,61 @@
-import { CylinderGeometry, Quaternion, Vector3, type BufferGeometry } from 'three';
+import { Vector3, type BufferGeometry } from 'three';
 import { pickRandom, randomBetween, type RandomFraction } from '$lib/domain/random';
+import { trunkRadiusAlong } from './fallenTrunk';
+import { woodTube } from './woodTube';
 
-export interface TrunkLie {
+interface Bough {
+	from: Vector3;
+	heading: Vector3;
 	length: number;
-	rise: number;
-	sink: number;
+	radius: number;
+	depth: number;
 }
 
-const Trunk = { Joints: 5, Wander: 0.25 } as const;
-const Branch = { Count: 10, FirstShare: 0.25, Length: [1.3, 3.6], Radius: 0.1, TipRadius: 0.028, Sides: 6, DrownedShare: 0.2 } as const;
-const Elbow = { Share: [0.4, 0.65], Lift: [0.3, 0.7], Thinning: 0.6, Shortening: 0.4 } as const;
-const Twig = { PerBranch: 3, FromShare: 0.55, Length: [0.5, 1.1], Radius: 0.028, TipRadius: 0.007, Sides: 4 } as const;
-const Reach = { Dip: [0.3, 0.7], Rise: [0.5, 1.3], Out: [0.15, 0.6], Side: [0.3, 1.1] } as const;
+const Branch = { Count: 14, FirstShare: 0.22, Length: [2, 4.2], RadiusShare: 0.42, DrownedShare: 0.25, Shortening: 0.45 } as const;
+const Kink = { Joints: 3, Swing: 0.55, Lift: 0.18, TipShare: 0.22 } as const;
+const Fork = { MostDepth: 2, Chance: 0.85, LengthShare: 0.55, RadiusShare: 0.6, Spread: 0.9 } as const;
+const Build = { Sides: [7, 5, 4], Roughness: 0.1, Thinnest: 0.012 } as const;
+const Reach = { Dip: [0.3, 0.8], Rise: [0.45, 1.3], Out: [0.1, 0.7], Side: [0.4, 1.2] } as const;
 const Sides = [-1, 1];
 const Up = new Vector3(0, 1, 0);
 
-export function limbBetween(from: Vector3, to: Vector3, fromRadius: number, toRadius: number, sides: number): BufferGeometry {
-	const direction = to.clone().sub(from);
-	const length = direction.length();
-	const turn = new Quaternion().setFromUnitVectors(Up, direction.normalize());
-	return new CylinderGeometry(toRadius, fromRadius, length, sides, 1, false).translate(0, length / 2, 0).applyQuaternion(turn).translate(from.x, from.y, from.z);
+function jitter(random: RandomFraction, swing: number) {
+	return new Vector3(random() - 1 / 2, random() - 1 / 2, random() - 1 / 2).multiplyScalar(swing * 2);
 }
 
-export function trunkPoints(lie: TrunkLie, random: RandomFraction) {
-	return Array.from({ length: Trunk.Joints + 1 }, (_, joint) => {
-		const along = joint / Trunk.Joints;
-		const wander = joint === 0 ? 0 : (random() - 0.5) * Trunk.Wander;
-		return new Vector3(along * lie.length, lie.rise - (lie.rise + lie.sink) * along * along, wander);
-	});
+function kinkedPoints(bough: Bough, random: RandomFraction) {
+	const points = [bough.from.clone()];
+	const heading = bough.heading.clone();
+	const step = bough.length / Kink.Joints;
+	for (let joint = 0; joint < Kink.Joints; joint++) {
+		heading.add(jitter(random, Kink.Swing)).addScaledVector(Up, Kink.Lift).normalize();
+		points.push(points[joint].clone().addScaledVector(heading, step));
+	}
+	return points;
+}
+
+function forksOf(bough: Bough, points: Vector3[], random: RandomFraction): Bough[] {
+	if (bough.depth >= Fork.MostDepth) return [];
+	return points.slice(1, -1).filter(() => random() < Fork.Chance).map((joint) => ({
+		from: joint,
+		heading: bough.heading.clone().add(jitter(random, Fork.Spread)).normalize(),
+		length: bough.length * Fork.LengthShare,
+		radius: bough.radius * Fork.RadiusShare,
+		depth: bough.depth + 1
+	}));
+}
+
+function grownBough(bough: Bough, random: RandomFraction): BufferGeometry[] {
+	const points = kinkedPoints(bough, random);
+	const toRadius = Math.max(Build.Thinnest, bough.radius * Kink.TipShare);
+	const tube = woodTube({ points, fromRadius: bough.radius, toRadius, sides: Build.Sides[bough.depth], roughness: Build.Roughness }, random);
+	return [tube, ...forksOf(bough, points, random).flatMap((fork) => grownBough(fork, random))];
+}
+
+function reachingHeading(random: RandomFraction) {
+	const isDrowned = random() < Branch.DrownedShare;
+	const rise = isDrowned ? -randomBetween(random, ...Reach.Dip) : randomBetween(random, ...Reach.Rise);
+	return new Vector3(randomBetween(random, ...Reach.Out), rise, pickRandom(random, Sides) * randomBetween(random, ...Reach.Side)).normalize();
 }
 
 function pointOnTrunk(trunk: Vector3[], along: number) {
@@ -36,36 +64,11 @@ function pointOnTrunk(trunk: Vector3[], along: number) {
 	return trunk[joint].clone().lerp(trunk[joint + 1], place - joint);
 }
 
-function reachingDirection(random: RandomFraction) {
-	const isDrowned = random() < Branch.DrownedShare;
-	const side = pickRandom(random, Sides);
-	const rise = isDrowned ? -randomBetween(random, ...Reach.Dip) : randomBetween(random, ...Reach.Rise);
-	return new Vector3(randomBetween(random, ...Reach.Out), rise, side * randomBetween(random, ...Reach.Side)).normalize();
-}
-
-function twigsOf(from: Vector3, to: Vector3, random: RandomFraction) {
-	return Array.from({ length: Twig.PerBranch }, () => {
-		const start = from.clone().lerp(to, Twig.FromShare + random() * (1 - Twig.FromShare) * 0.7);
-		const end = start.clone().add(reachingDirection(random).multiplyScalar(randomBetween(random, ...Twig.Length)));
-		return limbBetween(start, end, Twig.Radius, Twig.TipRadius, Twig.Sides);
-	});
-}
-
-function bentBranch(from: Vector3, length: number, radius: number, random: RandomFraction) {
-	const direction = reachingDirection(random);
-	const elbowShare = randomBetween(random, ...Elbow.Share);
-	const elbow = from.clone().add(direction.clone().multiplyScalar(length * elbowShare));
-	const bent = direction.clone().lerp(Up, randomBetween(random, ...Elbow.Lift)).normalize();
-	const tip = elbow.clone().add(bent.multiplyScalar(length * (1 - elbowShare)));
-	const elbowRadius = radius * Elbow.Thinning;
-	const limbs = [limbBetween(from, elbow, radius, elbowRadius, Branch.Sides), limbBetween(elbow, tip, elbowRadius, Branch.TipRadius, Branch.Sides)];
-	return [...limbs, ...twigsOf(elbow, tip, random)];
-}
-
 export function branchesOf(trunk: Vector3[], random: RandomFraction) {
 	return Array.from({ length: Branch.Count }, (_, index) => {
-		const along = Branch.FirstShare + (index / Branch.Count) * (1 - Branch.FirstShare);
-		const length = randomBetween(random, ...Branch.Length) * (1 - along * Elbow.Shortening);
-		return bentBranch(pointOnTrunk(trunk, along), length, Branch.Radius * (1.2 - along / 2), random);
+		const along = Branch.FirstShare + ((index + random() / 2) / Branch.Count) * (1 - Branch.FirstShare);
+		const length = randomBetween(random, ...Branch.Length) * (1 - along * Branch.Shortening);
+		const radius = trunkRadiusAlong(along) * Branch.RadiusShare;
+		return grownBough({ from: pointOnTrunk(trunk, along), heading: reachingHeading(random), length, radius, depth: 0 }, random);
 	}).flat();
 }

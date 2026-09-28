@@ -3,7 +3,7 @@ import { pickColour } from '../grass/coverPalette';
 import { pixelsAcross, type ReedBrush } from './reedPainters';
 
 const Sword = { Count: 16, Edge: 0.25, Shortest: 0.45, Width: 8, Arch: 0.12, Thinnest: 0.7, WidthSwing: 0.5 } as const;
-const Mace = { Heads: 4, Shortest: 0.7, HeadLength: 0.12, HeadWidth: 11, Spike: 0.06, StemWidth: 2.4, Highlight: 0.25 } as const;
+const Mace = { Heads: 5, Shortest: 0.7, HeadLength: 0.1, HeadWidth: 21, Spike: 0.05, StemWidth: 2.6, Highlight: 0.18, Shadow: -0.3 } as const;
 
 function paintSword(brush: ReedBrush) {
 	const { context, width, height, random, palette } = brush;
@@ -20,12 +20,14 @@ function paintMaceHead(brush: ReedBrush, top: { x: number; y: number }) {
 	const headLength = height * Mace.HeadLength;
 	const headWidth = Mace.HeadWidth * pixelsAcross(brush);
 	const colour = pickColour(palette.maceHeads, random);
-	context.fillStyle = colour;
+	const headTop = top.y + height * Mace.Spike;
+	const shading = context.createLinearGradient(top.x - headWidth / 2, 0, top.x + headWidth / 2, 0);
+	shading.addColorStop(0, shadeOf(colour, Mace.Highlight));
+	shading.addColorStop(1, shadeOf(colour, Mace.Shadow));
+	context.fillStyle = shading;
 	context.beginPath();
-	context.roundRect(top.x - headWidth / 2, top.y + height * Mace.Spike, headWidth, headLength, headWidth / 2);
+	context.roundRect(top.x - headWidth / 2, headTop, headWidth, headLength, headWidth / 2);
 	context.fill();
-	context.fillStyle = shadeOf(colour, Mace.Highlight);
-	context.fillRect(top.x - headWidth / 4, top.y + height * Mace.Spike + headWidth / 2, headWidth / 5, headLength - headWidth);
 }
 
 export function paintReedmace(brush: ReedBrush) {

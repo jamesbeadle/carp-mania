@@ -11,8 +11,8 @@ export interface CoverPalette {
 }
 
 const Summer: CoverPalette = {
-	blades: ['#34631a', '#437520', '#528728', '#619430', '#72a23a'],
-	dryBlades: ['#8c8a46', '#7a7c3e', '#9c9452'],
+	blades: ['#2a5216', '#35601a', '#41701f', '#4c7c25', '#5a882c'],
+	dryBlades: ['#7a783c', '#6a6c36', '#8a8446'],
 	seedHeads: ['#8a784a', '#766644', '#9c8a58'],
 	rushes: ['#3c6230', '#48703a', '#557c3e', '#628846', '#6e8e4a'],
 	sedges: ['#5f8a34', '#6f9a3e', '#7ea848', '#8aa850'],
@@ -22,7 +22,7 @@ const Summer: CoverPalette = {
 
 const Spring: CoverPalette = {
 	...Summer,
-	blades: ['#3c731e', '#4c8526', '#5c962e', '#6ca238', '#7eae44'],
+	blades: ['#326a1a', '#3e7a20', '#4a8a28', '#58962e', '#68a038'],
 	seedHeads: ['#8fa060', '#a0a870', '#b4b27c'],
 	flowerShare: 1.2
 };

@@ -20,7 +20,8 @@ export interface CoverPlant {
 }
 
 const Tile = { Metres: 8, NearestShore: -6, FarthestShore: 90 } as const;
-const Tint = { Darkest: 0.72, Range: 0.34, DryHue: 0.035, DryLift: 0.1 } as const;
+const Tint = { Darkest: 0.62, Range: 0.34, DryLift: 0.1, DryPatchShare: 0.5 } as const;
+const Growth = { Least: 0.75, PatchSwing: 0.5 } as const;
 const TileDiagonal = Tile.Metres * Math.SQRT2;
 
 interface Scattering {
@@ -41,15 +42,14 @@ function chosenPlanting(site: CoverSite, scattering: Scattering): Planting | nul
 }
 
 function plantOf(planting: Planting, site: CoverSite, random: RandomFraction): CoverPlant {
-	const height = randomBetween(random, ...planting.heights) * (0.75 + site.patch * 0.5);
-	const dryness = Math.max(0, site.meadow - site.patch * 0.5);
+	const height = randomBetween(random, ...planting.heights) * (Growth.Least + site.patch * Growth.PatchSwing);
+	const dryness = Math.max(0, site.meadow - site.patch * Tint.DryPatchShare);
 	const tint = { shade: Tint.Darkest + random() * Tint.Range, warmth: dryness * Tint.DryLift };
 	const width = height * randomBetween(random, ...planting.widthPerHeight);
 	const lean = (random() - 1 / 2) * planting.lean * 2;
 	const { reach, isMarginal } = planting;
 	return { point: site.point, cell: pickRandom(random, planting.cells), height, width, lean, turn: random() * Math.PI, tint, reach, isMarginal };
 }
-
 
 function scatterTile(corner: WorldPoint, scattering: Scattering, into: CoverPlant[]) {
 	const { sites, random } = scattering;
