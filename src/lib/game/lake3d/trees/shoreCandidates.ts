@@ -1,7 +1,7 @@
 import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
 
-const MetresOfShorePerCandidate = 1.6;
+const CandidatesPerShoreSquareMetre = 0.0149;
 const FullTurn = Math.PI * 2;
 
 function shoreLengthOf(outline: WorldPoint[]) {
@@ -22,6 +22,6 @@ function nearTheShore(outline: WorldPoint[], reach: number, random: RandomFracti
 }
 
 export function shoreCandidates(outline: WorldPoint[], reach: number, random: RandomFraction) {
-	const count = Math.round(shoreLengthOf(outline) / MetresOfShorePerCandidate);
+	const count = Math.round(shoreLengthOf(outline) * reach * CandidatesPerShoreSquareMetre);
 	return Array.from({ length: count }, () => nearTheShore(outline, reach, random));
 }

@@ -6,6 +6,7 @@ import { plantAnIsland } from './islandPlanting';
 import { shoreCandidates } from './shoreCandidates';
 import { treeAt, type PlantedTree } from './plantedTree';
 import { Bands, kindFor } from './speciesChoice';
+import { CrownReach } from './treeKinds';
 import { woodlandFields, type WoodlandFields } from './woodlandFields';
 
 export type { TreeKind } from './treeKinds';
@@ -20,19 +21,23 @@ export interface PlantingGround {
 	seed: number;
 }
 
-const Planting = { ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 20000, MostTrees: 3200, TreeLineReach: 42, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
+const Planting = { ClearOfBankside: 3, SpreadOfPlot: 1.35, Attempts: 20000, FewestMostTrees: 3200, MostTreesPerPlotMetre: 5.8, TreeLineReach: 42, BackRowDepth: 16, BackRowDensity: 0.65, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
 const Density = { Clearing: 0.3, Contrast: 1.6, DeepWoodsFrom: 110, DeepWoodsShare: 0.6 } as const;
 
 function densityAt(point: WorldPoint, distanceFromWater: number, fields: WoodlandFields) {
 	const depthShare = distanceFromWater > Density.DeepWoodsFrom ? Density.DeepWoodsShare : 1;
 	const woods = (fields.density(point) - Density.Clearing) * Density.Contrast * depthShare;
 	const lineShare = Planting.TreeLineFloor + (1 - Planting.TreeLineFloor) * fields.treeLine(point);
-	const treeLine = distanceFromWater < Planting.TreeLineReach ? Planting.TreeLineDensity * lineShare + woods / 2 : 0;
-	return Math.min(1, Math.max(0, woods, treeLine));
+	const isTreeLine = distanceFromWater < Planting.TreeLineReach;
+	const isBackRow = !isTreeLine && distanceFromWater < Planting.TreeLineReach + Planting.BackRowDepth;
+	const treeLine = isTreeLine ? Planting.TreeLineDensity * lineShare + woods / 2 : 0;
+	const backRow = isBackRow ? Planting.BackRowDensity * lineShare : 0;
+	return Math.min(1, Math.max(0, woods, treeLine, backRow));
 }
 
-function isClearOfBankside(point: WorldPoint, keepClear: ClearSpot[]) {
-	return keepClear.every((spot) => metresBetween(spot.point, point) > spot.radius + Planting.ClearOfBankside);
+function isClearOfBankside(tree: PlantedTree, keepClear: ClearSpot[]) {
+	const crownReach = tree.height * CrownReach[tree.kind];
+	return keepClear.every((spot) => metresBetween(spot.point, tree.point) > spot.radius + Planting.ClearOfBankside + crownReach);
 }
 
 function plantableEdgeOf(ground: PlantingGround): WorldPoint {
@@ -45,20 +50,21 @@ function plantableEdgeOf(ground: PlantingGround): WorldPoint {
 function candidatePoints(ground: PlantingGround, random: RandomFraction) {
 	const edge = plantableEdgeOf(ground);
 	const isOnThePlot = (point: WorldPoint) => Math.abs(point.x) < edge.x && Math.abs(point.z) < edge.z;
-	const shoreline = shoreCandidates(ground.outline, Planting.TreeLineReach, random).filter(isOnThePlot);
+	const shoreline = shoreCandidates(ground.outline, Planting.TreeLineReach + Planting.BackRowDepth, random).filter(isOnThePlot);
 	const anywhere = Array.from({ length: Planting.Attempts }, () => ({ x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z }));
 	return [...shoreline, ...anywhere];
 }
 
 function plantTheBank(ground: PlantingGround, fields: WoodlandFields, random: RandomFraction) {
 	const trees: PlantedTree[] = [];
+	const mostTrees = Math.max(Planting.FewestMostTrees, ground.plotReach * Planting.MostTreesPerPlotMetre);
 	for (const point of candidatePoints(ground, random)) {
-		if (trees.length >= Planting.MostTrees) break;
+		if (trees.length >= mostTrees) break;
 		if (isInsideOutline(point, ground.outline)) continue;
 		const distanceFromWater = distanceToOutline(point, ground.outline);
-		const isTooClose = distanceFromWater < Bands.NearestWater || !isClearOfBankside(point, ground.keepClear);
-		if (isTooClose || random() > densityAt(point, distanceFromWater, fields)) continue;
-		trees.push(treeAt(kindFor(point, distanceFromWater, fields, random), point, distanceFromWater, ground.outline, random));
+		if (distanceFromWater < Bands.NearestWater || random() > densityAt(point, distanceFromWater, fields)) continue;
+		const tree = treeAt(kindFor(point, distanceFromWater, fields, random), point, distanceFromWater, ground.outline, random);
+		if (isClearOfBankside(tree, ground.keepClear)) trees.push(tree);
 	}
 	return trees;
 }
