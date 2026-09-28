@@ -15,6 +15,7 @@ export interface WoodDetail {
 const Root = { Sink: 0.03, Flare: 1.35 } as const;
 const Texture = { AroundRepeats: 2, AlongPerCircumference: 1 } as const;
 const FullTurn = Math.PI * 2;
+const ReferenceSide = new Vector3(1, 0, 0.3).normalize();
 
 export function woodWriter() {
 	return new GeometryWriter([{ name: 'barkStyle', size: 3 }]);
@@ -53,7 +54,7 @@ function writeRing(writer: GeometryWriter, kind: TreeKind, limb: Limb, index: nu
 
 function writeLimb(writer: GeometryWriter, kind: TreeKind, limb: Limb, sides: number) {
 	const firstDirection = tangentAt(limb.points, 0);
-	const frame = { side: new Vector3().crossVectors(firstDirection, new Vector3(1, 0, 0.3)).normalize(), along: 0 };
+	const frame = { side: new Vector3().crossVectors(firstDirection, ReferenceSide).normalize(), along: 0 };
 	let previous = -1;
 	limb.points.forEach((point, index) => {
 		frame.along += index === 0 ? 0 : point.distanceTo(limb.points[index - 1]);

@@ -1,5 +1,6 @@
 import type { RandomFraction } from '$lib/domain/random';
 import type { AtlasPainter, PixelRegion } from './atlasPainter';
+import { centredRandom } from './centredRandom';
 
 const Broadleaf = { Filler: 70, FillerReach: 0.22, Longest: 0.1, Shortest: 0.07, Width: 0.48 } as const;
 const Shading = { Darkest: 0.5, Range: 0.5, Warmth: 0.8, Cool: 0.3, TwigLightness: 0.35, TwigWidth: 0.006, Scatter: 1.4, Steadiest: 0.6 } as const;
@@ -21,7 +22,7 @@ function scatterLeaves(painter: AtlasPainter, region: PixelRegion, centre: { x: 
 		const x = centre.x + Math.cos(angle) * distance;
 		const y = centre.y + Math.sin(angle) * distance;
 		const length = (Broadleaf.Shortest + random() * (Broadleaf.Longest - Broadleaf.Shortest)) * size;
-		const pointing = angle + (random() - 0.5) * Shading.Scatter * 2;
+		const pointing = angle + centredRandom(random) * Shading.Scatter * 2;
 		painter.leaf(x, y, pointing, length, length * Broadleaf.Width, toneFor((brightest * (index + 1)) / count, random));
 	}
 }
@@ -32,7 +33,7 @@ function paintSprig(painter: AtlasPainter, region: PixelRegion, heading: number,
 	const centre = centreOf(region);
 	const size = region.width;
 	const reach = Sprigs.Reach * (Sprigs.ShortestReach + random() * (1 - Sprigs.ShortestReach)) * size;
-	const curl = (random() - 0.5) * Sprigs.Curl;
+	const curl = centredRandom(random) * Sprigs.Curl;
 	const pointAt = (along: number): [number, number] => {
 		const turn = heading + curl * along;
 		const distance = Sprigs.Start * size + along * reach;

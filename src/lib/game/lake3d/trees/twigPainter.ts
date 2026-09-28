@@ -1,5 +1,6 @@
 import type { RandomFraction } from '$lib/domain/random';
 import type { AtlasPainter, PixelRegion } from './atlasPainter';
+import { centredRandom } from './centredRandom';
 
 const Twigs = { Depth: 8, FirstLength: 0.12, Shortening: 0.86, LengthJitter: 0.4, Spread: 0.48, Thickest: 0.007, Thinning: 0.74, Children: 2, ExtraChild: 0.35, Root: 0.8 } as const;
 const Bark = { Darkest: 0.55, Range: 0.3, Warmth: 0.15, Coverage: 0.85 } as const;
@@ -14,7 +15,7 @@ interface Twig {
 }
 
 function growTwig(painter: AtlasPainter, twig: Twig, random: RandomFraction) {
-	const bend = ((random() - 1 / 2) * Twigs.Spread) / 2;
+	const bend = (centredRandom(random) * Twigs.Spread) / 2;
 	const half = twig.length / 2;
 	const middle: [number, number] = [twig.x + Math.cos(twig.heading) * half, twig.y + Math.sin(twig.heading) * half];
 	const end: [number, number] = [middle[0] + Math.cos(twig.heading + bend) * half, middle[1] + Math.sin(twig.heading + bend) * half];
@@ -22,8 +23,8 @@ function growTwig(painter: AtlasPainter, twig: Twig, random: RandomFraction) {
 	if (twig.depth >= Twigs.Depth) return;
 	const children = Twigs.Children + (random() < Twigs.ExtraChild ? 1 : 0);
 	for (let child = 0; child < children; child++) {
-		const heading = twig.heading + bend + (child / Math.max(1, children - 1) - 1 / 2) * Twigs.Spread * 2 + (random() - 1 / 2) * Twigs.Spread;
-		growTwig(painter, { x: end[0], y: end[1], heading, length: twig.length * Twigs.Shortening * (1 + (random() - 1 / 2) * Twigs.LengthJitter), width: Math.max(1, twig.width * Twigs.Thinning), depth: twig.depth + 1 }, random);
+		const heading = twig.heading + bend + (child / Math.max(1, children - 1) - 1 / 2) * Twigs.Spread * 2 + centredRandom(random) * Twigs.Spread;
+		growTwig(painter, { x: end[0], y: end[1], heading, length: twig.length * Twigs.Shortening * (1 + centredRandom(random) * Twigs.LengthJitter), width: Math.max(1, twig.width * Twigs.Thinning), depth: twig.depth + 1 }, random);
 	}
 }
 

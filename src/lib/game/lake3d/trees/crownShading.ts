@@ -20,8 +20,8 @@ export function crownVolumeOf(sites: LeafSite[], margin: number): CrownVolume {
 	});
 	least.subScalar(margin);
 	most.addScalar(margin);
-	const centre = least.clone().add(most).multiplyScalar(0.5);
-	const radii = most.clone().sub(least).multiplyScalar(0.5).max(new Vector3(margin, margin, margin));
+	const centre = least.clone().add(most).divideScalar(2);
+	const radii = most.clone().sub(least).divideScalar(2).max(new Vector3(margin, margin, margin));
 	return { centre, radii, bottom: least.y, top: most.y };
 }
 

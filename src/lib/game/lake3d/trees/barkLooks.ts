@@ -39,7 +39,7 @@ function mixStyles(first: BarkStyle, second: BarkStyle, share: number): BarkStyl
 export function barkPaintAt(kind: TreeKind, level: number, height: number): BarkPaint {
 	const look = Looks[kind];
 	const twigLevel = kind === 'birch' ? Blend.BirchTwigLevel : Blend.TwigLevel;
-	const upperShare = Math.min(1, Math.max(0, (height - look.upperFrom) / Blend.Band + 0.5));
+	const upperShare = Math.min(1, Math.max(0, (height - look.upperFrom) / Blend.Band + 1 / 2));
 	const colour = new Color(look.trunk).lerp(new Color(look.upper), upperShare);
 	const style = mixStyles(look.style, look.upperStyle, upperShare);
 	if (level >= twigLevel) return { colour: new Color(look.twig), style: Furrowed };

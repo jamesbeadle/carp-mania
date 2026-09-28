@@ -5,6 +5,7 @@ import { AtlasRegions } from './foliageAtlas';
 import type { FoliageStyle } from './foliageStyles';
 import type { GeometryWriter } from './geometryWriter';
 import { writeCard, type ShadeLeaf } from './leafCards';
+import { centredRandom } from './centredRandom';
 import { deviate, randomUnit, UpAxis } from './limbPaths';
 import type { LeafSite } from './treeSkeleton';
 
@@ -28,7 +29,7 @@ export function clumpShading(context: FoliageContext, centre: Vector3, radius: n
 
 export function writeClump(writer: GeometryWriter, site: LeafSite, context: FoliageContext) {
 	const { style, random, volume } = context;
-	const jitter = 1 + (random() - 1 / 2) * Clump.SizeJitter;
+	const jitter = 1 + centredRandom(random) * Clump.SizeJitter;
 	const radius = style.clumpRadius * context.growth * jitter * (Clump.SmallestReach + (Clump.ReachGain * site.reach) / context.longestReach);
 	const tint = context.tint();
 	const outward = site.at.clone().sub(volume.centre).normalize();

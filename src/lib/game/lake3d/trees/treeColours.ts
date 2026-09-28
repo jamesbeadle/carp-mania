@@ -1,6 +1,7 @@
 import { Color, Vector4 } from 'three';
 import type { RandomFraction } from '$lib/domain/random';
 import type { SeasonName } from '$lib/domain/world/worldClock';
+import { centredRandom } from './centredRandom';
 import { isEvergreen, type TreeKind } from './treeKinds';
 
 type Palette = Record<TreeKind, string[]>;
@@ -15,7 +16,7 @@ const Foliage: Record<SeasonName, Palette> = {
 };
 
 const TreeShade = { Brightness: 0.35, Hue: 0.012 } as const;
-const Fullness = { AutumnLeast: 0.5, AutumnRange: 0.5 } as const;
+const Fullness = { AutumnLeast: 0.5, AutumnRange: 0.5, Spread: 7.31 } as const;
 interface ClumpTint {
 	hue: number;
 	hueRange: number;
@@ -38,13 +39,14 @@ export function isBare(season: SeasonName, kind: TreeKind) {
 export function crownColourOf(season: SeasonName, kind: TreeKind, pick: number, shade: number) {
 	const palette = Foliage[season][kind];
 	const colour = new Color(palette[Math.floor(pick * palette.length) % palette.length]);
-	colour.offsetHSL((shade - 0.5) * TreeShade.Hue * 2, 0, 0).multiplyScalar(1 + (shade - 0.5) * TreeShade.Brightness);
+	const offset = shade - 1 / 2;
+	colour.offsetHSL(offset * TreeShade.Hue * 2, 0, 0).multiplyScalar(1 + offset * TreeShade.Brightness);
 	const isThinning = season === 'autumn' && !isEvergreen(kind);
-	const fullness = isThinning ? Fullness.AutumnLeast + Fullness.AutumnRange * ((pick * 7.31) % 1) : 1;
+	const fullness = isThinning ? Fullness.AutumnLeast + Fullness.AutumnRange * ((pick * Fullness.Spread) % 1) : 1;
 	return new Vector4(colour.r, colour.g, colour.b, fullness);
 }
 
 export function clumpTintFor(season: SeasonName) {
 	const tint = ClumpTints[season];
-	return (random: RandomFraction) => new Color().setHSL(tint.hue + random() * tint.hueRange, tint.saturation, tint.lightness + (random() - 0.5) * tint.lightnessRange);
+	return (random: RandomFraction) => new Color().setHSL(tint.hue + random() * tint.hueRange, tint.saturation, tint.lightness + centredRandom(random) * tint.lightnessRange);
 }

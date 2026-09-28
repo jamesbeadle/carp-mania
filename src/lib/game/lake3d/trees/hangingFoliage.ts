@@ -3,6 +3,7 @@ import { clumpShading, writeClump, type FoliageContext } from './clumpFoliage';
 import { AtlasRegions } from './foliageAtlas';
 import type { GeometryWriter } from './geometryWriter';
 import { writeCard, writeStrip } from './leafCards';
+import { centredRandom } from './centredRandom';
 import { deviate, UpAxis } from './limbPaths';
 import type { LeafSite } from './treeSkeleton';
 
@@ -28,7 +29,7 @@ export function writeCurtain(writer: GeometryWriter, site: LeafSite, context: Fo
 	writeClump(writer, site, { ...context, cards: Math.max(1, Math.round(Curtain.TopClumpCards * context.cards / style.cards)) });
 	const strands = Math.max(1, Math.round((Curtain.Strands * context.cards) / style.cards));
 	for (let strand = 0; strand < strands; strand++) {
-		const top = site.at.clone().add(new Vector3(random() - 0.5, 0, random() - 0.5).multiplyScalar(style.clumpRadius * Curtain.Scatter));
+		const top = site.at.clone().add(new Vector3(centredRandom(random), 0, centredRandom(random)).multiplyScalar(style.clumpRadius * Curtain.Scatter));
 		const outward = outwardOf(top);
 		const hang = Math.max(0, top.y - Curtain.Floor) * (Curtain.ShortestHang + random() * Curtain.HangRange);
 		const tint = context.tint();
@@ -42,10 +43,10 @@ export function writeSpray(writer: GeometryWriter, site: LeafSite, context: Foli
 	const { random, style } = context;
 	const direction = site.heading.clone().addScaledVector(UpAxis, style.upward).normalize();
 	const length = site.reach * style.clumpRadius * context.growth;
-	const centre = site.at.clone().addScaledVector(direction, length * (0.5 - Spray.BaseBehind));
+	const centre = site.at.clone().addScaledVector(direction, length * (1 / 2 - Spray.BaseBehind));
 	const tint = context.tint();
 	for (let card = 0; card < context.cards; card++) {
-		const roll = (card / context.cards) * Math.PI + (random() - 0.5) * Spray.Roll;
+		const roll = (card / context.cards) * Math.PI + centredRandom(random) * Spray.Roll;
 		const across = deviate(direction, Math.PI / 2, roll).multiplyScalar((length * style.cardSize) / 2);
 		const down = direction.clone().multiplyScalar(-length / 2);
 		const normal = new Vector3().crossVectors(direction, across).normalize();

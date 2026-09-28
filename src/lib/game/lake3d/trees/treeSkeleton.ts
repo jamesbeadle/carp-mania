@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
 import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { BranchLevel, Habit } from './habitTypes';
+import { centredRandom } from './centredRandom';
 import { deviate, randomUnit, sampleLimb, UpAxis, type Limb } from './limbPaths';
 
 export type { BranchLevel, Habit } from './habitTypes';
@@ -66,12 +67,12 @@ function growLimb(growth: Growth, start: Vector3, heading: Vector3, length: numb
 	const { random, habit, levels } = growth;
 	if (levelIndex === levels.length - 2) plantAlong(growth, limb, length, habit.sitesOnBranches, Jitter.BranchSitesFrom, Jitter.BranchSitesSpan);
 	for (let index = 0; index < next.count; index++) {
-		const along = next.from + ((next.to - next.from) * (index + 0.5 + (random() - 0.5) * Jitter.Spacing)) / next.count;
+		const along = next.from + ((next.to - next.from) * (index + 1 / 2 + centredRandom(random) * Jitter.Spacing)) / next.count;
 		const sample = sampleLimb(limb, along);
-		growth.azimuth += GoldenAngle + (random() - 0.5) * Jitter.Azimuth;
-		const childHeading = deviate(sample.direction, next.angle * (1 + (random() - 0.5) * Jitter.Angle), growth.azimuth);
+		growth.azimuth += GoldenAngle + centredRandom(random) * Jitter.Azimuth;
+		const childHeading = deviate(sample.direction, next.angle * (1 + centredRandom(random) * Jitter.Angle), growth.azimuth);
 		const reach = next.reach ? next.reach(along) : 1;
-		const childLength = length * next.length * reach * (1 + (random() - 0.5) * Jitter.Length);
+		const childLength = length * next.length * reach * (1 + centredRandom(random) * Jitter.Length);
 		growLimb(growth, sample.point, childHeading, childLength, sample.radius * next.radius, levelIndex + 1);
 	}
 }
