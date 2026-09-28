@@ -12,10 +12,10 @@ export interface BandRow {
 	textureShift: number;
 }
 
-const Band = { StepMetres: 1.5, Sink: 0.1, TileMetres: 6, HeightSwing: 0.7, Wavelength: 7, Lean: 0.2, Presence: 1.8, Darkest: 0.8, ShadeRange: 0.2 } as const;
+const Band = { StepMetres: 1.5, Sink: 0.1, TileMetres: 6, HeightSwing: 0.7, Wavelength: 7, Lean: 0.2, Presence: 2.2, Darkest: 0.58, ShadeRange: 0.22 } as const;
 const Rows: BandRow[] = [
-	{ inset: 0.2, height: 0.85, textureShift: 0 },
-	{ inset: 0.9, height: 1.2, textureShift: 0.43 }
+	{ inset: 0.2, height: 0.95, textureShift: 0 },
+	{ inset: 0.9, height: 1.35, textureShift: 0.43 }
 ];
 const Channels = { Position: 3, Colour: 4, Uv: 2 } as const;
 

@@ -44,10 +44,10 @@ const Autumn: BushPalette = {
 };
 
 const Winter: BushPalette = {
-	leaves: ['#6a5238', '#76603e', '#5c4a32'],
-	darkLeaves: ['#5e4a34', '#6a5a3c', '#54442e'],
+	leaves: ['#5a4c3c', '#665644', '#4e4234'],
+	darkLeaves: ['#524638', '#5e5242', '#483e32'],
 	brambleLeaves: ['#2c4420', '#344a24', '#3c4a26', '#4a3e26'],
-	canes: ['#5a4a3a', '#66523e', '#4c3e32', '#6e5c48'],
+	canes: ['#4e463e', '#5a5046', '#443c36', '#62584c'],
 	brambleCanes: ['#5a4034', '#4e3a30', '#664a3a'],
 	fruit: [],
 	leafShare: 0.12,

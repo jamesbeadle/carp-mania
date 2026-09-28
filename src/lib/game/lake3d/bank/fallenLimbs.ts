@@ -11,11 +11,11 @@ interface Bough {
 	depth: number;
 }
 
-const Branch = { Count: 14, FirstShare: 0.22, Length: [2, 4.2], RadiusShare: 0.42, DrownedShare: 0.25, Shortening: 0.45 } as const;
-const Kink = { Joints: 3, Swing: 0.55, Lift: 0.18, TipShare: 0.12 } as const;
+const Branch = { Count: 16, FirstShare: 0.22, Length: [2, 4.2], RadiusShare: 0.42, DrownedShare: 0.35, Shortening: 0.45, BrokenShare: 0.3, Broken: 0.3 } as const;
+const Kink = { Joints: 3, Swing: 0.5, Lift: 0.07, TipShare: 0.12 } as const;
 const Fork = { MostDepth: 2, Chance: 0.85, LengthShare: 0.55, RadiusShare: 0.6, Spread: 0.9 } as const;
 const Build = { Sides: [7, 5, 4], Roughness: 0.1, Thinnest: 0.006 } as const;
-const Reach = { Dip: [0.3, 0.8], Rise: [0.45, 1.3], Out: [0.1, 0.7], Side: [0.4, 1.2] } as const;
+const Reach = { Dip: [0.3, 0.8], Rise: [0.15, 0.75], Out: [0.2, 0.8], Side: [0.6, 1.4] } as const;
 const Sides = [-1, 1];
 const Up = new Vector3(0, 1, 0);
 
@@ -67,7 +67,8 @@ function pointOnTrunk(trunk: Vector3[], along: number) {
 export function branchesOf(trunk: Vector3[], random: RandomFraction) {
 	return Array.from({ length: Branch.Count }, (_, index) => {
 		const along = Branch.FirstShare + ((index + random() / 2) / Branch.Count) * (1 - Branch.FirstShare);
-		const length = randomBetween(random, ...Branch.Length) * (1 - along * Branch.Shortening);
+		const snapped = random() < Branch.BrokenShare ? Branch.Broken : 1;
+		const length = randomBetween(random, ...Branch.Length) * (1 - along * Branch.Shortening) * snapped;
 		const radius = trunkRadiusAlong(along) * Branch.RadiusShare;
 		return grownBough({ from: pointOnTrunk(trunk, along), heading: reachingHeading(random), length, radius, depth: 0 }, random);
 	}).flat();
