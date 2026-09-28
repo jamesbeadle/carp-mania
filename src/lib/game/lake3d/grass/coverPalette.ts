@@ -20,7 +20,12 @@ const Summer: CoverPalette = {
 	flowerShare: 1
 };
 
-const Spring: CoverPalette = { ...Summer, blades: ['#3c731e', '#4c8526', '#5c962e', '#6ca238', '#7eae44'], seedHeads: ['#8fa060', '#a0a870', '#b4b27c'], flowerShare: 1.2 };
+const Spring: CoverPalette = {
+	...Summer,
+	blades: ['#3c731e', '#4c8526', '#5c962e', '#6ca238', '#7eae44'],
+	seedHeads: ['#8fa060', '#a0a870', '#b4b27c'],
+	flowerShare: 1.2
+};
 
 const Autumn: CoverPalette = {
 	blades: ['#56642a', '#667032', '#78793a', '#8a8446', '#6a6a30'],

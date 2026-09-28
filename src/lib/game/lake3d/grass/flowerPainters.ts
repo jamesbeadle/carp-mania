@@ -2,16 +2,25 @@ import { paintDot, paintStem } from './bladeStroke';
 import { pickColour } from './coverPalette';
 import { paintTuft, pixelsPer, type CellBrush } from './grassPainters';
 
-const Flower = { Buttercup: '#f0cc1e', ButtercupShade: '#c89a10', Daisy: '#f6f4ec', DaisyEye: '#e8b828', Clover: '#e2b4cc', WhiteClover: '#f0ecea', Leaf: '#3c6a26' } as const;
-const Heads = { Buttercups: 11, Daisies: 7, Clovers: 6, Petals: 5, PetalReach: 0.6 } as const;
+const Flower = {
+	Buttercup: '#f0cc1e',
+	ButtercupShade: '#c89a10',
+	Daisy: '#f6f4ec',
+	DaisyEye: '#e8b828',
+	Clover: '#e2b4cc',
+	WhiteClover: '#f0ecea',
+	Leaf: '#3c6a26'
+} as const;
+const Heads = { Buttercups: 11, Daisies: 7, Clovers: 6, Petals: 5, PetalReach: 0.6, PetalSquash: 0.7, PetalSize: 0.62, EyeSize: 0.4 } as const;
 
 function paintBloom(brush: CellBrush, centre: { x: number; y: number }, radius: number, colours: { petal: string; eye: string }) {
 	const { context } = brush;
 	for (let petal = 0; petal < Heads.Petals; petal++) {
 		const turn = (petal / Heads.Petals) * Math.PI * 2;
-		paintDot(context, { x: centre.x + Math.cos(turn) * radius * Heads.PetalReach, y: centre.y + Math.sin(turn) * radius * Heads.PetalReach * 0.7 }, radius * 0.62, colours.petal);
+		const spot = { x: centre.x + Math.cos(turn) * radius * Heads.PetalReach, y: centre.y + Math.sin(turn) * radius * Heads.PetalReach * Heads.PetalSquash };
+		paintDot(context, spot, radius * Heads.PetalSize, colours.petal);
 	}
-	paintDot(context, centre, radius * 0.4, colours.eye);
+	paintDot(context, centre, radius * Heads.EyeSize, colours.eye);
 }
 
 function flowerStems(brush: CellBrush, count: number, reach: [number, number]) {

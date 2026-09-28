@@ -12,7 +12,7 @@ export type CellPainter = (context: CanvasRenderingContext2D, cellIndex: number)
 
 const Channels = 4;
 const Opaque = { Alpha: 3, Solid: 128, SeeThrough: 8 } as const;
-const Anisotropy = 4;
+const MipmappedSurface = { generateMipmaps: true, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, colorSpace: SRGBColorSpace, anisotropy: 4 };
 
 function averageSolidColour(pixels: Uint8ClampedArray, indices: number[]) {
 	const solid = indices.filter((index) => pixels[index + Opaque.Alpha] > Opaque.Solid);
@@ -27,7 +27,8 @@ function bleedCell(pixels: Uint8ClampedArray, grid: AtlasGrid, column: number, r
 		for (let x = column * grid.cellWidth; x < (column + 1) * grid.cellWidth; x++) indices.push((y * width + x) * Channels);
 	}
 	const average = averageSolidColour(pixels, indices);
-	indices.filter((index) => pixels[index + Opaque.Alpha] < Opaque.SeeThrough).forEach((index) => average.forEach((value, channel) => (pixels[index + channel] = value)));
+	const clearPixels = indices.filter((index) => pixels[index + Opaque.Alpha] < Opaque.SeeThrough);
+	clearPixels.forEach((index) => pixels.set(average, index));
 }
 
 function flippedRows(pixels: Uint8ClampedArray, width: number, height: number) {
@@ -66,8 +67,9 @@ export function paintAtlas(grid: AtlasGrid, painter: CellPainter) {
 	if (!context) return emptyTexture();
 	paintCells(context, grid, painter);
 	const image = context.getImageData(0, 0, width, height);
-	for (let cellIndex = 0; cellIndex < grid.columns * grid.rows; cellIndex++) bleedCell(image.data, grid, cellIndex % grid.columns, Math.floor(cellIndex / grid.columns));
+	for (let cellIndex = 0; cellIndex < grid.columns * grid.rows; cellIndex++) {
+		bleedCell(image.data, grid, cellIndex % grid.columns, Math.floor(cellIndex / grid.columns));
+	}
 	const texture = new DataTexture(flippedRows(image.data, width, height), width, height, RGBAFormat, UnsignedByteType);
-	Object.assign(texture, { generateMipmaps: true, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, colorSpace: SRGBColorSpace, anisotropy: Anisotropy, needsUpdate: true });
-	return texture;
+	return Object.assign(texture, MipmappedSurface, { needsUpdate: true });
 }

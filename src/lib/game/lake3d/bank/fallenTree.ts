@@ -29,11 +29,13 @@ function coloured(geometry: BufferGeometry, base: Color) {
 
 export function createFallenTree(point: WorldPoint, shore: ShoreField, random: RandomFraction) {
 	const trunk = trunkPoints({ length: Tree.Length, rise: Tree.RootRise, sink: Tree.CrownSink }, random);
-	const limbs = trunk.slice(1).map((end, index) => limbBetween(trunk[index], end, trunkRadiusAt(index / trunk.length), trunkRadiusAt((index + 1) / trunk.length), Tree.Sides));
+	const radiusAtJoint = (joint: number) => trunkRadiusAt(joint / trunk.length);
+	const limbs = trunk.slice(1).map((end, index) => limbBetween(trunk[index], end, radiusAtJoint(index), radiusAtJoint(index + 1), Tree.Sides));
 	const plate = new IcosahedronGeometry(RootPlate.Radius, 1).scale(RootPlate.Thin, 1, 1).translate(0, Tree.RootRise, 0);
 	const wood = [...limbs, ...branchesOf(trunk, random), ...rootsOf(trunk[0], random)];
 	const bark = mergeGeometries(wood.map((limb) => coloured(limb.toNonIndexed(), Bark.Dry.clone().offsetHSL(0, 0, (random() - 1 / 2) * Bark.ToneSwing))));
-	const mesh = new Mesh(mergeGeometries([bark, coloured(plate.toNonIndexed(), Bark.Earth)]), new MeshStandardMaterial({ vertexColors: true, roughness: Bark.Roughness }));
+	const wholeTree = mergeGeometries([bark, coloured(plate.toNonIndexed(), Bark.Earth)]);
+	const mesh = new Mesh(wholeTree, new MeshStandardMaterial({ vertexColors: true, roughness: Bark.Roughness }));
 	const heading = shore.headingTowardTheWater(point);
 	mesh.position.set(point.x - Math.cos(heading) * Tree.Length * Gradient.RootShare, 0, point.z - Math.sin(heading) * Tree.Length * Gradient.RootShare);
 	mesh.rotation.set(0, -heading, 0);

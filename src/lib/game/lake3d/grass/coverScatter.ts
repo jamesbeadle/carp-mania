@@ -1,7 +1,8 @@
 import { Color } from 'three';
 import { pickRandom, randomBetween, seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import { mostPlantsPerSquareMetre, Plantings, SwimsReachMetres, type Planting } from './coverPlantings';
+import { mostPlantsPerSquareMetre, SwimsReachMetres } from './coverDensity';
+import { Plantings, type Planting } from './coverPlantings';
 import { CoverPalettes } from './coverPalette';
 import { CoverSites, type CoverGround, type CoverSite } from './coverSite';
 import type { FieldArea } from './shoreField';
@@ -44,7 +45,10 @@ function plantOf(planting: Planting, site: CoverSite, random: RandomFraction): C
 	const height = randomBetween(random, ...planting.heights) * (0.75 + site.patch * 0.5);
 	const dryness = Math.max(0, site.meadow - site.patch * 0.5);
 	const tint = new Color().setScalar(Tint.Darkest + random() * Tint.Range).lerp(Warmth, dryness * Tint.DryLift);
-	return { point: site.point, cell: pickRandom(random, planting.cells), height, width: height * randomBetween(random, ...planting.widthPerHeight), lean: (random() - 0.5) * planting.lean * 2, turn: random() * Math.PI, tint, reach: planting.reach, isMarginal: planting.isMarginal };
+	const width = height * randomBetween(random, ...planting.widthPerHeight);
+	const lean = (random() - 1 / 2) * planting.lean * 2;
+	const { reach, isMarginal } = planting;
+	return { point: site.point, cell: pickRandom(random, planting.cells), height, width, lean, turn: random() * Math.PI, tint, reach, isMarginal };
 }
 
 
@@ -67,7 +71,8 @@ function scatterTile(corner: WorldPoint, scattering: Scattering, into: CoverPlan
 
 export function scatterCover(ground: CoverGround, area: FieldArea, density: number) {
 	const { least, most } = area;
-	const scattering = { sites: new CoverSites(ground), flowerShare: CoverPalettes[ground.season].flowerShare, density, mostDensity: 0, random: seededRandom(ground.seed) };
+	const { flowerShare } = CoverPalettes[ground.season];
+	const scattering = { sites: new CoverSites(ground), flowerShare, density, mostDensity: 0, random: seededRandom(ground.seed) };
 	const plants: CoverPlant[] = [];
 	for (let x = least.x; x < most.x; x += Tile.Metres) {
 		for (let z = least.z; z < most.z; z += Tile.Metres) {

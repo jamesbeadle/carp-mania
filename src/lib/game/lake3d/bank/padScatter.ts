@@ -23,7 +23,8 @@ function boundsOf(area: WorldPoint[]) {
 
 function padAt(point: WorldPoint, index: number, random: RandomFraction): FloatingPad {
 	const isTilted = random() < Pads.TiltShare;
-	return { point, radius: randomBetween(random, ...Pads.Radius), turn: random() * Math.PI * 2, tilt: isTilted ? random() * Pads.MostTilt : 0, lift: Pads.Lift + (index % Pads.Layers) * Pads.Stacking };
+	const lift = Pads.Lift + (index % Pads.Layers) * Pads.Stacking;
+	return { point, radius: randomBetween(random, ...Pads.Radius), turn: random() * Math.PI * 2, tilt: isTilted ? random() * Pads.MostTilt : 0, lift };
 }
 
 export function scatterPads(area: WorldPoint[], density: number, random: RandomFraction) {

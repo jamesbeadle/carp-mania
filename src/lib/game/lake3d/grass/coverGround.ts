@@ -30,7 +30,8 @@ function areaAround(outline: WorldPoint[], plotEdge: WorldPoint | null): FieldAr
 	const least = { x: Math.min(...xs) - ReachBeyondTheWater, z: Math.min(...zs) - ReachBeyondTheWater };
 	const most = { x: Math.max(...xs) + ReachBeyondTheWater, z: Math.max(...zs) + ReachBeyondTheWater };
 	if (!plotEdge) return { least, most };
-	return { least: { x: Math.max(least.x, -plotEdge.x), z: Math.max(least.z, -plotEdge.z) }, most: { x: Math.min(most.x, plotEdge.x), z: Math.min(most.z, plotEdge.z) } };
+	const within = { least: { x: Math.max(least.x, -plotEdge.x), z: Math.max(least.z, -plotEdge.z) } };
+	return { ...within, most: { x: Math.min(most.x, plotEdge.x), z: Math.min(most.z, plotEdge.z) } };
 }
 
 export function surveyBank(plan: BankPlan): SurveyedBank {
@@ -40,5 +41,7 @@ export function surveyBank(plan: BankPlan): SurveyedBank {
 	const shore = new ShoreField(area, water);
 	const sampler = new GroundSampler(area, plan.groundAt, shore);
 	const groundAt = (point: WorldPoint) => sampler.heightAt(point);
-	return { area, edges: [plan.outline, ...plan.islands], shore, swims: swimClearingsFor(plan.pegs, water), facilities, plotEdge: plan.plotEdge, groundAt, season: plan.season, seed: plan.seed };
+	const swims = swimClearingsFor(plan.pegs, water);
+	const { plotEdge, season, seed } = plan;
+	return { area, edges: [plan.outline, ...plan.islands], shore, swims, facilities, plotEdge, groundAt, season, seed };
 }

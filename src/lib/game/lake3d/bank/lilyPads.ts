@@ -46,7 +46,8 @@ function flowerMesh(pads: FloatingPad[], season: SeasonName, random: RandomFract
 	flowering.forEach((pad, index) => {
 		const { point } = pad;
 		const size = randomBetween(random, ...Look.FlowerSize);
-		mesh.setMatrixAt(index, new Matrix4().compose(new Vector3(point.x, pad.lift + Look.FlowerLift, point.z), new Quaternion().setFromAxisAngle(Up, pad.turn), new Vector3(size, size, size)));
+		const turn = new Quaternion().setFromAxisAngle(Up, pad.turn);
+		mesh.setMatrixAt(index, new Matrix4().compose(new Vector3(point.x, pad.lift + Look.FlowerLift, point.z), turn, new Vector3(size, size, size)));
 		mesh.setColorAt(index, new Color(pickRandom(random, FlowerColours)));
 	});
 	return mesh;

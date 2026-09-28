@@ -10,8 +10,8 @@ export interface BushBrush {
 }
 
 const ReferenceCell = 256;
-const Shrub = { Leaves: 420, Reach: 0.47, Length: 15, Twigs: 7 } as const;
-const Bramble = { Clusters: 150, Reach: 0.47, Length: 20, Canes: 6, Fruit: 26 } as const;
+const Shrub = { Leaves: 420, Reach: 0.47, Length: 15, Twigs: 7, Smallest: 0.7, Swing: 0.6 } as const;
+const Bramble = { Clusters: 150, Reach: 0.47, FruitReach: 0.42, Length: 20, Canes: 6, Fruit: 14 } as const;
 const Shade = { Inner: -0.35, Lowest: -0.3, Highest: 0.12 } as const;
 const Strokes = { Twig: 2.2, Berry: 3.4, LeafAspect: 4.5 } as const;
 const Lobes = { Count: 5, Phase: 1.3, Depth: 0.3 } as const;
@@ -51,7 +51,10 @@ export function paintShrub(brush: BushBrush) {
 	const { palette, random } = brush;
 	paintTwigs(brush, Shrub.Twigs, Shrub.Reach);
 	const leaves = Math.round(Shrub.Leaves * palette.leafShare);
-	for (let leaf = 0; leaf < leaves; leaf++) paintLeaf(brush, spotInBlob(brush, Shrub.Reach), Shrub.Length * pixels(brush) * (0.7 + random() * 0.6), palette.leaves);
+	for (let leaf = 0; leaf < leaves; leaf++) {
+		const length = Shrub.Length * pixels(brush) * (Shrub.Smallest + random() * Shrub.Swing);
+		paintLeaf(brush, spotInBlob(brush, Shrub.Reach), length, palette.leaves);
+	}
 }
 
 export function paintBramble(brush: BushBrush) {
@@ -60,7 +63,12 @@ export function paintBramble(brush: BushBrush) {
 	for (let cluster = 0; cluster < Bramble.Clusters; cluster++) {
 		const at = spotInBlob(brush, Bramble.Reach);
 		const length = Bramble.Length * pixels(brush) * (0.7 + random() * 0.5);
-		Leaflets.forEach((leaflet) => paintLeaf(brush, { x: at.x + leaflet.x * length, y: at.y + leaflet.y * length, depth: at.depth }, length, palette.brambleLeaves));
+		Leaflets.forEach((leaflet) => {
+			const spot = { x: at.x + leaflet.x * length, y: at.y + leaflet.y * length, depth: at.depth };
+			paintLeaf(brush, spot, length, palette.brambleLeaves);
+		});
 	}
-	for (let berry = 0; berry < Bramble.Fruit; berry++) paintDot(context, spotInBlob(brush, Bramble.Reach * 0.9), Strokes.Berry * pixels(brush), pickColour(palette.fruit, random));
+	for (let berry = 0; berry < Bramble.Fruit; berry++) {
+		paintDot(context, spotInBlob(brush, Bramble.FruitReach), Strokes.Berry * pixels(brush), pickColour(palette.fruit, random));
+	}
 }

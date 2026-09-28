@@ -2,7 +2,8 @@ import { BufferAttribute, IcosahedronGeometry, PlaneGeometry, Quaternion, Vector
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { seededRandom } from '$lib/domain/random';
 
-const Blob = { Detail: 0, CardSize: 0.95, CardSizeSwing: 0.4, Placement: 0.5, PlacementSwing: 0.35, LowestCard: -0.35, Squash: 0.8, Lift: 0.55, Seed: 57 } as const;
+const Blob = { Detail: 0, LowestCard: -0.35, Squash: 0.8, Lift: 0.55, Seed: 57 } as const;
+const Card = { Size: 0.95, SizeSwing: 0.4, Placement: 0.5, PlacementSwing: 0.35 } as const;
 const Lobes = [
 	{ x: 0, y: 0.15, z: 0, size: 0.75 },
 	{ x: 0.45, y: -0.05, z: 0.2, size: 0.6 },
@@ -27,8 +28,8 @@ function cardAt(centre: Vector3, lobe: (typeof Lobes)[number], random: () => num
 	const outward = centre.clone().normalize();
 	const roll = new Quaternion().setFromAxisAngle(Facing, random() * Math.PI * 2);
 	const facing = new Quaternion().setFromUnitVectors(Facing, outward);
-	const placed = outward.clone().multiplyScalar((Blob.Placement + random() * Blob.PlacementSwing) * lobe.size).add(new Vector3(lobe.x, lobe.y, lobe.z));
-	const size = (Blob.CardSize + (random() - 0.5) * Blob.CardSizeSwing) * (lobe.size + 1) / 2;
+	const placed = outward.clone().multiplyScalar((Card.Placement + random() * Card.PlacementSwing) * lobe.size).add(new Vector3(lobe.x, lobe.y, lobe.z));
+	const size = (Card.Size + (random() - 1 / 2) * Card.SizeSwing) * (lobe.size + 1) / 2;
 	return new PlaneGeometry(size, size).applyQuaternion(roll).applyQuaternion(facing).translate(placed.x, placed.y, placed.z);
 }
 

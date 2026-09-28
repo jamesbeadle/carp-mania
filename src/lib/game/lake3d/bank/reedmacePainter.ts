@@ -2,7 +2,7 @@ import { paintBlade, paintStem, shadeOf } from '../grass/bladeStroke';
 import { pickColour } from '../grass/coverPalette';
 import { pixelsAcross, type ReedBrush } from './reedPainters';
 
-const Sword = { Count: 16, Edge: 0.25, Shortest: 0.45, Width: 8, Arch: 0.12 } as const;
+const Sword = { Count: 16, Edge: 0.25, Shortest: 0.45, Width: 8, Arch: 0.12, Thinnest: 0.7, WidthSwing: 0.5 } as const;
 const Mace = { Heads: 4, Shortest: 0.7, HeadLength: 0.12, HeadWidth: 11, Spike: 0.06, StemWidth: 2.4, Highlight: 0.25 } as const;
 
 function paintSword(brush: ReedBrush) {
@@ -11,7 +11,8 @@ function paintSword(brush: ReedBrush) {
 	const tall = height * (Sword.Shortest + random() * (1 - Sword.Shortest));
 	const arch = (random() - 0.5) * width * Sword.Arch * 2;
 	const tip = { x: rootX + arch * 1.6, y: height - tall };
-	paintBlade(context, { root: { x: rootX, y: height }, tip, bend: arch, width: Sword.Width * pixelsAcross(brush) * (0.7 + random() * 0.5), colour: pickColour(palette.maceLeaves, random) });
+	const swordWidth = Sword.Width * pixelsAcross(brush) * (Sword.Thinnest + random() * Sword.WidthSwing);
+	paintBlade(context, { root: { x: rootX, y: height }, tip, bend: arch, width: swordWidth, colour: pickColour(palette.maceLeaves, random) });
 }
 
 function paintMaceHead(brush: ReedBrush, top: { x: number; y: number }) {

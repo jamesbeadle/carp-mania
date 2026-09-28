@@ -29,7 +29,9 @@ function bushAt(point: WorldPoint, random: RandomFraction): CoverPlant {
 	const isBramble = random() < Look.BrambleShare;
 	const sizes: BushSizes = isBramble ? Sizes.Bramble : Sizes.Shrub;
 	const tint = new Color().setScalar(Look.Darkest + random() * Look.Range);
-	return { point, cell: isBramble ? BushCells.Bramble : BushCells.Shrub, height: randomBetween(random, ...sizes.height), width: randomBetween(random, ...sizes.width), lean: (random() - 0.5) * Look.Lean, turn: random() * Math.PI * 2, tint, reach: Look.Reach, isMarginal: false };
+	const cell = isBramble ? BushCells.Bramble : BushCells.Shrub;
+	const shape = { height: randomBetween(random, ...sizes.height), width: randomBetween(random, ...sizes.width), lean: (random() - 1 / 2) * Look.Lean };
+	return { point, cell, ...shape, turn: random() * Math.PI * 2, tint, reach: Look.Reach, isMarginal: false };
 }
 
 function edgeBushes(tree: PlantedTree, bank: SurveyedBank, random: RandomFraction) {
@@ -48,11 +50,14 @@ function scatteredGroups(bank: SurveyedBank, density: number, random: RandomFrac
 	const groups = Math.round((most.x - least.x) * (most.z - least.z) * Scatter.PerSquareMetre * density);
 	const centres = Array.from({ length: groups }, () => ({ x: least.x + random() * (most.x - least.x), z: least.z + random() * (most.z - least.z) }));
 	const inTheBand = centres.filter((centre) => bank.shore.distanceAt(centre) > Scatter.Band[0] && bank.shore.distanceAt(centre) < Scatter.Band[1]);
-	return inTheBand.flatMap((centre) => Array.from({ length: Math.ceil(random() * Scatter.Group) }, () => ({ x: centre.x + (random() - 0.5) * Scatter.GroupSpread * 2, z: centre.z + (random() - 0.5) * Scatter.GroupSpread * 2 })));
+	const jitter = () => (random() - 1 / 2) * Scatter.GroupSpread * 2;
+	const scattered = (centre: WorldPoint) => ({ x: centre.x + jitter(), z: centre.z + jitter() });
+	return inTheBand.flatMap((centre) => Array.from({ length: Math.ceil(random() * Scatter.Group) }, () => scattered(centre)));
 }
 
 export function plantBushes(trees: PlantedTree[], bank: SurveyedBank, density: number, random: RandomFraction) {
 	const edgeTrees = trees.filter((tree) => bank.shore.distanceAt(tree.point) < Edge.WoodsWithin && random() < Edge.Share * density);
-	const points = [...edgeTrees.flatMap((tree) => edgeBushes(tree, bank, random)), ...scatteredGroups(bank, density, random), ...watersideSpots(bank, density, random)];
+	const woodsEdge = edgeTrees.flatMap((tree) => edgeBushes(tree, bank, random));
+	const points = [...woodsEdge, ...scatteredGroups(bank, density, random), ...watersideSpots(bank, density, random)];
 	return points.filter((point) => canGrowAt(point, bank)).map((point) => bushAt(point, random));
 }

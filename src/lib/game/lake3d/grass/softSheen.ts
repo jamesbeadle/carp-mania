@@ -1,11 +1,14 @@
 import type { Material } from 'three';
+import { edited, including } from './shaderEdits';
 
-const Chunk = '#include <lights_physical_fragment>';
+function dimmedSpecular(sheen: string) {
+	return `material.specularF90 = ${sheen};\nmaterial.specularColor *= ${sheen};\nmaterial.specularColorBlended *= ${sheen};`;
+}
 
 export function withSoftSheen<Shaded extends Material>(material: Shaded, sheen: number) {
-	const dimming = `\nmaterial.specularF90 = ${sheen.toFixed(3)};\nmaterial.specularColor *= ${sheen.toFixed(3)};\nmaterial.specularColorBlended *= ${sheen.toFixed(3)};\n`;
+	const edits = [including('lights_physical_fragment', dimmedSpecular(sheen.toFixed(3)))];
 	material.onBeforeCompile = (shader) => {
-		shader.fragmentShader = shader.fragmentShader.replace(Chunk, Chunk + dimming);
+		shader.fragmentShader = edited(shader.fragmentShader, edits);
 	};
 	material.customProgramCacheKey = () => `soft-sheen-${sheen}`;
 	return material;

@@ -7,7 +7,7 @@ const Tones = ['#44362a', '#5e4c34', '#3a2e20', '#6a5638', '#524028'];
 const PebbleTones = ['#6e665a', '#7a7064', '#5e584e'];
 const Bits = ['#5a6a34', '#6a7a3c', '#7a7440'];
 const Speck = { Largest: 3, BitShare: 0.2 } as const;
-const Pebble = { Largest: 4.5, Smallest: 1.5 } as const;
+const Pebble = { Largest: 4.5, Smallest: 1.5, Flatness: 0.6 } as const;
 
 function scatterSpecks(context: CanvasRenderingContext2D, random: () => number) {
 	for (let speck = 0; speck < Dirt.Specks; speck++) {
@@ -21,7 +21,8 @@ function scatterPebbles(context: CanvasRenderingContext2D, random: () => number)
 	for (let pebble = 0; pebble < Dirt.Pebbles; pebble++) {
 		context.fillStyle = pickColour(PebbleTones, random);
 		context.beginPath();
-		context.ellipse(random() * Dirt.Pixels, random() * Dirt.Pixels, Pebble.Smallest + random() * Pebble.Largest, Pebble.Smallest + random() * Pebble.Largest * 0.6, random() * Math.PI, 0, Math.PI * 2);
+		const across = Pebble.Smallest + random() * Pebble.Largest;
+		context.ellipse(random() * Dirt.Pixels, random() * Dirt.Pixels, across, across * Pebble.Flatness, random() * Math.PI, 0, Math.PI * 2);
 		context.fill();
 	}
 }

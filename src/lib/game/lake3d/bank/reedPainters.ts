@@ -23,7 +23,7 @@ interface Point {
 
 const ReferenceWidth = 256;
 const Stem = { Edge: 0.14, Shortest: 0.62, Lean: 0.1, Width: 2.2, LowestLeaf: 0.08, HighestLeaf: 0.8 } as const;
-const Leaf = { Shortest: 0.16, Longest: 0.34, Width: 6.5, Droop: 0.2 } as const;
+const Leaf = { Shortest: 0.16, Longest: 0.34, Width: 6.5, Droop: 0.2, Thinnest: 0.7, WidthSwing: 0.5, Bend: 0.1 } as const;
 const Plume = { Strands: 55, Length: 0.15, Spread: 0.08, Sway: 0.08, StrandWidth: 1.1, Opacity: 0.6 } as const;
 
 export function pixelsAcross(brush: ReedBrush) {
@@ -34,7 +34,8 @@ function paintLeaf(brush: ReedBrush, from: Point, side: number) {
 	const { context, width, random, palette } = brush;
 	const length = width * (Leaf.Shortest + random() * (Leaf.Longest - Leaf.Shortest));
 	const tip = { x: from.x + side * length * 0.85, y: from.y - length * (0.35 - random() * Leaf.Droop) };
-	paintBlade(context, { root: from, tip, bend: side * length * 0.1, width: Leaf.Width * pixelsAcross(brush) * (0.7 + random() * 0.5), colour: pickColour(palette.leaves, random) });
+	const leafWidth = Leaf.Width * pixelsAcross(brush) * (Leaf.Thinnest + random() * Leaf.WidthSwing);
+	paintBlade(context, { root: from, tip, bend: side * length * Leaf.Bend, width: leafWidth, colour: pickColour(palette.leaves, random) });
 }
 
 function paintPlume(brush: ReedBrush, top: Point) {

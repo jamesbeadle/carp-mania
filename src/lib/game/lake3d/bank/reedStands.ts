@@ -8,7 +8,8 @@ import { ReedCells } from './reedAtlas';
 
 const Stand = { StepMetres: 0.16, BandHalfWidth: 3.2, MostInland: 0.9, Gappiness: 0.45, EdgeShare: 0.7, MaceShore: -1 } as const;
 const Heights = { Phragmites: [1.9, 2.9], Reedmace: [1.4, 2.0], Sparse: [1.5, 2.3] } as const;
-const Look = { WidthPerHeight: 0.58, Lean: 0.07, Darkest: 0.82, Range: 0.24, Reach: 8, MaceShare: 0.3, LeafyShare: 0.4, LeastHeight: 0.65, HeightSwing: 0.6 } as const;
+const Look = { WidthPerHeight: 0.58, Lean: 0.07, Darkest: 0.76, Range: 0.34, Reach: 8 } as const;
+const Mix = { MaceShare: 0.3, LeafyShare: 0.4, LeastHeight: 0.65, HeightSwing: 0.6 } as const;
 const Wavelengths = { Gaps: 7, Height: 5 } as const;
 
 interface StandContext {
@@ -18,9 +19,9 @@ interface StandContext {
 }
 
 function cellFor(offset: number, shore: number, random: RandomFraction) {
-	if (shore < Stand.MaceShore && random() < Look.MaceShare) return ReedCells.Reedmace;
+	if (shore < Stand.MaceShore && random() < Mix.MaceShare) return ReedCells.Reedmace;
 	if (Math.abs(offset) > Stand.BandHalfWidth * Stand.EdgeShare) return ReedCells.Sparse;
-	return random() < Look.LeafyShare ? ReedCells.Leafy : ReedCells.Plumed;
+	return random() < Mix.LeafyShare ? ReedCells.Leafy : ReedCells.Plumed;
 }
 
 function heightsFor(cell: number): readonly [number, number] {
@@ -34,9 +35,10 @@ function standAt(point: WorldPoint, offset: number, context: StandContext): Cove
 	const isThick = random() < 1 - Stand.Gappiness + noise.at(point, Wavelengths.Gaps) * Stand.Gappiness;
 	if (fromWater > Stand.MostInland || !isThick) return null;
 	const cell = cellFor(offset, fromWater, random);
-	const height = randomBetween(random, ...heightsFor(cell)) * (Look.LeastHeight + noise.at(point, Wavelengths.Height) * Look.HeightSwing);
+	const height = randomBetween(random, ...heightsFor(cell)) * (Mix.LeastHeight + noise.at(point, Wavelengths.Height) * Mix.HeightSwing);
 	const tint = new Color().setScalar(Look.Darkest + random() * Look.Range);
-	return { point, cell, height, width: height * Look.WidthPerHeight, lean: (random() - 0.5) * Look.Lean * 2, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
+	const lean = (random() - 1 / 2) * Look.Lean * 2;
+	return { point, cell, height, width: height * Look.WidthPerHeight, lean, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
 }
 
 function standsAlong(start: WorldPoint, end: WorldPoint, context: StandContext) {
