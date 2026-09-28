@@ -1,15 +1,15 @@
+import { GenerousCover, ModestCover, type CoverQuality } from './grass/coverTiers';
+
 export interface RenderQuality {
 	mostPixelRatio: number;
 	multisamples: number;
 	reflectionScale: number;
-	coverDensity: number;
-	coverCellPixels: number;
-	isCoverShadowed: boolean;
+	cover: CoverQuality;
 	hasBloom: boolean;
 }
 
-const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, coverDensity: 1, coverCellPixels: 256, isCoverShadowed: true, hasBloom: true };
-const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, coverDensity: 0.45, coverCellPixels: 128, isCoverShadowed: false, hasBloom: false };
+const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, cover: GenerousCover, hasBloom: true };
+const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, cover: ModestCover, hasBloom: false };
 const FewestCoresForGenerous = 6;
 
 let chosen: RenderQuality | null = null;

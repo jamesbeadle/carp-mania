@@ -3,7 +3,7 @@ import { pickRandom } from '$lib/domain/random';
 import { pickColour } from './coverPalette';
 import { paintTuft, pixelsPer, type CellBrush } from './grassPainters';
 
-const Rush = { Stems: 60, Fan: 0.55, Shortest: 0.55, Width: 2.6, FlowerShare: 0.18, FlowerColour: '#7a6440', FlowerAt: 0.72, FlowerRadius: 3.2 } as const;
+const Rush = { Stems: 38, Fan: 0.8, Shortest: 0.4, Width: 2.6, FlowerShare: 0.18, FlowerColour: '#7a6440', FlowerAt: 0.72, FlowerRadius: 3.2 } as const;
 const Sedge = { Leaves: 26, Widest: 7, Droop: 0.45 } as const;
 const Sides = [-1, 1];
 const Floret = { Largest: 2.8, Taper: 1.4 } as const;

@@ -1,4 +1,3 @@
-import { Color } from 'three';
 import { randomBetween, type RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
 import { CoverNoise } from '../grass/coverNoise';
@@ -36,7 +35,7 @@ function standAt(point: WorldPoint, offset: number, context: StandContext): Cove
 	if (fromWater > Stand.MostInland || !isThick) return null;
 	const cell = cellFor(offset, fromWater, random);
 	const height = randomBetween(random, ...heightsFor(cell)) * (Mix.LeastHeight + noise.at(point, Wavelengths.Height) * Mix.HeightSwing);
-	const tint = new Color().setScalar(Look.Darkest + random() * Look.Range);
+	const tint = { shade: Look.Darkest + random() * Look.Range, warmth: 0 };
 	const lean = (random() - 1 / 2) * Look.Lean * 2;
 	return { point, cell, height, width: height * Look.WidthPerHeight, lean, turn: random() * Math.PI, tint, reach: Look.Reach, isMarginal: true };
 }

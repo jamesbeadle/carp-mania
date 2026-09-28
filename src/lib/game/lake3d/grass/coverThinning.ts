@@ -1,6 +1,14 @@
-export const Thinning = { FullWithin: 16, GoneBeyond: 150, Curve: 1.5, Fade: 0.15, Growth: 0.006 } as const;
+import { renderQuality } from '../renderQuality';
+
+export const Thinning = { FullWithin: 14, GoneBeyond: 110, Curve: 1.6, Fade: 0.15, Growth: 0.006 } as const;
+
+export function thinningReach() {
+	const { cover } = renderQuality();
+	return { fullWithin: Thinning.FullWithin * cover.reach, goneBeyond: Thinning.GoneBeyond * cover.reach };
+}
 
 export function keptShareAt(metres: number) {
-	const share = Math.min(1, Math.max(0, (Thinning.GoneBeyond - metres) / (Thinning.GoneBeyond - Thinning.FullWithin)));
+	const { fullWithin, goneBeyond } = thinningReach();
+	const share = Math.min(1, Math.max(0, (goneBeyond - metres) / (goneBeyond - fullWithin)));
 	return Math.min(1, Math.pow(share, Thinning.Curve) * (1 + Thinning.Fade));
 }

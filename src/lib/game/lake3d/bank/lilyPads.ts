@@ -8,7 +8,7 @@ import { lilyFlowerGeometry, lilyPadGeometry } from './lilyShapes';
 import { lilyPadTexture } from './lilyTexture';
 import { scatterPads, type FloatingPad } from './padScatter';
 
-const Look = { PadRoughness: 0.6, PadSheen: 0.3, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.1, 0.16] } as const;
+const Look = { PadRoughness: 0.6, PadSheen: 0.16, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.1, 0.16] } as const;
 const PadTints: Record<SeasonName, string[]> = {
 	spring: ['#ffffff', '#eef6e0', '#dfeccc', '#f4ecd0'],
 	summer: ['#ffffff', '#e0ecd0', '#c8d8b0', '#f0e2b4', '#d8a888'],

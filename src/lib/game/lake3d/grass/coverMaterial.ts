@@ -1,7 +1,7 @@
 import { DoubleSide, MeshStandardMaterial, Vector3, Vector4, type Texture } from 'three';
 import { renderQuality } from '../renderQuality';
 import * as Chunks from './coverShader';
-import { Thinning } from './coverThinning';
+import { Thinning, thinningReach } from './coverThinning';
 import { CoverProjectVertex, CoverWindUniforms, type CoverWind } from './coverWind';
 import { edited, including, replacing, type ShaderEdit } from './shaderEdits';
 
@@ -40,10 +40,11 @@ function vertexEdits(look: CoverLook): ShaderEdit[] {
 
 function coverUniforms(look: CoverLook) {
 	const { grid, wind } = look;
+	const reach = thinningReach();
 	return {
 		coverGive: { value: look.give },
 		coverGrid: { value: new Vector3(grid.columns, grid.rows, grid.padding) },
-		coverThinning: { value: new Vector4(Thinning.FullWithin, Thinning.GoneBeyond, Thinning.Curve, Thinning.Fade) },
+		coverThinning: { value: new Vector4(reach.fullWithin, reach.goneBeyond, Thinning.Curve, Thinning.Fade) },
 		coverGrowth: { value: Thinning.Growth },
 		coverSheen: { value: look.sheen },
 		coverSheenReach: { value: new Vector3(SheenReach.Near, SheenReach.Far, SheenReach.Farthest) },

@@ -1,4 +1,3 @@
-import { Color } from 'three';
 import { randomBetween, type RandomFraction } from '$lib/domain/random';
 import { metresBetween, type WorldPoint } from '../lakeFrame';
 import type { SurveyedBank } from '../grass/coverGround';
@@ -8,8 +7,8 @@ import type { PlantedTree } from '../trees/treePlanting';
 import { BushCells } from './bushAtlas';
 import { watersideSpots } from './watersideBushes';
 
-const Edge = { WoodsWithin: 45, Share: 1, MostPerTree: 4, Outward: [1.5, 7], Sideways: 4 } as const;
-const Scatter = { PerSquareMetre: 0.005, Band: [3, 40], Group: 5, GroupSpread: 3.2 } as const;
+const Edge = { WoodsWithin: 40, Share: 0.6, MostPerTree: 3, Outward: [1.5, 7], Sideways: 4 } as const;
+const Scatter = { PerSquareMetre: 0.0035, Band: [3, 40], Group: 5, GroupSpread: 3.2 } as const;
 const Keep = { FromWater: 0.4, FromSwim: 4, FromFacility: 2 } as const;
 const Sizes = { Shrub: { height: [1.1, 2.6], width: [1.1, 2.4] }, Bramble: { height: [0.6, 1.2], width: [1.3, 2.8] } } as const;
 interface BushSizes {
@@ -28,7 +27,7 @@ function canGrowAt(point: WorldPoint, bank: SurveyedBank) {
 function bushAt(point: WorldPoint, random: RandomFraction): CoverPlant {
 	const isBramble = random() < Look.BrambleShare;
 	const sizes: BushSizes = isBramble ? Sizes.Bramble : Sizes.Shrub;
-	const tint = new Color().setScalar(Look.Darkest + random() * Look.Range);
+	const tint = { shade: Look.Darkest + random() * Look.Range, warmth: 0 };
 	const cell = isBramble ? BushCells.Bramble : BushCells.Shrub;
 	const shape = { height: randomBetween(random, ...sizes.height), width: randomBetween(random, ...sizes.width), lean: (random() - 1 / 2) * Look.Lean };
 	return { point, cell, ...shape, turn: random() * Math.PI * 2, tint, reach: Look.Reach, isMarginal: false };

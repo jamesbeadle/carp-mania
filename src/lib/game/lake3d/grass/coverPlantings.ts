@@ -50,7 +50,7 @@ const marginals: Planting = {
 	heights: [0.7, 1.45],
 	widthPerHeight: [0.75, 1.15],
 	lean: 0.1,
-	reach: 1.6,
+	reach: 2.2,
 	isMarginal: true,
 	densityAt: marginDensity
 };

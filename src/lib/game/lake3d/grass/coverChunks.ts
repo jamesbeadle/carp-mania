@@ -1,10 +1,11 @@
-import { Box3, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Camera, type Material } from 'three';
+import { Box3, Color, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Camera, type Material } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
 import { sharingShape } from './coverCards';
 import type { CoverPlant } from './coverScatter';
 import { hiddenBeyond } from './chunkHiding';
-import { keptShareAt, Thinning } from './coverThinning';
+import { keptShareAt, thinningReach } from './coverThinning';
+import { tintColour } from './plantTint';
 
 export interface ChunkPlan {
 	name: string;
@@ -58,10 +59,11 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	const geometry = sharingShape(plan.geometry);
 	const attribute = new Float32Array(plants.length * AttributeSize);
 	const mesh = new InstancedMesh(geometry, plan.material, plants.length);
+	const colour = new Color();
 	mesh.name = plan.name;
 	plants.forEach((plant, index) => {
 		mesh.setMatrixAt(index, placementOf(plant, plan));
-		mesh.setColorAt(index, plant.tint);
+		mesh.setColorAt(index, tintColour(plant.tint, colour));
 		attribute.set([plant.cell, index / plants.length, plant.reach], index * AttributeSize);
 	});
 	geometry.setAttribute('coverPlant', new InstancedBufferAttribute(attribute, AttributeSize));
@@ -69,7 +71,7 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	mesh.receiveShadow = true;
 	castsShadowWith(mesh, plan.shadowMaterial);
 	thinnedByDistance(mesh, plan, plants.length);
-	return hiddenBeyond(mesh, Thinning.GoneBeyond * plan.mostReach);
+	return hiddenBeyond(mesh, thinningReach().goneBeyond * plan.mostReach);
 }
 
 export function coverChunks(plants: CoverPlant[], plan: ChunkPlan) {

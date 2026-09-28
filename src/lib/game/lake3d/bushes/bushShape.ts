@@ -1,6 +1,7 @@
 import { BufferAttribute, IcosahedronGeometry, PlaneGeometry, Quaternion, Vector3, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { seededRandom } from '$lib/domain/random';
+import { renderQuality } from '../renderQuality';
 
 const Blob = { Detail: 0, LowestCard: -0.35, Squash: 0.8, Lift: 0.55, Seed: 57 } as const;
 const Card = { Size: 0.95, SizeSwing: 0.4, Placement: 0.5, PlacementSwing: 0.35 } as const;
@@ -11,6 +12,7 @@ const Lobes = [
 	{ x: 0.05, y: 0.2, z: -0.45, size: 0.5 }
 ];
 const Shade = { Lowest: 0.5, Range: 0.5 } as const;
+const LightLobes = 2;
 const Facing = new Vector3(0, 0, 1);
 const Up = new Vector3(0, 1, 0);
 
@@ -50,6 +52,8 @@ function roundedAndShaded(geometry: BufferGeometry) {
 
 export function bushBlob() {
 	const random = seededRandom(Blob.Seed);
-	const cards = Lobes.flatMap((lobe) => faceCentres().map((centre) => cardAt(centre, lobe, random)));
+	const { cover } = renderQuality();
+	const lobes = cover.isDetailed ? Lobes : Lobes.slice(0, LightLobes);
+	const cards = lobes.flatMap((lobe) => faceCentres().map((centre) => cardAt(centre, lobe, random)));
 	return roundedAndShaded(mergeGeometries(cards)).scale(1, Blob.Squash, 1).translate(0, Blob.Lift, 0);
 }

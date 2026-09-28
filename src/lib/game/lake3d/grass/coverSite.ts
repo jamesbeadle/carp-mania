@@ -52,9 +52,13 @@ export class CoverSites {
 		};
 	}
 
-	isBuildable(point: WorldPoint) {
+	facilitiesNear(point: WorldPoint, slack: number) {
+		return this.ground.facilities.filter((spot) => metresBetween(spot.point, point) < spot.radius + Clear.FacilityMargin + slack);
+	}
+
+	isBuildable(point: WorldPoint, facilities: ClearSpot[]) {
 		const edge = this.ground.plotEdge;
 		const isOffThePlot = edge !== null && (Math.abs(point.x) > edge.x - Clear.PlotEdgeMargin || Math.abs(point.z) > edge.z - Clear.PlotEdgeMargin);
-		return !isOffThePlot && this.ground.facilities.every((spot) => metresBetween(spot.point, point) > spot.radius + Clear.FacilityMargin);
+		return !isOffThePlot && facilities.every((spot) => metresBetween(spot.point, point) > spot.radius + Clear.FacilityMargin);
 	}
 }

@@ -14,11 +14,11 @@ const Finish = { give: 0.12, isThinned: false, roughness: 0.9, sheen: 0.25 } as 
 const Look = { Sink: 0.12, ChunkMetres: 200, Reach: 3 } as const;
 
 export function createBushes(trees: PlantedTree[], bank: SurveyedBank, wind: CoverWind, random: RandomFraction) {
-	const quality = renderQuality();
-	const bushes = plantBushes(trees, bank, quality.coverDensity, random);
-	const atlas = bushAtlas(bank.season, quality.coverCellPixels);
+	const { cover } = renderQuality();
+	const bushes = plantBushes(trees, bank, cover.density, random);
+	const atlas = bushAtlas(bank.season, cover.cellPixels);
 	const material = coverMaterial(atlas, BushGrid, wind, Finish);
-	const shadowMaterial = quality.isCoverShadowed ? coverDepthMaterial(atlas, BushGrid) : undefined;
+	const shadowMaterial = cover.isShadowed ? coverDepthMaterial(atlas, BushGrid) : undefined;
 	const placing = { groundAt: bank.groundAt, sink: Look.Sink, mostReach: Look.Reach, seed: bank.seed, shadowMaterial };
 	return coverChunks(bushes, { ...placing, name: 'cover-bushes', metres: Look.ChunkMetres, geometry: bushBlob(), material });
 }

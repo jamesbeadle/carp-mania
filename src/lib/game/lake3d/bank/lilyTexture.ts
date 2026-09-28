@@ -2,7 +2,7 @@ import { CanvasTexture, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import { shadeOf } from '../grass/bladeStroke';
 
-const Leaf = { Pixels: 256, Base: '#2e5a20', Rim: '#4e4020', Vein: '#5a8a3a', Veins: 26, Mottles: 220, Seed: 811 } as const;
+const Leaf = { Pixels: 256, Base: '#244a1a', Rim: '#443a1c', Vein: '#4a7a30', Veins: 26, Mottles: 220, Seed: 811 } as const;
 const Shades = { Mottle: 0.18, MottleOpacity: 0.55, VeinOpacity: 0.45, RimWidth: 0.08 } as const;
 
 function paintVeins(context: CanvasRenderingContext2D, centre: number) {

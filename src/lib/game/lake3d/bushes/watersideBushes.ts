@@ -22,6 +22,6 @@ export function watersideSpots(bank: SurveyedBank, density: number, random: Rand
 	return candidates.filter((point) => {
 		const fromWater = bank.shore.distanceAt(point);
 		const isOnTheLip = fromWater > Waterside.NearestWater && fromWater < Waterside.FarthestWater;
-		return isOnTheLip && noise.at(point, Waterside.Wavelength) > Waterside.Threshold && random() < Math.sqrt(density);
+		return isOnTheLip && noise.at(point, Waterside.Wavelength) > Waterside.Threshold && random() < density;
 	});
 }

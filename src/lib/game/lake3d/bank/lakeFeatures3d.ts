@@ -24,7 +24,8 @@ export function createLakeFeatures(plan: FeaturePlan) {
 	const random = seededRandom(bank.seed);
 	const lines = layout.features.filter(isReedLine).map((line) => line.points.map((point) => worldPointOf(frame, point)));
 	const lilyAreas = layout.features.filter(isAreaFeature).filter((area) => area.kind === LilyPadKind);
-	const lilies = createLilyBeds(lilyAreas.map((area) => smoothWorldOutline(frame, area.points)), bank.season, renderQuality().coverDensity, random);
+	const { cover } = renderQuality();
+	const lilies = createLilyBeds(lilyAreas.map((area) => smoothWorldOutline(frame, area.points)), bank.season, cover.density, random);
 	const snags = layout.features.filter(isSnag).map((snag) => createFallenTree(worldPointOf(frame, snag.point), bank.shore, random));
 	return new Group().add(...createReedBeds({ lines, bank, season: bank.season, wind: plan.wind, random }), lilies, ...snags);
 }
