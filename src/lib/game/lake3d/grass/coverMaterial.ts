@@ -15,6 +15,7 @@ export interface CoverFinish {
 	give: number;
 	isThinned: boolean;
 	isFadedFromAbove?: boolean;
+	isFacingCamera?: boolean;
 	roughness: number;
 	sheen: number;
 }
@@ -28,6 +29,7 @@ interface CoverLook extends CoverFinish {
 const CutOff = 0.45;
 const SheenReach = { Near: 12, Far: 110, Farthest: 0.6 } as const;
 const SeenFromAbove = { FadeFrom: 0.62, GoneAt: 0.88 } as const;
+const FacingJitter = 1.4;
 
 const FragmentEdits: ShaderEdit[] = [
 	replacing('normal_fragment_begin', Chunks.SameNormalBothSides),
@@ -38,7 +40,8 @@ const FragmentEdits: ShaderEdit[] = [
 function vertexEdits(look: CoverLook): ShaderEdit[] {
 	const thinning = look.isThinned ? Chunks.CoverThinningVertex : '';
 	const fromAbove = look.isFadedFromAbove ? Chunks.CoverFromAboveVertex : '';
-	return [including('uv_vertex', Chunks.CoverAtlasVertex), including('begin_vertex', thinning + fromAbove), replacing('project_vertex', CoverProjectVertex)];
+	const facing = look.isFacingCamera ? Chunks.CoverFacingVertex : '';
+	return [including('uv_vertex', Chunks.CoverAtlasVertex), including('begin_vertex', facing + thinning + fromAbove), replacing('project_vertex', CoverProjectVertex)];
 }
 
 function coverUniforms(look: CoverLook) {
@@ -50,6 +53,7 @@ function coverUniforms(look: CoverLook) {
 		coverThinning: { value: new Vector4(reach.fullWithin, reach.goneBeyond, Thinning.Curve, Thinning.Fade) },
 		coverGrowth: { value: Thinning.Growth },
 		coverAbove: { value: new Vector2(SeenFromAbove.FadeFrom, SeenFromAbove.GoneAt) },
+		coverFacing: { value: FacingJitter },
 		coverSheen: { value: look.sheen },
 		coverSheenReach: { value: new Vector3(SheenReach.Near, SheenReach.Far, SheenReach.Farthest) },
 		coverTime: wind.time,
@@ -69,6 +73,6 @@ export function coverMaterial(atlas: Texture, grid: AtlasGrid, wind: CoverWind, 
 		shader.vertexShader = vertexHead + edited(shader.vertexShader, vertexEdits(look));
 		shader.fragmentShader = Chunks.CoverFragmentUniforms + edited(shader.fragmentShader, FragmentEdits);
 	};
-	material.customProgramCacheKey = () => `cover-${look.isThinned}-${look.isFadedFromAbove === true}`;
+	material.customProgramCacheKey = () => `cover-${look.isThinned}-${look.isFadedFromAbove === true}-${look.isFacingCamera === true}`;
 	return material;
 }

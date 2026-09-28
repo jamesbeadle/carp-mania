@@ -5,7 +5,7 @@ const Bank = { Lip: 0.3, FringeWidth: 2.6, FarFadeFrom: 28, FarFadeTo: 60 } as c
 const Swim = { Worn: -0.7, Trodden: 2.6, TroddenCurve: 1.7, BusyWithin: 12, QuietBeyond: 40, Raggedness: 1.6 } as const;
 const Margin = { DeepestShore: -2.2, HighestShore: 1.4, Threshold: 0.36, Density: 6, PodView: 7, PodViewFade: 3.5, Cleared: 0.3, ClearedFade: 1, Clumping: 0.7, BesidePod: 0.3 } as const;
 const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 3.5, FringeThreshold: 0.22 } as const;
-const Short = { Density: 4, Patchiness: 0.9 } as const;
+const Short = { Density: 5.5, Patchiness: 0.9 } as const;
 const Flowers = { Buttercups: 0.7, Daisies: 0.6, SwimGap: 1, DaisyRarity: 3 } as const;
 
 function ramp(value: number, from: number, to: number) {

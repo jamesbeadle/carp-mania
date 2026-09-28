@@ -10,8 +10,8 @@ import { scatterPads, type FloatingPad } from './padScatter';
 
 const Look = { PadRoughness: 0.5, PadSheen: 0.22, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.17, 0.26] } as const;
 const PadTints: Record<SeasonName, string[]> = {
-	spring: ['#ffffff', '#eef6e0', '#dfeccc', '#f4ecd0'],
-	summer: ['#ffffff', '#e0ecd0', '#c8d8b0', '#f0e2b4', '#d8a888'],
+	spring: ['#dce4d0', '#ccd8bc', '#bcc8a8', '#d4ccb0'],
+	summer: ['#d4dcc8', '#bccaae', '#a8b894', '#ccc098', '#b89478'],
 	autumn: ['#e8e0b0', '#d8c890', '#c89e70', '#f0e8c8', '#b88a60'],
 	winter: ['#b89a70', '#a88a64', '#c8a878']
 };

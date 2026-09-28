@@ -15,7 +15,7 @@ export interface Planting {
 const shortGrass: Planting = {
 	cells: [CoverCells.ShortGrass, CoverCells.ShortGrass, CoverCells.TuftedGrass],
 	heights: [0.07, 0.24],
-	widthPerHeight: [2.8, 4.2],
+	widthPerHeight: [1.5, 2.3],
 	lean: 0.22,
 	reach: 1,
 	isMarginal: false,

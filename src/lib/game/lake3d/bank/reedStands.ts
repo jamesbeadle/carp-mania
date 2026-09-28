@@ -38,7 +38,8 @@ function standIn(clump: ReedClump, isMace: boolean, context: StandContext): Cove
 	const { random } = context;
 	const turn = random() * Math.PI * 2;
 	const reach = Math.sqrt(random());
-	const point = { x: clump.centre.x + Math.cos(turn) * reach * clump.radius, z: clump.centre.z + Math.sin(turn) * reach * clump.radius };
+	const { centre, radius } = clump;
+	const point = { x: centre.x + Math.cos(turn) * reach * radius, z: centre.z + Math.sin(turn) * reach * radius };
 	if (context.shore.distanceAt(point) > Stand.MostInland) return null;
 	const cell = cellFor(reach, isMace, random);
 	const isEmergent = cell === ReedCells.Emergent || cell === ReedCells.MaceStems;

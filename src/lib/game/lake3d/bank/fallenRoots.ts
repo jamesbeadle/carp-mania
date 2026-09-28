@@ -4,9 +4,9 @@ import { randomBetween, type RandomFraction } from '$lib/domain/random';
 import { CoverNoise } from '../grass/coverNoise';
 import { woodTube } from './woodTube';
 
-const Roots = { Count: 18, Reach: [0.7, 1.6], Back: [0.1, 0.55], Droop: 0.45, Radius: [0.045, 0.1], TipRadius: 0.012, Sides: 5, Roughness: 0.25, Joints: 4, Kink: 0.55 } as const;
+const Roots = { Count: 28, Reach: [0.8, 1.9], Back: [0.05, 0.4], Droop: 0.4, Radius: [0.035, 0.09], TipRadius: 0.012, Sides: 5, Roughness: 0.25, Joints: 4, Kink: 0.55 } as const;
 const Start = { Around: 0.28, Back: 0.05 } as const;
-const Clod = { Radius: 0.85, Detail: 3, Thin: 0.42, Back: 0.3, Lumpiness: 0.55, Wavelength: 0.35, Seed: 29, Squash: 0.9 } as const;
+const Clod = { Radius: 0.85, Detail: 3, Thin: 0.34, Back: 0.3, Lumpiness: 0.75, Wavelength: 0.35, Seed: 29, Squash: 0.9 } as const;
 
 function rootPoints(base: Vector3, turn: number, random: RandomFraction) {
 	const outward = new Vector3(-randomBetween(random, ...Roots.Back), Math.sin(turn), Math.cos(turn)).normalize();
