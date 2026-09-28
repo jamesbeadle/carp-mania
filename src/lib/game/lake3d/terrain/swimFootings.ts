@@ -12,8 +12,8 @@ const Footings = { ClearMetres: 0.12, LeastDropShare: 0.12, HeldMetres: 2.5, Fad
 export class SwimFootings {
 	private readonly footings: Footing[];
 
-	constructor(pods: WorldPoint[], distanceToShore: (point: WorldPoint) => number) {
-		this.footings = pods.map((pod) => {
+	constructor(spots: WorldPoint[], distanceToShore: (point: WorldPoint) => number) {
+		this.footings = spots.map((pod) => {
 			const room = (distanceToShore(pod) - Footings.ClearMetres) / Shore.DropMetres;
 			return { pod, dropShare: MathUtils.clamp(room, Footings.LeastDropShare, 1) };
 		});

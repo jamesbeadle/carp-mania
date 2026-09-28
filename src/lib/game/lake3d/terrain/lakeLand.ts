@@ -29,8 +29,8 @@ const ShoreMapTexelsPerStation = 2;
 export function createLakeLand(plan: LandPlan) {
 	const half = plan.plotEdge ?? { x: plan.plotReach * Grid.ReachShare, z: plan.plotReach * Grid.ReachShare };
 	const swims = swimGroundsOf(plan.pegs, plan);
-	const pods = swims.map((swim) => swim.pod);
-	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), pods });
+	const footings = [...swims.map((swim) => swim.pod), ...plan.pegs];
+	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), footings });
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
 	const look = { season: plan.season, bed: plan.bed, wear: swimWearOf(swims), clock: plan.clock };
 	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: renderQuality().groundCells, plotEdge: plan.plotEdge, look }));

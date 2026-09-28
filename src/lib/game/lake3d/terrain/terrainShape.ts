@@ -17,7 +17,7 @@ export interface TerrainPlan {
 	bedDepth: number;
 	isFlatBeyond: boolean;
 	edgeMetres: number;
-	pods: WorldPoint[];
+	footings: WorldPoint[];
 }
 
 function rollingHills(point: WorldPoint) {
@@ -53,7 +53,7 @@ export class TerrainShape {
 	constructor(readonly plan: TerrainPlan) {
 		this.lakeBounds = boundsOf(plan.outline);
 		this.shore = new ShoreIndex(plan.outline, plan.islands, ShoreReach);
-		this.footings = new SwimFootings(plan.pods, (point) => this.shore.nearest(point, ShoreReach)?.distance ?? ShoreReach);
+		this.footings = new SwimFootings(plan.footings, (point) => this.shore.nearest(point, ShoreReach)?.distance ?? ShoreReach);
 	}
 
 	nearestShore(point: WorldPoint, reachMetres: number): ShoreHit | null {
