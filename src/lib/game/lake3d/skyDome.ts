@@ -1,0 +1,30 @@
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import type { SkyMood } from './skyLook';
+import { sunSkyPositionOf, type SunPlacement } from './sunAndSky';
+
+const SkyScale = 9000;
+const SkyBrightness = 0.1;
+const FinalColour = 'gl_FragColor = vec4( texColor, 1.0 );';
+
+export function createClearSky(isSunShown: boolean) {
+	const sky = new Sky();
+	sky.scale.setScalar(SkyScale);
+	const { material } = sky;
+	const { uniforms } = material;
+	const { cloudCoverage, showSunDisc } = uniforms;
+	cloudCoverage.value = 0;
+	showSunDisc.value = Number(isSunShown);
+	uniforms.brightness = { value: SkyBrightness };
+	material.fragmentShader = material.fragmentShader.replace(FinalColour, 'gl_FragColor = vec4( texColor * brightness, 1.0 );').replace('void main', 'uniform float brightness;\nvoid main');
+	return sky;
+}
+
+export function paintSky(sky: Sky, mood: SkyMood, placement: SunPlacement) {
+	const { material } = sky;
+	const { turbidity, rayleigh, mieCoefficient, mieDirectionalG, sunPosition } = material.uniforms;
+	turbidity.value = mood.turbidity;
+	rayleigh.value = mood.rayleigh;
+	mieCoefficient.value = mood.mieCoefficient;
+	mieDirectionalG.value = mood.mieDirectionalG;
+	sunPosition.value.copy(sunSkyPositionOf(placement));
+}

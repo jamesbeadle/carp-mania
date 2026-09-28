@@ -39,5 +39,6 @@ export function createRodPod(kits: RodKit[]): RodPod {
 	group.add(bar(width, PodSize.FrontHeight - FrontBarDrop, PodSize.FrontDistance), bar(width, PodSize.BackHeight, 0));
 	group.add(leg(PodSize.FrontHeight, PodSize.FrontDistance, LegSplay.Front), leg(PodSize.BackHeight, 0, LegSplay.Back));
 	const rods = kits.map((kit, index) => podRodFor(kit, index, kits.length, group));
+	group.traverse((part) => (part.castShadow = true));
 	return { group, rods };
 }

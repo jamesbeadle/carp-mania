@@ -93,5 +93,6 @@ export class LakeScene {
 		this.life.advance(secondsElapsed);
 		this.roaming.advance(secondsElapsed, timeSeconds);
 		this.rig.advance(secondsElapsed);
+		this.world.sky.followSight(this.rig.sightline);
 	}
 }

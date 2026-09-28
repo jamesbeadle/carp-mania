@@ -20,6 +20,10 @@ export class SceneLighting {
 		const lightingKey = lightingKeyOf(conditions);
 		if (lightingKey === this.litFor) return;
 		this.litFor = lightingKey;
-		this.renderer.lightFrom(this.world.sky.environmentScene());
+		const { sky } = this.world;
+		const { sunlight } = sky;
+		const skyScene = sky.environmentScene();
+		this.renderer.lightFrom(skyScene);
+		sky.tintHaze(this.renderer.readHorizon(skyScene, sunlight.direction));
 	}
 }

@@ -11,7 +11,6 @@ import { createLakeLand } from './terrain/lakeLand';
 import { LakeWater } from './lakeWater';
 import { SkyAndLight } from './skyAndLight';
 import { Vegetation } from './vegetation';
-import { Clouds } from './clouds';
 import { NearDetailLayer } from './renderQuality';
 import { plantTrees } from './trees/treePlanting';
 import { smoothWorldOutline } from './worldShapes';
@@ -47,7 +46,6 @@ export class LakeWorld {
 	readonly facilityLabels: Object3D[];
 	readonly groundAt: (point: WorldPoint) => number;
 	private readonly vegetation: Vegetation;
-	private readonly clouds = new Clouds();
 
 	constructor(plan: LakeWorldPlan, width: number, height: number) {
 		const { layout, season } = plan;
@@ -70,7 +68,7 @@ export class LakeWorld {
 		const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((plot) => ({ point: plot.point, radius: plot.footprintMetres / 2 }))];
 		const woodland = plantTrees({ outline: this.outline, islands: this.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
 		this.vegetation = new Vegetation({ woodland, outline: this.outline, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
-		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group, createLakeFeatures(layout, this.frame, season, plan.seed));
+		this.scene.add(this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group, createLakeFeatures(layout, this.frame, season, plan.seed));
 	}
 
 	get daylight() {
@@ -79,7 +77,7 @@ export class LakeWorld {
 	}
 
 	advance(timeSeconds: number, secondsElapsed: number) {
-		this.clouds.advance(secondsElapsed);
+		this.sky.advance(secondsElapsed);
 		this.water.advance(timeSeconds);
 		const { sunlight } = this.sky;
 		this.vegetation.blow(timeSeconds, sunlight.windStrength);
@@ -87,9 +85,6 @@ export class LakeWorld {
 
 	setConditions(conditions: StageConditions) {
 		this.sky.setConditions(conditions);
-		const { sunlight } = this.sky;
-		const { weather } = conditions;
-		this.clouds.cover(weather.cloudCover, sunlight.colour, sunlight.daylight, weather.windStrength);
 		this.water.light(this.sky.sunlight);
 	}
 }

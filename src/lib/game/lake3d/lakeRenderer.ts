@@ -1,19 +1,23 @@
+import type { HazeColours } from './aerialHaze';
+import { HorizonProbe } from './horizonProbe';
 import { PostEffects } from './postEffects';
 import { renderQuality } from './renderQuality';
-import { ACESFilmicToneMapping, PCFShadowMap, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2, WebGLRenderer, type Scene } from 'three';
+import { AgXToneMapping, PCFShadowMap, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2, WebGLRenderer, type Scene, type Vector3 } from 'three';
 
 const MostSecondsPerFrame = 0.1;
 const MillisecondsPerSecond = 1000;
 
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
-export const Exposure = { Day: 0.55, Night: 1.45 } as const;
+export const Exposure = { Day: 1.6, Night: 1.45 } as const;
 const FieldOfView = { Landscape: 50, Portrait: 72 } as const;
 const EnvironmentStrength = 0.55;
+const EnvironmentCapture = { Blur: 0, Nearest: 0.1, Farthest: 20000 } as const;
 
 export interface LakeRenderer {
 	expose: (daylight: number) => void;
 	lightFrom: (skyScene: Scene) => void;
+	readHorizon: (skyScene: Scene, sunDirection: Vector3) => HazeColours;
 	stop: () => void;
 }
 
@@ -26,7 +30,7 @@ function rendererOn(canvas: HTMLCanvasElement, isSeeThrough: boolean) {
 	const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: isSeeThrough, powerPreference: 'high-performance' });
 	renderer.setPixelRatio(Math.min(renderQuality().mostPixelRatio, window.devicePixelRatio || 1));
 	renderer.outputColorSpace = SRGBColorSpace;
-	renderer.toneMapping = ACESFilmicToneMapping;
+	renderer.toneMapping = AgXToneMapping;
 	renderer.toneMappingExposure = Exposure.Day;
 	const shadows = renderer.shadowMap;
 	shadows.enabled = true;
@@ -68,9 +72,11 @@ export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camer
 	const environment = new PMREMGenerator(renderer);
 	const lightFrom = (skyScene: Scene) => {
 		const previous = scene.environment;
-		scene.environment = environment.fromScene(skyScene).texture;
+		scene.environment = environment.fromScene(skyScene, EnvironmentCapture.Blur, EnvironmentCapture.Nearest, EnvironmentCapture.Farthest).texture;
 		scene.environmentIntensity = EnvironmentStrength;
 		previous?.dispose();
 	};
-	return { expose, lightFrom, stop: () => (cancelAnimationFrame(frameHandle), environment.dispose(), renderer.dispose()) };
+	const probe = new HorizonProbe(renderer);
+	const readHorizon = (skyScene: Scene, sunDirection: Vector3) => probe.measure(skyScene, sunDirection);
+	return { expose, lightFrom, readHorizon, stop: () => (cancelAnimationFrame(frameHandle), environment.dispose(), probe.dispose(), renderer.dispose()) };
 }

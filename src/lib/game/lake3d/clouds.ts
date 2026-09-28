@@ -1,64 +1,63 @@
-import { CanvasTexture, Color, Group, SRGBColorSpace, Sprite, SpriteMaterial } from 'three';
-import { seededRandom } from '$lib/domain/random';
+import { BackSide, Color, Mesh, ShaderMaterial, SphereGeometry, Vector2, Vector3 } from 'three';
+import type { Weather, WeatherKind } from '$lib/domain/world/weather';
+import type { WindDirection } from '$lib/domain/world/weatherGlass';
+import { CloudFragment, CloudVertex } from './cloudShader';
+import { renderQuality } from './renderQuality';
+import { brightnessOf } from './skyLook';
 
-const Sky = { Count: 26, Seed: 83, LeastDistance: 700, DistanceRange: 1500, LeastHeight: 220, HeightRange: 260, LeastSize: 260, SizeRange: 420, Squash: 0.42 } as const;
-const Puff = { Pixels: 256, Blobs: 22 } as const;
-const Drift = { MetresPerSecondPerWind: 6, Calmest: 0.6 } as const;
-const NightCloud = new Color('#10141b');
-const Opacity = { Night: 0.35, Day: 1 } as const;
-const White = new Color('#ffffff');
-const SunTint = 0.35;
+const Dome = { Radius: 7000, WidthSegments: 48, HeightSegments: 16, RenderOrder: 2 } as const;
+const Drift = { LayerUnitsPerSecond: 0.004, CalmestShare: 0.15 } as const;
+const Lighting = { SunlitBrightness: 2.4, ShadedBrightness: 0.62, SkyBlueInShade: 0.35 } as const;
+const ShadeBlue = new Color('#8fa3c4');
+const Heaviness: Record<WeatherKind, number> = { clear: 0, heat: 0, mist: 0.25, overcast: 0.55, rain: 0.9 };
+const DownwindOf: Record<WindDirection, [number, number]> = { north: [0, 1], east: [-1, 0], south: [0, -1], west: [1, 0], south_west: [Math.SQRT1_2, -Math.SQRT1_2] };
 
-function puffTexture() {
-	const canvas = document.createElement('canvas');
-	canvas.width = Puff.Pixels;
-	canvas.height = Puff.Pixels;
-	const context = canvas.getContext('2d');
-	const random = seededRandom(Sky.Seed);
-	for (let index = 0; context && index < Puff.Blobs; index++) {
-		const x = Puff.Pixels * (0.25 + random() * 0.5);
-		const y = Puff.Pixels * (0.4 + random() * 0.25);
-		const radius = Puff.Pixels * (0.08 + random() * 0.14);
-		const glow = context.createRadialGradient(x, y, 0, x, y, radius);
-		glow.addColorStop(0, 'rgba(255,255,255,0.55)');
-		glow.addColorStop(1, 'rgba(255,255,255,0)');
-		context.fillStyle = glow;
-		context.fillRect(0, 0, Puff.Pixels, Puff.Pixels);
-	}
-	const texture = new CanvasTexture(canvas);
-	texture.colorSpace = SRGBColorSpace;
-	return texture;
+function cloudMaterial() {
+	const uniforms = {
+		sunDirection: { value: new Vector3(0, 1, 0) },
+		litColour: { value: new Color() },
+		shadeColour: { value: new Color() },
+		hazeColour: { value: new Color() },
+		cover: { value: 0 },
+		heaviness: { value: 0 },
+		drift: { value: new Vector2() }
+	};
+	const defines = { OCTAVES: renderQuality().cloudOctaves };
+	return new ShaderMaterial({ uniforms, defines, vertexShader: CloudVertex, fragmentShader: CloudFragment, side: BackSide, transparent: true, depthWrite: false, fog: false });
 }
 
 export class Clouds {
-	readonly group = new Group();
-	private readonly material = new SpriteMaterial({ map: puffTexture(), fog: false, depthWrite: false, transparent: true });
-	private readonly puffs: Sprite[];
-	private drift: number = Drift.Calmest;
+	readonly dome: Mesh;
+	private readonly material = cloudMaterial();
+	private readonly wind = new Vector2();
 
 	constructor() {
-		const random = seededRandom(Sky.Seed);
-		this.puffs = Array.from({ length: Sky.Count }, () => {
-			const puff = new Sprite(this.material);
-			const angle = random() * Math.PI * 2;
-			const distance = Sky.LeastDistance + random() * Sky.DistanceRange;
-			const size = Sky.LeastSize + random() * Sky.SizeRange;
-			puff.position.set(Math.cos(angle) * distance, Sky.LeastHeight + random() * Sky.HeightRange, Math.sin(angle) * distance);
-			puff.scale.set(size, size * Sky.Squash, 1);
-			return puff;
-		});
-		this.group.add(...this.puffs);
+		this.dome = new Mesh(new SphereGeometry(Dome.Radius, Dome.WidthSegments, Dome.HeightSegments, 0, Math.PI * 2, 0, Math.PI / 2), this.material);
+		this.dome.renderOrder = Dome.RenderOrder;
 	}
 
-	cover(cloudCover: number, sunColour: Color, daylight: number, windStrength: number) {
-		const shown = Math.round(cloudCover * Sky.Count);
-		this.puffs.forEach((puff, index) => (puff.visible = index < shown));
-		this.material.color.copy(NightCloud).lerp(White.clone().lerp(sunColour, SunTint), daylight);
-		this.material.opacity = Opacity.Night + (Opacity.Day - Opacity.Night) * daylight;
-		this.drift = Drift.Calmest + windStrength * Drift.MetresPerSecondPerWind;
+	cover(weather: Weather) {
+		const { cover, heaviness } = this.material.uniforms;
+		cover.value = weather.cloudCover;
+		heaviness.value = Heaviness[weather.kind];
+		const [east, south] = DownwindOf[weather.windDirection];
+		const speed = Drift.LayerUnitsPerSecond * (Drift.CalmestShare + weather.windStrength);
+		this.wind.set(east * speed, south * speed);
+	}
+
+	light(sunDirection: Vector3, sunColour: Color, horizon: Color) {
+		const { litColour, shadeColour, hazeColour } = this.material.uniforms;
+		const brightness = brightnessOf(horizon);
+		const { uniforms } = this.material;
+		const { sunDirection: towardSun } = uniforms;
+		towardSun.value.copy(sunDirection);
+		litColour.value.copy(sunColour).multiplyScalar(brightness * Lighting.SunlitBrightness);
+		shadeColour.value.copy(horizon).lerp(ShadeBlue.clone().multiplyScalar(brightness), Lighting.SkyBlueInShade).multiplyScalar(Lighting.ShadedBrightness);
+		hazeColour.value.copy(horizon);
 	}
 
 	advance(secondsElapsed: number) {
-		this.group.rotateY((this.drift * secondsElapsed) / Sky.LeastDistance);
+		const { drift } = this.material.uniforms;
+		drift.value.addScaledVector(this.wind, secondsElapsed);
 	}
 }
