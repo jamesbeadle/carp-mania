@@ -5,7 +5,7 @@ void main() {
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
 
-export const GradeLook = { Warmth: 0.03, Vibrance: 0.3, Contrast: 0.22, VignetteDarkness: 0.18, VignetteReach: 0.85 } as const;
+export const GradeLook = { Warmth: 0.03, Vibrance: 0.22, Contrast: 0.2, VignetteDarkness: 0.18, VignetteReach: 0.85 } as const;
 
 export const GradeShader = {
 	name: 'LakeGrade',

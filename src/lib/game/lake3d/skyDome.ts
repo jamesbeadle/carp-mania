@@ -1,8 +1,10 @@
+import { MathUtils } from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import type { SkyMood } from './skyLook';
 import { sunSkyPositionOf, type SunPlacement } from './sunAndSky';
 
 const SkyScale = 9000;
+const LowSun = { FullDayDegrees: 20, ExtraRayleigh: 1.4, MieShed: 0.4 } as const;
 const SkyBrightness = 0.1;
 const FinalColour = 'gl_FragColor = vec4( texColor, 1.0 );';
 
@@ -22,9 +24,10 @@ export function createClearSky(isSunShown: boolean) {
 export function paintSky(sky: Sky, mood: SkyMood, placement: SunPlacement) {
 	const { material } = sky;
 	const { turbidity, rayleigh, mieCoefficient, mieDirectionalG, sunPosition } = material.uniforms;
+	const lowness = 1 - MathUtils.clamp(placement.elevationDegrees / LowSun.FullDayDegrees, 0, 1);
 	turbidity.value = mood.turbidity;
-	rayleigh.value = mood.rayleigh;
-	mieCoefficient.value = mood.mieCoefficient;
+	rayleigh.value = mood.rayleigh + LowSun.ExtraRayleigh * lowness;
+	mieCoefficient.value = mood.mieCoefficient * (1 - LowSun.MieShed * lowness);
 	mieDirectionalG.value = mood.mieDirectionalG;
 	sunPosition.value.copy(sunSkyPositionOf(placement));
 }

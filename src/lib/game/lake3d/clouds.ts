@@ -7,7 +7,7 @@ import { brightnessOf } from './skyLook';
 
 const Dome = { Radius: 7000, WidthSegments: 48, HeightSegments: 16, RenderOrder: 2 } as const;
 const Drift = { LayerUnitsPerSecond: 0.004, CalmestShare: 0.15 } as const;
-const Lighting = { SunlitBrightness: 2.4, ShadedBrightness: 0.62, SkyBlueInShade: 0.35 } as const;
+const Lighting = { SunlitShare: 0.22, ShadedBrightness: 0.62, SkyBlueInShade: 0.35 } as const;
 const ShadeBlue = new Color('#8fa3c4');
 const Heaviness: Record<WeatherKind, number> = { clear: 0, heat: 0, mist: 0.25, overcast: 0.55, rain: 0.9 };
 const DownwindOf: Record<WindDirection, [number, number]> = { north: [0, 1], east: [-1, 0], south: [0, -1], west: [1, 0], south_west: [Math.SQRT1_2, -Math.SQRT1_2] };
@@ -45,13 +45,13 @@ export class Clouds {
 		this.wind.set(east * speed, south * speed);
 	}
 
-	light(sunDirection: Vector3, sunColour: Color, horizon: Color) {
+	light(sunDirection: Vector3, sunColour: Color, sunIntensity: number, horizon: Color) {
 		const { litColour, shadeColour, hazeColour } = this.material.uniforms;
 		const brightness = brightnessOf(horizon);
 		const { uniforms } = this.material;
 		const { sunDirection: towardSun } = uniforms;
 		towardSun.value.copy(sunDirection);
-		litColour.value.copy(sunColour).multiplyScalar(brightness * Lighting.SunlitBrightness);
+		litColour.value.copy(sunColour).multiplyScalar(sunIntensity * Lighting.SunlitShare);
 		shadeColour.value.copy(horizon).lerp(ShadeBlue.clone().multiplyScalar(brightness), Lighting.SkyBlueInShade).multiplyScalar(Lighting.ShadedBrightness);
 		hazeColour.value.copy(horizon);
 	}

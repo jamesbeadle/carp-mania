@@ -37,6 +37,7 @@ export class SkyAndLight {
 	private readonly fog = new FogExp2(0xffffff);
 	private readonly night = createNightSky();
 	private readonly clouds = new Clouds();
+	private lightDirection = new Vector3(0, 1, 0);
 
 	constructor(scene: Scene, private readonly wholePlotReach: number, isOpenSky: boolean) {
 		const sun = this.sunShadow.light;
@@ -67,8 +68,9 @@ export class SkyAndLight {
 
 	tintHaze(colours: HazeColours) {
 		const { direction, colour } = this.sunlight;
+		const sun = this.sunShadow.light;
 		tintHaze(this.fog, colours, direction);
-		this.clouds.light(direction, colour, colours.away);
+		this.clouds.light(this.lightDirection, colour, sun.intensity, colours.away);
 	}
 
 	followSight(sightline: Sightline) {
@@ -83,7 +85,8 @@ export class SkyAndLight {
 	private lightTheLand(mood: SkyMood, placement: SunPlacement) {
 		const { colour, daylight } = this.sunlight;
 		const sun = this.sunShadow.light;
-		this.sunShadow.shineFrom(lightDirectionOf(placement));
+		this.lightDirection = lightDirectionOf(placement);
+		this.sunShadow.shineFrom(this.lightDirection);
 		sun.color.copy(colour);
 		sun.intensity = placement.isUp ? Light.SunBrightest * mood.sunStrength * daylight : Light.MoonBrightest;
 		this.skyLight.intensity = Light.SkyDimmest + (Light.SkyBrightest - Light.SkyDimmest) * daylight;

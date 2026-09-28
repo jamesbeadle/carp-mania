@@ -1,8 +1,8 @@
 import { DepthTexture, type Camera, type Scene, type WebGLRenderer, type WebGLRenderTarget } from 'three';
 import { GTAOPass } from 'three/examples/jsm/postprocessing/GTAOPass.js';
 
-const Occlusion = { radius: 1.4, distanceExponent: 1.6, thickness: 2.5, scale: 1.1, samples: 16, screenSpaceRadius: false } as const;
-const Denoise = { lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 } as const;
+const Occlusion = { radius: 2.6, distanceExponent: 2, thickness: 3, scale: 1.5, samples: 16, screenSpaceRadius: false } as const;
+const Denoise = { lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 10, rings: 2, samples: 16 } as const;
 const PlaceholderPixels = 1;
 
 export class GroundContactPass extends GTAOPass {
