@@ -1,11 +1,12 @@
-import { Color, DirectionalLight, FogExp2, Group, HemisphereLight, Vector3, type Scene } from 'three';
+import { Color, DirectionalLight, FogExp2, Group, HemisphereLight, Scene, Vector3 } from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import type { StageConditions } from '../sky/stageConditions';
 import { daylightOf, horizonColourAt, skyMoodFor, sunColourAt, type SkyMood } from './skyLook';
+import { createNightSky } from './nightSky';
 import { sunPlacementAt, sunSkyPositionOf, type SunPlacement } from './sunAndSky';
 
 const SkyScale = 9000;
-const Light = { SunDistance: 400, SunBrightest: 3.2, MoonBrightest: 0.35, SkyDimmest: 0.35, SkyBrightest: 1.6, ShadowMapPixels: 2048, ShadowDepthShare: 3 } as const;
+const Light = { SunDistance: 400, SunBrightest: 3.2, MoonBrightest: 0.6, SkyDimmest: 0.5, SkyBrightest: 1.6, ShadowMapPixels: 2048, ShadowDepthShare: 3 } as const;
 const SkyTint = new Color('#b9d4ff');
 const GroundBounce = new Color('#3a4a24');
 const MoonHeight = 0.6;
@@ -39,14 +40,19 @@ export class SkyAndLight {
 	private readonly sun: DirectionalLight;
 	private readonly skyLight = new HemisphereLight(SkyTint, GroundBounce);
 	private readonly fog = new FogExp2(0xffffff);
+	private readonly night = createNightSky();
 
 	constructor(scene: Scene, shadowReach: number, isOpenSky: boolean) {
 		this.sky.scale.setScalar(SkyScale);
 		this.sun = shadowCastingSun(shadowReach);
 		this.group.add(this.sun, this.sun.target, this.skyLight);
 		if (!isOpenSky) return;
-		this.group.add(this.sky);
+		this.group.add(this.sky, this.night.dome);
 		scene.fog = this.fog;
+	}
+
+	environmentScene() {
+		return new Scene().add(this.sky.clone());
 	}
 
 	setConditions(conditions: StageConditions) {
@@ -56,6 +62,7 @@ export class SkyAndLight {
 		const elevation = placement.elevationDegrees;
 		this.sunlight = { direction: placement.direction, colour: sunColourAt(elevation), windStrength: weather.windStrength, daylight: daylightOf(elevation) };
 		this.paintTheSky(mood, placement);
+		this.night.darken(this.sunlight.daylight);
 		this.lightTheLand(mood, placement);
 		this.fog.color.copy(horizonColourAt(elevation).multiply(mood.fogTint));
 		this.fog.density = mood.fogDensity;

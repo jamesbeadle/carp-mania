@@ -1,6 +1,6 @@
 import { BufferGeometry, LatheGeometry, Shape, ShapeGeometry, Vector2 } from 'three';
 
-export const Body = { TailRoot: -0.38, Nose: 0.5, DeepestShare: 0.55, Depth: 0.155, Thinnest: 0.034, Slimness: 0.52, Profiles: 28, Around: 22 } as const;
+export const Body = { TailRoot: -0.38, Nose: 0.5, DeepestShare: 0.55, Depth: 0.155, Thinnest: 0.034, Slimness: 0.52, Profiles: 44, Around: 36 } as const;
 const Rounding = { Tail: 0.7, Nose: 0.55 } as const;
 
 function radiusAt(share: number) {
@@ -33,8 +33,15 @@ export function carpBodyGeometry(): BufferGeometry {
 	return geometry;
 }
 
+const FinCurveSegments = 10;
+
 export function finGeometry(outline: [number, number][]) {
-	const geometry = new ShapeGeometry(new Shape(outline.map(([along, up]) => new Vector2(along, up))));
+	const [first, ...rest] = outline.map(([along, up]) => new Vector2(along, up));
+	const shape = new Shape();
+	shape.moveTo(first.x, first.y);
+	shape.splineThru(rest);
+	shape.lineTo(first.x, first.y);
+	const geometry = new ShapeGeometry(shape, FinCurveSegments);
 	geometry.rotateY(-Math.PI / 2);
 	return geometry;
 }

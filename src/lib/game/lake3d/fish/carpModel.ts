@@ -8,6 +8,7 @@ import { swimmingMaterial, type SwimBeat } from './swimmingMaterial';
 
 const Eye = { Radius: 0.018, Along: 0.4, Up: 0.035, Out: 0.052 } as const;
 const PairedFins = { Splay: 0.5, Out: 0.045 } as const;
+const SkinRelief = 1.5;
 const skins = new Map<CarpStrain, ReturnType<typeof carpSkinTexture>>();
 
 function skinFor(strain: CarpStrain) {
@@ -39,8 +40,9 @@ function eyes() {
 
 export function createCarp(strain: CarpStrain, beat: SwimBeat) {
 	const colours = FishPalette[strain];
-	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ map: skinFor(strain), roughness: 0.42, metalness: 0.15 }, beat));
-	const finMaterial = swimmingMaterial({ color: colourOf(colours.fin), roughness: 0.7, side: DoubleSide, transparent: true, opacity: 0.92 }, beat);
+	const skin = skinFor(strain);
+	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ map: skin, bumpMap: skin, bumpScale: SkinRelief, roughness: 0.38, metalness: 0.12 }, beat));
+	const finMaterial = swimmingMaterial({ color: colourOf(colours.fin), roughness: 0.6, side: DoubleSide, transparent: true, opacity: 0.8 }, beat);
 	const fins = [FinOutlines.tail, FinOutlines.dorsal, FinOutlines.anal].map((outline) => new Mesh(finGeometry(outline), finMaterial));
 	const group = new Group();
 	group.add(body, ...fins, ...pairedFins(FinOutlines.pectoral, finMaterial), ...pairedFins(FinOutlines.pelvic, finMaterial), ...eyes());

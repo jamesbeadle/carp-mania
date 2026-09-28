@@ -1,7 +1,7 @@
 import { seededRandom } from '$lib/domain/random';
-import type { ClearSpot } from './bank/facilityGrounds';
-import { metresBetween, type WorldPoint } from './lakeFrame';
-import { distanceToOutline, isInsideOutline } from './worldGeometry';
+import type { ClearSpot } from '../bank/facilityGrounds';
+import { metresBetween, type WorldPoint } from '../lakeFrame';
+import { distanceToOutline, isInsideOutline } from '../worldGeometry';
 
 export type TreeKind = 'poplar' | 'broadleaf' | 'willow';
 

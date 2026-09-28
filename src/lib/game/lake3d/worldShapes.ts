@@ -20,12 +20,3 @@ export function shapeWithHoles(outer: WorldPoint[], holes: WorldPoint[][]) {
 	shape.holes = holes.map(shapeOf);
 	return shape;
 }
-
-export function rectangleAround(halfWidth: number, halfDepth: number): WorldPoint[] {
-	return [
-		{ x: -halfWidth, z: -halfDepth },
-		{ x: halfWidth, z: -halfDepth },
-		{ x: halfWidth, z: halfDepth },
-		{ x: -halfWidth, z: halfDepth }
-	];
-}

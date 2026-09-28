@@ -1,4 +1,4 @@
-import type { Group, Mesh, MeshStandardMaterial, Object3D } from 'three';
+import type { Group, MeshStandardMaterial, Object3D } from 'three';
 import type { AlarmParts } from './podParts';
 import type { RodModel } from './rodModel';
 
@@ -7,7 +7,7 @@ export class PodRod {
 	readonly tip: Object3D;
 	private readonly rod: Group;
 	private readonly led: MeshStandardMaterial;
-	private readonly hanger: Mesh;
+	private readonly hanger: Object3D;
 	private readonly hangerRest: number;
 	private readonly bendBy: (amount: number) => void;
 
