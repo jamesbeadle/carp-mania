@@ -35,7 +35,8 @@ void main() {
 
 export function createNightSky() {
 	const uniforms = { darkness: { value: 0 }, moonDirection: { value: new Vector3(0, 1, 0) } };
-	const material = new ShaderMaterial({ uniforms, vertexShader: NightVertex, fragmentShader: NightFragment, side: BackSide, transparent: true, depthWrite: false, fog: false });
+	const shaders = { vertexShader: NightVertex, fragmentShader: NightFragment };
+	const material = new ShaderMaterial({ uniforms, ...shaders, side: BackSide, transparent: true, depthWrite: false, fog: false });
 	const dome = new Mesh(new SphereGeometry(Dome.Radius, Dome.WidthSegments, Dome.HeightSegments), material);
 	dome.renderOrder = Dome.RenderOrder;
 	const { darkness, moonDirection } = uniforms;

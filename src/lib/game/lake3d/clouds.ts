@@ -12,7 +12,13 @@ const Lighting = { SunlitShare: 0.22, ShadedBrightness: 0.62, SkyBlueInShade: 0.
 const Shadows = { Strongest: 0.32 } as const;
 const ShadeBlue = new Color('#8fa3c4');
 const Heaviness: Record<WeatherKind, number> = { clear: 0, heat: 0, mist: 0.25, overcast: 0.55, rain: 0.9 };
-const DownwindOf: Record<WindDirection, [number, number]> = { north: [0, 1], east: [-1, 0], south: [0, -1], west: [1, 0], south_west: [Math.SQRT1_2, -Math.SQRT1_2] };
+const DownwindOf: Record<WindDirection, [number, number]> = {
+	north: [0, 1],
+	east: [-1, 0],
+	south: [0, -1],
+	west: [1, 0],
+	south_west: [Math.SQRT1_2, -Math.SQRT1_2]
+};
 
 export interface CloudLighting {
 	direction: Vector3;
@@ -35,7 +41,8 @@ function cloudMaterial() {
 		drift: { value: new Vector2() }
 	};
 	const defines = { OCTAVES: renderQuality().cloudOctaves };
-	return new ShaderMaterial({ uniforms, defines, vertexShader: CloudVertex, fragmentShader: CloudFragment, side: BackSide, transparent: true, depthWrite: false, fog: false });
+	const shaders = { vertexShader: CloudVertex, fragmentShader: CloudFragment };
+	return new ShaderMaterial({ uniforms, defines, ...shaders, side: BackSide, transparent: true, depthWrite: false, fog: false });
 }
 
 export class Clouds {

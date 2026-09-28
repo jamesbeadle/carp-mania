@@ -17,7 +17,8 @@ export function createClearSky(isSunShown: boolean) {
 	cloudCoverage.value = 0;
 	showSunDisc.value = Number(isSunShown);
 	uniforms.brightness = { value: SkyBrightness };
-	material.fragmentShader = material.fragmentShader.replace(FinalColour, 'gl_FragColor = vec4( texColor * brightness, 1.0 );').replace('void main', 'uniform float brightness;\nvoid main');
+	const dimmed = material.fragmentShader.replace(FinalColour, 'gl_FragColor = vec4( texColor * brightness, 1.0 );');
+	material.fragmentShader = dimmed.replace('void main', 'uniform float brightness;\nvoid main');
 	return sky;
 }
 
