@@ -3,11 +3,13 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
 import type { ShoreField } from '../grass/shoreField';
-import { branchesOf, limbBetween, rootsOf, trunkPoints } from './fallenLimbs';
+import { barkTexture } from './barkTexture';
+import { branchesOf, limbBetween, trunkPoints } from './fallenLimbs';
+import { rootsOf } from './fallenRoots';
 
 const Tree = { Length: 9, RootRise: 0.3, CrownSink: 1.2, TrunkRadius: 0.3, TopRadius: 0.07, Sides: 9 } as const;
-const RootPlate = { Radius: 0.55, Thin: 0.45 } as const;
-const Bark = { Dry: new Color('#4c4238'), Wet: new Color('#26221c'), Earth: new Color('#3a2c20'), WetBelow: 0.08, Roughness: 0.95, ToneSwing: 0.12 } as const;
+const RootPlate = { Radius: 0.75, Thin: 0.4 } as const;
+const Bark = { Dry: new Color('#5a5046'), Wet: new Color('#262a1c'), Earth: new Color('#3a2c20'), WetBelow: 0.08, Roughness: 0.95, ToneSwing: 0.12 } as const;
 const Gradient = { RootShare: 0.3 } as const;
 
 function trunkRadiusAt(share: number) {
@@ -35,7 +37,7 @@ export function createFallenTree(point: WorldPoint, shore: ShoreField, random: R
 	const wood = [...limbs, ...branchesOf(trunk, random), ...rootsOf(trunk[0], random)];
 	const bark = mergeGeometries(wood.map((limb) => coloured(limb.toNonIndexed(), Bark.Dry.clone().offsetHSL(0, 0, (random() - 1 / 2) * Bark.ToneSwing))));
 	const wholeTree = mergeGeometries([bark, coloured(plate.toNonIndexed(), Bark.Earth)]);
-	const mesh = new Mesh(wholeTree, new MeshStandardMaterial({ vertexColors: true, roughness: Bark.Roughness }));
+	const mesh = new Mesh(wholeTree, new MeshStandardMaterial({ map: barkTexture(), vertexColors: true, roughness: Bark.Roughness }));
 	const heading = shore.headingTowardTheWater(point);
 	mesh.position.set(point.x - Math.cos(heading) * Tree.Length * Gradient.RootShare, 0, point.z - Math.sin(heading) * Tree.Length * Gradient.RootShare);
 	mesh.rotation.set(0, -heading, 0);
