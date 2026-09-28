@@ -1,15 +1,14 @@
 import { Vector3 } from 'three';
-import { clumpShading, writeClump, type FoliageContext } from './clumpFoliage';
+import { writeClump, type FoliageContext } from './clumpFoliage';
 import { AtlasRegions } from './foliageAtlas';
 import type { GeometryWriter } from './geometryWriter';
-import { writeCard, writeStrip } from './leafCards';
+import { writeStrip } from './leafCards';
 import { centredRandom } from './centredRandom';
-import { deviate, UpAxis } from './limbPaths';
+import { UpAxis } from './limbPaths';
 import type { LeafSite } from './treeSkeleton';
 
 const Curtain = { Strands: 4, TopClumpCards: 3, Floor: 0.03, ShortestHang: 0.5, HangRange: 0.45, HalfWidth: 0.02, Steps: 4, Drift: 0.12, Bulge: 0.04, Scatter: 0.7 } as const;
 const CurtainLight = { Outward: 0.75, Up: 0.35, Lowest: 0.5 } as const;
-const Spray = { BaseBehind: 0.3, Roll: 0.45 } as const;
 
 function outwardOf(point: Vector3) {
 	const flat = new Vector3(point.x, 0, point.z);
@@ -36,20 +35,5 @@ export function writeCurtain(writer: GeometryWriter, site: LeafSite, context: Fo
 		const normal = outward.clone().multiplyScalar(CurtainLight.Outward).addScaledVector(UpAxis, CurtainLight.Up).normalize();
 		const shade = (position: Vector3) => ({ normal, colour: tint.clone().multiplyScalar(CurtainLight.Lowest + (1 - CurtainLight.Lowest) * Math.min(1, position.y / volume.top)) });
 		writeStrip(writer, { path: hangPath(top, outward, hang), halfWidth: Curtain.HalfWidth * context.growth, region: AtlasRegions[style.region], order: random() }, shade);
-	}
-}
-
-export function writeSpray(writer: GeometryWriter, site: LeafSite, context: FoliageContext) {
-	const { random, style } = context;
-	const direction = site.heading.clone().addScaledVector(UpAxis, style.upward).normalize();
-	const length = site.reach * style.clumpRadius * context.growth;
-	const centre = site.at.clone().addScaledVector(direction, length * (1 / 2 - Spray.BaseBehind));
-	const tint = context.tint();
-	for (let card = 0; card < context.cards; card++) {
-		const roll = (card / context.cards) * Math.PI + centredRandom(random) * Spray.Roll;
-		const across = deviate(direction, Math.PI / 2, roll).multiplyScalar((length * style.cardSize) / 2);
-		const down = direction.clone().multiplyScalar(-length / 2);
-		const normal = new Vector3().crossVectors(direction, across).normalize();
-		writeCard(writer, { centre, across, down, region: AtlasRegions[style.region], order: random(), spin: null }, clumpShading(context, centre, length, normal, tint));
 	}
 }

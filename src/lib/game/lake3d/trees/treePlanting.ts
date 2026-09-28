@@ -3,6 +3,7 @@ import type { ClearSpot } from '../bank/facilityGrounds';
 import { metresBetween, type WorldPoint } from '../lakeFrame';
 import { distanceToOutline, isInsideOutline } from '../worldGeometry';
 import { plantAnIsland } from './islandPlanting';
+import { shoreCandidates } from './shoreCandidates';
 import { treeAt, type PlantedTree } from './plantedTree';
 import { Bands, kindFor } from './speciesChoice';
 import { woodlandFields, type WoodlandFields } from './woodlandFields';
@@ -19,7 +20,7 @@ export interface PlantingGround {
 	seed: number;
 }
 
-const Planting = { ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 20000, MostTrees: 2600, TreeLineReach: 42, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
+const Planting = { ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 20000, MostTrees: 3200, TreeLineReach: 42, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
 const Density = { Clearing: 0.3, Contrast: 1.6, DeepWoodsFrom: 110, DeepWoodsShare: 0.6 } as const;
 
 function densityAt(point: WorldPoint, distanceFromWater: number, fields: WoodlandFields) {
@@ -41,11 +42,18 @@ function plantableEdgeOf(ground: PlantingGround): WorldPoint {
 	return { x: plotEdge.x - Planting.CrownClearOfEdge, z: plotEdge.z - Planting.CrownClearOfEdge };
 }
 
-function plantTheBank(ground: PlantingGround, fields: WoodlandFields, random: RandomFraction) {
+function candidatePoints(ground: PlantingGround, random: RandomFraction) {
 	const edge = plantableEdgeOf(ground);
+	const isOnThePlot = (point: WorldPoint) => Math.abs(point.x) < edge.x && Math.abs(point.z) < edge.z;
+	const shoreline = shoreCandidates(ground.outline, Planting.TreeLineReach, random).filter(isOnThePlot);
+	const anywhere = Array.from({ length: Planting.Attempts }, () => ({ x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z }));
+	return [...shoreline, ...anywhere];
+}
+
+function plantTheBank(ground: PlantingGround, fields: WoodlandFields, random: RandomFraction) {
 	const trees: PlantedTree[] = [];
-	for (let attempt = 0; attempt < Planting.Attempts && trees.length < Planting.MostTrees; attempt++) {
-		const point = { x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z };
+	for (const point of candidatePoints(ground, random)) {
+		if (trees.length >= Planting.MostTrees) break;
 		if (isInsideOutline(point, ground.outline)) continue;
 		const distanceFromWater = distanceToOutline(point, ground.outline);
 		const isTooClose = distanceFromWater < Bands.NearestWater || !isClearOfBankside(point, ground.keepClear);

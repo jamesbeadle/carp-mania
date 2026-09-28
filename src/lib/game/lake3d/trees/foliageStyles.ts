@@ -1,7 +1,7 @@
 import type { FoliageRegion } from './foliageAtlas';
 import type { TreeKind } from './treeKinds';
 
-export type FoliageForm = 'clump' | 'curtain' | 'spray';
+export type FoliageForm = 'clump' | 'curtain';
 
 export interface FoliageStyle {
 	form: FoliageForm;

@@ -11,24 +11,33 @@ const Alpha = 3;
 const Most = 255;
 const CoverageGain = 1.28;
 
-function sampleAt(source: Uint8Array, width: number, x: number, y: number) {
+function texelOffset(width: number, x: number, y: number) {
 	const clampedX = Math.min(width - 1, Math.max(0, x));
 	const clampedY = Math.min(width - 1, Math.max(0, y));
 	return (clampedY * width + clampedX) * Channels;
 }
 
-function filterTexel(source: Uint8Array, width: number, x: number, y: number, target: Uint8Array, offset: number) {
-	const sums = [0, 0, 0, 0];
-	Tent.forEach((down, row) => {
-		Tent.forEach((across, column) => {
-			const at = sampleAt(source, width, x * 2 + column - 1, y * 2 + row - 1);
-			const weight = down * across * source[at + Alpha];
-			for (let channel = 0; channel < Alpha; channel++) sums[channel] += source[at + channel] * weight;
+const sums = new Float64Array(Channels);
+
+function gatherTent(source: Uint8Array, width: number, x: number, y: number) {
+	sums.fill(0);
+	for (let row = 0; row < Tent.length; row++) {
+		for (let column = 0; column < Tent.length; column++) {
+			const at = texelOffset(width, x * 2 + column - 1, y * 2 + row - 1);
+			const weight = Tent[row] * Tent[column] * source[at + Alpha];
+			sums[0] += source[at] * weight;
+			sums[1] += source[at + 1] * weight;
+			sums[2] += source[at + 2] * weight;
 			sums[Alpha] += weight;
-		});
-	});
+		}
+	}
+}
+
+function filterTexel(source: Uint8Array, width: number, x: number, y: number, target: Uint8Array, offset: number) {
+	gatherTent(source, width, x, y);
 	const coverage = sums[Alpha] / (TentTotal * Most);
-	for (let channel = 0; channel < Alpha; channel++) target[offset + channel] = sums[Alpha] > 0 ? sums[channel] / sums[Alpha] : source[sampleAt(source, width, x * 2, y * 2) + channel];
+	const fallback = texelOffset(width, x * 2, y * 2);
+	for (let channel = 0; channel < Alpha; channel++) target[offset + channel] = sums[Alpha] > 0 ? sums[channel] / sums[Alpha] : source[fallback + channel];
 	target[offset + Alpha] = Math.min(Most, coverage * CoverageGain * Most);
 }
 

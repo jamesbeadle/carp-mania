@@ -3,7 +3,7 @@ import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import { writeClump, type FoliageContext } from './clumpFoliage';
 import { crownVolumeOf } from './crownShading';
 import type { FoliageStyle } from './foliageStyles';
-import { writeCurtain, writeSpray } from './hangingFoliage';
+import { writeCurtain } from './hangingFoliage';
 import { leafWriter } from './leafCards';
 import type { LeafSite, Skeleton } from './treeSkeleton';
 
@@ -13,7 +13,7 @@ export interface FoliageDetail {
 }
 
 const WidestMargin = 0.08;
-const Forms = { clump: writeClump, curtain: writeCurtain, spray: writeSpray } as const;
+const Forms = { clump: writeClump, curtain: writeCurtain } as const;
 
 function strided(sites: LeafSite[], stride: number) {
 	return sites.filter((_, index) => index % stride === 0);

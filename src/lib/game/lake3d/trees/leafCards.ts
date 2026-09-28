@@ -15,7 +15,7 @@ export interface Card {
 	down: Vector3;
 	region: AtlasRegion;
 	order: number;
-	spin: number | null;
+	spin: number;
 }
 
 export interface Strip {
@@ -62,9 +62,8 @@ export function writeCard(writer: GeometryWriter, card: Card, shade: ShadeLeaf) 
 		const offsetDown = down * 2 - 1;
 		const resting = card.centre.clone().addScaledVector(card.across, offsetAcross).addScaledVector(card.down, offsetDown);
 		const shading = shade(resting);
-		const position = spin === null ? resting : card.centre;
-		const corner = spin === null ? [0, 0] : spun(offsetAcross * half, -offsetDown * half, spin);
-		return writer.vertex(position, shading.normal, atlasU(card.region, across), atlasV(card.region, down), shading.colour, [0, card.order, ...corner]);
+		const corner = spun(offsetAcross * half, -offsetDown * half, spin);
+		return writer.vertex(card.centre, shading.normal, atlasU(card.region, across), atlasV(card.region, down), shading.colour, [0, card.order, ...corner]);
 	});
 	writer.quad(corners[0], corners[3], corners[2], corners[1]);
 }
