@@ -36,8 +36,8 @@ export class Vegetation {
 		this.group.add(this.trees.group, createGrassTufts(plan, this.grassWind));
 		this.group.add(createMarginPlants({ shores: [plan.outline, ...plan.islands], reedLines: plan.reedLines, openings: plan.openings, season: plan.season, seed: plan.seed, groundAt: plan.groundAt }, this.grassWind));
 		const { country } = plan;
-		const hedgerows = country ? [createHedgerows({ country, season: plan.season, seed: plan.seed, groundAt: plan.groundAt })] : [];
-		this.group.add(...hedgerows);
+		const hedgerows = country ? createHedgerows({ country, season: plan.season, seed: plan.seed, groundAt: plan.groundAt }) : new Group();
+		this.group.add(hedgerows);
 	}
 
 	blow(timeSeconds: number, windStrength: number) {

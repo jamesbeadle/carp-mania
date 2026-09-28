@@ -5,8 +5,8 @@ import { FishPalette, type FishColours } from '../../scene/fishPalette';
 import { colourOf } from '../cssColour';
 import { paintScales, Skin } from './carpScales';
 
-const Belly = { Cream: new Color('#f3e6c2'), Share: 0.55 } as const;
-const UpperFlank = 0.45;
+const Belly = { Cream: new Color('#f3e6c2'), Share: 0.45 } as const;
+const Bronze = { MidFlank: 0.22, UpperFlank: 0.55 } as const;
 const Mottle = { Count: 90, Seed: 23, Shade: 'rgba(40, 30, 12, 0.07)' } as const;
 const Gill = { Line: 'rgba(40, 26, 12, 0.55)', Width: 2.5, Flanks: [0.25, 0.75], Reach: 0.17 } as const;
 
@@ -18,8 +18,9 @@ function paintCountershading(context: CanvasRenderingContext2D, colours: FishCol
 	const flank = colourOf(colours.flank);
 	const back = colourOf(colours.back);
 	const belly = hexOf(flank.clone().lerp(Belly.Cream, Belly.Share));
-	const upper = hexOf(flank.clone().lerp(back, UpperFlank));
-	const stops: [number, string][] = [[0, belly], [0.14, belly], [0.26, colours.flank], [0.38, upper], [0.5, colours.back], [0.62, upper], [0.74, colours.flank], [0.86, belly], [1, belly]];
+	const middle = hexOf(flank.clone().lerp(back, Bronze.MidFlank));
+	const upper = hexOf(flank.clone().lerp(back, Bronze.UpperFlank));
+	const stops: [number, string][] = [[0, belly], [0.12, belly], [0.24, colours.flank], [0.3, middle], [0.4, upper], [0.5, colours.back], [0.6, upper], [0.7, middle], [0.76, colours.flank], [0.88, belly], [1, belly]];
 	const shade = context.createLinearGradient(0, 0, Skin.Width, 0);
 	stops.forEach(([at, colour]) => shade.addColorStop(at, colour));
 	context.fillStyle = shade;

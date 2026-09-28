@@ -1,23 +1,28 @@
-import { CanvasTexture, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, RepeatWrapping, Shape, ShapeGeometry, SRGBColorSpace, Vector2, Vector3, type Material } from 'three';
+import { CanvasTexture, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, RepeatWrapping, Shape, ShapeGeometry, Vector2, Vector3, type Material } from 'three';
 
 const Net = { Handle: 1.9, Arm: 1.05, Spread: 0.5, Rod: 0.014, ArmRod: 0.009, Cord: 0.004 } as const;
-const Mesh3D = { Pixels: 64, Holes: 6, CutOff: 0.4, Repeat: 9 } as const;
-const NetLook = { Pole: '#1c1f1c', Mesh: '#2e3a2c', Cord: '#c8c8c0' } as const;
+const Mesh3D = { Pixels: 64, Holes: 6, Repeat: 9, Opacity: 0.85 } as const;
+const NetLook = { Pole: '#1c1f1c', Mesh: '#2e3a2c', Cord: '#c8c8c0', Strands: '#ffffff', Holes: '#3a3a3a' } as const;
 const UpAxis = new Vector3(0, 1, 0);
+
+function paintNetting(context: CanvasRenderingContext2D) {
+	const step = Mesh3D.Pixels / Mesh3D.Holes;
+	context.fillStyle = NetLook.Holes;
+	context.fillRect(0, 0, Mesh3D.Pixels, Mesh3D.Pixels);
+	context.fillStyle = NetLook.Strands;
+	for (let line = 0; line <= Mesh3D.Holes; line++) {
+		context.fillRect(line * step - 1, 0, 2, Mesh3D.Pixels);
+		context.fillRect(0, line * step - 1, Mesh3D.Pixels, 2);
+	}
+}
 
 function meshTexture() {
 	const canvas = document.createElement('canvas');
 	canvas.width = Mesh3D.Pixels;
 	canvas.height = Mesh3D.Pixels;
 	const context = canvas.getContext('2d');
-	const step = Mesh3D.Pixels / Mesh3D.Holes;
-	for (let line = 0; context && line <= Mesh3D.Holes; line++) {
-		context.fillStyle = NetLook.Mesh;
-		context.fillRect(line * step - 1, 0, 2, Mesh3D.Pixels);
-		context.fillRect(0, line * step - 1, Mesh3D.Pixels, 2);
-	}
+	if (context) paintNetting(context);
 	const texture = new CanvasTexture(canvas);
-	texture.colorSpace = SRGBColorSpace;
 	texture.wrapS = RepeatWrapping;
 	texture.wrapT = RepeatWrapping;
 	texture.repeat.set(Mesh3D.Repeat, Mesh3D.Repeat);
@@ -40,7 +45,7 @@ export function landingNet(headDip: number) {
 	const arms = corners.map((corner) => rodBetween(spreader, corner, Net.ArmRod, pole));
 	const cord = rodBetween(corners[0], corners[1], Net.Cord, new MeshStandardMaterial({ color: NetLook.Cord }));
 	const outline = new Shape([new Vector2(0, 0), new Vector2(-Net.Spread, Net.Arm), new Vector2(Net.Spread, Net.Arm)]);
-	const netting = new Mesh(new ShapeGeometry(outline).rotateX(Math.PI / 2), new MeshStandardMaterial({ map: meshTexture(), alphaTest: Mesh3D.CutOff, side: DoubleSide, roughness: 0.9 }));
+	const netting = new Mesh(new ShapeGeometry(outline).rotateX(Math.PI / 2), new MeshStandardMaterial({ color: NetLook.Mesh, alphaMap: meshTexture(), transparent: true, opacity: Mesh3D.Opacity, depthWrite: false, side: DoubleSide, roughness: 0.9 }));
 	const head = new Group().add(...arms, cord, netting);
 	head.rotateX(headDip);
 	return new Group().add(handle, head);

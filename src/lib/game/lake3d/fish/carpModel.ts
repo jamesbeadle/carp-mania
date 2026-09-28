@@ -10,6 +10,7 @@ import { swimmingMaterial, type SwimBeat } from './swimmingMaterial';
 
 const PairedFins = { Splay: 0.5, Out: 0.045 } as const;
 const SkinRelief = 1.5;
+const Flesh = { Tone: '#d6c09a', Roughness: 0.42, Metalness: 0.05 } as const;
 const skins = new Map<CarpStrain, ReturnType<typeof carpSkinTexture>>();
 const Fin = { Roughness: 0.6, Opacity: 0.82 } as const;
 let finRays: { upright: Texture; tail: Texture } | null = null;
@@ -44,7 +45,7 @@ function finMaterialOf(strain: CarpStrain, rays: Texture, beat: SwimBeat) {
 export function createCarp(strain: CarpStrain, beat: SwimBeat) {
 	const skin = skinFor(strain);
 	const rays = raysFor();
-	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ map: skin, bumpMap: skin, bumpScale: SkinRelief, roughness: 0.38, metalness: 0.12 }, beat));
+	const body = new Mesh(carpBodyGeometry(), swimmingMaterial({ color: Flesh.Tone, map: skin, bumpMap: skin, bumpScale: SkinRelief, roughness: Flesh.Roughness, metalness: Flesh.Metalness }, beat));
 	const finMaterial = finMaterialOf(strain, rays.upright, beat);
 	const tail = new Mesh(finGeometry(FinOutlines.tail), finMaterialOf(strain, rays.tail, beat));
 	const fins = [FinOutlines.dorsal, FinOutlines.anal].map((outline) => new Mesh(finGeometry(outline), finMaterial));
