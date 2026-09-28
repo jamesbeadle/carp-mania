@@ -29,6 +29,8 @@ uniform float swayFlutter;
 const SwayVertex = `
 #ifdef USE_BATCHING
 vec3 swayRoot = batchingMatrix[3].xyz;
+#elif defined(USE_INSTANCING)
+vec3 swayRoot = instanceMatrix[3].xyz;
 #else
 vec3 swayRoot = vec3(0.0);
 #endif

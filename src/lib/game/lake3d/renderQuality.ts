@@ -7,10 +7,11 @@ export interface RenderQuality {
 	treeCardShare: number;
 	nearTreeMetres: number;
 	treeAtlasPixels: number;
+	treeVariantsSingleDraw: number;
 }
 
-const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true, treeCardShare: 1, nearTreeMetres: 55, treeAtlasPixels: 2048 };
-const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false, treeCardShare: 0.5, nearTreeMetres: 35, treeAtlasPixels: 1024 };
+const Generous: RenderQuality = { mostPixelRatio: 2, multisamples: 4, reflectionScale: 0.5, grassTufts: 26000, hasBloom: true, treeCardShare: 1, nearTreeMetres: 55, treeAtlasPixels: 2048, treeVariantsSingleDraw: 2 };
+const Modest: RenderQuality = { mostPixelRatio: 1.5, multisamples: 0, reflectionScale: 0.3, grassTufts: 9000, hasBloom: false, treeCardShare: 0.5, nearTreeMetres: 35, treeAtlasPixels: 1024, treeVariantsSingleDraw: 1 };
 const FewestCoresForGenerous = 6;
 
 let chosen: RenderQuality | null = null;

@@ -13,6 +13,8 @@ export interface WoodDetail {
 }
 
 const Root = { Sink: 0.03, Flare: 1.25 } as const;
+const Tip = { Share: 0.2 } as const;
+const FinestThinnedLevel = 1;
 const Texture = { AroundRepeats: 2, AlongPerCircumference: 1 } as const;
 const FullTurn = Math.PI * 2;
 const ReferenceSide = new Vector3(1, 0, 0.3).normalize();
@@ -64,11 +66,14 @@ function writeLimb(writer: GeometryWriter, kind: TreeKind, limb: Limb, sides: nu
 	});
 }
 
-function thinned(limb: Limb, stride: number): Limb {
+function thinned(limb: Limb, pointStride: number): Limb {
 	const { points, radii } = limb;
 	const last = points.length - 1;
+	const stride = limb.level > FinestThinnedLevel ? 1 : pointStride;
 	const isKept = (index: number) => index % stride === 0 || index === last;
-	return { ...limb, points: points.filter((_, index) => isKept(index)), radii: radii.filter((_, index) => isKept(index)) };
+	const keptRadii = radii.filter((_, index) => isKept(index));
+	const tip = keptRadii.length - 1;
+	return { ...limb, points: points.filter((_, index) => isKept(index)), radii: keptRadii.map((radius, index) => (index === tip ? radius * Tip.Share : radius)) };
 }
 
 export function woodGeometry(kind: TreeKind, skeleton: Skeleton, detail: WoodDetail) {

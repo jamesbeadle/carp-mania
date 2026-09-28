@@ -1,6 +1,6 @@
 import { Color, DoubleSide, MeshDepthMaterial, MeshStandardMaterial, RGBADepthPacking, ShaderChunk, type Texture, type WebGLProgramParametersWithUniforms } from 'three';
 import type { CrownSway } from './crownSway';
-import { BiasedLeafTexture, EveryLeafKept, LeafBillboard, LeafFragmentDeclarations, LeafFullness, LeafVertexDeclarations, SoftSheen, Translucency } from './leafShader';
+import { BiasedLeafTexture, EveryLeafKept, HazyAlphaTest, LeafBillboard, LeafFragmentDeclarations, LeafFullness, LeafVertexDeclarations, SoftSheen, Translucency } from './leafShader';
 
 const Leaf = { Roughness: 1, CutOff: 0.5, GlowSpread: 0.35, GlowFocus: 3, GlowStrength: 0.9, Sheen: 0.25, ShadowCutOff: 0.3, AliasedMipBias: 0.5 } as const;
 const GlowTint = new Color(1.1, 1.0, 0.55);
@@ -22,6 +22,7 @@ function patchLeafShader(shader: WebGLProgramParametersWithUniforms, mipBias: nu
 	shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\n' + LeafVertexDeclarations).replace('#include <color_vertex>', LeafFullness).replace('#include <project_vertex>', LeafBillboard);
 	shader.fragmentShader = (LeafFragmentDeclarations + shader.fragmentShader)
 		.replace('#include <map_fragment>', BiasedLeafTexture)
+		.replace('#include <alphatest_fragment>', HazyAlphaTest)
 		.replace('#include <normal_fragment_begin>', frontFacing)
 		.replace('#include <lights_fragment_end>', SoftSheen)
 		.replace('#include <opaque_fragment>', Translucency);

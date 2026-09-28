@@ -1,4 +1,4 @@
-import { Vector3, type BufferGeometry, type Color } from 'three';
+import type { BufferGeometry, Color } from 'three';
 import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import { writeClump, type FoliageContext } from './clumpFoliage';
 import { crownVolumeOf, type CrownVolume } from './crownShading';
@@ -6,7 +6,8 @@ import type { FoliageStyle } from './foliageStyles';
 import { writeCurtain } from './hangingFoliage';
 import { leafWriter, markBounds } from './leafCards';
 import { siteCrowding } from './siteCrowding';
-import type { LeafSite, Skeleton } from './treeSkeleton';
+import { gatheredSites } from './siteGathering';
+import type { Skeleton } from './treeSkeleton';
 
 export interface FoliageDetail {
 	siteStride: number;
@@ -18,10 +19,6 @@ const WidestMargin = 0.08;
 const GrowthPower = 0.4;
 const Bounds = { CardReach: 1.5, Sway: 0.12 } as const;
 const Forms = { clump: writeClump, curtain: writeCurtain } as const;
-
-function strided(sites: LeafSite[], stride: number) {
-	return sites.filter((_, index) => index % stride === 0);
-}
 
 function boundsOf(volume: CrownVolume, style: FoliageStyle, growth: number) {
 	const reach = style.clumpRadius * growth * style.cardSize * style.aspect * Bounds.CardReach + Bounds.Sway;
@@ -38,20 +35,12 @@ export function foliageGeometry(skeleton: Skeleton, style: FoliageStyle, detail:
 	const siteStride = Math.min(detail.siteStride, style.mostStride);
 	const occlusion = 1 / Math.cbrt(siteStride);
 	const growth = Math.pow(siteStride / detail.cardShare, GrowthPower);
-	const sites = strided(skeleton.sites, siteStride);
+	const sites = gatheredSites(skeleton.sites, siteStride);
 	const crowding = siteCrowding(skeleton.sites, style.clumpRadius);
 	const region = detail.hasFineLeaves ? style.fineRegion : style.region;
 	const context: FoliageContext = { style: { ...style, region }, volume, random, cards, growth, longestReach, occlusion, crowding, tint: () => tint(random) };
 	sites.forEach((site) => Forms[style.form](writer, site, context));
 	const bounds = boundsOf(volume, style, growth);
 	markBounds(writer, bounds.least, bounds.most);
-	return writer.build();
-}
-
-
-export function emptyFoliage(): BufferGeometry {
-	const writer = leafWriter();
-	const origin = new Vector3();
-	markBounds(writer, origin, origin);
 	return writer.build();
 }

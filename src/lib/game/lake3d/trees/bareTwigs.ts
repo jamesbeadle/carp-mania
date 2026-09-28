@@ -8,7 +8,7 @@ const Twig: BranchLevel = { count: 4, from: 0.25, to: 1, angle: degrees(38), len
 const TwigsOf: Record<TreeKind, Partial<BranchLevel>> = {
 	oak: { count: 5, bend: 0.05, wander: 0.7 },
 	alder: { count: 4 },
-	willow: { count: 3, angle: degrees(25), length: 1.4, bend: -1.8, segments: 3, wander: 0.2 },
+	willow: { count: 3, angle: degrees(30), length: 0.7, bend: -1.4, segments: 3, wander: 0.25 },
 	birch: { count: 5, bend: -0.9, length: 0.75 },
 	poplar: { count: 4, angle: degrees(20), bend: 0.4 },
 	pine: {},

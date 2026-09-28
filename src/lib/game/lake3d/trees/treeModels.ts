@@ -2,10 +2,10 @@ import type { BufferGeometry } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import { withTwigs } from './bareTwigs';
 import { woodGeometry } from './barkGeometry';
-import { emptyFoliage, foliageGeometry, type FoliageDetail } from './crownFoliage';
-import { FoliageStyles, WinterTwigs } from './foliageStyles';
+import { foliageGeometry } from './crownFoliage';
+import { FoliageStyles, WinterStyles } from './foliageStyles';
 import { clumpTintFor, isBare } from './treeColours';
-import { BareDetails, Details, FirstHazeDetail } from './treeDetails';
+import { BareDetails, Details } from './treeDetails';
 import { Habits } from './treeHabits';
 import { TreeKinds, type TreeKind } from './treeKinds';
 import { growSkeleton } from './treeSkeleton';
@@ -23,7 +23,6 @@ const Seeds = { PerKind: 101, PerVariant: 7 } as const;
 export interface ModelLook {
 	season: SeasonName;
 	cardShare: number;
-	hasTwigHaze: boolean;
 }
 
 function leafyModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
@@ -36,9 +35,7 @@ function leafyModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 function bareModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 	const skeleton = growSkeleton(withTwigs(Habits[kind], kind), seed);
 	const tint = clumpTintFor(look.season);
-	const haze = (foliage: FoliageDetail) => foliageGeometry(skeleton, WinterTwigs, foliage, tint, seed);
-	const isHazy = (level: number) => look.hasTwigHaze && level >= FirstHazeDetail;
-	const leaves = BareDetails.map(({ foliage }, level) => (isHazy(level) ? haze(foliage) : emptyFoliage()));
+	const leaves = BareDetails.map(({ foliage }) => foliageGeometry(skeleton, WinterStyles[kind], foliage, tint, seed));
 	return { kind, leaves, wood: BareDetails.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
 }
 

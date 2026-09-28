@@ -51,7 +51,7 @@ function writeOneCard(writer: GeometryWriter, site: LeafSite, context: FoliageCo
 	const down = new Vector3().crossVectors(normal, across).normalize().multiplyScalar(half * aspect);
 	const axis = style.isAlongBranch ? site.heading : NoAxis;
 	centre.addScaledVector(axis, -half * aspect * style.tipInset);
-	const card = { centre, across, down, region: pickOf(AtlasRegions[style.region], random), order: random(), spin: centredRandom(random) * style.spin * 2, axis };
+	const card = { centre, across, down, region: pickOf(AtlasRegions[style.region], random), order: random(), spin: centredRandom(random) * style.spin * 2, axis, haze: style.isHaze ? 1 : 0 };
 	writeCard(writer, card, clumpShading(context, site.at, radius, normal, tint));
 }
 

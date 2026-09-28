@@ -1,18 +1,30 @@
 import { glslDefines } from './glslConstants';
 
 const LeafTurning = glslDefines({ LEAF_AXIS_LEAST: 0.0001, LEAF_SHORTEST: 0.35 });
+const HazeShape = glslDefines({ HAZE_DENSITY: 0.8, HAZE_NOISE_ACROSS: 12.9898, HAZE_NOISE_DOWN: 78.233, HAZE_NOISE_SCALE: 43758.5453 });
 
 export const LeafVertexDeclarations = LeafTurning + `
 attribute float dangle;
 attribute float cardOrder;
 attribute vec2 leafCorner;
 attribute vec3 leafAxis;
+attribute float leafHaze;
+varying float vLeafHaze;
+#ifdef USE_INSTANCING
+attribute float instanceFullness;
+#endif
 `;
 
 export const LeafFullness = `
 #include <color_vertex>
-float leafKeep = step(cardOrder, vColor.a);
+#ifdef USE_INSTANCING
+float leafFullness = instanceFullness;
+#else
+float leafFullness = vColor.a;
+#endif
+float leafKeep = step(cardOrder, leafFullness);
 vColor.a = 1.0;
+vLeafHaze = leafHaze;
 `;
 
 export const EveryLeafKept = `
@@ -24,6 +36,8 @@ export const LeafBillboard = `
 #include <project_vertex>
 #ifdef USE_BATCHING
 mat4 leafPlacement = batchingMatrix;
+#elif defined(USE_INSTANCING)
+mat4 leafPlacement = instanceMatrix;
 #else
 mat4 leafPlacement = mat4(1.0);
 #endif
@@ -38,7 +52,8 @@ mvPosition.xy += (leafSide * leafCorner.x + leafUp * leafCorner.y * leafForeshor
 gl_Position = projectionMatrix * mvPosition;
 `;
 
-export const LeafFragmentDeclarations = `
+export const LeafFragmentDeclarations = HazeShape + `
+varying float vLeafHaze;
 uniform float leafGlowSpread;
 uniform float leafGlowFocus;
 uniform float leafGlowStrength;
@@ -67,4 +82,16 @@ float leafThrough = max(dot(-normal, leafSun), 0.0) * leafGlowSpread + pow(leafF
 outgoingLight += directionalLights[ 0 ].color * diffuseColor.rgb * leafGlowTint * leafThrough * leafGlowStrength;
 #endif
 #include <opaque_fragment>
+`;
+
+export const HazyAlphaTest = `
+#ifdef ALPHA_TO_COVERAGE
+float leafCrisp = smoothstep(alphaTest, alphaTest + fwidth(diffuseColor.a), diffuseColor.a);
+diffuseColor.a = mix(leafCrisp, diffuseColor.a * HAZE_DENSITY, vLeafHaze);
+if (diffuseColor.a == 0.0) discard;
+#else
+float leafNoise = fract(sin(dot(floor(gl_FragCoord.xy), vec2(HAZE_NOISE_ACROSS, HAZE_NOISE_DOWN))) * HAZE_NOISE_SCALE);
+float leafCut = mix(alphaTest, leafNoise, vLeafHaze);
+if (diffuseColor.a * mix(1.0, HAZE_DENSITY, vLeafHaze) < leafCut) discard;
+#endif
 `;

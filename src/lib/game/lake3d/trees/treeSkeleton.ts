@@ -4,8 +4,6 @@ import type { BranchLevel, Habit } from './habitTypes';
 import { centredRandom } from './centredRandom';
 import { deviate, randomUnit, sampleLimb, UpAxis, type Limb } from './limbPaths';
 
-export type { BranchLevel, Habit } from './habitTypes';
-
 export interface LeafSite {
 	at: Vector3;
 	heading: Vector3;
@@ -26,7 +24,7 @@ interface Growth {
 }
 
 const GoldenAngle = Math.PI * (3 - Math.sqrt(5));
-const Jitter = { Spacing: 0.7, Azimuth: 0.9, Angle: 0.35, Length: 0.4, SitesFrom: 0.3, SitesSpan: 0.6, BranchSitesFrom: 0.45, BranchSitesSpan: 0.5 } as const;
+const Jitter = { Spacing: 0.7, Azimuth: 0.9, Angle: 0.35, Length: 0.4, SitesFrom: 0.3, SitesSpan: 0.6, BranchSitesFrom: 0.45, BranchSitesSpan: 0.5, BranchTipReach: 0.5 } as const;
 
 function traceLimb(growth: Growth, start: Vector3, heading: Vector3, length: number, radius: number, levelIndex: number): Limb {
 	const level = growth.levels[levelIndex];
@@ -58,14 +56,21 @@ function plantSites(growth: Growth, limb: Limb, length: number) {
 	plantAlong(growth, limb, length, habit.sitesAlong, Jitter.SitesFrom, Jitter.SitesSpan);
 }
 
+function plantBranchSites(growth: Growth, limb: Limb, length: number) {
+	const tip = sampleLimb(limb, 1);
+	const { skeleton, habit } = growth;
+	skeleton.sites.push({ at: tip.point, heading: tip.direction, reach: length * Jitter.BranchTipReach });
+	plantAlong(growth, limb, length, habit.sitesOnBranches, Jitter.BranchSitesFrom, Jitter.BranchSitesSpan);
+}
+
 function growLimb(growth: Growth, start: Vector3, heading: Vector3, length: number, radius: number, levelIndex: number) {
 	const limb = traceLimb(growth, start, heading, length, radius, levelIndex);
 	const { skeleton } = growth;
 	skeleton.limbs.push(limb);
 	const next = growth.levels[levelIndex + 1];
 	if (!next) return plantSites(growth, limb, length);
-	const { random, habit, levels } = growth;
-	if (levelIndex === levels.length - 2) plantAlong(growth, limb, length, habit.sitesOnBranches, Jitter.BranchSitesFrom, Jitter.BranchSitesSpan);
+	const { random, levels } = growth;
+	if (levelIndex === levels.length - 2) plantBranchSites(growth, limb, length);
 	for (let index = 0; index < next.count; index++) {
 		const along = next.from + ((next.to - next.from) * (index + 1 / 2 + centredRandom(random) * Jitter.Spacing)) / next.count;
 		const sample = sampleLimb(limb, along);

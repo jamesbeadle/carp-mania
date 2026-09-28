@@ -16,8 +16,8 @@ interface PaintedLeaf {
 	light: number;
 }
 
-const Lobes = { Fewest: 3, Extra: 3, Smallest: 0.15, RadiusRange: 0.1, Spread: 0.6, Margin: 0.03 } as const;
-const Leaves = { PerLobeArea: 1900, Shortest: 0.058, LengthRange: 0.04, Scatter: 1.1, EdgeBias: 0.65, Room: 0.1 } as const;
+const Lobes = { Fewest: 5, Extra: 4, Smallest: 0.1, RadiusRange: 0.08, Spread: 0.62, Margin: 0.03, Reach: 1.3 } as const;
+const Leaves = { PerLobeArea: 2600, Shortest: 0.058, LengthRange: 0.04, Scatter: 1.1, Falloff: 0.8, Room: 0.1 } as const;
 
 interface LeafShape {
 	scale: number;
@@ -25,25 +25,32 @@ interface LeafShape {
 }
 
 const Shapes = { Broad: { scale: 1, width: 0.56 }, FineBroad: { scale: 0.45, width: 0.56 }, Round: { scale: 0.9, width: 0.85 }, FineRound: { scale: 0.42, width: 0.85 } } as const;
-const Light = { Darkest: 0.42, Range: 0.62, Height: 0.35, Order: 0.65, Warmth: 0.7, Cool: 0.28 } as const;
+const Light = { Darkest: 0.36, Range: 0.72, Height: 0.2, Order: 0.42, Lobe: 0.38, LobeUp: 0.75, LobeSide: 0.35, Warmth: 0.7, Cool: 0.28 } as const;
 const Stem = { Width: 0.009, Base: 0.9, BaseSpread: 0.4, Bend: 0.25, Tone: { lightness: 0.3, warmth: 1 } } as const;
 const FullTurn = Math.PI * 2;
 
 function lobeIn(region: PixelRegion, random: RandomFraction): Lobe {
 	const size = region.width;
 	const radius = (Lobes.Smallest + random() * Lobes.RadiusRange) * size;
-	const room = size / 2 - radius - (Lobes.Margin + Leaves.Room) * size;
+	const room = size / 2 - radius * Lobes.Reach - (Lobes.Margin + Leaves.Room) * size;
 	const clamp = (offset: number) => Math.max(-room, Math.min(room, offset));
 	return { x: region.left + size / 2 + clamp(centredRandom(random) * Lobes.Spread * size), y: region.top + size / 2 + clamp(centredRandom(random) * Lobes.Spread * size), radius };
 }
 
+function lobeLightAt(lobe: Lobe, x: number, y: number) {
+	const facing = ((lobe.y - y) * Light.LobeUp + (x - lobe.x) * Light.LobeSide) / (lobe.radius * Lobes.Reach);
+	return Math.min(1, Math.max(0, (1 + facing) / 2));
+}
+
 function leafInLobe(lobe: Lobe, region: PixelRegion, shape: LeafShape, random: RandomFraction): PaintedLeaf {
 	const heading = random() * FullTurn;
-	const distance = Math.pow(random(), 1 - Leaves.EdgeBias / 2) * lobe.radius;
+	const distance = Math.pow(random(), Leaves.Falloff) * lobe.radius * Lobes.Reach;
+	const x = lobe.x + Math.cos(heading) * distance;
 	const y = lobe.y + Math.sin(heading) * distance;
 	const height = 1 - (y - region.top) / region.height;
 	const length = (Leaves.Shortest + random() * Leaves.LengthRange) * region.width * shape.scale;
-	return { x: lobe.x + Math.cos(heading) * distance, y, angle: heading + centredRandom(random) * Leaves.Scatter * 2, length, light: random() * Light.Order + height * Light.Height };
+	const light = random() * Light.Order + height * Light.Height + lobeLightAt(lobe, x, y) * Light.Lobe;
+	return { x, y, angle: heading + centredRandom(random) * Leaves.Scatter * 2, length, light };
 }
 
 function toneOf(leaf: PaintedLeaf, random: RandomFraction): Tone {

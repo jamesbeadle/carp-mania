@@ -5,7 +5,7 @@ import { AtlasGrid, AtlasRegions, type AtlasRegion, type FoliageRegion } from '.
 import { paintBirch, paintFineBirch } from './birchPainter';
 import { paintBroadleaf, paintFineBroadleaf, paintFineRoundleaf, paintRoundleaf } from './leafPainters';
 import { paintNeedles, paintSpray, paintWillow } from './stripPainters';
-import { paintTwigs } from './twigPainter';
+import { paintTwigs, paintWhips } from './twigPainter';
 import { mipLevelsOf } from './atlasMipmaps';
 
 export { AtlasRegions, type AtlasRegion, type FoliageRegion } from './atlasRegions';
@@ -21,7 +21,8 @@ const Paintings: Record<FoliageRegion, Painting> = {
 	willow: paintWillow,
 	needles: paintNeedles,
 	spray: paintSpray,
-	twigs: paintTwigs
+	twigs: paintTwigs,
+	whips: paintWhips
 };
 const Atlas = { Seed: 71, Backdrop: '#a9b596', Anisotropy: 4 } as const;
 const Channels = 4;

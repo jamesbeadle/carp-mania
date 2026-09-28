@@ -37,6 +37,6 @@ export function writeCurtain(writer: GeometryWriter, site: LeafSite, context: Fo
 		const tint = context.tint();
 		const normal = outward.clone().multiplyScalar(CurtainLight.Outward).addScaledVector(UpAxis, CurtainLight.Up).normalize();
 		const shade = (position: Vector3) => ({ normal, colour: tint.clone().multiplyScalar(CurtainLight.Lowest + (1 - CurtainLight.Lowest) * Math.min(1, position.y / volume.top)) });
-		writeStrip(writer, { path: hangPath(top, outward, hang), halfWidth: Curtain.HalfWidth * context.growth, region: regions[Math.floor(random() * regions.length) % regions.length], order: random() }, shade);
+		writeStrip(writer, { path: hangPath(top, outward, hang), halfWidth: Curtain.HalfWidth * context.growth, region: regions[Math.floor(random() * regions.length) % regions.length], order: random(), haze: style.isHaze ? 1 : 0 }, shade);
 	}
 }

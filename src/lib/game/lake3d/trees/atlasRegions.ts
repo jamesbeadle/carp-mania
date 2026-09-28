@@ -5,7 +5,7 @@ export interface AtlasRegion {
 	height: number;
 }
 
-export type FoliageRegion = 'broadleaf' | 'broadleafFine' | 'roundleaf' | 'roundleafFine' | 'birch' | 'birchFine' | 'willow' | 'needles' | 'spray' | 'twigs';
+export type FoliageRegion = 'broadleaf' | 'broadleafFine' | 'roundleaf' | 'roundleafFine' | 'birch' | 'birchFine' | 'willow' | 'needles' | 'spray' | 'twigs' | 'whips';
 
 export const AtlasGrid = { Columns: 8, Rows: 4 } as const;
 
@@ -14,7 +14,8 @@ function cell(column: number, row: number, rows = 1): AtlasRegion {
 }
 
 export const AtlasRegions: Record<FoliageRegion, AtlasRegion[]> = {
-	broadleaf: [cell(0, 0), cell(1, 0), cell(2, 0), cell(3, 0)],
+	broadleaf: [cell(0, 0), cell(1, 0), cell(2, 0)],
+	whips: [cell(3, 0)],
 	broadleafFine: [cell(4, 0), cell(5, 0), cell(6, 0), cell(7, 0)],
 	birch: [cell(0, 1), cell(1, 1), cell(2, 1)],
 	birchFine: [cell(3, 1), cell(4, 1), cell(5, 1)],
