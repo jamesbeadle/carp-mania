@@ -1,6 +1,7 @@
 import { Color, DoubleSide, MeshDepthMaterial, MeshStandardMaterial, RGBADepthPacking, ShaderChunk, type Texture, type WebGLProgramParametersWithUniforms } from 'three';
 import type { CrownSway } from './crownSway';
-import { BiasedLeafTexture, EveryLeafKept, HazyAlphaTest, LeafBillboard, LeafFragmentDeclarations, LeafFullness, LeafVertexDeclarations, SoftSheen, Translucency } from './leafShader';
+import { HazyAlphaTest } from './hazeShader';
+import { BiasedLeafTexture, EveryLeafKept, LeafBillboard, LeafFragmentDeclarations, LeafFullness, LeafVertexDeclarations, SoftSheen, Translucency } from './leafShader';
 
 const Leaf = { Roughness: 1, CutOff: 0.5, GlowSpread: 0.35, GlowFocus: 3, GlowStrength: 0.9, Sheen: 0.25, ShadowCutOff: 0.3, AliasedMipBias: 0.5 } as const;
 const GlowTint = new Color(1.1, 1.0, 0.55);
