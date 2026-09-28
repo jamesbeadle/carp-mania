@@ -20,7 +20,7 @@ export const FoliageStyles: Record<TreeKind, FoliageStyle> = {
 	birch: { form: 'clump', region: 'birch', clumpRadius: 0.042, cards: 3, cardSize: 1.9, flatten: 1, upward: 0 },
 	poplar: { form: 'clump', region: 'broadleaf', clumpRadius: 0.042, cards: 5, cardSize: 1.5, flatten: 1.3, upward: 0.2 },
 	pine: { form: 'clump', region: 'needles', clumpRadius: 0.058, cards: 7, cardSize: 1.5, flatten: 0.5, upward: 0.7 },
-	spruce: { form: 'spray', region: 'spray', clumpRadius: 0.5, cards: 2, cardSize: 0.55, flatten: 1, upward: 0.6 }
+	spruce: { form: 'clump', region: 'spray', clumpRadius: 0.055, cards: 3, cardSize: 1.8, flatten: 0.6, upward: 0.2 }
 };
 
 export const WinterTwigs: FoliageStyle = { form: 'clump', region: 'twigs', clumpRadius: 0.075, cards: 1, cardSize: 1.5, flatten: 1, upward: 0 };
