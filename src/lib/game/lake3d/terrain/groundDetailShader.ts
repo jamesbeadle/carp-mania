@@ -15,6 +15,16 @@ const float PathShare = 0.65;
 const float CausticMetres = 2.7;
 const float CausticDrift = 0.035;
 
+vec3 tileAt(sampler2D tile, vec2 ground, float metres) {
+	return texture2D(tile, ground / metres).rgb;
+}
+
+vec3 marginColour(vec2 ground, vec4 fine, vec3 earth) {
+	vec3 shingle = tileAt(shingleTile, ground, ShingleMetres);
+	float stony = smoothstep(0.9 - shingleShare, 1.1 - shingleShare, fine.b);
+	return mix(earth * 0.75, shingle, stony);
+}
+
 float wearAt(vec2 ground, float ragged) {
 	float worn = 0.0;
 	for (int index = 0; index < MostWornSwims; index++) {

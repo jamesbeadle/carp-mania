@@ -31,6 +31,7 @@ const float ShingleMetres = 1.1;
 const float BedMetres = 2.6;
 const float BroadMetres = 190.0;
 const float FineMetres = 17.0;
+const float TussockMetres = 4.1;
 const vec3 Absorption = vec3(1.1, 0.42, 0.55);
 const mat2 Turned = mat2(0.8, 0.6, -0.6, 0.8);
 
@@ -46,22 +47,14 @@ struct GroundSurface {
 	float relief;
 };
 ${GroundDetailFunctions}
-vec3 tileAt(sampler2D tile, vec2 ground, float metres) {
-	return texture2D(tile, ground / metres).rgb;
-}
-
 vec3 grassColour(vec2 ground, vec4 broad, vec4 fine, float height) {
 	vec3 near = tileAt(grassTile, ground, GrassMetres);
 	vec3 far = tileAt(grassTile, Turned * ground, GrassFarMetres);
 	vec3 blades = mix(near, far, 0.3 + 0.3 * fine.r);
+	float tussock = texture2D(groundNoise, ground / TussockMetres).g * texture2D(groundNoise, Turned * ground / (TussockMetres * 1.63)).a;
+	blades *= mix(0.78, 1.18, smoothstep(0.1, 0.5, tussock));
 	float dryness = clamp(smoothstep(0.35, 0.85, broad.r) + smoothstep(2.0, 6.0, height) * 0.5, 0.0, 1.0);
 	return blades * mix(lushGrass, dryGrass, dryness) * (0.8 + 0.4 * fine.g);
-}
-
-vec3 marginColour(vec2 ground, vec4 fine, vec3 earth) {
-	vec3 shingle = tileAt(shingleTile, ground, ShingleMetres);
-	float stony = smoothstep(0.9 - shingleShare, 1.1 - shingleShare, fine.b);
-	return mix(earth * 0.75, shingle, stony);
 }
 
 GroundSurface groundSurface() {
@@ -77,7 +70,7 @@ GroundSurface groundSurface() {
 	float under = 1.0 - smoothstep(-0.12, -0.02, height);
 	float wet = 1.0 - smoothstep(0.01, 0.07 + 0.06 * fine.g, height);
 	float worn = wearAt(ground, fine.b) * (1.0 - margin) * 0.8;
-	vec3 grass = mix(grassColour(ground, broad, fine, height), earth * 1.25, worn * smoothstep(0.25, 0.6, fine.r + worn * 0.5));
+	vec3 grass = mix(grassColour(ground, broad, fine, height), earth * 1.05, worn * smoothstep(0.25, 0.6, fine.r + worn * 0.5));
 	vec3 colour = mix(grass, earth, bare);
 	colour = mix(colour, marginColour(ground, fine, earth), margin);
 	colour = mix(colour, tileAt(bedTile, ground, BedMetres) * SiltFilm, under);
