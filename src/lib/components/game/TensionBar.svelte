@@ -16,7 +16,7 @@
 </script>
 
 <div class="tension relative mt-2 h-4 rounded-full" style="background: linear-gradient(90deg, {stops})">
-	<div class="absolute -inset-y-1 w-2 rounded-full shadow-lg transition-[left] duration-75" class:bg-mist-100={!isOutsideBand} class:bg-danger-400={isOutsideBand} style="left: calc({tension * PercentScale}% - {MarkerHalfWidthPixels}px)"></div>
+	<div class="absolute -inset-y-1 w-2 rounded-full shadow-lg" class:bg-mist-100={!isOutsideBand} class:bg-danger-400={isOutsideBand} style="left: calc({tension * PercentScale}% - {MarkerHalfWidthPixels}px)"></div>
 </div>
 
 <style>

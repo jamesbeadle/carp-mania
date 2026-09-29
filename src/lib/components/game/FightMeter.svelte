@@ -3,6 +3,7 @@
 	import { buzzForARun } from '$lib/game/session/haptics';
 	import { ReelInput } from '$lib/game/session/reelInput.svelte';
 	import { followTheFight } from '$lib/game/session/sessionSounds';
+	import { startFightTicking } from '$lib/game/session/tickFight';
 	import { formatWeight } from '$lib/format/weight';
 	import ReelZone from './ReelZone.svelte';
 	import RunWarning from './RunWarning.svelte';
@@ -12,24 +13,11 @@
 
 	const reel = new ReelInput();
 	const GuessRoundingLb = 5;
-	const MostSecondsPerFrame = 0.1;
-	const MillisecondsPerSecond = 1000;
 	const carp = $derived(fight.carp);
 	const guessedWeight = $derived(Math.round(Number(carp.weight_lb) / GuessRoundingLb) * GuessRoundingLb);
 
-	$effect(() => {
-		let handle = 0;
-		let last = performance.now();
-		const frame = (now: number) => {
-			fight.isReeling = reel.isReeling;
-			fight.advance(Math.min(MostSecondsPerFrame, (now - last) / MillisecondsPerSecond));
-			last = now;
-			if (fight.outcome) return onFinished();
-			handle = requestAnimationFrame(frame);
-		};
-		handle = requestAnimationFrame(frame);
-		return () => cancelAnimationFrame(handle);
-	});
+	$effect(() => void (fight.isReeling = reel.isReeling));
+	$effect(() => startFightTicking(fight, onFinished));
 
 	$effect(() => followTheFight(fight.isReeling, fight.isRunning));
 	$effect(() => void (fight.isRunning && buzzForARun()));
