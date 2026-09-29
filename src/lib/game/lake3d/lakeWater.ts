@@ -78,6 +78,10 @@ export class LakeWater {
 		this.mesh.getRenderTarget().setSize(reflectionPixels(width), reflectionPixels(height));
 	}
 
+	dispose() {
+		this.mesh.dispose();
+	}
+
 	private reflectEveryOtherFrame() {
 		const { mesh } = this;
 		const reflect = mesh.onBeforeRender;

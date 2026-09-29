@@ -10,6 +10,7 @@ import { Heights } from './lakeGround';
 import { fineWorldOutline } from './terrain/fineOutline';
 import { createLakeLand } from './terrain/lakeLand';
 import { LakeWater } from './lakeWater';
+import { disposeWorldOf } from './sceneDisposal';
 import { SkyAndLight } from './skyAndLight';
 import { Vegetation } from './vegetation';
 import { NearDetailLayer } from './renderQuality';
@@ -91,5 +92,10 @@ export class LakeWorld {
 		const { sunlight } = this.sky;
 		this.water.light(sunlight);
 		lightTheWindows(sunlight.daylight);
+	}
+
+	dispose() {
+		this.water.dispose();
+		disposeWorldOf(this.scene);
 	}
 }

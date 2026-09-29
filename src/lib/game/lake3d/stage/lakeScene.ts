@@ -84,6 +84,7 @@ export class LakeScene {
 
 	dispose() {
 		this.renderer.stop();
+		this.world.dispose();
 	}
 
 	private frame(view: SceneView, secondsElapsed: number, timeSeconds: number) {

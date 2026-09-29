@@ -38,6 +38,12 @@ export class PostEffects {
 		this.composer.render();
 	}
 
+	dispose() {
+		const { composer } = this;
+		composer.passes.forEach((pass) => pass.dispose());
+		composer.dispose();
+	}
+
 	private startFromTheSceneTarget() {
 		const { composer } = this;
 		composer.readBuffer = composer.renderTarget2;
