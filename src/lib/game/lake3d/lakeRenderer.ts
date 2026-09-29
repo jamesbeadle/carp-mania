@@ -16,11 +16,6 @@ export interface LakeRenderer {
 	stop: () => void;
 }
 
-export function isWebGlAvailable() {
-	const canvas = document.createElement('canvas');
-	return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
-}
-
 export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, step: FrameStep, onResize: (width: number, height: number) => void, isSeeThrough = false): LakeRenderer {
 	const renderer = rendererOn(canvas, isSeeThrough);
 	const effects = isSeeThrough ? null : new PostEffects(renderer, scene, camera);
