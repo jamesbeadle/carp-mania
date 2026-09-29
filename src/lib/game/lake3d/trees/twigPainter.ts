@@ -2,10 +2,9 @@ import type { RandomFraction } from '$lib/domain/random';
 import type { AtlasPainter, PixelRegion } from './atlasPainter';
 import { centredRandom } from './centredRandom';
 
-const Twigs = { Depth: 8, FirstLength: 0.16, Shortening: 0.8, LengthJitter: 0.35, Spread: 0.36, Thickest: 0.014, Thinning: 0.7, Children: 2, ExtraChild: 0.45, Root: 0.97, Wobble: 0.5 } as const;
-const Bark = { Darkest: 0.42, Range: 0.3, Warmth: -0.15, Coverage: 0.9 } as const;
-const Whips = { Count: 11, Margin: 0.08, Jitter: 0.7, LateStart: 0.25, Sway: 0.05, Waves: 1.5, Steps: 16, Width: 0.012, Darkest: 0.45, Range: 0.25, Warmth: 0.2 } as const;
-const Haze = { Blobs: 9, Height: 0.4, Rise: 0.25, Across: 0.3, Radius: 0.12, RadiusRange: 0.06, Coverage: 0.07, Tone: { lightness: 0.55, warmth: -0.15 } } as const;
+const Twigs = { Depth: 7, FirstLength: 0.2, Shortening: 0.78, LengthJitter: 0.35, Spread: 0.42, Thickest: 0.016, Thinning: 0.68, Children: 2, ExtraChild: 0.3, Root: 0.97, Wobble: 0.45 } as const;
+const Bark = { Darkest: 0.34, Range: 0.2, Warmth: 0.05, Coverage: 1, TipCoverage: 0.45 } as const;
+const Whips = { Count: 7, Margin: 0.08, Jitter: 0.7, LateStart: 0.25, Sway: 0.05, Waves: 1.5, Steps: 16, Width: 0.012, Darkest: 0.45, Range: 0.25, Warmth: 0.2 } as const;
 
 interface Twig {
 	x: number;
@@ -21,7 +20,8 @@ function growTwig(painter: AtlasPainter, twig: Twig, random: RandomFraction) {
 	const half = twig.length / 2;
 	const middle: [number, number] = [twig.x + Math.cos(twig.heading) * half, twig.y + Math.sin(twig.heading) * half];
 	const end: [number, number] = [middle[0] + Math.cos(twig.heading + bend) * half, middle[1] + Math.sin(twig.heading + bend) * half];
-	painter.stroke([[twig.x, twig.y], middle, end], twig.width, { lightness: Bark.Darkest + random() * Bark.Range, warmth: Bark.Warmth }, Bark.Coverage);
+	const coverage = Bark.Coverage + ((Bark.TipCoverage - Bark.Coverage) * (twig.depth - 1)) / (Twigs.Depth - 1);
+	painter.stroke([[twig.x, twig.y], middle, end], twig.width, { lightness: Bark.Darkest + random() * Bark.Range, warmth: Bark.Warmth }, coverage);
 	if (twig.depth >= Twigs.Depth) return;
 	const children = Twigs.Children + (random() < Twigs.ExtraChild ? 1 : 0);
 	for (let child = 0; child < children; child++) {
@@ -32,24 +32,16 @@ function growTwig(painter: AtlasPainter, twig: Twig, random: RandomFraction) {
 	}
 }
 
-function paintHaze(painter: AtlasPainter, region: PixelRegion, random: RandomFraction) {
-	const size = region.width;
-	for (let blob = 0; blob < Haze.Blobs; blob++) {
-		const x = region.left + size * (1 / 2 + centredRandom(random) * Haze.Across * 2);
-		const y = region.top + size * (Haze.Height + centredRandom(random) * Haze.Rise);
-		painter.haze(x, y, size * (Haze.Radius + random() * Haze.RadiusRange), Haze.Tone, Haze.Coverage);
-	}
-}
-
 export function paintTwigs(painter: AtlasPainter, region: PixelRegion, random: RandomFraction) {
 	const size = region.width;
-	paintHaze(painter, region, random);
+	painter.backdrop(region, { lightness: Bark.Darkest + Bark.Range / 2, warmth: Bark.Warmth });
 	const root = { x: region.left + size / 2, y: region.top + size * Twigs.Root };
 	growTwig(painter, { ...root, heading: -Math.PI / 2, length: Twigs.FirstLength * size, width: Twigs.Thickest * size, depth: 1 }, random);
 }
 
 export function paintWhips(painter: AtlasPainter, region: PixelRegion, random: RandomFraction) {
 	const { width, height } = region;
+	painter.backdrop(region, { lightness: Whips.Darkest + Whips.Range / 2, warmth: Whips.Warmth });
 	for (let whip = 0; whip < Whips.Count; whip++) {
 		const x = region.left + width * (Whips.Margin + ((1 - Whips.Margin * 2) * (whip + random() * Whips.Jitter)) / Whips.Count);
 		const start = height * random() * Whips.LateStart;

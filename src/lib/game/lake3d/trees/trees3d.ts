@@ -7,7 +7,8 @@ import { barkTexture } from './barkTexture';
 import { CrownSway } from './crownSway';
 import { DetailChooser, type Distant } from './detailChooser';
 import { foliageAtlas } from './foliageAtlas';
-import { leafMaterial, leafShadowMaterial } from './leafMaterial';
+import { leafLayers } from './leafLayers';
+import { leafShadowMaterial } from './leafMaterial';
 import { modelIndexOf, plantingsByModel } from './modelChoice';
 import { hasMultiDraw } from './multiDraw';
 import { TreeBatch } from './treeBatch';
@@ -46,7 +47,7 @@ export class Trees {
 		const atlas = foliageAtlas(quality.treeAtlasPixels);
 		const Parts = isBatched ? TreeBatch : TreeInstances;
 		const counts = plantingsByModel(trees, this.variants);
-		this.leaves = new Parts(models.map((model) => model.leaves), leafMaterial(atlas, this.sway, isMultisampled), counts);
+		this.leaves = leafLayers({ models, season, isMultisampled, counts }, Parts, atlas, this.sway);
 		this.wood = new Parts(models.map((model) => model.wood), barkMaterial(barkTexture(Looks.BarkPixels), this.sway), counts);
 		trees.forEach((tree) => this.plant(tree, season, groundAt));
 		const reaches = ReachShares.map((share) => share * quality.nearTreeMetres);

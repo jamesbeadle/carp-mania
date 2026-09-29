@@ -29,8 +29,15 @@ function patchLeafShader(shader: WebGLProgramParametersWithUniforms, mipBias: nu
 		.replace('#include <opaque_fragment>', Translucency);
 }
 
-export function leafMaterial(atlas: Texture, sway: CrownSway, isMultisampled: boolean) {
-	const material = new MeshStandardMaterial({ map: atlas, vertexColors: true, side: DoubleSide, roughness: Leaf.Roughness, alphaTest: Leaf.CutOff, alphaToCoverage: isMultisampled });
+export interface LeafEdges {
+	isMultisampled: boolean;
+	isVeilBlended: boolean;
+}
+
+export function leafMaterial(atlas: Texture, sway: CrownSway, edges: LeafEdges) {
+	const { isMultisampled, isVeilBlended } = edges;
+	const material = new MeshStandardMaterial({ map: atlas, vertexColors: true, side: DoubleSide, roughness: Leaf.Roughness, alphaTest: Leaf.CutOff, alphaToCoverage: isMultisampled, transparent: isVeilBlended, depthWrite: !isVeilBlended, forceSinglePass: true });
+	if (isVeilBlended) material.defines = { LEAF_BLENDED: '' };
 	material.onBeforeCompile = (shader) => {
 		sway.attach(shader, true);
 		patchLeafShader(shader, isMultisampled ? 0 : Leaf.AliasedMipBias);

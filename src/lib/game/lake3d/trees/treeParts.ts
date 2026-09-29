@@ -7,4 +7,4 @@ export interface TreeParts {
 	show(planting: number, model: number, detail: number): void;
 }
 
-export type TreePartsMaker = (geometriesByModel: BufferGeometry[][], material: Material, plantingsByModel: number[]) => TreeParts;
+export type TreePartsMaker = new (geometriesByModel: BufferGeometry[][], material: Material, plantingsByModel: number[]) => TreeParts;

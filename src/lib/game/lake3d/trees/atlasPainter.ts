@@ -45,15 +45,9 @@ export class AtlasPainter {
 		this.colour.stroke();
 	}
 
-	haze(x: number, y: number, radius: number, tone: Tone, coverage: number) {
-		const gradient = this.mask.createRadialGradient(x, y, 0, x, y, radius);
-		gradient.addColorStop(0, `rgba(255,255,255,${coverage})`);
-		gradient.addColorStop(1, 'rgba(255,255,255,0)');
-		this.mask.fillStyle = gradient;
-		this.mask.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+	backdrop(region: PixelRegion, tone: Tone) {
 		this.colour.fillStyle = toneStyle(tone);
-		this.colour.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-		this.mask.fillStyle = 'white';
+		this.colour.fillRect(region.left, region.top, region.width, region.height);
 	}
 
 	within(region: PixelRegion, paint: (region: PixelRegion) => void) {

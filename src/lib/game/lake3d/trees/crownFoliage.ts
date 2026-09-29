@@ -1,7 +1,7 @@
-import type { BufferGeometry, Color } from 'three';
+import { Vector3, type BufferGeometry, type Color } from 'three';
 import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import { writeClump, type FoliageContext } from './clumpFoliage';
-import { crownVolumeOf, type CrownVolume } from './crownShading';
+import { crownDepth, crownVolumeOf, type CrownVolume } from './crownShading';
 import type { FoliageStyle } from './foliageStyles';
 import { writeCurtain } from './hangingFoliage';
 import { leafWriter, markBounds } from './leafCards';
@@ -35,12 +35,19 @@ export function foliageGeometry(skeleton: Skeleton, style: FoliageStyle, detail:
 	const siteStride = Math.min(detail.siteStride, style.mostStride);
 	const occlusion = 1 / Math.cbrt(siteStride);
 	const growth = Math.pow(siteStride / detail.cardShare, GrowthPower);
-	const sites = gatheredSites(skeleton.sites, siteStride);
+	const sites = gatheredSites(skeleton.sites, siteStride).filter((site) => crownDepth(volume, site.at) >= (style.innermostDepth ?? 0));
 	const crowding = siteCrowding(skeleton.sites, style.clumpRadius);
 	const region = detail.hasFineLeaves ? style.fineRegion : style.region;
 	const context: FoliageContext = { style: { ...style, region }, volume, random, cards, growth, longestReach, occlusion, crowding, tint: () => tint(random) };
 	sites.forEach((site) => Forms[style.form](writer, site, context));
 	const bounds = boundsOf(volume, style, growth);
 	markBounds(writer, bounds.least, bounds.most);
+	return writer.build();
+}
+
+export function emptyFoliage(): BufferGeometry {
+	const writer = leafWriter();
+	const origin = new Vector3();
+	markBounds(writer, origin, origin);
 	return writer.build();
 }

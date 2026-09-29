@@ -14,6 +14,7 @@ export interface WoodDetail {
 
 const Root = { Sink: 0.03, Flare: 1.25 } as const;
 const Tip = { Share: 0.2 } as const;
+const Collar = { Flare: 1.6, Reach: 2.2, MostShare: 0.35, LeastSides: 4, LeastRadius: 0.006 } as const;
 const FinestThinnedLevel = 1;
 const Texture = { AroundRepeats: 2, AlongPerCircumference: 1 } as const;
 const FullTurn = Math.PI * 2;
@@ -29,6 +30,15 @@ function rooted(limb: Limb): Limb {
 	const [baseRadius, ...restRadii] = limb.radii;
 	const sunk = base.clone().addScaledVector(UpAxis, -Root.Sink);
 	return { ...limb, points: [sunk, base, ...rest], radii: [baseRadius * Root.Flare, baseRadius * Root.Flare, ...restRadii] };
+}
+
+function collared(limb: Limb, sides: number): Limb {
+	if (limb.level === 0 || sides < Collar.LeastSides || limb.radii[0] < Collar.LeastRadius) return limb;
+	const [base, next, ...rest] = limb.points;
+	const [baseRadius, ...restRadii] = limb.radii;
+	const reach = Math.min(baseRadius * Collar.Reach, base.distanceTo(next) * Collar.MostShare);
+	const neck = base.clone().addScaledVector(next.clone().sub(base).normalize(), reach);
+	return { ...limb, points: [base, neck, next, ...rest], radii: [baseRadius * Collar.Flare, baseRadius, ...restRadii] };
 }
 
 function tangentAt(points: Vector3[], index: number) {
@@ -81,6 +91,9 @@ export function woodGeometry(kind: TreeKind, skeleton: Skeleton, detail: WoodDet
 	const [trunk] = skeleton.limbs;
 	const thinnest = trunk.radii[0] * detail.thinnestShare;
 	const limbs = skeleton.limbs.filter((limb) => limb.level <= detail.deepestLevel && limb.radii[0] >= thinnest);
-	limbs.forEach((limb) => writeLimb(writer, kind, rooted(thinned(limb, detail.pointStride)), detail.sides[limb.level]));
+	limbs.forEach((limb) => {
+		const sides = detail.sides[limb.level];
+		writeLimb(writer, kind, collared(rooted(thinned(limb, detail.pointStride)), sides), sides);
+	});
 	return writer.build();
 }

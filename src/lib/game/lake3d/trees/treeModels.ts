@@ -2,7 +2,7 @@ import type { BufferGeometry } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import { withTwigs } from './bareTwigs';
 import { woodGeometry } from './barkGeometry';
-import { foliageGeometry } from './crownFoliage';
+import { foliageGeometry, type FoliageDetail } from './crownFoliage';
 import { FoliageStyles, WinterStyles } from './foliageStyles';
 import { clumpTintFor, isBare } from './treeColours';
 import { BareDetails, Details } from './treeDetails';
@@ -35,7 +35,8 @@ function leafyModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 function bareModel(kind: TreeKind, seed: number, look: ModelLook): TreeModel {
 	const skeleton = growSkeleton(withTwigs(Habits[kind], kind), seed);
 	const tint = clumpTintFor(look.season);
-	const leaves = BareDetails.map(({ foliage }) => foliageGeometry(skeleton, WinterStyles[kind], foliage, tint, seed));
+	const veil = (foliage: FoliageDetail) => foliageGeometry(skeleton, WinterStyles[kind], { ...foliage, siteStride: Math.round(foliage.siteStride / look.cardShare) }, tint, seed);
+	const leaves = BareDetails.map(({ foliage }) => veil(foliage));
 	return { kind, leaves, wood: BareDetails.map((detail) => woodGeometry(kind, skeleton, detail.wood)) };
 }
 
