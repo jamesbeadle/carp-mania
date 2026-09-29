@@ -8,9 +8,9 @@ export interface TrunkLie {
 	crownSink: number;
 }
 
-const Trunk = { Joints: 7, Wander: 0.35, Bow: 0.5, Radius: 0.36, MiddleRadius: 0.22, TipRadius: 0.05, MiddleShare: 0.55, Sides: 12, Roughness: 0.12 } as const;
-const Sunk = { WaterlineShare: 0.42 } as const;
-const Flare = { Back: 0.25, Forward: 0.9, Radius: 0.5, Sides: 12, Roughness: 0.2 } as const;
+const Trunk = { Joints: 7, Wander: 0.35, Bow: 0.5, Radius: 0.5, MiddleRadius: 0.34, TipRadius: 0.1, MiddleShare: 0.55, Sides: 12, Roughness: 0.12 } as const;
+const Sunk = { WaterlineShare: 0.35 } as const;
+const Flare = { Back: 0.25, Forward: 0.9, Radius: 0.68, Sides: 12, Roughness: 0.2 } as const;
 
 export function trunkRadius() {
 	return Trunk.Radius;

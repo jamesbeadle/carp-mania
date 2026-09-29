@@ -9,7 +9,7 @@ import { branchesOf } from './fallenLimbs';
 import { rootsOf, soilClod } from './fallenRoots';
 import { trunkPoints, trunkTubes } from './fallenTrunk';
 
-const Tree = { Length: 9, CrownSink: 0.55, RootShare: 0.3 } as const;
+const Tree = { Length: 9.5, CrownSink: 0.22, RootShare: 0.28 } as const;
 const Finish = { Roughness: 0.92 } as const;
 
 function toneAll(parts: BufferGeometry[], tone: (typeof WoodTones)[keyof typeof WoodTones], random: RandomFraction) {

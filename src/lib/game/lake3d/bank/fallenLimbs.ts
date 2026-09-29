@@ -11,11 +11,11 @@ interface Bough {
 	depth: number;
 }
 
-const Branch = { Count: 16, FirstShare: 0.22, Length: [2, 4.2], RadiusShare: 0.42, DrownedShare: 0.35, Shortening: 0.45, BrokenShare: 0.3, Broken: 0.3 } as const;
-const Kink = { Joints: 3, Swing: 0.5, Lift: 0.07, TipShare: 0.12 } as const;
-const Fork = { MostDepth: 2, Chance: 0.85, LengthShare: 0.55, RadiusShare: 0.6, Spread: 0.9 } as const;
+const Branch = { Count: 10, FirstShare: 0.3, Length: [2.4, 4.8], RadiusShare: 0.3, UprightShare: 0.6, Shortening: 0.45, BrokenShare: 0.3, Broken: 0.3 } as const;
+const Kink = { Joints: 4, Swing: 0.3, Lift: 0.05, TipShare: 0.14 } as const;
+const Fork = { MostDepth: 2, Chance: 0.7, LengthShare: 0.55, RadiusShare: 0.6, Spread: 0.45 } as const;
 const Build = { Sides: [7, 5, 4], Roughness: 0.1, Thinnest: 0.006 } as const;
-const Reach = { Dip: [0.3, 0.8], Rise: [0.15, 0.75], Out: [0.2, 0.8], Side: [0.6, 1.4] } as const;
+const Reach = { Rise: [0.7, 1.3], Lean: [0, 0.3], Level: [-0.04, 0.16], Out: [0.3, 0.9], Side: [0.6, 1.4] } as const;
 const Sides = [-1, 1];
 const Up = new Vector3(0, 1, 0);
 
@@ -53,9 +53,11 @@ function grownBough(bough: Bough, random: RandomFraction): BufferGeometry[] {
 }
 
 function reachingHeading(random: RandomFraction) {
-	const isDrowned = random() < Branch.DrownedShare;
-	const rise = isDrowned ? -randomBetween(random, ...Reach.Dip) : randomBetween(random, ...Reach.Rise);
-	return new Vector3(randomBetween(random, ...Reach.Out), rise, pickRandom(random, Sides) * randomBetween(random, ...Reach.Side)).normalize();
+	const out = randomBetween(random, ...Reach.Out);
+	const side = pickRandom(random, Sides);
+	const isUpright = random() < Branch.UprightShare;
+	if (isUpright) return new Vector3(out, randomBetween(random, ...Reach.Rise), side * randomBetween(random, ...Reach.Lean)).normalize();
+	return new Vector3(out, randomBetween(random, ...Reach.Level), side * randomBetween(random, ...Reach.Side)).normalize();
 }
 
 function pointOnTrunk(trunk: Vector3[], along: number) {
