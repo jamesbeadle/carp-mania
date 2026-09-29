@@ -69,6 +69,10 @@ export class LakeWorld {
 		this.vegetation.blow(timeSeconds, sunlight.windStrength);
 	}
 
+	fillCoverAround() {
+		this.vegetation.fillCoverAround(this.camera);
+	}
+
 	setConditions(conditions: StageConditions) {
 		this.sky.setConditions(conditions);
 		const { sunlight } = this.sky;

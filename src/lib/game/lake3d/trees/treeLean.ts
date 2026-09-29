@@ -1,8 +1,8 @@
 import { MathUtils } from 'three';
 import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import { distanceToOutline } from '../worldGeometry';
 import type { TreeKind } from './treeKinds';
+import type { WaterEdge } from './waterEdge';
 
 const LeanDegrees: Record<TreeKind, { least: number; range: number }> = {
 	willow: { least: 5, range: 9 },
@@ -22,18 +22,18 @@ export interface Lean {
 	leanHeading: number;
 }
 
-function waterwardHeading(point: WorldPoint, outline: WorldPoint[]) {
-	const east = distanceToOutline({ x: point.x + Probe, z: point.z }, outline);
-	const west = distanceToOutline({ x: point.x - Probe, z: point.z }, outline);
-	const south = distanceToOutline({ x: point.x, z: point.z + Probe }, outline);
-	const north = distanceToOutline({ x: point.x, z: point.z - Probe }, outline);
+function waterwardHeading(point: WorldPoint, water: WaterEdge) {
+	const east = water.metresFromWater({ x: point.x + Probe, z: point.z });
+	const west = water.metresFromWater({ x: point.x - Probe, z: point.z });
+	const south = water.metresFromWater({ x: point.x, z: point.z + Probe });
+	const north = water.metresFromWater({ x: point.x, z: point.z - Probe });
 	return Math.atan2(west - east, north - south);
 }
 
-export function leanOf(kind: TreeKind, point: WorldPoint, distanceFromWater: number, outline: WorldPoint[], random: RandomFraction): Lean {
+export function leanOf(kind: TreeKind, point: WorldPoint, distanceFromWater: number, water: WaterEdge, random: RandomFraction): Lean {
 	const degrees = LeanDegrees[kind];
 	const lean = MathUtils.degToRad(degrees.least + random() * degrees.range);
 	const isWaterside = distanceFromWater < WatersideReach;
-	const leanHeading = isWaterside ? waterwardHeading(point, outline) : random() * Math.PI * 2;
+	const leanHeading = isWaterside ? waterwardHeading(point, water) : random() * Math.PI * 2;
 	return { lean, leanHeading };
 }

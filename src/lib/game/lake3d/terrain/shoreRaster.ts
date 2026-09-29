@@ -8,6 +8,8 @@ export interface RasterFrame {
 	down: number;
 }
 
+export const WaterTexel = 1;
+
 export interface ShoreRaster {
 	distances: Float32Array;
 	nearestRing: Uint8Array;
@@ -55,7 +57,7 @@ function fillWater(frame: RasterFrame, raster: ShoreRaster, rings: WorldPoint[][
 		for (let pair = 0; pair + 1 < crossings.length; pair += 2) {
 			const first = Math.max(0, Math.ceil((crossings[pair] - frame.originX) / frame.texelMetres - 0.5));
 			const last = Math.min(frame.across - 1, Math.floor((crossings[pair + 1] - frame.originX) / frame.texelMetres - 0.5));
-			raster.isWater.fill(1, row * frame.across + first, row * frame.across + last + 1);
+			raster.isWater.fill(WaterTexel, row * frame.across + first, row * frame.across + last + 1);
 		}
 	}
 }
