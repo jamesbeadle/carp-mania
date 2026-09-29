@@ -27,7 +27,8 @@ export interface FrameLoopPlan {
 export function runFrameLoop(plan: FrameLoopPlan): FrameLoop {
 	const { renderer, effects, canvas, scene, camera, step, onResize } = plan;
 	const draw = effects ? () => effects.render() : () => renderer.render(scene, camera);
-	const firstFrame = Promise.withResolvers<void>();
+	let markFirstFrameDrawn = () => {};
+	const whenFirstFrameDrawn = new Promise<void>((resolve) => (markFirstFrameDrawn = resolve));
 	const governor = new FrameGovernor();
 	const fullPixelRatio = basePixelRatio();
 	const shadows = renderer.shadowMap;
@@ -46,9 +47,9 @@ export function runFrameLoop(plan: FrameLoopPlan): FrameLoop {
 		shadows.needsUpdate = frames % ShadowRefreshEveryFrames !== 0;
 		last = now;
 		draw();
-		firstFrame.resolve();
+		markFirstFrameDrawn();
 		handle = requestAnimationFrame(frame);
 	};
 	handle = requestAnimationFrame(frame);
-	return { stop: () => cancelAnimationFrame(handle), whenFirstFrameDrawn: firstFrame.promise };
+	return { stop: () => cancelAnimationFrame(handle), whenFirstFrameDrawn };
 }
