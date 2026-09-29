@@ -1,15 +1,12 @@
 import type { HazeColours } from './aerialHaze';
 import { environmentLightOf } from './environmentLight';
-import { FrameGovernor } from './frameGovernor';
+import { runFrameLoop, type FrameStep } from './frameLoop';
 import { PostEffects } from './postEffects';
 import { exposureAt, lookFor } from './rendererExposure';
-import { basePixelRatio, fitTo, rendererOn } from './rendererFit';
+import { rendererOn } from './rendererFit';
 import type { PerspectiveCamera, Scene, Vector3 } from 'three';
 
-const MostSecondsPerFrame = 0.1;
-const MillisecondsPerSecond = 1000;
-
-export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
+export type { FrameStep } from './frameLoop';
 
 export interface LakeRenderer {
 	expose: (daylight: number, share?: number) => void;
@@ -27,27 +24,11 @@ export function isWebGlAvailable() {
 export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, step: FrameStep, onResize: (width: number, height: number) => void, isSeeThrough = false): LakeRenderer {
 	const renderer = rendererOn(canvas, isSeeThrough);
 	const effects = isSeeThrough ? null : new PostEffects(renderer, scene, camera);
-	const draw = effects ? () => effects.render() : () => renderer.render(scene, camera);
-	const governor = new FrameGovernor();
-	const fullPixelRatio = basePixelRatio();
-	let frameHandle = 0;
-	let last: number | null = null;
-	let start = 0;
-	const frame = (now: number) => {
-		start = last === null ? now : start;
-		const frameSeconds = last === null ? 0 : Math.max(0, (now - last) / MillisecondsPerSecond);
-		governor.note(frameSeconds);
-		fitTo(canvas, renderer, camera, fullPixelRatio * governor.scale, onResize, effects);
-		step(Math.min(MostSecondsPerFrame, frameSeconds), (now - start) / MillisecondsPerSecond);
-		last = now;
-		draw();
-		frameHandle = requestAnimationFrame(frame);
-	};
-	frameHandle = requestAnimationFrame(frame);
+	const stopFrames = runFrameLoop({ renderer, effects, canvas, scene, camera, step, onResize });
 	const { exposureShare } = lookFor(isSeeThrough);
 	const expose = (daylight: number, share = 1) => void (renderer.toneMappingExposure = exposureAt(daylight) * exposureShare * share);
 	const environment = environmentLightOf(renderer, scene);
-	const stop = () => (cancelAnimationFrame(frameHandle), environment.dispose(), renderer.dispose());
 	const { lightFrom, readHorizon, readHorizonLater } = environment;
+	const stop = () => (stopFrames(), environment.dispose(), renderer.dispose());
 	return { expose, lightFrom, readHorizon, readHorizonLater, stop };
 }

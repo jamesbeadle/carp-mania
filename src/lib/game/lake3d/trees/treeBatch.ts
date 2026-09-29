@@ -17,6 +17,7 @@ export class TreeBatch implements TreeParts {
 		const indices = totalOf(geometries, (geometry) => geometry.getIndex()?.count ?? 0);
 		const instances = plantingsByModel.reduce((sum, count) => sum + count, 0);
 		this.mesh = new BatchedMesh(Math.max(1, instances), vertices, indices, material);
+		this.mesh.sortObjects = false;
 		this.meshes = [this.mesh];
 		this.geometryIds = geometriesByModel.map((models) => models.map((geometry) => this.mesh.addGeometry(geometry)));
 		geometries.forEach((geometry) => geometry.dispose());

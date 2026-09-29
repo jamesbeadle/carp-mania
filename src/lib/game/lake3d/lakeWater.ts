@@ -11,6 +11,7 @@ import { shapeWithHoles } from './worldShapes';
 import { WaterFragmentShader, WaterVertexShader } from './waterShader';
 
 export const WaterLook = { Tint: '#ffffff', Deep: '#2a5446', Shallow: '#4c5436', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
+const Reflection = { Multisamples: 0, RefreshEveryFrames: 2 } as const;
 
 function shoreUniforms() {
 	return { shoreMap: { value: null }, shoreOrigin: { value: new Vector2() }, shoreSize: { value: new Vector2(1, 1) }, shoreBand: { value: 1 }, deepestMetres: { value: 1 }, shallowColour: { value: new Color(WaterLook.Shallow) } };
@@ -31,8 +32,9 @@ export class LakeWater {
 
 	constructor(outline: WorldPoint[], islands: WorldPoint[][], transparencyPercent: number, width: number, height: number) {
 		const reachingShape = shapeWithHoles(pushedTowardsLand(outline, false), islands.map((island) => pushedTowardsLand(island, true)));
-		this.mesh = new Reflector(new ShapeGeometry(reachingShape), { color: new Color(WaterLook.Tint), textureWidth: reflectionPixels(width), textureHeight: reflectionPixels(height), shader: waterShader() });
+		this.mesh = new Reflector(new ShapeGeometry(reachingShape), { color: new Color(WaterLook.Tint), textureWidth: reflectionPixels(width), textureHeight: reflectionPixels(height), shader: waterShader(), multisample: Reflection.Multisamples });
 		this.mesh.rotateX(-Math.PI / 2);
+		this.reflectEveryOtherFrame();
 		const material = this.mesh.material as ShaderMaterial;
 		material.fog = true;
 		material.transparent = true;
@@ -74,5 +76,17 @@ export class LakeWater {
 
 	resize(width: number, height: number) {
 		this.mesh.getRenderTarget().setSize(reflectionPixels(width), reflectionPixels(height));
+	}
+
+	private reflectEveryOtherFrame() {
+		const { mesh } = this;
+		const reflect = mesh.onBeforeRender;
+		let frames = 0;
+		mesh.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+			frames += 1;
+			const isRestingFrame = frames % Reflection.RefreshEveryFrames !== 0;
+			if (isRestingFrame) return;
+			reflect.call(mesh, renderer, scene, camera, geometry, material, group);
+		};
 	}
 }

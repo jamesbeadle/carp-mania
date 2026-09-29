@@ -1,7 +1,7 @@
 import { Group, Vector3, type Camera, type Mesh } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
-import { renderQuality } from '../renderQuality';
+import { NearDetailLayer, renderQuality } from '../renderQuality';
 import { barkMaterial } from './barkMaterial';
 import { barkTexture } from './barkTexture';
 import { CrownSway } from './crownSway';
@@ -84,6 +84,8 @@ export class Trees {
 	private prepare(mesh: Mesh, chooser: DetailChooser) {
 		const cullAndSort = mesh.onBeforeRender.bind(mesh);
 		mesh.onBeforeRender = (renderer, scene, camera: Camera, geometry, material, group) => {
+			const isReflectedView = !camera.layers.isEnabled(NearDetailLayer);
+			if (isReflectedView) return;
 			chooser.look(camera);
 			cullAndSort(renderer, scene, camera, geometry, material, group);
 		};

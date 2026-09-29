@@ -36,9 +36,9 @@ const Generous: RenderQuality = {
 	treeAtlasPixels: 2048,
 	treeVariantsSingleDraw: 2,
 	hasAmbientOcclusion: true,
-	shadowMapPixels: 2560,
+	shadowMapPixels: 2048,
 	hasCascadedShadows: true,
-	cloudOctaves: 6,
+	cloudOctaves: 5,
 	hasCloudShadows: true
 };
 
