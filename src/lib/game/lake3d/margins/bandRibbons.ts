@@ -4,7 +4,7 @@ import { CoverNoise } from '../grass/coverNoise';
 import type { SurveyedBank } from '../grass/coverGround';
 import { marginShareAt } from '../grass/coverDensity';
 import { CoverSites } from '../grass/coverSite';
-import { resampledLoop } from './edgeSamples';
+import { resampledLoop, smoothedAlong } from './edgeSamples';
 
 export interface BandRow {
 	inset: number;
@@ -12,7 +12,8 @@ export interface BandRow {
 	textureShift: number;
 }
 
-const Band = { StepMetres: 1.5, Sink: 0.1, TileMetres: 6, HeightSwing: 0.7, Wavelength: 7, Lean: 0.2, Presence: 2.2, Darkest: 0.4, ShadeRange: 0.2, JitterWavelength: 1.1, Jitter: 1 } as const;
+const Band = { StepMetres: 1.5, Sink: 0.1, TileMetres: 6, HeightSwing: 0.7, Wavelength: 7, Lean: 0.2, Presence: 2.2, Darkest: 0.4, ShadeRange: 0.2, JitterWavelength: 1.1, Jitter: 1, BaseShade: 0.55, Softening: 4, OpacityGain: 2.2 } as const;
+const Broad = { Wavelength: 26, Least: 0.6, Swing: 0.75 } as const;
 const Rows: BandRow[] = [
 	{ inset: 0.2, height: 1.1, textureShift: 0 },
 	{ inset: 0.9, height: 1.7, textureShift: 0.43 }
@@ -35,21 +36,27 @@ function vertexCount(parts: RibbonParts) {
 	return positions.length / Channels.Position;
 }
 
-function addColumn(parts: RibbonParts, bank: SurveyedBank, sites: CoverSites, sample: { point: WorldPoint; along: number }, row: BandRow) {
-	const { point, along } = sample;
+function footing(bank: SurveyedBank, point: WorldPoint, row: BandRow) {
 	const inland = bank.shore.headingTowardTheWater(point) + Math.PI;
-	const base = { x: point.x + Math.cos(inland) * row.inset, z: point.z + Math.sin(inland) * row.inset };
+	return { inland, base: { x: point.x + Math.cos(inland) * row.inset, z: point.z + Math.sin(inland) * row.inset } };
+}
+
+function addColumn(parts: RibbonParts, bank: SurveyedBank, sites: CoverSites, sample: { point: WorldPoint; along: number; presence: number }, row: BandRow) {
+	const { point, along, presence } = sample;
+	const { inland, base } = footing(bank, point, row);
 	const noise = sites.noiseAt(base, Band.Wavelength);
 	const bottom = Math.max(bank.groundAt(base), 0) - Band.Sink;
 	const jitter = 1 + (sites.noiseAt(base, Band.JitterWavelength) - 1 / 2) * Band.Jitter;
-	const tall = row.height * (1 - Band.HeightSwing / 2 + noise * Band.HeightSwing) * jitter;
-	const presence = Math.min(1, marginShareAt(sites.siteAt(base)) * Band.Presence);
+	const broad = Broad.Least + sites.noiseAt(base, Broad.Wavelength) * Broad.Swing;
+	const tall = row.height * (1 - Band.HeightSwing / 2 + noise * Band.HeightSwing) * jitter * broad * presence;
 	const shade = Band.Darkest + noise * Band.ShadeRange;
 	parts.positions.push(base.x, bottom, base.z, base.x + Math.cos(inland) * Band.Lean, bottom + tall, base.z + Math.sin(inland) * Band.Lean);
 	parts.rises.push(0, tall);
 	const outward = [-Math.cos(inland) * Facing.Outward, Facing.Upward, -Math.sin(inland) * Facing.Outward];
 	parts.normals.push(...outward, ...outward);
-	parts.colours.push(shade, shade, shade, presence, shade, shade, shade, presence);
+	const foot = shade * Band.BaseShade;
+	const opacity = Math.min(1, presence * Band.OpacityGain);
+	parts.colours.push(foot, foot, foot, opacity, shade, shade, shade, opacity);
 	const across = along / Band.TileMetres + row.textureShift;
 	parts.uvs.push(across, 0, across, 1);
 }
@@ -57,7 +64,8 @@ function addColumn(parts: RibbonParts, bank: SurveyedBank, sites: CoverSites, sa
 function addRibbon(parts: RibbonParts, bank: SurveyedBank, sites: CoverSites, edge: WorldPoint[], row: BandRow) {
 	const samples = resampledLoop(edge, Band.StepMetres);
 	const first = vertexCount(parts);
-	samples.forEach((sample) => addColumn(parts, bank, sites, sample, row));
+	const presences = smoothedAlong(samples.map(({ point }) => Math.min(1, marginShareAt(sites.siteAt(footing(bank, point, row).base)) * Band.Presence)), Band.Softening);
+	samples.forEach((sample, index) => addColumn(parts, bank, sites, { ...sample, presence: presences[index] }, row));
 	for (let index = 0; index < samples.length - 1; index++) {
 		const corner = first + index * 2;
 		parts.indices.push(corner, corner + 2, corner + 1, corner + 1, corner + 2, corner + 3);

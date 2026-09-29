@@ -21,3 +21,10 @@ export function resampledLoop(edge: WorldPoint[], stepMetres: number): EdgeSampl
 	const closing = samples[0];
 	return closing ? [...samples, { point: closing.point, along: travelled }] : samples;
 }
+
+export function smoothedAlong(values: number[], reach: number) {
+	return values.map((_, index) => {
+		const window = values.slice(Math.max(0, index - reach), index + reach + 1);
+		return window.reduce((sum, value) => sum + value, 0) / window.length;
+	});
+}
