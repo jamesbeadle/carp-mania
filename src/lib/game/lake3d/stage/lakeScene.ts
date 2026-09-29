@@ -3,7 +3,8 @@ import { createSwimPegs, type SwimPeg } from '../bank/swimPegs';
 import { CameraRig } from '../cameraRig';
 import { RoamingFish } from '../fish/roamingFish';
 import { startLakeRenderer, type LakeRenderer } from '../lakeRenderer';
-import { bedDepthFor, type LakeWorld } from '../lakeWorld';
+import { bedDepthFor } from '../bedDepth';
+import type { LakeWorld } from '../lakeWorld';
 import { buildLakeWorld } from '../lakeWorldBuild';
 import { createAimMarker } from './castAim';
 import { pickedSwimId, pickedWaterPoint } from './scenePicking';
@@ -75,6 +76,7 @@ export class LakeScene {
 
 	dispose() {
 		this.renderer.stop();
+		this.world.dispose();
 	}
 
 	private frame(view: SceneView, secondsElapsed: number, timeSeconds: number) {

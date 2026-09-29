@@ -5,6 +5,7 @@ const Probe = { Pixels: 4, Views: 4, FieldOfViewDegrees: 12, ElevationDegrees: 3
 const View = { SunwardLeft: 0, SunwardRight: 1, AwayLeft: 2, AwayRight: 3 } as const;
 const QuarterTurn = Math.PI / 2;
 const Halfway = 1 / 2;
+const MostGlow = 1.5;
 const TargetWidth = Probe.Pixels * Probe.Views;
 
 export class HorizonProbe {
@@ -60,7 +61,7 @@ export class HorizonProbe {
 		const away = this.averageOf(pixels, View.AwayLeft).lerp(this.averageOf(pixels, View.AwayRight), Halfway);
 		const probeFacing = Math.max(Glow.LeastFacing, this.directionToward(sunAzimuth + Glow.ProbeTurn).dot(sunDirection));
 		const glow = sunward.sub(away).multiplyScalar(1 / Math.pow(probeFacing, Glow.Sharpness));
-		return { away, glow: new Color(Math.max(0, glow.r), Math.max(0, glow.g), Math.max(0, glow.b)) };
+		return { away, glow: new Color(MathUtils.clamp(glow.r, 0, MostGlow), MathUtils.clamp(glow.g, 0, MostGlow), MathUtils.clamp(glow.b, 0, MostGlow)) };
 	}
 
 	private directionToward(azimuth: number) {

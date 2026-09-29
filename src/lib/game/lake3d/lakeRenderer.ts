@@ -25,6 +25,6 @@ export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camer
 	const expose = (daylight: number, share = 1) => void (renderer.toneMappingExposure = exposureAt(daylight) * exposureShare * share);
 	const environment = environmentLightOf(renderer, scene);
 	const { lightFrom, readHorizon, readHorizonLater } = environment;
-	const stop = () => (frames.stop(), environment.dispose(), renderer.dispose());
+	const stop = () => (frames.stop(), effects?.dispose(), environment.dispose(), renderer.dispose());
 	return { expose, lightFrom, readHorizon, readHorizonLater, stop, whenFirstFrameDrawn: frames.whenFirstFrameDrawn };
 }

@@ -4,8 +4,8 @@ import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { StageConditions } from '../sky/stageConditions';
 import { lightTheWindows } from './bank/windowGlow';
 import type { LakeFrame, WorldPoint } from './lakeFrame';
-import { Heights } from './lakeGround';
 import type { LakeWater } from './lakeWater';
+import { disposeWorldOf } from './sceneDisposal';
 import type { SkyAndLight } from './skyAndLight';
 import type { Vegetation } from './vegetation';
 
@@ -30,13 +30,6 @@ export interface LakeWorldParts {
 	facilityLabels: Object3D[];
 	groundAt: (point: WorldPoint) => number;
 	vegetation: Vegetation;
-}
-
-const MetresPerFootOfDepth = 0.3048;
-const DepthShown = 0.45;
-
-export function bedDepthFor(layout: LakeLayout) {
-	return Math.min(Heights.BedDeepest, Math.max(Heights.ShallowestBed, layout.baseDepthFeet * MetresPerFootOfDepth * DepthShown));
 }
 
 export class LakeWorld {
@@ -81,5 +74,10 @@ export class LakeWorld {
 		const { sunlight } = this.sky;
 		this.water.light(sunlight);
 		lightTheWindows(sunlight.daylight);
+	}
+
+	dispose() {
+		this.water.dispose();
+		disposeWorldOf(this.scene);
 	}
 }
