@@ -4,7 +4,6 @@ import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { StageConditions } from '../sky/stageConditions';
 import { createFacilities } from './bank/facilities3d';
 import { plotFacilities } from './bank/facilityGrounds';
-import { createLakeFeatures } from './bank/lakeFeatures3d';
 import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
 import { Heights } from './lakeGround';
 import { fineWorldOutline } from './terrain/fineOutline';
@@ -72,8 +71,8 @@ export class LakeWorld {
 		this.facilityLabels = facilities.labels;
 		const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((plot) => ({ point: plot.point, radius: plot.footprintMetres / 2 }))];
 		const woodland = plantTrees({ outline: shoreline.outline, islands: shoreline.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
-		this.vegetation = new Vegetation({ woodland, outline: shoreline.outline, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
-		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group, createLakeFeatures(layout, this.frame, season, plan.seed));
+		this.vegetation = new Vegetation({ woodland, layout, frame: this.frame, outline: shoreline.outline, islands: shoreline.islands, pegs, keepClear, plotEdge, season, seed: plan.seed, groundAt: this.groundAt });
+		this.scene.add(this.clouds.group, this.sky.group, land.group, this.water.mesh, this.vegetation.group, facilities.group);
 	}
 
 	get daylight() {

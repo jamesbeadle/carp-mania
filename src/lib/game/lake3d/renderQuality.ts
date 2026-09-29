@@ -1,3 +1,5 @@
+import { GenerousCover, ModestCover, type CoverQuality } from './grass/coverTiers';
+
 export interface RenderQuality {
 	mostPixelRatio: number;
 	multisamples: number;
@@ -59,6 +61,10 @@ function isModestDevice() {
 export function renderQuality(): RenderQuality {
 	chosen ??= isModestDevice() ? Modest : Generous;
 	return chosen;
+}
+
+export function coverQuality(): CoverQuality {
+	return renderQuality() === Generous ? GenerousCover : ModestCover;
 }
 
 export const NearDetailLayer = 1;

@@ -1,36 +1,39 @@
 import { Group } from 'three';
-import type { SeasonName } from '$lib/domain/world/worldClock';
-import type { ClearSpot } from './bank/facilityGrounds';
-import { createGrassTufts } from './grass/grassTufts';
-import type { WorldPoint } from './lakeFrame';
+import { seededRandom } from '$lib/domain/random';
+import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
+import { createLakeFeatures } from './bank/lakeFeatures3d';
+import { createBushes } from './bushes/bushes3d';
+import { surveyBank, type BankPlan } from './grass/coverGround';
+import { CoverWind } from './grass/coverWind';
+import { createGroundCover } from './grass/groundCover';
+import type { LakeFrame } from './lakeFrame';
 import { Trees } from './trees/trees3d';
 import type { Woodland } from './trees/treePlanting';
-import { WindSway } from './trees/windSway';
 
-export interface VegetationPlan {
+export interface VegetationPlan extends BankPlan {
 	woodland: Woodland;
-	outline: WorldPoint[];
-	keepClear: ClearSpot[];
-	plotEdge: WorldPoint | null;
-	season: SeasonName;
-	seed: number;
-	groundAt: (point: WorldPoint) => number;
+	layout: LakeLayout;
+	frame: LakeFrame;
 }
 
-const GrassGive = 2.5;
+const BushSeedStep = 101;
 
 export class Vegetation {
 	readonly group = new Group();
 	private readonly trees: Trees;
-	private readonly grassWind = new WindSway(GrassGive, 0);
+	private readonly coverWind = new CoverWind();
 
 	constructor(plan: VegetationPlan) {
 		this.trees = new Trees(plan.woodland, plan.season, plan.groundAt);
-		this.group.add(this.trees.group, createGrassTufts(plan, this.grassWind));
+		const bank = surveyBank(plan);
+		const features = createLakeFeatures({ layout: plan.layout, frame: plan.frame, bank, wind: this.coverWind });
+		const { woodland } = plan;
+		const bushes = createBushes(woodland.onTheBank, bank, this.coverWind, seededRandom(plan.seed + BushSeedStep));
+		this.group.add(this.trees.group, createGroundCover(bank, this.coverWind), features, ...bushes);
 	}
 
 	blow(timeSeconds: number, windStrength: number) {
 		this.trees.blow(timeSeconds, windStrength);
-		this.grassWind.blow(timeSeconds, windStrength);
+		this.coverWind.blow(timeSeconds, windStrength);
 	}
 }
