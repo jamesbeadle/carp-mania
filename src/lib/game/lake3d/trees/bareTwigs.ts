@@ -12,7 +12,8 @@ const TwigsOf: Record<TreeKind, Partial<BranchLevel>> = {
 	birch: { count: 5, bend: -0.9, length: 0.75 },
 	poplar: { count: 4, angle: degrees(20), bend: 0.4 },
 	pine: {},
-	spruce: {}
+	spruce: {},
+	holly: {}
 };
 
 export function withTwigs(habit: Habit, kind: TreeKind): Habit {

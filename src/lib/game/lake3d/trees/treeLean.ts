@@ -11,7 +11,8 @@ const LeanDegrees: Record<TreeKind, { least: number; range: number }> = {
 	birch: { least: 2, range: 7 },
 	poplar: { least: 0, range: 1.5 },
 	pine: { least: 0, range: 4 },
-	spruce: { least: 0, range: 1.5 }
+	spruce: { least: 0, range: 1.5 },
+	holly: { least: 0, range: 5 }
 };
 const WatersideReach = 14;
 const Probe = 1;

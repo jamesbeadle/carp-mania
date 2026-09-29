@@ -15,9 +15,9 @@ export const Details: TreeDetail[] = [
 
 export const BareDetails: TreeDetail[] = [
 	{ foliage: { siteStride: 3, cardShare: 0.8, hasFineLeaves: true }, wood: { sides: [10, 6, 4, 3, 3], deepestLevel: 4, pointStride: 1, thinnestShare: 0 } },
-	{ foliage: { siteStride: 6, cardShare: 0.55, hasFineLeaves: true }, wood: { sides: [6, 4, 3, 3, 3], deepestLevel: 3, pointStride: 2, thinnestShare: 0.1 } },
-	{ foliage: { siteStride: 10, cardShare: 0.45, hasFineLeaves: true }, wood: { sides: [5, 3, 3, 3, 3], deepestLevel: 2, pointStride: 3, thinnestShare: 0.2 } },
-	{ foliage: { siteStride: 20, cardShare: 0.4, hasFineLeaves: true }, wood: { sides: [4, 3, 3, 3, 3], deepestLevel: 1, pointStride: 4, thinnestShare: 0.5 } }
+	{ foliage: { siteStride: 6, cardShare: 0.55, hasFineLeaves: true }, wood: { sides: [6, 4, 3, 3, 3], deepestLevel: 2, pointStride: 2, thinnestShare: 0.12 } },
+	{ foliage: { siteStride: 16, cardShare: 0.45, hasFineLeaves: true }, wood: { sides: [5, 3, 3, 3, 3], deepestLevel: 2, pointStride: 3, thinnestShare: 0.25 } },
+	{ foliage: { siteStride: 36, cardShare: 0.4, hasFineLeaves: true }, wood: { sides: [3, 3, 3, 3, 3], deepestLevel: 1, pointStride: 4, thinnestShare: 0.5 } }
 ];
 
 export const DetailLevels = Details.length;

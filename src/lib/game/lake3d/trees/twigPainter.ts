@@ -4,7 +4,7 @@ import { centredRandom } from './centredRandom';
 
 const Twigs = { Depth: 7, FirstLength: 0.2, Shortening: 0.78, LengthJitter: 0.35, Spread: 0.42, Thickest: 0.016, Thinning: 0.68, Children: 2, ExtraChild: 0.3, Root: 0.97, Wobble: 0.45 } as const;
 const Bark = { Darkest: 0.34, Range: 0.2, Warmth: 0.05, Coverage: 1, TipCoverage: 0.45 } as const;
-const Whips = { Count: 7, Margin: 0.08, Jitter: 0.7, LateStart: 0.25, Sway: 0.05, Waves: 1.5, Steps: 16, Width: 0.012, Darkest: 0.45, Range: 0.25, Warmth: 0.2 } as const;
+const Whips = { Count: 7, Margin: 0.08, Jitter: 0.7, LateStart: 0.25, Sway: 0.05, Waves: 1.5, Steps: 16, Width: 0.009, Darkest: 0.45, Range: 0.25, Warmth: 0.2 } as const;
 
 interface Twig {
 	x: number;

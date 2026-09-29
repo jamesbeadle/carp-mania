@@ -32,7 +32,7 @@ export function foliageGeometry(skeleton: Skeleton, style: FoliageStyle, detail:
 	const volume = crownVolumeOf(skeleton.sites, Math.min(style.clumpRadius, WidestMargin));
 	const longestReach = Math.max(...skeleton.sites.map((site) => site.reach));
 	const cards = Math.max(1, Math.round(style.cards * detail.cardShare));
-	const siteStride = Math.min(detail.siteStride, style.mostStride);
+	const siteStride = Math.min(Math.round(detail.siteStride * (style.strideScale ?? 1)), style.mostStride);
 	const occlusion = 1 / Math.cbrt(siteStride);
 	const growth = Math.pow(siteStride / detail.cardShare, GrowthPower);
 	const sites = gatheredSites(skeleton.sites, siteStride).filter((site) => crownDepth(volume, site.at) >= (style.innermostDepth ?? 0));

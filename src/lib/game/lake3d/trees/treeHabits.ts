@@ -87,5 +87,14 @@ export const Habits: Record<TreeKind, Habit> = {
 		sitesAlong: 1,
 		sitesOnBranches: 2,
 		hasLeader: true
+	},
+	holly: {
+		trunk: trunk({ length: 1, radius: 0.035, wander: 0.15, segments: 5, taper: 0.2 }),
+		levels: [
+			{ count: 14, from: 0.1, to: 0.95, angle: degrees(60), length: 0.4, bend: 0.25, wander: 0.4, segments: 3, radius: 0.5, taper: 0.3, reach: oval },
+			{ count: 3, from: 0.3, to: 1, angle: degrees(45), length: 0.5, bend: 0.2, wander: 0.45, segments: 2, radius: 0.55, taper: 0.3 }
+		],
+		sitesAlong: 3,
+		sitesOnBranches: 2
 	}
 };

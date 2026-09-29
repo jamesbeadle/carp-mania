@@ -25,6 +25,7 @@ const Looks: Record<TreeKind, BarkLook> = {
 	birch: { trunk: '#35302b', upper: '#b9b4aa', upperFrom: 0.14, band: 0.3, twig: '#43332d', twigFrom: 1, style: [0.9, 0.1, 0], upperStyle: [0.05, 0.95, 0], crownFrom: 0.7 },
 	poplar: { trunk: '#4c483f', upper: '#5c574b', upperFrom: 0.4, band: 0.12, twig: '#4e473c', twigFrom: 2, style: Furrowed, upperStyle: Furrowed },
 	pine: { trunk: '#4a3d33', upper: '#5c4536', upperFrom: 0.62, band: 0.2, twig: '#4e3a2c', twigFrom: 1, style: [0.4, 0, 0.6], upperStyle: [0, 0, 1] },
+	holly: { trunk: '#5b5a52', upper: '#625f57', upperFrom: 0.5, band: 0.12, twig: '#4e4c44', twigFrom: 2, style: [0.4, 0, 0.6], upperStyle: [0.2, 0, 0.8] },
 	spruce: { trunk: '#4a3a2f', upper: '#52412f', upperFrom: 0.5, band: 0.12, twig: '#43352b', twigFrom: 2, style: [0, 0, 1], upperStyle: [0, 0, 1] }
 };
 

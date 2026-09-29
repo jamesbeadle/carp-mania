@@ -19,6 +19,7 @@ export interface FoliageStyle {
 	mostStride: number;
 	isHaze?: boolean;
 	innermostDepth?: number;
+	strideScale?: number;
 }
 
 const Turn = Math.PI;
@@ -33,11 +34,12 @@ export const FoliageStyles: Record<TreeKind, FoliageStyle> = {
 	birch: { ...Hanging, form: 'clump', region: 'birch', fineRegion: 'birchFine', clumpRadius: 0.042, cards: 3, cardSize: 1.5, flatten: 1, upward: 0 },
 	poplar: { ...Loose, form: 'clump', region: 'broadleafFine', fineRegion: 'broadleafFine', clumpRadius: 0.034, cards: 6, cardSize: 1.3, flatten: 1.4, upward: 0.2 },
 	pine: { spin: 0.3, aspect: 0.8, isAlongBranch: false, tipInset: 0, mostStride: AnyStride, form: 'clump', region: 'needles', fineRegion: 'needles', clumpRadius: 0.055, cards: 7, cardSize: 1.3, flatten: 0.45, upward: 0.7 },
+	holly: { ...Loose, form: 'clump', region: 'roundleaf', fineRegion: 'roundleafFine', clumpRadius: 0.07, cards: 6, cardSize: 1.3, flatten: 0.9, upward: 0.1 },
 	spruce: { spin: 0.08, aspect: 1.5, isAlongBranch: true, tipInset: 0.3, mostStride: 5, form: 'clump', region: 'spray', fineRegion: 'spray', clumpRadius: 0.045, cards: 2, cardSize: 1.15, flatten: 0.6, upward: 0.2 }
 };
 
 const WinterTwigs: FoliageStyle = { spin: 0.25, aspect: 1, isAlongBranch: true, tipInset: 0.6, mostStride: AnyStride, form: 'clump', region: 'twigs', fineRegion: 'twigs', clumpRadius: 0.05, cards: 1, cardSize: 1.4, flatten: 1, upward: 0, isHaze: true, innermostDepth: 0.35 };
 
-const WinterWhips: FoliageStyle = { ...WinterTwigs, form: 'curtain', region: 'whips', fineRegion: 'whips', clumpRadius: 0.05, cards: 3, spin: 0.35, isAlongBranch: false, tipInset: 0, innermostDepth: 0 };
+const WinterWhips: FoliageStyle = { ...WinterTwigs, form: 'curtain', region: 'whips', fineRegion: 'whips', clumpRadius: 0.05, cards: 3, spin: 0.35, isAlongBranch: false, tipInset: 0, innermostDepth: 0, strideScale: 2 };
 
-export const WinterStyles: Record<TreeKind, FoliageStyle> = { oak: WinterTwigs, alder: WinterTwigs, willow: WinterWhips, birch: WinterTwigs, poplar: WinterTwigs, pine: WinterTwigs, spruce: WinterTwigs };
+export const WinterStyles: Record<TreeKind, FoliageStyle> = { oak: WinterTwigs, alder: WinterTwigs, willow: WinterWhips, birch: WinterTwigs, poplar: WinterTwigs, pine: WinterTwigs, spruce: WinterTwigs, holly: WinterTwigs };
