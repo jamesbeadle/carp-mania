@@ -1,64 +1,80 @@
-import { CanvasTexture, Color, Group, SRGBColorSpace, Sprite, SpriteMaterial } from 'three';
-import { seededRandom } from '$lib/domain/random';
+import { Color, Mesh, SphereGeometry, Vector2, Vector3 } from 'three';
+import type { Weather, WeatherKind } from '$lib/domain/world/weather';
+import type { WindDirection } from '$lib/domain/world/weatherGlass';
+import { shadeUnderClouds } from './aerialHaze';
+import { cloudMaterial, fadeInReflections } from './cloudMaterial';
+import { renderQuality } from './renderQuality';
+import { brightnessOf } from './skyLook';
 
-const Sky = { Count: 26, Seed: 83, LeastDistance: 700, DistanceRange: 1500, LeastHeight: 220, HeightRange: 260, LeastSize: 260, SizeRange: 420, Squash: 0.42 } as const;
-const Puff = { Pixels: 256, Blobs: 22 } as const;
-const Drift = { MetresPerSecondPerWind: 6, Calmest: 0.6 } as const;
-const NightCloud = new Color('#10141b');
-const Opacity = { Night: 0.35, Day: 1 } as const;
-const White = new Color('#ffffff');
-const SunTint = 0.35;
+const Dome = { Radius: 7000, WidthSegments: 48, HeightSegments: 16, RenderOrder: 2 } as const;
+const Drift = { LayerUnitsPerSecond: 0.004, CalmestShare: 0.15 } as const;
+const Lighting = { SunlitShare: 0.22, ShadedBrightness: 0.62, SkyBlueInShade: 0.35, HeavyDarkening: 0.4 } as const;
+const Moonlit = { DuskDaylight: 0.3, ShadeOverSky: 1.15, LitOverSky: 1.5 } as const;
+const Shadows = { Strongest: 0.26 } as const;
+const ShadeBlue = new Color('#8fa3c4');
+const Heaviness: Record<WeatherKind, number> = { clear: 0, heat: 0, mist: 0.25, overcast: 0.55, rain: 0.9 };
+const DownwindOf: Record<WindDirection, [number, number]> = {
+	north: [0, 1],
+	east: [-1, 0],
+	south: [0, -1],
+	west: [1, 0],
+	south_west: [Math.SQRT1_2, -Math.SQRT1_2]
+};
 
-function puffTexture() {
-	const canvas = document.createElement('canvas');
-	canvas.width = Puff.Pixels;
-	canvas.height = Puff.Pixels;
-	const context = canvas.getContext('2d');
-	const random = seededRandom(Sky.Seed);
-	for (let index = 0; context && index < Puff.Blobs; index++) {
-		const x = Puff.Pixels * (0.25 + random() * 0.5);
-		const y = Puff.Pixels * (0.4 + random() * 0.25);
-		const radius = Puff.Pixels * (0.08 + random() * 0.14);
-		const glow = context.createRadialGradient(x, y, 0, x, y, radius);
-		glow.addColorStop(0, 'rgba(255,255,255,0.55)');
-		glow.addColorStop(1, 'rgba(255,255,255,0)');
-		context.fillStyle = glow;
-		context.fillRect(0, 0, Puff.Pixels, Puff.Pixels);
-	}
-	const texture = new CanvasTexture(canvas);
-	texture.colorSpace = SRGBColorSpace;
-	return texture;
+export interface CloudLighting {
+	direction: Vector3;
+	colour: Color;
+	intensity: number;
+	horizon: Color;
+	veil: number;
+	daylight: number;
+}
+
+function nightnessOf(daylight: number) {
+	return 1 - Math.min(1, daylight / Moonlit.DuskDaylight);
 }
 
 export class Clouds {
-	readonly group = new Group();
-	private readonly material = new SpriteMaterial({ map: puffTexture(), fog: false, depthWrite: false, transparent: true });
-	private readonly puffs: Sprite[];
-	private drift: number = Drift.Calmest;
+	readonly dome: Mesh;
+	private readonly material = cloudMaterial();
+	private readonly wind = new Vector2();
+	private shadowStrength = 0;
 
 	constructor() {
-		const random = seededRandom(Sky.Seed);
-		this.puffs = Array.from({ length: Sky.Count }, () => {
-			const puff = new Sprite(this.material);
-			const angle = random() * Math.PI * 2;
-			const distance = Sky.LeastDistance + random() * Sky.DistanceRange;
-			const size = Sky.LeastSize + random() * Sky.SizeRange;
-			puff.position.set(Math.cos(angle) * distance, Sky.LeastHeight + random() * Sky.HeightRange, Math.sin(angle) * distance);
-			puff.scale.set(size, size * Sky.Squash, 1);
-			return puff;
-		});
-		this.group.add(...this.puffs);
+		this.dome = new Mesh(new SphereGeometry(Dome.Radius, Dome.WidthSegments, Dome.HeightSegments, 0, Math.PI * 2, 0, Math.PI / 2), this.material);
+		this.dome.renderOrder = Dome.RenderOrder;
+		fadeInReflections(this.dome, this.material);
 	}
 
-	cover(cloudCover: number, sunColour: Color, daylight: number, windStrength: number) {
-		const shown = Math.round(cloudCover * Sky.Count);
-		this.puffs.forEach((puff, index) => (puff.visible = index < shown));
-		this.material.color.copy(NightCloud).lerp(White.clone().lerp(sunColour, SunTint), daylight);
-		this.material.opacity = Opacity.Night + (Opacity.Day - Opacity.Night) * daylight;
-		this.drift = Drift.Calmest + windStrength * Drift.MetresPerSecondPerWind;
+	cover(weather: Weather) {
+		const { cover, heaviness } = this.material.uniforms;
+		cover.value = weather.cloudCover;
+		heaviness.value = Heaviness[weather.kind];
+		const [east, south] = DownwindOf[weather.windDirection];
+		const speed = Drift.LayerUnitsPerSecond * (Drift.CalmestShare + weather.windStrength);
+		this.wind.set(east * speed, south * speed);
+	}
+
+	light(lighting: CloudLighting) {
+		const { litColour, shadeColour, hazeColour, veil, heaviness, sunDirection } = this.material.uniforms;
+		const { horizon } = lighting;
+		const nightness = nightnessOf(lighting.daylight);
+		veil.value = lighting.veil;
+		sunDirection.value.copy(lighting.direction);
+		litColour.value.copy(lighting.colour).multiplyScalar(lighting.intensity * Lighting.SunlitShare);
+		litColour.value.lerp(horizon.clone().multiplyScalar(Moonlit.LitOverSky), nightness);
+		const shadeBrightness = Lighting.ShadedBrightness * (1 - heaviness.value * Lighting.HeavyDarkening);
+		const skyBlue = ShadeBlue.clone().multiplyScalar(brightnessOf(horizon));
+		shadeColour.value.copy(horizon).lerp(skyBlue, Lighting.SkyBlueInShade).multiplyScalar(shadeBrightness);
+		shadeColour.value.lerp(horizon.clone().multiplyScalar(Moonlit.ShadeOverSky), nightness);
+		hazeColour.value.copy(horizon);
+		const { hasCloudShadows } = renderQuality();
+		this.shadowStrength = hasCloudShadows ? Shadows.Strongest * lighting.daylight * (1 - heaviness.value) : 0;
 	}
 
 	advance(secondsElapsed: number) {
-		this.group.rotateY((this.drift * secondsElapsed) / Sky.LeastDistance);
+		const { drift, cover } = this.material.uniforms;
+		drift.value.addScaledVector(this.wind, secondsElapsed);
+		shadeUnderClouds(drift.value, cover.value, this.shadowStrength);
 	}
 }

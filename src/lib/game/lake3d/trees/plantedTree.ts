@@ -1,17 +1,26 @@
+import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-
-export type TreeKind = 'poplar' | 'broadleaf' | 'willow' | 'bush';
+import { TreeHeights, type TreeKind } from './treeKinds';
+import { leanOf } from './treeLean';
 
 export interface PlantedTree {
 	kind: TreeKind;
 	point: WorldPoint;
 	height: number;
 	turn: number;
+	lean: number;
+	leanHeading: number;
+	girth: number;
+	pick: number;
 }
 
-const TreeHeights: Record<TreeKind, { least: number; range: number }> = { poplar: { least: 16, range: 10 }, broadleaf: { least: 9, range: 8 }, willow: { least: 7, range: 4 }, bush: { least: 1.8, range: 2 } };
+const Girth = { Least: 0.82, Range: 0.36 } as const;
+const Youth = { Chance: 0.14, Least: 0.5, Range: 0.25 } as const;
 
-export function treeAt(kind: TreeKind, point: WorldPoint, random: () => number): PlantedTree {
+export function treeAt(kind: TreeKind, point: WorldPoint, distanceFromWater: number, outline: WorldPoint[], random: RandomFraction): PlantedTree {
 	const heights = TreeHeights[kind];
-	return { kind, point, height: heights.least + random() * heights.range, turn: random() * Math.PI * 2 };
+	const youth = random() < Youth.Chance ? Youth.Least + random() * Youth.Range : 1;
+	const height = (heights.least + random() * heights.range) * youth;
+	const lean = leanOf(kind, point, distanceFromWater, outline, random);
+	return { kind, point, height, turn: random() * Math.PI * 2, ...lean, girth: Girth.Least + random() * Girth.Range, pick: random() };
 }

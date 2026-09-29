@@ -1,38 +1,27 @@
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
-import { seededRandom } from '$lib/domain/random';
+import { DataTexture, LinearFilter, LinearMipmapLinearFilter, RepeatWrapping, RGBAFormat, UnsignedByteType } from 'three';
+import { seededRandom, type RandomFraction } from '$lib/domain/random';
+import { paintBirch, paintFurrows, paintPlates, type Grey } from './barkPainters';
 
-const Bark = { Width: 128, Height: 256, Fissures: 34, Seed: 53, RepeatAround: 2, RepeatUp: 3, RidgeEvery: 3 } as const;
-const Tones = { Ground: '#d8d2c8', Fissure: 'rgba(40, 32, 24, 0.55)', Ridge: 'rgba(255, 250, 240, 0.25)' } as const;
-const FissureStep = 16;
+const Bark = { Seed: 43, Channels: 4, Opaque: 255, Anisotropy: 4 } as const;
 
-function fissure(context: CanvasRenderingContext2D, random: () => number, style: string, width: number) {
-	let x = random() * Bark.Width;
-	context.strokeStyle = style;
-	context.lineWidth = width;
-	context.beginPath();
-	context.moveTo(x, 0);
-	for (let y = FissureStep; y <= Bark.Height; y += FissureStep) {
-		x += (random() - 0.5) * 6;
-		context.lineTo(x, y);
-	}
-	context.stroke();
+function greyChannel(paint: Grey, size: number, random: RandomFraction) {
+	const canvas = document.createElement('canvas');
+	canvas.width = size;
+	canvas.height = size;
+	const context = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+	paint(context, size, random);
+	return context.getImageData(0, 0, size, size).data;
 }
 
-export function barkTexture() {
-	const canvas = document.createElement('canvas');
-	canvas.width = Bark.Width;
-	canvas.height = Bark.Height;
-	const context = canvas.getContext('2d');
+export function barkTexture(size: number) {
 	const random = seededRandom(Bark.Seed);
-	if (context) {
-		context.fillStyle = Tones.Ground;
-		context.fillRect(0, 0, Bark.Width, Bark.Height);
-		for (let index = 0; index < Bark.Fissures; index++) fissure(context, random, index % Bark.RidgeEvery === 0 ? Tones.Ridge : Tones.Fissure, 1 + random() * 3);
+	const channels = [paintFurrows, paintBirch, paintPlates].map((paint) => greyChannel(paint, size, random));
+	const data = new Uint8Array(size * size * Bark.Channels);
+	for (let index = 0; index < data.length; index += Bark.Channels) {
+		channels.forEach((channel, offset) => (data[index + offset] = channel[index]));
+		data[index + Bark.Channels - 1] = Bark.Opaque;
 	}
-	const texture = new CanvasTexture(canvas);
-	texture.colorSpace = SRGBColorSpace;
-	texture.wrapS = RepeatWrapping;
-	texture.wrapT = RepeatWrapping;
-	texture.repeat.set(Bark.RepeatAround, Bark.RepeatUp);
+	const texture = new DataTexture(data, size, size, RGBAFormat, UnsignedByteType);
+	Object.assign(texture, { wrapS: RepeatWrapping, wrapT: RepeatWrapping, generateMipmaps: true, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, anisotropy: Bark.Anisotropy, needsUpdate: true });
 	return texture;
 }

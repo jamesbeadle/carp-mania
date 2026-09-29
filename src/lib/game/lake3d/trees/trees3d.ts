@@ -1,59 +1,92 @@
-import { Color, DoubleSide, Group, InstancedMesh, Matrix4, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
+import { Group, Vector3, type Camera, type Mesh } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
+import { renderQuality } from '../renderQuality';
+import { barkMaterial } from './barkMaterial';
 import { barkTexture } from './barkTexture';
-import { leafClusterTexture } from './leafTexture';
-import { BarkColour, foliageFor } from './treeColours';
-import type { PlantedTree, TreeKind } from './plantedTree';
-import type { Woodland } from './treePlanting';
-import { treeShapeOf } from './treeShapes';
-import { WindSway } from './windSway';
+import { CrownSway } from './crownSway';
+import { DetailChooser, type Distant } from './detailChooser';
+import { foliageAtlas } from './foliageAtlas';
+import { leafLayers } from './leafLayers';
+import { leafShadowMaterial } from './leafMaterial';
+import { modelIndexOf, plantingsByModel } from './modelChoice';
+import { hasMultiDraw } from './multiDraw';
+import { TreeBatch } from './treeBatch';
+import { TreeInstances } from './treeInstances';
+import type { TreeParts } from './treeParts';
+import { crownColourOf } from './treeColours';
+import { treeModels, DetailLevels } from './treeModels';
+import { placementOf } from './treePlacement';
+import type { PlantedTree, Woodland } from './treePlanting';
 
-const TreeKinds: TreeKind[] = ['poplar', 'broadleaf', 'willow', 'bush'];
-const UpAxis = new Vector3(0, 1, 0);
-const ShadeVariation = 0.08;
-const LeafCutOff = 0.45;
+const Looks = { Variants: 4, BarkPixels: 512, ReferenceHeight: 16, ShadeSpread: 13.7 } as const;
+const FarDetail = DetailLevels - 1;
+const ReachShares = [1, 2.3, 4.3];
 
-function placementOf(tree: PlantedTree, groundAt: (point: WorldPoint) => number) {
-	const { point } = tree;
-	const position = new Vector3(point.x, groundAt(point), point.z);
-	const turn = new Quaternion().setFromAxisAngle(UpAxis, tree.turn);
-	return new Matrix4().compose(position, turn, new Vector3(tree.height, tree.height, tree.height));
+interface Planting extends Distant {
+	model: number;
+	leaves: number;
+	wood: number;
 }
 
 export class Trees {
 	readonly group = new Group();
-	private readonly wind = new WindSway();
-	private readonly leaves = leafClusterTexture();
-	private readonly bark = this.wind.sway(new MeshStandardMaterial({ color: BarkColour, map: barkTexture(), roughness: 1 }));
+	private readonly sway = new CrownSway();
+	private readonly plantings: Planting[] = [];
+	private readonly leaves: TreeParts;
+	private readonly wood: TreeParts;
+	private readonly variants: number;
 
 	constructor(woodland: Woodland, season: SeasonName, groundAt: (point: WorldPoint) => number) {
-		const trees = [...woodland.onTheBank, ...woodland.onTheIslands, ...woodland.inTheCountry];
-		TreeKinds.forEach((kind) => {
-			const ofKind = trees.filter((tree) => tree.kind === kind);
-			if (ofKind.length === 0) return;
-			this.group.add(...this.instancedFor(ofKind, kind, season, groundAt));
-		});
+		const quality = renderQuality();
+		const trees = [...woodland.onTheBank, ...woodland.onTheIslands];
+		const isMultisampled = quality.multisamples > 0;
+		const isBatched = hasMultiDraw();
+		this.variants = isBatched ? Looks.Variants : quality.treeVariantsSingleDraw;
+		const models = treeModels({ season, cardShare: quality.treeCardShare }, this.variants);
+		const atlas = foliageAtlas(quality.treeAtlasPixels);
+		const Parts = isBatched ? TreeBatch : TreeInstances;
+		const counts = plantingsByModel(trees, this.variants);
+		this.leaves = leafLayers({ models, season, isMultisampled, counts }, Parts, atlas, this.sway);
+		this.wood = new Parts(models.map((model) => model.wood), barkMaterial(barkTexture(Looks.BarkPixels), this.sway), counts);
+		trees.forEach((tree) => this.plant(tree, season, groundAt));
+		const reaches = ReachShares.map((share) => share * quality.nearTreeMetres);
+		const chooser = new DetailChooser(this.plantings, reaches, (index, detail) => this.show(index, detail));
+		const shadowMaterial = leafShadowMaterial(atlas);
+		this.leaves.meshes.forEach((mesh) => Object.assign(mesh, { customDepthMaterial: shadowMaterial }));
+		this.wood.meshes.forEach((mesh) => Object.assign(mesh, { receiveShadow: true }));
+		const { wood, leaves } = this;
+		const meshes = [...wood.meshes, ...leaves.meshes];
+		meshes.forEach((mesh) => this.prepare(mesh, chooser));
+		[...wood.distantMeshes, ...leaves.distantMeshes].forEach((mesh) => Object.assign(mesh, { castShadow: false }));
+		this.group.add(...meshes);
 	}
 
 	blow(timeSeconds: number, windStrength: number) {
-		this.wind.blow(timeSeconds, windStrength);
+		this.sway.blow(timeSeconds, windStrength);
 	}
 
-	private instancedFor(trees: PlantedTree[], kind: TreeKind, season: SeasonName, groundAt: (point: WorldPoint) => number) {
-		const shape = treeShapeOf(kind);
-		const foliage = foliageFor(season, kind);
-		const leafMaterial = this.wind.sway(new MeshStandardMaterial({ map: this.leaves, alphaTest: LeafCutOff, side: DoubleSide, roughness: 0.85, vertexColors: true }));
-		const crowns = new InstancedMesh(shape.crown, leafMaterial, trees.length);
-		const trunks = new InstancedMesh(shape.trunk, this.bark, trees.length);
-		trees.forEach((tree, index) => {
-			const placement = placementOf(tree, groundAt);
-			crowns.setMatrixAt(index, placement);
-			trunks.setMatrixAt(index, placement);
-			crowns.setColorAt(index, new Color(foliage[index % foliage.length]).offsetHSL(0, 0, (Math.sin(index * 12.9898) * ShadeVariation) / 2));
-		});
-		crowns.castShadow = true;
-		trunks.castShadow = true;
-		return [crowns, trunks];
+	private plant(tree: PlantedTree, season: SeasonName, groundAt: (point: WorldPoint) => number) {
+		const model = modelIndexOf(tree, this.variants);
+		const placement = placementOf(tree, groundAt);
+		const colour = crownColourOf(season, tree.kind, tree.pick, (tree.pick * Looks.ShadeSpread) % 1);
+		const leaves = this.leaves.plant(model, FarDetail, placement, colour);
+		const wood = this.wood.plant(model, FarDetail, placement, null);
+		this.plantings.push({ position: new Vector3().setFromMatrixPosition(placement), scale: tree.height / Looks.ReferenceHeight, detail: FarDetail, model, leaves, wood });
+	}
+
+	private show(index: number, detail: number) {
+		const planting = this.plantings[index];
+		this.leaves.show(planting.leaves, planting.model, detail);
+		this.wood.show(planting.wood, planting.model, detail);
+	}
+
+	private prepare(mesh: Mesh, chooser: DetailChooser) {
+		const cullAndSort = mesh.onBeforeRender.bind(mesh);
+		mesh.onBeforeRender = (renderer, scene, camera: Camera, geometry, material, group) => {
+			chooser.look(camera);
+			cullAndSort(renderer, scene, camera, geometry, material, group);
+		};
+		mesh.castShadow = true;
 	}
 }

@@ -2,50 +2,43 @@ import { Group } from 'three';
 import type { BedType } from '$lib/domain/types';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
-import { slabSides } from '../lakeGround';
-import { createCountryside } from './countryMesh';
-import { CountryShape } from './countryShape';
-import { FieldPattern } from './fieldPattern';
-import { fieldTexture } from './fieldTexture';
-import { meadowOf } from './terrainColours';
-import { createTerrainMesh } from './terrainMesh';
+import { Heights, slabSides } from '../lakeGround';
+import type { WaterShape } from '../swimFacing';
+import { renderQuality } from '../renderQuality';
+import { farGround } from './farGround';
+import { createFarHills } from './farHills';
+import { createGroundMeshes } from './groundMeshes';
+import { bakeShoreMap } from './shoreMap';
+import { swimGroundsOf } from './swimWear';
+import { withSwimTongues } from './swimTongues';
 import { TerrainShape } from './terrainShape';
 
 export interface LandPlan {
 	outline: WorldPoint[];
 	islands: WorldPoint[][];
+	swimWater: WaterShape;
 	plotReach: number;
 	plotEdge: WorldPoint | null;
 	season: SeasonName;
 	bed: BedType;
 	bedDepth: number;
-	seed: number;
+	pegs: WorldPoint[];
+	clock: { value: number };
 }
 
-export interface Country {
-	shape: CountryShape;
-	fields: FieldPattern;
-}
-
-const Grid = { ReachShare: 1.6, MetresPerCell: 1.7, MostCells: 420, DioramaMetresPerCell: 1.2 } as const;
-
-function countryAround(plan: LandPlan, edgeHalf: number): Country {
-	return { shape: new CountryShape(edgeHalf), fields: new FieldPattern(plan.seed) };
-}
-
-function countrysideOf(country: Country, plan: LandPlan) {
-	const fields = fieldTexture(country.fields, plan.season, plan.seed);
-	return createCountryside(country.shape, fields, meadowOf(plan.season));
-}
+const Grid = { ReachShare: 1.6, MetresPerCell: 1.7, DioramaMetresPerCell: 1.2 } as const;
+const ShoreMapTexelsPerStation = 1.3;
 
 export function createLakeLand(plan: LandPlan) {
 	const half = plan.plotEdge ?? { x: plan.plotReach * Grid.ReachShare, z: plan.plotReach * Grid.ReachShare };
-	const shape = new TerrainShape({ outline: plan.outline, islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z) });
+	const swims = swimGroundsOf(plan.pegs, plan.swimWater);
+	const footings = [...swims.map((swim) => swim.pod), ...plan.pegs];
+	const shape = new TerrainShape({ outline: withSwimTongues(plan.outline, swims), islands: plan.islands, bedDepth: plan.bedDepth, isFlatBeyond: plan.plotEdge !== null, edgeMetres: Math.max(half.x, half.z), footings });
 	const metresPerCell = plan.plotEdge ? Grid.DioramaMetresPerCell : Grid.MetresPerCell;
-	const terrain = createTerrainMesh(shape, { width: half.x * 2, depth: half.z * 2, metresPerCell, mostCells: Grid.MostCells }, plan);
-	const group = new Group().add(terrain);
-	const country = plan.plotEdge ? null : countryAround(plan, half.x);
-	group.add(country ? countrysideOf(country, plan) : slabSides(half, plan.bedDepth));
-	const groundAt = (point: WorldPoint) => (country?.shape.isBeyondThePlot(point) ? country.shape.heightAt(point) : shape.heightAt(point));
-	return { group, groundAt, country };
+	const shoreMap = bakeShoreMap(shape, renderQuality().shoreSpacingMetres / ShoreMapTexelsPerStation, swims);
+	const look = { season: plan.season, bed: plan.bed, shore: shoreMap, clock: plan.clock };
+	const group = new Group().add(...createGroundMeshes(shape, { half, metresPerCell, mostCells: renderQuality().groundCells, plotEdge: plan.plotEdge, look }));
+	const surroundings = plan.plotEdge ? [slabSides(plan.plotEdge, plan.bedDepth)] : [farGround(half, look), createFarHills(Math.hypot(half.x, half.z), Heights.Bank, look)];
+	group.add(...surroundings);
+	return { group, groundAt: (point: WorldPoint) => shape.heightAt(point), shoreMap };
 }

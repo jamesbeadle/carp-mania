@@ -1,48 +1,57 @@
-import { Color, ShapeGeometry, UniformsLib, UniformsUtils, Vector3, Vector4, type Camera, type ShaderMaterial } from 'three';
+import { Color, ShapeGeometry, UniformsLib, UniformsUtils, Vector2, Vector3, type Camera, type ShaderMaterial } from 'three';
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import type { WorldPoint } from './lakeFrame';
 import type { Sunlight } from './skyAndLight';
 import { renderQuality } from './renderQuality';
 import { rippleNormalTexture } from './rippleTexture';
-import { waterDepthMap, type WaterBed } from './waterDepthMap';
+import { sharedGroundNoise } from './terrain/groundTiles';
+import type { ShoreMap } from './terrain/shoreMap';
+import { pushedTowardsLand } from './waterEdge';
 import { shapeWithHoles } from './worldShapes';
 import { WaterFragmentShader, WaterVertexShader } from './waterShader';
 
-export const WaterLook = { Tint: '#ffffff', Deep: '#1b463f', Shallow: '#56643a', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
+export const WaterLook = { Tint: '#ffffff', Deep: '#2a5446', Shallow: '#4c5436', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
+
+function shoreUniforms() {
+	return { shoreMap: { value: null }, shoreOrigin: { value: new Vector2() }, shoreSize: { value: new Vector2(1, 1) }, shoreBand: { value: 1 }, deepestMetres: { value: 1 }, shallowColour: { value: new Color(WaterLook.Shallow) } };
+}
 
 function waterShader() {
-	const own = { time: { value: 0 }, sunDirection: { value: new Vector3(0, 1, 0) }, sunColour: { value: new Color() }, deepColour: { value: new Color(WaterLook.Deep) }, shallowColour: { value: new Color(WaterLook.Shallow) }, clarity: { value: 0.5 }, daylight: { value: 1 }, ripples: { value: rippleNormalTexture() }, depthMap: { value: null }, depthBounds: { value: new Vector4(0, 0, 1, 1) }, choppiness: { value: WaterLook.CalmChop }, color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null } };
-	return { name: 'LakeWater', uniforms: UniformsUtils.merge([UniformsLib.fog, own]), vertexShader: WaterVertexShader, fragmentShader: WaterFragmentShader };
+	const own = { time: { value: 0 }, sunDirection: { value: new Vector3(0, 1, 0) }, sunColour: { value: new Color() }, deepColour: { value: new Color(WaterLook.Deep) }, clarity: { value: 0.5 }, daylight: { value: 1 }, ripples: { value: rippleNormalTexture() }, waterNoise: { value: sharedGroundNoise() }, choppiness: { value: WaterLook.CalmChop }, color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null } };
+	return { name: 'LakeWater', uniforms: UniformsUtils.merge([UniformsLib.fog, own, shoreUniforms()]), vertexShader: WaterVertexShader, fragmentShader: WaterFragmentShader };
 }
 
 function reflectionPixels(size: number) {
 	return Math.min(WaterLook.MaximumReflectionPixels, Math.round(size * renderQuality().reflectionScale));
 }
 
-export interface WaterPlan {
-	islands: WorldPoint[][];
-	bed: WaterBed;
-	transparencyPercent: number;
-}
-
 export class LakeWater {
 	readonly mesh: Reflector;
 	private readonly uniforms: ShaderMaterial['uniforms'];
 
-	constructor(plan: WaterPlan, width: number, height: number) {
-		const { bed } = plan;
-		const geometry = new ShapeGeometry(shapeWithHoles(bed.outline, plan.islands));
-		this.mesh = new Reflector(geometry, { color: new Color(WaterLook.Tint), textureWidth: reflectionPixels(width), textureHeight: reflectionPixels(height), shader: waterShader() });
+	constructor(outline: WorldPoint[], islands: WorldPoint[][], transparencyPercent: number, width: number, height: number) {
+		const reachingShape = shapeWithHoles(pushedTowardsLand(outline, false), islands.map((island) => pushedTowardsLand(island, true)));
+		this.mesh = new Reflector(new ShapeGeometry(reachingShape), { color: new Color(WaterLook.Tint), textureWidth: reflectionPixels(width), textureHeight: reflectionPixels(height), shader: waterShader() });
 		this.mesh.rotateX(-Math.PI / 2);
 		const material = this.mesh.material as ShaderMaterial;
 		material.fog = true;
 		material.transparent = true;
 		this.uniforms = material.uniforms;
-		const { clarity, depthMap, depthBounds } = this.uniforms;
-		clarity.value = plan.transparencyPercent / WaterLook.ClearestPercent;
-		const depth = waterDepthMap(bed);
-		depthMap.value = depth.texture;
-		depthBounds.value = depth.bounds;
+		const { clarity } = this.uniforms;
+		clarity.value = transparencyPercent / WaterLook.ClearestPercent;
+	}
+
+	get clock(): { value: number } {
+		return this.uniforms.time;
+	}
+
+	useShoreMap(map: ShoreMap) {
+		const { shoreMap, shoreOrigin, shoreSize, shoreBand, deepestMetres } = this.uniforms;
+		shoreMap.value = map.texture;
+		shoreOrigin.value.copy(map.origin);
+		shoreSize.value.copy(map.size);
+		shoreBand.value = map.bandMetres;
+		deepestMetres.value = map.deepestMetres;
 	}
 
 	advance(timeSeconds: number) {

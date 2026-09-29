@@ -1,15 +1,15 @@
-import { Color, DirectionalLight, FogExp2, Group, HemisphereLight, Scene, Vector3 } from 'three';
-import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { Color, FogExp2, Group, Scene, Vector3 } from 'three';
 import type { StageConditions } from '../sky/stageConditions';
-import { daylightOf, horizonColourAt, skyMoodFor, sunColourAt, type SkyMood } from './skyLook';
+import { tintHaze, veiled, type HazeColours } from './aerialHaze';
+import { Clouds } from './clouds';
+import { LandLight, lightDirectionOf } from './landLight';
 import { createNightSky } from './nightSky';
-import { sunPlacementAt, sunSkyPositionOf, type SunPlacement } from './sunAndSky';
+import type { Sightline } from './shadowRange';
+import { createClearSky, paintSky } from './skyDome';
+import { daylightOf, skyMoodFor, sunColourAt } from './skyLook';
+import { sunPlacementAt } from './sunAndSky';
 
-const SkyScale = 9000;
-const Light = { SunDistance: 400, SunBrightest: 3.2, MoonBrightest: 0.6, SkyDimmest: 0.5, SkyBrightest: 1.6, ShadowMapPixels: 2048, ShadowDepthShare: 3 } as const;
-const SkyTint = new Color('#b9d4ff');
-const GroundBounce = new Color('#3a4a24');
-const MoonHeight = 0.6;
+const OverviewMostHaze = 0.0011;
 
 export interface Sunlight {
 	direction: Vector3;
@@ -18,69 +18,68 @@ export interface Sunlight {
 	daylight: number;
 }
 
-function lightDirectionOf(sun: SunPlacement) {
-	const { direction } = sun;
-	if (sun.isUp) return direction;
-	return new Vector3(-direction.x, MoonHeight, -direction.z).normalize();
-}
-
-function shadowCastingSun(shadowReach: number) {
-	const light = new DirectionalLight();
-	light.castShadow = true;
-	const shadow = light.shadow;
-	shadow.mapSize.set(Light.ShadowMapPixels, Light.ShadowMapPixels);
-	Object.assign(shadow.camera, { left: -shadowReach, right: shadowReach, top: shadowReach, bottom: -shadowReach, far: Light.SunDistance * Light.ShadowDepthShare });
-	return light;
-}
-
 export class SkyAndLight {
 	readonly group = new Group();
 	sunlight: Sunlight = { direction: new Vector3(0, 1, 0), colour: new Color(), windStrength: 0, daylight: 1 };
-	private readonly sky = new Sky();
-	private readonly sun: DirectionalLight;
-	private readonly skyLight = new HemisphereLight(SkyTint, GroundBounce);
+	private readonly sky = createClearSky(true);
+	private readonly skyWithoutSun = createClearSky(false);
+	private readonly land: LandLight;
 	private readonly fog = new FogExp2(0xffffff);
 	private readonly night = createNightSky();
+	private readonly clouds = new Clouds();
+	private mood = skyMoodFor('clear');
 
-	constructor(scene: Scene, shadowReach: number, isOpenSky: boolean) {
-		this.sky.scale.setScalar(SkyScale);
-		this.sun = shadowCastingSun(shadowReach);
-		this.group.add(this.sun, this.sun.target, this.skyLight);
+	constructor(scene: Scene, wholePlotReach: number, isOpenSky: boolean) {
+		this.land = new LandLight(scene, wholePlotReach);
+		const { objects } = this.land;
+		this.group.add(...objects);
+		this.land.follow({ eye: new Vector3(), focus: new Vector3(), isOverview: true });
 		if (!isOpenSky) return;
-		this.group.add(this.sky, this.night.dome);
+		this.group.add(this.sky, this.night.dome, this.clouds.dome);
 		scene.fog = this.fog;
 	}
 
+	get exposureShare() {
+		const { mood } = this;
+		return mood.exposureShare;
+	}
+
 	environmentScene() {
-		return new Scene().add(this.sky.clone());
+		return new Scene().add(this.skyWithoutSun, this.night.dome.clone());
 	}
 
 	setConditions(conditions: StageConditions) {
 		const { weather } = conditions;
 		const mood = skyMoodFor(weather.kind);
+		this.mood = mood;
 		const placement = sunPlacementAt(conditions.hour, conditions.season);
 		const elevation = placement.elevationDegrees;
 		this.sunlight = { direction: placement.direction, colour: sunColourAt(elevation), windStrength: weather.windStrength, daylight: daylightOf(elevation) };
-		this.paintTheSky(mood, placement);
-		this.night.darken(this.sunlight.daylight);
-		this.lightTheLand(mood, placement);
-		this.fog.color.copy(horizonColourAt(elevation).multiply(mood.fogTint));
+		paintSky(this.sky, mood, placement);
+		paintSky(this.skyWithoutSun, mood, placement);
+		this.night.darken(this.sunlight.daylight, lightDirectionOf(placement), placement.direction);
+		this.clouds.cover(weather);
+		const { colour, daylight } = this.sunlight;
+		this.land.light(mood, placement, colour, daylight);
 		this.fog.density = mood.fogDensity;
 	}
 
-	private paintTheSky(mood: SkyMood, placement: SunPlacement) {
-		const skyMaterial = this.sky.material;
-		const { turbidity, rayleigh, sunPosition } = skyMaterial.uniforms;
-		turbidity.value = mood.turbidity;
-		rayleigh.value = mood.rayleigh;
-		sunPosition.value.copy(sunSkyPositionOf(placement));
+	tintHaze(measured: HazeColours) {
+		const { direction, colour, daylight } = this.sunlight;
+		const { mood } = this;
+		const colours = veiled(measured, mood);
+		tintHaze(this.fog, colours, direction);
+		const intensity = this.land.sunIntensity;
+		this.clouds.light({ direction: this.land.direction, colour, intensity, horizon: colours.away, veil: mood.veil, daylight });
 	}
 
-	private lightTheLand(mood: SkyMood, placement: SunPlacement) {
-		const { colour, daylight } = this.sunlight;
-		this.sun.position.copy(lightDirectionOf(placement)).multiplyScalar(Light.SunDistance);
-		this.sun.color.copy(colour);
-		this.sun.intensity = placement.isUp ? Light.SunBrightest * mood.sunStrength * daylight : Light.MoonBrightest;
-		this.skyLight.intensity = Light.SkyDimmest + (Light.SkyBrightest - Light.SkyDimmest) * daylight * mood.sunStrength;
+	followSight(sightline: Sightline) {
+		this.land.follow(sightline);
+		const { fogDensity } = this.mood;
+		this.fog.density = sightline.isOverview ? Math.min(fogDensity, OverviewMostHaze) : fogDensity;
+	}
+
+	advance(secondsElapsed: number) {
+		this.clouds.advance(secondsElapsed);
 	}
 }
