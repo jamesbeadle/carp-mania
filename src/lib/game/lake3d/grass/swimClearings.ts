@@ -8,7 +8,7 @@ export interface SwimClearing {
 	heading: number;
 }
 
-const View = { Within: 12, SideFrom: 0.2, AheadFrom: 0.6 } as const;
+const View = { Within: 12, FadeFrom: 7, SideFrom: 0.1, AheadFrom: 0.7 } as const;
 
 export function swimClearingsFor(pegs: WorldPoint[], water: WaterShape): SwimClearing[] {
 	return pegs.map((peg) => {
@@ -22,7 +22,8 @@ function aheadOfPod(point: WorldPoint, clearing: SwimClearing) {
 	const metres = metresBetween(point, pod);
 	if (metres > View.Within) return 0;
 	const facing = ((point.x - pod.x) * Math.sin(heading) + (point.z - pod.z) * Math.cos(heading)) / Math.max(metres, Number.EPSILON);
-	return Math.min(1, Math.max(0, (facing - View.SideFrom) / (View.AheadFrom - View.SideFrom)));
+	const nearness = Math.min(1, (View.Within - metres) / (View.Within - View.FadeFrom));
+	return nearness * Math.min(1, Math.max(0, (facing - View.SideFrom) / (View.AheadFrom - View.SideFrom)));
 }
 
 export function viewAheadOfPods(point: WorldPoint, clearings: SwimClearing[]) {

@@ -15,6 +15,7 @@ export interface TuftShape {
 	widest: number;
 	dryShare: number;
 	isSpread?: boolean;
+	dome?: number;
 }
 
 const ReferenceCell = 256;
@@ -36,7 +37,8 @@ export function paintTuft(brush: CellBrush, shape: TuftShape, heightShare = 1) {
 		const isDry = random() < shape.dryShare;
 		const base = pickColour(isDry ? palette.dryBlades : palette.blades, random);
 		const rootX = (shape.isSpread ? Clump.Edge + random() * (1 - Clump.Edge * 2) : clumpedAcross(random)) * size;
-		const height = (shape.shortest + random() * (1 - shape.shortest)) * size * heightShare;
+		const envelope = 1 - (shape.dome ?? 0) * Math.pow((rootX / size - Clump.Centre) * 2, 2);
+		const height = (shape.shortest + random() * (1 - shape.shortest)) * size * heightShare * envelope;
 		const fan = shape.isSpread ? 0 : (rootX - size / 2) * Clump.Spread;
 		const lean = (random() - Clump.Centre) * shape.lean * size + fan;
 		const colour = isBack ? shadeOf(base, Clump.BackShade) : base;

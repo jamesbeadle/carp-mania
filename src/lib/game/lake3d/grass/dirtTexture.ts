@@ -2,8 +2,10 @@ import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import { pickColour } from './coverPalette';
 
-const Dirt = { Pixels: 256, Base: '#4a4230', Specks: 2600, Pebbles: 24, Seed: 3319 } as const;
-const Tones = ['#40392a', '#554c36', '#363024', '#5e553c', '#4c442f', '#3c3a2a'];
+const Dirt = { Pixels: 256, Base: '#5e4c32', Specks: 2600, Pebbles: 24, Scuffs: 14, Seed: 3319 } as const;
+const Tones = ['#584630', '#6b5a3e', '#4e3e2a', '#74603f', '#62503a', '#50422e'];
+const ScuffTones = ['#8a7656', '#7e6a4c', '#94805e'];
+const Scuff = { Largest: 22, Smallest: 7, Flatness: 0.55, Opacity: 0.55 } as const;
 const PebbleTones = ['#6a665c', '#76706a', '#5a5850'];
 const Bits = ['#4e6030', '#5a6c36', '#66683a', '#4a5a2c'];
 const Speck = { Largest: 3, BitShare: 0.3 } as const;
@@ -15,6 +17,18 @@ function scatterSpecks(context: CanvasRenderingContext2D, random: () => number) 
 		context.fillStyle = pickColour(isGrassBit ? Bits : Tones, random);
 		context.fillRect(random() * Dirt.Pixels, random() * Dirt.Pixels, 1 + random() * Speck.Largest, 1 + random() * Speck.Largest);
 	}
+}
+
+function scatterScuffs(context: CanvasRenderingContext2D, random: () => number) {
+	context.globalAlpha = Scuff.Opacity;
+	for (let scuff = 0; scuff < Dirt.Scuffs; scuff++) {
+		context.fillStyle = pickColour(ScuffTones, random);
+		context.beginPath();
+		const across = Scuff.Smallest + random() * Scuff.Largest;
+		context.ellipse(random() * Dirt.Pixels, random() * Dirt.Pixels, across, across * Scuff.Flatness, random() * Math.PI, 0, Math.PI * 2);
+		context.fill();
+	}
+	context.globalAlpha = 1;
 }
 
 function scatterPebbles(context: CanvasRenderingContext2D, random: () => number) {
@@ -36,6 +50,7 @@ export function dirtTexture() {
 	if (context) {
 		context.fillStyle = Dirt.Base;
 		context.fillRect(0, 0, Dirt.Pixels, Dirt.Pixels);
+		scatterScuffs(context, random);
 		scatterSpecks(context, random);
 		scatterPebbles(context, random);
 	}

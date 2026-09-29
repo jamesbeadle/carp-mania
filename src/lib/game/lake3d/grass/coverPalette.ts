@@ -32,7 +32,7 @@ const Autumn: CoverPalette = {
 	dryBlades: ['#a8925a', '#b8a068', '#9a8450'],
 	seedHeads: ['#9a7c52', '#b09064', '#7e6444'],
 	rushes: ['#4a5a2c', '#5a6432', '#6e6c3a', '#7a6a3c'],
-	sedges: ['#8a8a44', '#9c9450', '#a8985a', '#7c7a3c'],
+	sedges: ['#7a7a3a', '#8a8244', '#948448', '#6c6a34'],
 	spikes: ['#6e5038', '#7e5e44', '#5e4430'],
 	flowerShare: 0.25
 };
@@ -42,7 +42,7 @@ const Winter: CoverPalette = {
 	dryBlades: ['#7e7c5a', '#88845e', '#727252'],
 	seedHeads: ['#8a7a5e', '#9c8c70', '#76684e'],
 	rushes: ['#4c5634', '#58603c', '#646444', '#6c6444'],
-	sedges: ['#8a8058', '#968a62', '#7c7450', '#a0946c'],
+	sedges: ['#6e6440', '#7a6c46', '#62583a', '#84744e'],
 	spikes: ['#5e4c3a', '#6c5844', '#524232'],
 	flowerShare: 0
 };

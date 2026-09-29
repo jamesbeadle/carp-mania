@@ -7,6 +7,7 @@ import type { SurveyedBank } from './coverGround';
 import { coverMaterial } from './coverMaterial';
 import { scatterCover, type CoverPlant } from './coverScatter';
 import type { CoverWind } from './coverWind';
+import { createSward } from './sward';
 import { createWornPatches } from './wornPatches';
 import { createMarginBand } from '../margins/marginBand';
 
@@ -32,5 +33,5 @@ export function createGroundCover(bank: SurveyedBank, wind: CoverWind) {
 	const grass = coverChunks(plants.filter((plant) => !plant.isMarginal).map(facingPlant), grassPlan);
 	const margins = coverChunks(plants.filter((plant) => plant.isMarginal), marginPlan);
 	grass.forEach((levels) => levels.traverse((part) => part.layers.set(NearDetailLayer)));
-	return new Group().add(...grass, ...margins, createMarginBand(bank), createWornPatches(bank));
+	return new Group().add(createSward(bank, atlas, CoverGrid, wind), ...grass, ...margins, createMarginBand(bank), createWornPatches(bank));
 }

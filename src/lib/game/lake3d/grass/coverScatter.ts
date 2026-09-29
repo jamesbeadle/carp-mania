@@ -1,6 +1,6 @@
 import { pickRandom, randomBetween, seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import { mostPlantsPerSquareMetre, SwimsReachMetres } from './coverDensity';
+import { marginShareAt, mostPlantsPerSquareMetre, SwimsReachMetres } from './coverDensity';
 import { Plantings, type Planting } from './coverPlantings';
 import { CoverPalettes } from './coverPalette';
 import { CoverSites, type CoverGround, type CoverSite } from './coverSite';
@@ -22,6 +22,7 @@ export interface CoverPlant {
 const Tile = { Metres: 8, NearestShore: -6, FarthestShore: 90 } as const;
 const Tint = { Darkest: 0.84, Range: 0.24, DryLift: 0.1, DryPatchShare: 0.5 } as const;
 const Growth = { Least: 0.75, PatchSwing: 0.5 } as const;
+const MarginTaper = { Least: 0.35, Presence: 2.5 } as const;
 const TileDiagonal = Tile.Metres * Math.SQRT2;
 
 interface Scattering {
@@ -42,7 +43,8 @@ function chosenPlanting(site: CoverSite, scattering: Scattering): Planting | nul
 }
 
 function plantOf(planting: Planting, site: CoverSite, random: RandomFraction): CoverPlant {
-	const height = randomBetween(random, ...planting.heights) * (Growth.Least + site.patch * Growth.PatchSwing);
+	const taper = planting.isMarginal ? MarginTaper.Least + (1 - MarginTaper.Least) * Math.min(1, marginShareAt(site) * MarginTaper.Presence) : 1;
+	const height = randomBetween(random, ...planting.heights) * (Growth.Least + site.patch * Growth.PatchSwing) * taper;
 	const dryness = Math.max(0, site.meadow - site.patch * Tint.DryPatchShare);
 	const tint = { shade: Tint.Darkest + random() * Tint.Range, warmth: dryness * Tint.DryLift };
 	const width = height * randomBetween(random, ...planting.widthPerHeight);
@@ -61,7 +63,7 @@ function scatterTile(corner: WorldPoint, scattering: Scattering, into: CoverPlan
 	const candidates = Math.round(Tile.Metres * Tile.Metres * scattering.mostDensity * scattering.density);
 	for (let index = 0; index < candidates; index++) {
 		const point = { x: corner.x + random() * Tile.Metres, z: corner.z + random() * Tile.Metres };
-		if (!sites.isBuildable(point, facilities)) continue;
+		if (random() > sites.clearanceFrom(point, facilities)) continue;
 		const site = sites.siteAt(point, isFarFromSwims);
 		const planting = chosenPlanting(site, scattering);
 		if (!planting) continue;

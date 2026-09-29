@@ -8,7 +8,7 @@ const Meadow = { Threshold: 0.52, Density: 1.6, Fringe: 1.2, SwimGap: 3.5, Fring
 const Short = { Density: 5.5, Patchiness: 0.9 } as const;
 const Flowers = { Buttercups: 0.7, Daisies: 0.6, SwimGap: 1, DaisyRarity: 3 } as const;
 
-function ramp(value: number, from: number, to: number) {
+export function ramp(value: number, from: number, to: number) {
 	return Math.min(1, Math.max(0, (value - from) / (to - from)));
 }
 

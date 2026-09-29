@@ -29,9 +29,9 @@ interface CoverLook extends CoverFinish {
 const CutOff = 0.45;
 const SheenReach = { Near: 12, Far: 110, Farthest: 0.6 } as const;
 const SeenFromAbove = { FadeFrom: 0.62, GoneAt: 0.88 } as const;
-const FacingJitter = 1.4;
+const FacingJitter = 2.1;
 
-const FragmentEdits: ShaderEdit[] = [
+export const FragmentEdits: ShaderEdit[] = [
 	replacing('normal_fragment_begin', Chunks.SameNormalBothSides),
 	including('map_fragment', Chunks.CoverMipAlphaFragment),
 	including('lights_physical_fragment', Chunks.CoverSheenFragment)
@@ -45,13 +45,20 @@ function vertexEdits(look: CoverLook): ShaderEdit[] {
 }
 
 function coverUniforms(look: CoverLook) {
-	const { grid, wind } = look;
+	const { grid } = look;
 	const reach = thinningReach();
 	return {
-		coverGive: { value: look.give },
 		coverGrid: { value: new Vector3(grid.columns, grid.rows, grid.padding) },
 		coverThinning: { value: new Vector4(reach.fullWithin, reach.goneBeyond, Thinning.Curve, Thinning.Fade) },
 		coverGrowth: { value: Thinning.Growth },
+		...sharedUniforms(look)
+	};
+}
+
+export function sharedUniforms(look: { give: number; sheen: number; wind: CoverWind }) {
+	const { wind } = look;
+	return {
+		coverGive: { value: look.give },
 		coverAbove: { value: new Vector2(SeenFromAbove.FadeFrom, SeenFromAbove.GoneAt) },
 		coverFacing: { value: FacingJitter },
 		coverSheen: { value: look.sheen },
@@ -61,11 +68,14 @@ function coverUniforms(look: CoverLook) {
 	};
 }
 
+export function coverSurface(atlas: Texture, roughness: number) {
+	const isSmoothEdged = renderQuality().multisamples > 0;
+	return new MeshStandardMaterial({ map: atlas, alphaTest: CutOff, side: DoubleSide, roughness, vertexColors: true, alphaToCoverage: isSmoothEdged });
+}
+
 export function coverMaterial(atlas: Texture, grid: AtlasGrid, wind: CoverWind, finish: CoverFinish) {
 	const look: CoverLook = { ...finish, atlas, grid, wind };
-	const isSmoothEdged = renderQuality().multisamples > 0;
-	const surface = { map: atlas, alphaTest: CutOff, side: DoubleSide, roughness: look.roughness, vertexColors: true };
-	const material = new MeshStandardMaterial({ ...surface, alphaToCoverage: isSmoothEdged });
+	const material = coverSurface(atlas, look.roughness);
 	const uniforms = coverUniforms(look);
 	const vertexHead = Chunks.CoverVertexUniforms + CoverWindUniforms;
 	material.onBeforeCompile = (shader) => {

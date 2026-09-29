@@ -29,7 +29,7 @@ export interface CoverSite {
 
 const Wavelengths = { Meadow: 24, Patch: 7, Margin: 11, Bloom: 5 } as const;
 const FarFromSwims = 1e6;
-const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1 } as const;
+const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1, Feather: 3 } as const;
 
 export class CoverSites {
 	private readonly noise: CoverNoise;
@@ -59,12 +59,14 @@ export class CoverSites {
 	}
 
 	facilitiesNear(point: WorldPoint, slack: number) {
-		return this.ground.facilities.filter((spot) => metresBetween(spot.point, point) < spot.radius + Clear.FacilityMargin + slack);
+		return this.ground.facilities.filter((spot) => metresBetween(spot.point, point) < spot.radius + Clear.FacilityMargin + Clear.Feather + slack);
 	}
 
-	isBuildable(point: WorldPoint, facilities: ClearSpot[]) {
+	clearanceFrom(point: WorldPoint, facilities: ClearSpot[]) {
 		const edge = this.ground.plotEdge;
 		const isOffThePlot = edge !== null && (Math.abs(point.x) > edge.x - Clear.PlotEdgeMargin || Math.abs(point.z) > edge.z - Clear.PlotEdgeMargin);
-		return !isOffThePlot && facilities.every((spot) => metresBetween(spot.point, point) > spot.radius + Clear.FacilityMargin);
+		if (isOffThePlot) return 0;
+		const beyond = (spot: ClearSpot) => (metresBetween(spot.point, point) - spot.radius - Clear.FacilityMargin) / Clear.Feather;
+		return facilities.reduce((least, spot) => Math.min(least, Math.max(0, beyond(spot))), 1);
 	}
 }
