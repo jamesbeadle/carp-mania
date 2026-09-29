@@ -3,10 +3,10 @@ import type { LakeLayout, LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { StageConditions } from '../sky/stageConditions';
 import { createFacilities } from './bank/facilities3d';
+import { bedDepthFor } from './bedDepth';
 import { lightTheWindows } from './bank/windowGlow';
 import { plotFacilities } from './bank/facilityGrounds';
 import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
-import { Heights } from './lakeGround';
 import { fineWorldOutline } from './terrain/fineOutline';
 import { createLakeLand } from './terrain/lakeLand';
 import { LakeWater } from './lakeWater';
@@ -28,14 +28,8 @@ export interface LakeWorldPlan {
 }
 
 const Lens = { FieldOfViewDegrees: 50, Nearest: 0.1, Farthest: 12000 } as const;
-const MetresPerFootOfDepth = 0.3048;
-const DepthShown = 0.45;
 const PegClearing = 10;
 const ShadowShareOfPlot = 0.75;
-
-export function bedDepthFor(layout: LakeLayout) {
-	return Math.min(Heights.BedDeepest, Math.max(Heights.ShallowestBed, layout.baseDepthFeet * MetresPerFootOfDepth * DepthShown));
-}
 
 export class LakeWorld {
 	readonly scene = new Scene();
