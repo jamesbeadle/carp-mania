@@ -15,6 +15,7 @@ export interface LakeRenderer {
 	expose: (daylight: number, share?: number) => void;
 	lightFrom: (skyScene: Scene) => void;
 	readHorizon: (skyScene: Scene, sunDirection: Vector3) => HazeColours;
+	readHorizonLater: (skyScene: Scene, sunDirection: Vector3) => Promise<HazeColours>;
 	stop: () => void;
 }
 
@@ -47,5 +48,6 @@ export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camer
 	const expose = (daylight: number, share = 1) => void (renderer.toneMappingExposure = exposureAt(daylight) * exposureShare * share);
 	const environment = environmentLightOf(renderer, scene);
 	const stop = () => (cancelAnimationFrame(frameHandle), environment.dispose(), renderer.dispose());
-	return { expose, lightFrom: environment.lightFrom, readHorizon: environment.readHorizon, stop };
+	const { lightFrom, readHorizon, readHorizonLater } = environment;
+	return { expose, lightFrom, readHorizon, readHorizonLater, stop };
 }

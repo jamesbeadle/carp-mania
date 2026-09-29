@@ -8,6 +8,7 @@ const EnvironmentCapture = { Blur: 0, Nearest: 0.1, Farthest: 20000 } as const;
 export interface EnvironmentLight {
 	lightFrom: (skyScene: Scene) => void;
 	readHorizon: (skyScene: Scene, sunDirection: Vector3) => HazeColours;
+	readHorizonLater: (skyScene: Scene, sunDirection: Vector3) => Promise<HazeColours>;
 	dispose: () => void;
 }
 
@@ -21,6 +22,7 @@ export function environmentLightOf(renderer: WebGLRenderer, scene: Scene): Envir
 		previous?.dispose();
 	};
 	const readHorizon = (skyScene: Scene, sunDirection: Vector3) => probe.measure(skyScene, sunDirection);
+	const readHorizonLater = (skyScene: Scene, sunDirection: Vector3) => probe.measureLater(skyScene, sunDirection);
 	const dispose = () => (environment.dispose(), probe.dispose());
-	return { lightFrom, readHorizon, dispose };
+	return { lightFrom, readHorizon, readHorizonLater, dispose };
 }

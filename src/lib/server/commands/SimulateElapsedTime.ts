@@ -19,9 +19,9 @@ import { summariseDays } from './summariseDays';
 
 export async function SimulateElapsedTime(locals: App.Locals): Promise<WhileYouWereAway> {
 	const user = requireUser(locals);
-	const openWaters = (await loadMyWaters(locals, user.id)).filter((water) => water.is_setup_complete);
+	const [waters, profile] = await Promise.all([loadMyWaters(locals, user.id), loadProfile(locals)]);
+	const openWaters = waters.filter((water) => water.is_setup_complete);
 	if (openWaters.length === 0) return nothingHappened();
-	const profile = await loadProfile(locals);
 	const summaries: WaterSummary[] = [];
 	for (const lake of openWaters) summaries.push({ waterName: lake.name, summary: await simulateWater(locals, lake, profile) });
 	return summariseEstate(summaries);
