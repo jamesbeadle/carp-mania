@@ -6,6 +6,7 @@
 	import { stageConditionsFor } from '$lib/game/sky/stageConditions';
 	import ViewToggle from '../game/ViewToggle.svelte';
 	import { lakeFlyover3dOnDemand, type LakeFlyover3DComponent } from '../lake3d/lake3dOnDemand';
+	import WaterVeil from '../lake3d/WaterVeil.svelte';
 	import BuilderCanvas from './BuilderCanvas.svelte';
 
 	interface Props {
@@ -36,7 +37,7 @@
 <div class="relative">
 	{#if isIn3d}
 		<div class="relative aspect-[3/2] overflow-hidden rounded-2xl border border-carbon-700">
-			{#if LakeFlyover3D}<LakeFlyover3D lake={sceneLake} swims={sceneSwims} {carp} conditions={planLight} isDiorama />{/if}
+			{#if LakeFlyover3D}<LakeFlyover3D lake={sceneLake} swims={sceneSwims} {carp} conditions={planLight} isDiorama />{:else}<WaterVeil />{/if}
 		</div>
 	{:else}
 		<BuilderCanvas {builder} {lake} {sceneLake} {swims} {sceneSwims} {carp} {drafts} />

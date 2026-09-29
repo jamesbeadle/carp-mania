@@ -1,4 +1,5 @@
 import { Group } from 'three';
+import { untilTheNextFrame } from '../frameYield';
 import { coverQuality, NearDetailLayer } from '../renderQuality';
 import { CoverGrid, coverAtlas } from './coverAtlas';
 import { crossedCards } from './coverCards';
@@ -21,9 +22,10 @@ function facingPlant(plant: CoverPlant): CoverPlant {
 	return { ...plant, turn: 0 };
 }
 
-export function createGroundCover(bank: SurveyedBank, wind: CoverWind) {
+export async function growGroundCover(bank: SurveyedBank, wind: CoverWind) {
 	const cover = coverQuality();
 	const plants = scatterCover(bank, bank.area, cover.density);
+	await untilTheNextFrame();
 	const atlas = coverAtlas(bank.season, cover.cellPixels);
 	const material = coverMaterial(atlas, CoverGrid, wind, Finish);
 	const chunkPlan = { material, groundAt: bank.groundAt, sink: Chunks.Sink, seed: bank.seed };
@@ -33,5 +35,6 @@ export function createGroundCover(bank: SurveyedBank, wind: CoverWind) {
 	const grass = coverChunks(plants.filter((plant) => !plant.isMarginal).map(facingPlant), grassPlan);
 	const margins = coverChunks(plants.filter((plant) => plant.isMarginal), marginPlan);
 	grass.forEach((levels) => levels.traverse((part) => part.layers.set(NearDetailLayer)));
+	await untilTheNextFrame();
 	return new Group().add(createSward(bank, atlas, CoverGrid, wind), ...grass, ...margins, createMarginBand(bank), createWornPatches(bank));
 }

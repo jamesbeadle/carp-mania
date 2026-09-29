@@ -14,16 +14,17 @@ export interface LakeRenderer {
 	readHorizon: (skyScene: Scene, sunDirection: Vector3) => HazeColours;
 	readHorizonLater: (skyScene: Scene, sunDirection: Vector3) => Promise<HazeColours>;
 	stop: () => void;
+	whenFirstFrameDrawn: Promise<void>;
 }
 
 export function startLakeRenderer(canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, step: FrameStep, onResize: (width: number, height: number) => void, isSeeThrough = false): LakeRenderer {
 	const renderer = rendererOn(canvas, isSeeThrough);
 	const effects = isSeeThrough ? null : new PostEffects(renderer, scene, camera);
-	const stopFrames = runFrameLoop({ renderer, effects, canvas, scene, camera, step, onResize });
+	const frames = runFrameLoop({ renderer, effects, canvas, scene, camera, step, onResize });
 	const { exposureShare } = lookFor(isSeeThrough);
 	const expose = (daylight: number, share = 1) => void (renderer.toneMappingExposure = exposureAt(daylight) * exposureShare * share);
 	const environment = environmentLightOf(renderer, scene);
 	const { lightFrom, readHorizon, readHorizonLater } = environment;
-	const stop = () => (stopFrames(), environment.dispose(), renderer.dispose());
-	return { expose, lightFrom, readHorizon, readHorizonLater, stop };
+	const stop = () => (frames.stop(), environment.dispose(), renderer.dispose());
+	return { expose, lightFrom, readHorizon, readHorizonLater, stop, whenFirstFrameDrawn: frames.whenFirstFrameDrawn };
 }

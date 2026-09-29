@@ -2,10 +2,12 @@
 	import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 	import type { Carp, Lake, Swim } from '$lib/domain/types';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
-	import { LakeScene } from '$lib/game/lake3d/stage/lakeScene';
+	import type { LakeScene } from '$lib/game/lake3d/stage/lakeScene';
+	import { SceneMount } from '$lib/game/lake3d/stage/sceneMount.svelte';
 	import { lookingOverTheLake } from '$lib/game/lake3d/stage/sceneView';
 	import { untrack } from 'svelte';
 	import MeshBackdrop from '../brand/MeshBackdrop.svelte';
+	import WaterVeil from './WaterVeil.svelte';
 
 	interface Props {
 		lake: Lake;
@@ -22,28 +24,26 @@
 	const DioramaZoom = 1.3;
 
 	let canvas: HTMLCanvasElement;
-	let scene = $state<LakeScene | null>(null);
+	const mount = new SceneMount();
 	let draggedFrom: { x: number; y: number } | null = null;
 
 	$effect(() => {
 		const fish = carp.map((one) => ({ strain: one.strain, weightLb: Number(one.weight_lb) }));
-		const made = new LakeScene(canvas, untrack(() => ({ lake, swims, fish, conditions, isDiorama })), () => lookingOverTheLake(showingAt));
-		if (isDiorama) made.rig.zoomBy(DioramaZoom);
-		scene = made;
-		return () => made.dispose();
+		const zoomTheDiorama = (made: LakeScene) => void (isDiorama && made.rig.zoomBy(DioramaZoom));
+		return mount.open(canvas, untrack(() => ({ lake, swims, fish, conditions, isDiorama })), () => lookingOverTheLake(showingAt), zoomTheDiorama);
 	});
 
-	$effect(() => scene?.setConditions(conditions));
+	$effect(() => mount.scene?.setConditions(conditions));
 
 	function drag(event: PointerEvent) {
 		if (!draggedFrom) return;
-		scene?.rig.look(event.clientX - draggedFrom.x, event.clientY - draggedFrom.y);
+		mount.scene?.rig.look(event.clientX - draggedFrom.x, event.clientY - draggedFrom.y);
 		draggedFrom = { x: event.clientX, y: event.clientY };
 	}
 
 	function zoom(event: WheelEvent) {
 		event.preventDefault();
-		scene?.rig.zoomBy(event.deltaY > 0 ? ZoomPerWheelStep : 1 / ZoomPerWheelStep);
+		mount.scene?.rig.zoomBy(event.deltaY > 0 ? ZoomPerWheelStep : 1 / ZoomPerWheelStep);
 	}
 </script>
 
@@ -58,3 +58,4 @@
 	onwheel={zoom}
 	aria-label="Your water in 3D — drag to fly around it"
 ></canvas>
+{#if mount.isVeiled}<WaterVeil />{/if}

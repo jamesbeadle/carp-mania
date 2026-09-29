@@ -9,6 +9,11 @@ const ShadowRefreshEveryFrames = 2;
 
 export type FrameStep = (secondsElapsed: number, timeSeconds: number) => void;
 
+export interface FrameLoop {
+	stop: () => void;
+	whenFirstFrameDrawn: Promise<void>;
+}
+
 export interface FrameLoopPlan {
 	renderer: WebGLRenderer;
 	effects: PostEffects | null;
@@ -19,9 +24,10 @@ export interface FrameLoopPlan {
 	onResize: (width: number, height: number) => void;
 }
 
-export function runFrameLoop(plan: FrameLoopPlan) {
+export function runFrameLoop(plan: FrameLoopPlan): FrameLoop {
 	const { renderer, effects, canvas, scene, camera, step, onResize } = plan;
 	const draw = effects ? () => effects.render() : () => renderer.render(scene, camera);
+	const firstFrame = Promise.withResolvers<void>();
 	const governor = new FrameGovernor();
 	const fullPixelRatio = basePixelRatio();
 	const shadows = renderer.shadowMap;
@@ -40,8 +46,9 @@ export function runFrameLoop(plan: FrameLoopPlan) {
 		shadows.needsUpdate = frames % ShadowRefreshEveryFrames !== 0;
 		last = now;
 		draw();
+		firstFrame.resolve();
 		handle = requestAnimationFrame(frame);
 	};
 	handle = requestAnimationFrame(frame);
-	return () => cancelAnimationFrame(handle);
+	return { stop: () => cancelAnimationFrame(handle), whenFirstFrameDrawn: firstFrame.promise };
 }

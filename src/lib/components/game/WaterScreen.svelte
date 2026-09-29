@@ -13,6 +13,7 @@
 	import { isWebGlAvailable } from '$lib/game/lake3d/webGlAvailability';
 	import LakeCanvas from '../LakeCanvas.svelte';
 	import { lakeView3dOnDemand, type LakeView3DComponent } from '../lake3d/lake3dOnDemand';
+	import WaterVeil from '../lake3d/WaterVeil.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import SceneStage from '../stage/SceneStage.svelte';
 	import SessionDeck from './SessionDeck.svelte';
@@ -68,7 +69,7 @@
 
 {#snippet water()}
 	{#if isIn3d}
-		{#if LakeView3D}<LakeView3D {session} {lake} {swims} {carp} shoals={session.shoals} {conditions} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} onCastBlocked={(problem) => (session.notice = CastProblemWords[problem])} />{/if}
+		{#if LakeView3D}<LakeView3D {session} {lake} {swims} {carp} shoals={session.shoals} {conditions} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} onCastBlocked={(problem) => (session.notice = CastProblemWords[problem])} />{:else}<WaterVeil />{/if}
 	{:else}
 		<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 	{/if}

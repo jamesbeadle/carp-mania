@@ -7,6 +7,7 @@
 	import ViewToggle from '../game/ViewToggle.svelte';
 	import LakeCanvas from '../LakeCanvas.svelte';
 	import { lakeFlyover3dOnDemand, type LakeFlyover3DComponent } from '../lake3d/lake3dOnDemand';
+	import WaterVeil from '../lake3d/WaterVeil.svelte';
 	import SceneStage from './SceneStage.svelte';
 
 	interface Props {
@@ -38,7 +39,7 @@
 <SceneStage {conditions} {overTheSky} {belowTheBank} isImmersive={isIn3d}>
 	{#snippet water()}
 		{#if isIn3d}
-			{#if LakeFlyover3D}<LakeFlyover3D {lake} {swims} {carp} {conditions} {showingAt} />{/if}
+			{#if LakeFlyover3D}<LakeFlyover3D {lake} {swims} {carp} {conditions} {showingAt} />{:else}<WaterVeil />{/if}
 		{:else}
 			<LakeCanvas {lake} {swims} {carp} {showingAt} />
 		{/if}
