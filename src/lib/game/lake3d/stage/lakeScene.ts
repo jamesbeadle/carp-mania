@@ -14,8 +14,6 @@ import { worldPlanOf, type LakeScenePlan } from './scenePlan';
 import type { SceneView } from './sceneView';
 import { WaterLife } from './waterLife';
 
-export type { LakeScenePlan } from './scenePlan';
-
 const Strength = { Thrash: 0.8, CastSplash: 0.4, Swirl: 0.5 } as const;
 
 export class LakeScene {
@@ -29,8 +27,12 @@ export class LakeScene {
 	private readonly renderer: LakeRenderer;
 	private readonly lighting: SceneLighting;
 
-	static async create(canvas: HTMLCanvasElement, plan: LakeScenePlan, readView: () => SceneView) {
-		const world = await buildLakeWorld(worldPlanOf(plan), canvas.clientWidth, canvas.clientHeight);
+	static async create(canvas: HTMLCanvasElement, plan: LakeScenePlan, readView: () => SceneView, signal?: AbortSignal) {
+		const world = await buildLakeWorld(worldPlanOf(plan), canvas.clientWidth, canvas.clientHeight, signal);
+		if (signal?.aborted) {
+			world.dispose();
+			throw signal.reason;
+		}
 		return new LakeScene(canvas, world, plan, readView);
 	}
 

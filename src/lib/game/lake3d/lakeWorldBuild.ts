@@ -41,7 +41,7 @@ function surveyThePlot(plan: LakeWorldPlan): Plot {
 	return { frame, plotReach: plotReachOf(frame), outline, islands, shoreline, pegs, wholePlot, plotEdge };
 }
 
-export async function buildLakeWorld(plan: LakeWorldPlan, width: number, height: number): Promise<LakeWorld> {
+export async function buildLakeWorld(plan: LakeWorldPlan, width: number, height: number, signal?: AbortSignal): Promise<LakeWorld> {
 	const { layout, season } = plan;
 	const plot = surveyThePlot(plan);
 	const { frame, outline, islands, shoreline, pegs, plotEdge, plotReach } = plot;
@@ -50,19 +50,19 @@ export async function buildLakeWorld(plan: LakeWorldPlan, width: number, height:
 	const sky = new SkyAndLight(scene, plotReach * ShadowShareOfPlot, !plan.isDiorama);
 	const water = new LakeWater(shoreline.outline, shoreline.islands, plan.transparencyPercent, width, height);
 	water.keepOutOfTheReflection(camera, NearDetailLayer);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const land = createLakeLand({ ...shoreline, swimWater: { outline, islands }, plotEdge, plotReach, season, bed: layout.baseBed, bedDepth: bedDepthFor(layout), pegs, clock: water.clock });
 	const { groundAt } = land;
 	water.useShoreMap(land.shoreMap);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const plots = plotFacilities(layout, { outline, islands }, pegs, plot.wholePlot);
 	const facilities = createFacilities(plots, groundAt);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((one) => ({ point: one.point, radius: one.footprintMetres / 2 }))];
 	const woodland = plantTrees({ outline: shoreline.outline, islands: shoreline.islands, keepClear, plotReach, plotEdge, seed: plan.seed });
-	await untilTheNextFrame();
-	const vegetation = await buildVegetation({ woodland, layout, frame, outline: shoreline.outline, islands: shoreline.islands, pegs, keepClear, plotEdge, season, seed: plan.seed, groundAt });
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
+	const vegetation = await buildVegetation({ woodland, layout, frame, outline: shoreline.outline, islands: shoreline.islands, pegs, keepClear, plotEdge, season, seed: plan.seed, groundAt }, signal);
+	await untilTheNextFrame(signal);
 	scene.add(sky.group, land.group, water.mesh, vegetation.group, facilities.group);
 	return new LakeWorld({ scene, camera, frame, outline, islands, water, sky, facilityLabels: facilities.labels, groundAt, vegetation });
 }

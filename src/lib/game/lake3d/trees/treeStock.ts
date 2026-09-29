@@ -15,12 +15,12 @@ export interface TreeStock {
 
 const BatchedVariants = 4;
 
-export async function gatherTreeStock(season: SeasonName): Promise<TreeStock> {
+export async function gatherTreeStock(season: SeasonName, signal?: AbortSignal): Promise<TreeStock> {
 	const quality = renderQuality();
 	const isBatched = hasMultiDraw();
 	const variants = isBatched ? BatchedVariants : quality.treeVariantsSingleDraw;
 	const models = treeModels({ season, cardShare: quality.treeCardShare }, variants);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const atlas = foliageAtlas(quality.treeAtlasPixels);
 	return { models, atlas, variants, isBatched };
 }

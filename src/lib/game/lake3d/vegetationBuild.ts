@@ -20,18 +20,18 @@ export interface VegetationPlan extends BankPlan {
 
 const BushSeedStep = 101;
 
-export async function buildVegetation(plan: VegetationPlan): Promise<Vegetation> {
+export async function buildVegetation(plan: VegetationPlan, signal?: AbortSignal): Promise<Vegetation> {
 	const coverWind = new CoverWind();
-	const stock = await gatherTreeStock(plan.season);
-	await untilTheNextFrame();
+	const stock = await gatherTreeStock(plan.season, signal);
+	await untilTheNextFrame(signal);
 	const trees = new Trees(plan.woodland, plan.season, plan.groundAt, stock);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const bank = surveyBank(plan);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const features = createLakeFeatures({ layout: plan.layout, frame: plan.frame, bank, wind: coverWind });
 	const { woodland } = plan;
 	const bushes = createBushes(woodland.onTheBank, bank, coverWind, seededRandom(plan.seed + BushSeedStep));
-	await untilTheNextFrame();
-	const cover = await growGroundCover(bank, coverWind);
+	await untilTheNextFrame(signal);
+	const cover = await growGroundCover(bank, coverWind, signal);
 	return new Vegetation(trees, coverWind, [cover, features, ...bushes]);
 }

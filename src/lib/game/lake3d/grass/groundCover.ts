@@ -22,10 +22,10 @@ function facingPlant(plant: CoverPlant): CoverPlant {
 	return { ...plant, turn: 0 };
 }
 
-export async function growGroundCover(bank: SurveyedBank, wind: CoverWind) {
+export async function growGroundCover(bank: SurveyedBank, wind: CoverWind, signal?: AbortSignal) {
 	const cover = coverQuality();
 	const plants = scatterCover(bank, bank.area, cover.density);
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	const atlas = coverAtlas(bank.season, cover.cellPixels);
 	const material = coverMaterial(atlas, CoverGrid, wind, Finish);
 	const chunkPlan = { material, groundAt: bank.groundAt, sink: Chunks.Sink, seed: bank.seed };
@@ -35,6 +35,6 @@ export async function growGroundCover(bank: SurveyedBank, wind: CoverWind) {
 	const grass = coverChunks(plants.filter((plant) => !plant.isMarginal).map(facingPlant), grassPlan);
 	const margins = coverChunks(plants.filter((plant) => plant.isMarginal), marginPlan);
 	grass.forEach((levels) => levels.traverse((part) => part.layers.set(NearDetailLayer)));
-	await untilTheNextFrame();
+	await untilTheNextFrame(signal);
 	return new Group().add(createSward(bank, atlas, CoverGrid, wind), ...grass, ...margins, createMarginBand(bank), createWornPatches(bank));
 }
