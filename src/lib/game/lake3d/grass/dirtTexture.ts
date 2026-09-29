@@ -2,10 +2,10 @@ import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import { pickColour } from './coverPalette';
 
-const Dirt = { Pixels: 256, Base: '#5e4c32', Specks: 2600, Pebbles: 24, Scuffs: 14, Seed: 3319 } as const;
+const Dirt = { Pixels: 256, Base: '#5e4c32', Specks: 2600, Pebbles: 24, Scuffs: 8, Seed: 3319 } as const;
 const Tones = ['#584630', '#6b5a3e', '#4e3e2a', '#74603f', '#62503a', '#50422e'];
 const ScuffTones = ['#8a7656', '#7e6a4c', '#94805e'];
-const Scuff = { Largest: 22, Smallest: 7, Flatness: 0.55, Opacity: 0.55 } as const;
+const Scuff = { Largest: 30, Smallest: 12, Flatness: 0.55, Opacity: 0.26 } as const;
 const PebbleTones = ['#6a665c', '#76706a', '#5a5850'];
 const Bits = ['#4e6030', '#5a6c36', '#66683a', '#4a5a2c'];
 const Speck = { Largest: 3, BitShare: 0.3 } as const;
