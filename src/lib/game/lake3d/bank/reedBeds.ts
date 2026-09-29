@@ -9,6 +9,7 @@ import { coverMaterial } from '../grass/coverMaterial';
 import type { CoverWind } from '../grass/coverWind';
 import { coverQuality } from '../renderQuality';
 import { ReedGrid, reedAtlas } from './reedAtlas';
+import { createReedCanopy } from './reedCanopy';
 import { reedStands } from './reedStands';
 
 const ReedCards = { planes: 3, segments: 4, upwardNormals: 0.35, rootShade: 0.4, splay: 0.06 } as const;
@@ -27,12 +28,13 @@ export interface ReedBedPlan {
 export function createReedBeds(plan: ReedBedPlan) {
 	const { bank } = plan;
 	const cover = coverQuality();
-	const stands = reedStands(plan.lines, bank.shore, bank.seed, plan.random);
+	const { stands, clumps } = reedStands(plan.lines, bank.shore, bank.seed, plan.random);
 	const atlas = reedAtlas(plan.season, cover.cellPixels);
 	const material = coverMaterial(atlas, ReedGrid, plan.wind, Finish);
 	const rootedAt = (point: WorldPoint) => Math.max(bank.groundAt(point), -Look.DeepestRoot);
 	const shadowMaterial = cover.isShadowed ? coverDepthMaterial(atlas, ReedGrid) : undefined;
 	const placing = { groundAt: rootedAt, sink: Look.Sink, mostReach: Look.Reach, seed: bank.seed, shadowMaterial };
 	const cards = { ...ReedCards, segments: cover.isDetailed ? ReedCards.segments : LightReedSegments };
-	return coverChunks(stands, { ...placing, name: 'reed-beds', metres: Look.ChunkMetres, geometry: crossedCards(cards), material });
+	const beds = coverChunks(stands, { ...placing, name: 'reed-beds', metres: Look.ChunkMetres, geometry: crossedCards(cards), material });
+	return [...beds, createReedCanopy(clumps, plan.season, plan.random)];
 }

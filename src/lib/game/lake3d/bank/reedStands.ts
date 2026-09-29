@@ -60,5 +60,6 @@ export function reedStands(lines: WorldPoint[][], shore: ShoreField, seed: numbe
 	const clumpContext = { noise: new CoverNoise(seed), random };
 	const context = { shore, random };
 	const clumps = lines.flatMap((line) => reedClumpsAlong(line, clumpContext));
-	return [...clumps.flatMap((clump) => standsIn(clump, context)), ...lines.flatMap((line) => loneReeds(line, shore, random))];
+	const stands = [...clumps.flatMap((clump) => standsIn(clump, context)), ...lines.flatMap((line) => loneReeds(line, shore, random))];
+	return { stands, clumps };
 }
