@@ -14,6 +14,11 @@ export interface RenderQuality {
 	nearTreeMetres: number;
 	treeAtlasPixels: number;
 	treeVariantsSingleDraw: number;
+	hasAmbientOcclusion: boolean;
+	shadowMapPixels: number;
+	hasCascadedShadows: boolean;
+	cloudOctaves: number;
+	hasCloudShadows: boolean;
 }
 
 const Generous: RenderQuality = {
@@ -29,7 +34,12 @@ const Generous: RenderQuality = {
 	treeCardShare: 1,
 	nearTreeMetres: 55,
 	treeAtlasPixels: 4096,
-	treeVariantsSingleDraw: 2
+	treeVariantsSingleDraw: 2,
+	hasAmbientOcclusion: true,
+	shadowMapPixels: 2560,
+	hasCascadedShadows: true,
+	cloudOctaves: 6,
+	hasCloudShadows: true
 };
 
 const Modest: RenderQuality = {
@@ -45,7 +55,12 @@ const Modest: RenderQuality = {
 	treeCardShare: 0.5,
 	nearTreeMetres: 35,
 	treeAtlasPixels: 1024,
-	treeVariantsSingleDraw: 1
+	treeVariantsSingleDraw: 1,
+	hasAmbientOcclusion: false,
+	shadowMapPixels: 1024,
+	hasCascadedShadows: false,
+	cloudOctaves: 4,
+	hasCloudShadows: false
 };
 
 const FewestCoresForGenerous = 6;
