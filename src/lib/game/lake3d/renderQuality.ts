@@ -22,8 +22,8 @@ export interface RenderQuality {
 }
 
 const Generous: RenderQuality = {
-	mostPixelRatio: 2,
-	multisamples: 4,
+	mostPixelRatio: 1.5,
+	multisamples: 2,
 	reflectionScale: 0.5,
 	grassTufts: 26000,
 	hasBloom: true,
@@ -33,7 +33,7 @@ const Generous: RenderQuality = {
 	hasDetailedGround: true,
 	treeCardShare: 1,
 	nearTreeMetres: 55,
-	treeAtlasPixels: 4096,
+	treeAtlasPixels: 2048,
 	treeVariantsSingleDraw: 2,
 	hasAmbientOcclusion: true,
 	shadowMapPixels: 2560,
