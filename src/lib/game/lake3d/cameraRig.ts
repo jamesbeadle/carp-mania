@@ -7,7 +7,7 @@ import { pointToward } from './worldGeometry';
 export type CameraShot = { kind: 'overview'; reach: number } | { kind: 'bank'; swim: WorldPoint; heading: number } | { kind: 'follow'; swim: WorldPoint; heading: number; target: Vector3 } | { kind: 'mat'; swim: WorldPoint; heading: number };
 
 const Overview = { HeightShare: 0.55, DistanceShare: 0.75, DriftPerSecond: 0.02 } as const;
-const Bank = { BehindMetres: 1.9, SideMetres: 0.55, EyeHeight: 1.15, LookAheadMetres: 70, LookHeight: 3, MostTurn: 1.1, MostTilt: 0.35 } as const;
+const Bank = { BehindMetres: 1.9, SideMetres: 0.55, EyeHeight: 1.15, LookAheadMetres: 70, LookHeight: -3.5, MostTurn: 1.1, MostTilt: 0.35 } as const;
 const Mat = { BehindMetres: 1.8, Height: 2.1, BackMetres: 1.1, FramedLeftMetres: 0.75 } as const;
 const Settling = 2.4;
 

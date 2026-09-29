@@ -18,7 +18,8 @@ const Baking = { MarginMetres: 6, BandMetres: 16, MostTexels: 2048, DeepestSpare
 const ByteMost = 255;
 
 function frameAround(shape: TerrainShape, texelMetres: number): RasterFrame {
-	const { least, most } = boundsOf([...shape.plan.outline, ...shape.plan.footings]);
+	const { outline, footings } = shape.plan;
+	const { least, most } = boundsOf([...outline, ...footings]);
 	const width = most.x - least.x + Baking.MarginMetres * 2;
 	const depth = most.z - least.z + Baking.MarginMetres * 2;
 	const texel = Math.max(texelMetres, width / Baking.MostTexels, depth / Baking.MostTexels);

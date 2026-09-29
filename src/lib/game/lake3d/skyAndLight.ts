@@ -31,7 +31,8 @@ export class SkyAndLight {
 
 	constructor(scene: Scene, wholePlotReach: number, isOpenSky: boolean) {
 		this.land = new LandLight(scene, wholePlotReach);
-		this.group.add(...this.land.objects);
+		const { objects } = this.land;
+		this.group.add(...objects);
 		this.land.follow({ eye: new Vector3(), focus: new Vector3(), isOverview: true });
 		if (!isOpenSky) return;
 		this.group.add(this.sky, this.night.dome, this.clouds.dome);

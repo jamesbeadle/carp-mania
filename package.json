@@ -11,6 +11,7 @@
 		"audit:files": "node scripts/auditFileLengths.mjs",
 		"audit:routes": "node scripts/auditRoutes.mjs",
 		"test:domain": "node --import ./scripts/registerTypescriptImports.mjs --experimental-strip-types scripts/testDomain.ts",
+		"test:pace": "node --import ./scripts/registerTypescriptImports.mjs --experimental-strip-types scripts/testPace.ts",
 		"test:sql": "node scripts/testSql.mjs"
 	},
 	"dependencies": {

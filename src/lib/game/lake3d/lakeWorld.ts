@@ -3,6 +3,7 @@ import type { LakeLayout, LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { StageConditions } from '../sky/stageConditions';
 import { createFacilities } from './bank/facilities3d';
+import { lightTheWindows } from './bank/windowGlow';
 import { plotFacilities } from './bank/facilityGrounds';
 import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
 import { Heights } from './lakeGround';
@@ -87,6 +88,8 @@ export class LakeWorld {
 
 	setConditions(conditions: StageConditions) {
 		this.sky.setConditions(conditions);
-		this.water.light(this.sky.sunlight);
+		const { sunlight } = this.sky;
+		this.water.light(sunlight);
+		lightTheWindows(sunlight.daylight);
 	}
 }

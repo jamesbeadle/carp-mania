@@ -1,4 +1,4 @@
-import { CylinderGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry, TorusGeometry } from 'three';
+import { CylinderGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry, TorusGeometry, Vector3 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 export const PodSize = { RodSpacing: 0.3, FrontDistance: 0.95, FrontHeight: 0.72, BackHeight: 0.36, BarRadius: 0.011 } as const;
@@ -9,6 +9,29 @@ const PodMetal = new MeshStandardMaterial({ color: '#8d9296', metalness: 0.9, ro
 const Rubber = new MeshStandardMaterial({ color: '#141414', roughness: 0.8 });
 const AlarmShell = new MeshStandardMaterial({ color: '#16181a', roughness: 0.35, metalness: 0.2 });
 const Chrome = new MeshStandardMaterial({ color: '#d5dade', metalness: 1, roughness: 0.15 });
+const Gripper = { Width: 0.05, Rise: 0.016, Lift: 0.02 } as const;
+const Foot = { Radius: 0.035, Thickness: 0.012 } as const;
+const UpAxis = new Vector3(0, 1, 0);
+
+export function buttRest(across: number) {
+	const gripper = new Mesh(new TorusGeometry(Gripper.Width / 2, Gripper.Rise, 8, 16, Math.PI), Rubber);
+	gripper.rotation.set(0, Math.PI / 2, Math.PI);
+	gripper.position.set(across, PodSize.BackHeight + Gripper.Lift, 0);
+	return gripper;
+}
+
+export function foot(depth: number, splay: number) {
+	const disc = new Mesh(new CylinderGeometry(Foot.Radius, Foot.Radius, Foot.Thickness, 14), Rubber);
+	disc.position.set(0, Foot.Thickness / 2, depth + splay);
+	return disc;
+}
+
+export function strut(from: Vector3, to: Vector3) {
+	const mesh = new Mesh(new CylinderGeometry(PodSize.BarRadius, PodSize.BarRadius, from.distanceTo(to), 12), PodMetal);
+	mesh.position.lerpVectors(from, to, 0.5);
+	mesh.quaternion.setFromUnitVectors(UpAxis, to.clone().sub(from).normalize());
+	return mesh;
+}
 
 export interface AlarmParts {
 	group: Group;

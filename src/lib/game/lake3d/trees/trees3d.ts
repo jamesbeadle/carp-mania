@@ -55,9 +55,10 @@ export class Trees {
 		const shadowMaterial = leafShadowMaterial(atlas);
 		this.leaves.meshes.forEach((mesh) => Object.assign(mesh, { customDepthMaterial: shadowMaterial }));
 		this.wood.meshes.forEach((mesh) => Object.assign(mesh, { receiveShadow: true }));
-		const meshes = [...this.wood.meshes, ...this.leaves.meshes];
+		const { wood, leaves } = this;
+		const meshes = [...wood.meshes, ...leaves.meshes];
 		meshes.forEach((mesh) => this.prepare(mesh, chooser));
-		[...this.wood.distantMeshes, ...this.leaves.distantMeshes].forEach((mesh) => Object.assign(mesh, { castShadow: false }));
+		[...wood.distantMeshes, ...leaves.distantMeshes].forEach((mesh) => Object.assign(mesh, { castShadow: false }));
 		this.group.add(...meshes);
 	}
 

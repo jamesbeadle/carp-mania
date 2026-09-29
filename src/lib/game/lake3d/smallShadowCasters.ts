@@ -9,7 +9,8 @@ function isMesh(object: Object3D): object is Mesh {
 function radiusOf(mesh: Mesh) {
 	const { geometry } = mesh;
 	if (!geometry.boundingSphere) geometry.computeBoundingSphere();
-	const radius = geometry.boundingSphere?.radius ?? Infinity;
+	const sphere = geometry.boundingSphere;
+	const radius = sphere?.radius ?? Infinity;
 	return radius * mesh.matrixWorld.getMaxScaleOnAxis();
 }
 
