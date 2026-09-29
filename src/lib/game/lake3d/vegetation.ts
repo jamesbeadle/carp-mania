@@ -1,11 +1,11 @@
-import { Group } from 'three';
+import { Group, type Camera } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
 import { createLakeFeatures } from './bank/lakeFeatures3d';
 import { createBushes } from './bushes/bushes3d';
 import { surveyBank, type BankPlan } from './grass/coverGround';
 import { CoverWind } from './grass/coverWind';
-import { createGroundCover } from './grass/groundCover';
+import { GroundCover } from './grass/groundCover';
 import type { LakeFrame } from './lakeFrame';
 import { Trees } from './trees/trees3d';
 import type { Woodland } from './trees/treePlanting';
@@ -21,6 +21,7 @@ const BushSeedStep = 101;
 export class Vegetation {
 	readonly group = new Group();
 	private readonly trees: Trees;
+	private readonly cover: GroundCover;
 	private readonly coverWind = new CoverWind();
 
 	constructor(plan: VegetationPlan) {
@@ -29,7 +30,12 @@ export class Vegetation {
 		const features = createLakeFeatures({ layout: plan.layout, frame: plan.frame, bank, wind: this.coverWind });
 		const { woodland } = plan;
 		const bushes = createBushes(woodland.onTheBank, bank, this.coverWind, seededRandom(plan.seed + BushSeedStep));
-		this.group.add(this.trees.group, createGroundCover(bank, this.coverWind), features, ...bushes);
+		this.cover = new GroundCover(bank, this.coverWind);
+		this.group.add(this.trees.group, this.cover.group, features, ...bushes);
+	}
+
+	fillCoverAround(camera: Camera) {
+		this.cover.fillAround(camera);
 	}
 
 	blow(timeSeconds: number, windStrength: number) {
