@@ -1,5 +1,5 @@
 import type { WorldPoint } from '../lakeFrame';
-import { distanceToOutline, isInsideOutline } from '../worldGeometry';
+import { rasteriseShore, type RasterFrame } from '../terrain/shoreRaster';
 
 export interface WaterEdges {
 	outline: WorldPoint[];
@@ -11,13 +11,12 @@ export interface FieldArea {
 	most: WorldPoint;
 }
 
-const Field = { FewestMetresPerCell: 2, MostCellsAcross: 260, GradientStep: 0.5 } as const;
+const Field = { FewestMetresPerCell: 2, MostCellsAcross: 260, GradientStep: 0.5, FarthestMetres: 100 } as const;
+const WaterTexel = 1;
 
-function signedShoreDistance(point: WorldPoint, water: WaterEdges) {
-	const toEdge = Math.min(distanceToOutline(point, water.outline), ...water.islands.map((island) => distanceToOutline(point, island)));
-	const isOnAnIsland = water.islands.some((island) => isInsideOutline(point, island));
-	const isInWater = isInsideOutline(point, water.outline) && !isOnAnIsland;
-	return isInWater ? -toEdge : toEdge;
+function signedDistances(frame: RasterFrame, water: WaterEdges) {
+	const raster = rasteriseShore(frame, [water.outline, ...water.islands], Field.FarthestMetres);
+	return raster.distances.map((distance, texel) => (raster.isWater[texel] === WaterTexel ? -distance : distance));
 }
 
 export class ShoreField {
@@ -31,8 +30,7 @@ export class ShoreField {
 		this.metresPerCell = Math.max(Field.FewestMetresPerCell, (most.x - least.x) / Field.MostCellsAcross);
 		this.across = Math.ceil((most.x - least.x) / this.metresPerCell) + 1;
 		this.down = Math.ceil((most.z - least.z) / this.metresPerCell) + 1;
-		this.distances = new Float32Array(this.across * this.down);
-		for (let row = 0; row < this.down; row++) this.fillRow(row, water);
+		this.distances = signedDistances(this.cellCentres(), water);
 	}
 
 	distanceAt(point: WorldPoint) {
@@ -59,11 +57,9 @@ export class ShoreField {
 		return this.distances[row * this.across + column];
 	}
 
-	private fillRow(row: number, water: WaterEdges) {
+	private cellCentres(): RasterFrame {
 		const { least } = this.area;
-		for (let column = 0; column < this.across; column++) {
-			const point = { x: least.x + column * this.metresPerCell, z: least.z + row * this.metresPerCell };
-			this.distances[row * this.across + column] = signedShoreDistance(point, water);
-		}
+		const halfCell = this.metresPerCell / 2;
+		return { originX: least.x - halfCell, originZ: least.z - halfCell, texelMetres: this.metresPerCell, across: this.across, down: this.down };
 	}
 }
