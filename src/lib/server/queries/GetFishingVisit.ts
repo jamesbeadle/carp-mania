@@ -31,6 +31,7 @@ export async function GetFishingVisit(locals: App.Locals, lakeId: string, visitI
 	if (!visit || !isVisitFishable(visit) || !isDayTicketStillValid(visit.visited_at, new Date())) return null;
 	const visitedAt = new Date(visit.visited_at);
 	const bailiff = trustedSupabase();
+	const [recentCaptures, streakDays] = await Promise.all([loadRecentCapturesBefore(bailiff, lakeId, visitedAt), loadStreakDays(bailiff, user.id, visit.visited_at)]);
 	return {
 		id: visit.id,
 		seed: Number(visit.seed),
@@ -38,8 +39,8 @@ export async function GetFishingVisit(locals: App.Locals, lakeId: string, visitI
 		window: { fromHour: visit.session_from_hour, toHour: visit.session_to_hour },
 		ticketKind: visit.ticket_products?.kind ?? FallbackKind,
 		sessionsLeft: visit.sessions_left,
-		recentCaptures: await loadRecentCapturesBefore(bailiff, lakeId, visitedAt),
-		streakDays: await loadStreakDays(bailiff, user.id, visit.visited_at),
+		recentCaptures,
+		streakDays,
 		waterAsFound: visit.water_as_found as WaterAsFound,
 		skillsAtStart: skillsOf(visit.skills_at_start as Skills)
 	};

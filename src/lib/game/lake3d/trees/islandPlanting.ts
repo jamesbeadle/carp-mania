@@ -1,9 +1,9 @@
 import type { RandomFraction } from '$lib/domain/random';
 import type { WorldPoint } from '../lakeFrame';
-import { distanceToOutline, isInsideOutline } from '../worldGeometry';
 import { treeAt, type PlantedTree } from './plantedTree';
 import { Bands, kindFor } from './speciesChoice';
 import type { WoodlandFields } from './woodlandFields';
+import { WaterEdge } from './waterEdge';
 
 const Islands = { TreesPerSquareMetre: 0.006, EdgeSetback: 2.5, Waterside: 5 } as const;
 
@@ -13,13 +13,14 @@ export function plantAnIsland(points: WorldPoint[], fields: WoodlandFields, rand
 	const least = { x: Math.min(...xs), z: Math.min(...zs) };
 	const size = { x: Math.max(...xs) - least.x, z: Math.max(...zs) - least.z };
 	const attempts = Math.ceil(size.x * size.z * Islands.TreesPerSquareMetre * 2) + 3;
+	const water = WaterEdge.aroundAnIsland(points, Math.hypot(size.x, size.z));
 	const trees: PlantedTree[] = [];
 	for (let attempt = 0; attempt < attempts; attempt++) {
 		const point = { x: least.x + random() * size.x, z: least.z + random() * size.z };
-		const fromEdge = distanceToOutline(point, points);
-		if (!isInsideOutline(point, points) || fromEdge < Islands.EdgeSetback) continue;
+		const fromEdge = water.metresFromWater(point);
+		if (!water.isOnLand(point) || fromEdge < Islands.EdgeSetback) continue;
 		const kind = fromEdge < Islands.Waterside ? kindFor(point, Bands.OtherKindsFromWater - 1, fields, random) : kindFor(point, Bands.Waterside, fields, random);
-		trees.push(treeAt(kind, point, fromEdge, points, random));
+		trees.push(treeAt(kind, point, fromEdge, water, random));
 	}
 	return trees;
 }

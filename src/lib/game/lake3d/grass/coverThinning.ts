@@ -7,6 +7,11 @@ export function thinningReach() {
 	return { fullWithin: Thinning.FullWithin * cover.reach, goneBeyond: Thinning.GoneBeyond * cover.reach };
 }
 
+export function hiddenBeyondMetres(mostReach: number) {
+	const { goneBeyond } = thinningReach();
+	return goneBeyond * mostReach;
+}
+
 export function keptShareAt(metres: number) {
 	const { fullWithin, goneBeyond } = thinningReach();
 	const share = Math.min(1, Math.max(0, (goneBeyond - metres) / (goneBeyond - fullWithin)));

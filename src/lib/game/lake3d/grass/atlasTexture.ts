@@ -11,24 +11,35 @@ export interface AtlasGrid {
 export type CellPainter = (context: CanvasRenderingContext2D, cellIndex: number) => void;
 
 const Channels = 4;
+const ColourChannels = [0, 1, 2] as const;
 const Opaque = { Alpha: 3, Solid: 128, SeeThrough: 8 } as const;
 const MipmappedSurface = { generateMipmaps: true, minFilter: LinearMipmapLinearFilter, magFilter: LinearFilter, colorSpace: SRGBColorSpace, anisotropy: 4 };
 
-function averageSolidColour(pixels: Uint8ClampedArray, indices: number[]) {
-	const solid = indices.filter((index) => pixels[index + Opaque.Alpha] > Opaque.Solid);
-	const total = [0, 1, 2].map((channel) => solid.reduce((sum, index) => sum + pixels[index + channel], 0));
-	return total.map((sum) => sum / Math.max(1, solid.length));
+function eachPixelOfCell(grid: AtlasGrid, column: number, row: number, visit: (index: number) => void) {
+	const width = grid.columns * grid.cellWidth;
+	const firstRow = row * grid.cellHeight;
+	const firstColumn = column * grid.cellWidth;
+	for (let y = firstRow; y < firstRow + grid.cellHeight; y++) {
+		for (let x = firstColumn; x < firstColumn + grid.cellWidth; x++) visit((y * width + x) * Channels);
+	}
+}
+
+function averageSolidColour(pixels: Uint8ClampedArray, grid: AtlasGrid, column: number, row: number) {
+	const total = ColourChannels.map(() => 0);
+	let solidCount = 0;
+	eachPixelOfCell(grid, column, row, (index) => {
+		if (pixels[index + Opaque.Alpha] <= Opaque.Solid) return;
+		solidCount += 1;
+		ColourChannels.forEach((channel) => (total[channel] += pixels[index + channel]));
+	});
+	return total.map((sum) => sum / Math.max(1, solidCount));
 }
 
 function bleedCell(pixels: Uint8ClampedArray, grid: AtlasGrid, column: number, row: number) {
-	const width = grid.columns * grid.cellWidth;
-	const indices: number[] = [];
-	for (let y = row * grid.cellHeight; y < (row + 1) * grid.cellHeight; y++) {
-		for (let x = column * grid.cellWidth; x < (column + 1) * grid.cellWidth; x++) indices.push((y * width + x) * Channels);
-	}
-	const average = averageSolidColour(pixels, indices);
-	const clearPixels = indices.filter((index) => pixels[index + Opaque.Alpha] < Opaque.SeeThrough);
-	clearPixels.forEach((index) => pixels.set(average, index));
+	const average = averageSolidColour(pixels, grid, column, row);
+	eachPixelOfCell(grid, column, row, (index) => {
+		if (pixels[index + Opaque.Alpha] < Opaque.SeeThrough) pixels.set(average, index);
+	});
 }
 
 function flippedRows(pixels: Uint8ClampedArray, width: number, height: number) {

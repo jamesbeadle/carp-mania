@@ -1,25 +1,24 @@
 import { Group, Vector3, type Camera, type Mesh } from 'three';
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
-import { renderQuality } from '../renderQuality';
+import { NearDetailLayer, renderQuality } from '../renderQuality';
 import { barkMaterial } from './barkMaterial';
 import { barkTexture } from './barkTexture';
 import { CrownSway } from './crownSway';
 import { DetailChooser, type Distant } from './detailChooser';
-import { foliageAtlas } from './foliageAtlas';
 import { leafLayers } from './leafLayers';
 import { leafShadowMaterial } from './leafMaterial';
 import { modelIndexOf, plantingsByModel } from './modelChoice';
-import { hasMultiDraw } from './multiDraw';
 import { TreeBatch } from './treeBatch';
 import { TreeInstances } from './treeInstances';
 import type { TreeParts } from './treeParts';
 import { crownColourOf } from './treeColours';
-import { treeModels, DetailLevels } from './treeModels';
+import { DetailLevels } from './treeModels';
 import { placementOf } from './treePlacement';
 import type { PlantedTree, Woodland } from './treePlanting';
+import type { TreeStock } from './treeStock';
 
-const Looks = { Variants: 4, BarkPixels: 512, ReferenceHeight: 16, ShadeSpread: 13.7 } as const;
+const Looks = { BarkPixels: 512, ReferenceHeight: 16, ShadeSpread: 13.7 } as const;
 const FarDetail = DetailLevels - 1;
 const ReachShares = [1, 2.3, 4.3];
 
@@ -37,15 +36,13 @@ export class Trees {
 	private readonly wood: TreeParts;
 	private readonly variants: number;
 
-	constructor(woodland: Woodland, season: SeasonName, groundAt: (point: WorldPoint) => number) {
+	constructor(woodland: Woodland, season: SeasonName, groundAt: (point: WorldPoint) => number, stock: TreeStock) {
 		const quality = renderQuality();
 		const trees = [...woodland.onTheBank, ...woodland.onTheIslands];
 		const isMultisampled = quality.multisamples > 0;
-		const isBatched = hasMultiDraw();
-		this.variants = isBatched ? Looks.Variants : quality.treeVariantsSingleDraw;
-		const models = treeModels({ season, cardShare: quality.treeCardShare }, this.variants);
-		const atlas = foliageAtlas(quality.treeAtlasPixels);
-		const Parts = isBatched ? TreeBatch : TreeInstances;
+		const { models, atlas } = stock;
+		this.variants = stock.variants;
+		const Parts = stock.isBatched ? TreeBatch : TreeInstances;
 		const counts = plantingsByModel(trees, this.variants);
 		this.leaves = leafLayers({ models, season, isMultisampled, counts }, Parts, atlas, this.sway);
 		this.wood = new Parts(models.map((model) => model.wood), barkMaterial(barkTexture(Looks.BarkPixels), this.sway), counts);
@@ -84,6 +81,8 @@ export class Trees {
 	private prepare(mesh: Mesh, chooser: DetailChooser) {
 		const cullAndSort = mesh.onBeforeRender.bind(mesh);
 		mesh.onBeforeRender = (renderer, scene, camera: Camera, geometry, material, group) => {
+			const isReflectedView = !camera.layers.isEnabled(NearDetailLayer);
+			if (isReflectedView) return;
 			chooser.look(camera);
 			cullAndSort(renderer, scene, camera, geometry, material, group);
 		};

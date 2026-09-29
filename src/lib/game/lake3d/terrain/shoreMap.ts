@@ -1,6 +1,6 @@
 import { ClampToEdgeWrapping, DataTexture, LinearFilter, RGBAFormat, Vector2 } from 'three';
 import { boundsOf } from './landBounds';
-import { rasteriseShore, type RasterFrame, type ShoreRaster } from './shoreRaster';
+import { rasteriseShore, WaterTexel, type RasterFrame, type ShoreRaster } from './shoreRaster';
 import { Shore } from './shoreProfile';
 import { paintSwimWear } from './swimWearMap';
 import type { SwimGround } from './swimWear';
@@ -40,7 +40,7 @@ function encode(shape: TerrainShape, frame: RasterFrame, raster: ShoreRaster, we
 	const { distances, nearestRing } = raster;
 	const data = new Uint8Array(frame.across * frame.down * 4);
 	for (let texel = 0; texel < distances.length; texel++) {
-		const isWater = raster.isWater[texel] === 1;
+		const isWater = raster.isWater[texel] === WaterTexel;
 		const distance = distances[texel];
 		const centre = texelCentre(frame, texel);
 		const height = shape.heightNear(centre, { distance, isWater, isIsland: nearestRing[texel] > 0 });

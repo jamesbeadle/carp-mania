@@ -8,12 +8,13 @@
 	import type { SessionState } from '$lib/game/session/sessionState.svelte';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
 	import { CastControl, type CastRequest } from '$lib/game/lake3d/stage/castControl.svelte';
-	import { LakeScene } from '$lib/game/lake3d/stage/lakeScene';
 	import { LakeViewInput } from '$lib/game/lake3d/stage/lakeViewInput.svelte';
+	import { SceneMount } from '$lib/game/lake3d/stage/sceneMount.svelte';
 	import { sceneViewOf } from '$lib/game/lake3d/stage/sessionSceneView';
 	import { scenePointOfWorld } from '$lib/game/lake3d/stage/swimSpots';
 	import { untrack } from 'svelte';
 	import CastHud from './CastHud.svelte';
+	import WaterVeil from './WaterVeil.svelte';
 
 	interface Props {
 		session: SessionState;
@@ -34,9 +35,9 @@
 	const MillisecondsPerSecond = 1000;
 
 	let canvas: HTMLCanvasElement;
-	let scene = $state<LakeScene | null>(null);
-	const cast = new CastControl(() => scene, untrack(() => lake.layout), () => session.swim);
-	const input = new LakeViewInput(() => scene, () => canvas, cast, {
+	const mount = new SceneMount();
+	const cast = new CastControl(() => mount.scene, untrack(() => lake.layout), () => session.swim);
+	const input = new LakeViewInput(() => mount.scene, () => canvas, cast, {
 		reachFeetToCast: () => castReach?.reachFeet ?? null,
 		onSwimPicked: (swimId) => {
 			const swim = swims.find((candidate) => candidate.id === swimId);
@@ -44,18 +45,25 @@
 		},
 		onCast: (request) => {
 			if (request.problem) return onCastBlocked(request.problem);
+			const { scene } = mount;
 			if (scene) onWaterClick(scenePointOfWorld(scene.lakeFrame, request.landing));
 		}
 	});
 
 	$effect(() => {
 		const fish = [...carp, ...sampleOfShoals(shoals)].map((one) => ({ strain: one.strain, weightLb: Number(one.weight_lb) }));
-		const made = new LakeScene(canvas, untrack(() => ({ lake, swims, fish, conditions })), () => sceneViewOf(session, input.hoveredSwimId, showingAt));
-		scene = made;
-		return () => made.dispose();
+		return mount.open(canvas, untrack(() => ({ lake, swims, fish, conditions })), () => sceneViewOf(session, input.hoveredSwimId, showingAt));
 	});
 
-	$effect(() => scene?.setConditions(conditions));
+	$effect(() => mount.scene?.setConditions(conditions));
+
+	function keyDown(event: KeyboardEvent) {
+		if (mount.hasDrawn) input.keyDown(event);
+	}
+
+	function keyUp(event: KeyboardEvent) {
+		if (mount.hasDrawn) input.keyUp(event);
+	}
 
 	$effect(() => {
 		let handle = 0;
@@ -70,7 +78,7 @@
 	});
 </script>
 
-<svelte:window onkeydown={(event) => input.keyDown(event)} onkeyup={(event) => input.keyUp(event)} />
+<svelte:window onkeydown={keyDown} onkeyup={keyUp} />
 
 <div class="absolute inset-0">
 	<canvas
@@ -84,4 +92,5 @@
 		onwheel={(event) => input.wheel(event)}
 	></canvas>
 	<CastHud {cast} isReady={castReach !== null} />
+	{#if mount.isVeiled}<WaterVeil />{/if}
 </div>

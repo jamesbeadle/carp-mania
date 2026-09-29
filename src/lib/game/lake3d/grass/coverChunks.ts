@@ -1,16 +1,16 @@
-import { Box3, Color, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Camera, type Material } from 'three';
-import { seededRandom } from '$lib/domain/random';
+import { Box3, Color, InstancedBufferAttribute, InstancedMesh, Vector3, type BufferGeometry, type Camera, type Material } from 'three';
+import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import { NearDetailLayer } from '../renderQuality';
 import type { WorldPoint } from '../lakeFrame';
 import { sharingShape } from './coverCards';
 import type { CoverPlant } from './coverScatter';
 import { hiddenBeyond } from './chunkHiding';
-import { keptShareAt, thinningReach } from './coverThinning';
+import { hiddenBeyondMetres, keptShareAt } from './coverThinning';
+import { placementOf } from './plantPlacement';
 import { tintColour } from './plantTint';
 
 export interface ChunkPlan {
 	name: string;
-	metres: number;
 	geometry: BufferGeometry;
 	material: Material;
 	groundAt: (point: WorldPoint) => number;
@@ -18,26 +18,22 @@ export interface ChunkPlan {
 	mostReach: number;
 	seed: number;
 	shadowMaterial?: Material;
+	detailLayer?: number;
 }
 
-const Up = new Vector3(0, 1, 0);
+export interface Chunking extends ChunkPlan {
+	metres: number;
+}
+
 const AttributeSize = 3;
 
-function shuffled(plants: CoverPlant[], random: () => number) {
+function shuffled(plants: CoverPlant[], random: RandomFraction) {
 	const order = [...plants];
 	for (let index = order.length - 1; index > 0; index--) {
 		const swap = Math.floor(random() * (index + 1));
 		[order[index], order[swap]] = [order[swap], order[index]];
 	}
 	return order;
-}
-
-function placementOf(plant: CoverPlant, plan: ChunkPlan) {
-	const { point } = plant;
-	const leaning = new Quaternion().setFromAxisAngle(new Vector3(Math.cos(plant.turn), 0, Math.sin(plant.turn)), plant.lean);
-	const turning = new Quaternion().setFromAxisAngle(Up, plant.turn);
-	const position = new Vector3(point.x, plan.groundAt(point) - plan.sink, point.z);
-	return new Matrix4().compose(position, leaning.multiply(turning), new Vector3(plant.width, plant.height, plant.width));
 }
 
 function thinnedByDistance(mesh: InstancedMesh, plan: ChunkPlan, total: number) {
@@ -64,7 +60,7 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	const colour = new Color();
 	mesh.name = plan.name;
 	plants.forEach((plant, index) => {
-		mesh.setMatrixAt(index, placementOf(plant, plan));
+		mesh.setMatrixAt(index, placementOf(plant, plan.groundAt, plan.sink));
 		mesh.setColorAt(index, tintColour(plant.tint, colour));
 		attribute.set([plant.cell, index / plants.length, plant.reach], index * AttributeSize);
 	});
@@ -73,10 +69,19 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	mesh.receiveShadow = true;
 	castsShadowWith(mesh, plan.shadowMaterial);
 	thinnedByDistance(mesh, plan, plants.length);
-	return hiddenBeyond(mesh, thinningReach().goneBeyond * plan.mostReach);
+	return hiddenBeyond(mesh, hiddenBeyondMetres(plan.mostReach));
 }
 
-export function coverChunks(plants: CoverPlant[], plan: ChunkPlan) {
+export function coverChunk(plants: CoverPlant[], plan: ChunkPlan, random: RandomFraction) {
+	if (plants.length === 0) return null;
+	const levels = chunkMesh(shuffled(plants, random), plan);
+	const { detailLayer } = plan;
+	if (detailLayer === undefined) return levels;
+	levels.traverse((part) => part.layers.set(detailLayer));
+	return levels;
+}
+
+export function coverChunks(plants: CoverPlant[], plan: Chunking) {
 	const random = seededRandom(plan.seed);
 	const byChunk = new Map<string, CoverPlant[]>();
 	plants.forEach((plant) => {

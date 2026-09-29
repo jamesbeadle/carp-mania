@@ -1,6 +1,6 @@
 import { Vector3, type Mesh, type Object3D } from 'three';
 
-const SmallCaster = { LargestRadiusMetres: 1.6, ReachMetres: 48 } as const;
+const SmallCaster = { LargestRadiusMetres: 1.6, ReachMetres: 48, RestepMetres: 1 } as const;
 
 function isMesh(object: Object3D): object is Mesh {
 	return (object as Mesh).isMesh === true;
@@ -17,10 +17,14 @@ function radiusOf(mesh: Mesh) {
 export class SmallShadowCasters {
 	private readonly radii = new WeakMap<Mesh, number>();
 	private readonly place = new Vector3();
+	private lastEye: Vector3 | null = null;
 
 	constructor(private readonly root: Object3D) {}
 
 	keepNear(eye: Vector3) {
+		const hasBarelyMoved = this.lastEye !== null && this.lastEye.distanceTo(eye) < SmallCaster.RestepMetres;
+		if (hasBarelyMoved) return;
+		this.lastEye = eye.clone();
 		this.root.traverseVisible((object) => this.consider(object, eye));
 	}
 

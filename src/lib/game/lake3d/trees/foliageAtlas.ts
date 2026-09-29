@@ -63,7 +63,17 @@ function paintAll(colour: CanvasRenderingContext2D, mask: CanvasRenderingContext
 	(Object.keys(Paintings) as FoliageRegion[]).forEach((name) => AtlasRegions[name].forEach((region) => painter.within(pixelRegionOf(region, size), (pixelRegion) => Paintings[name](painter, pixelRegion, random))));
 }
 
+const painted = new Map<number, DataTexture>();
+
 export function foliageAtlas(pixelsWide: number) {
+	const known = painted.get(pixelsWide);
+	if (known) return known;
+	const atlas = paintAtlas(pixelsWide);
+	painted.set(pixelsWide, atlas);
+	return atlas;
+}
+
+function paintAtlas(pixelsWide: number) {
 	const size = { width: pixelsWide, height: (pixelsWide * AtlasGrid.Rows) / AtlasGrid.Columns };
 	const colour = canvasOf(size);
 	const mask = canvasOf(size);

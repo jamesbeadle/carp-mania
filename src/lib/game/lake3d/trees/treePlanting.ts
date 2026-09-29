@@ -1,7 +1,6 @@
 import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { ClearSpot } from '../bank/facilityGrounds';
 import type { WorldPoint } from '../lakeFrame';
-import { distanceToOutline, isInsideOutline } from '../worldGeometry';
 import { isClearOfBankside } from './bankClearance';
 import { plantBoundaryHedge } from './boundaryHedge';
 import { plantAnIsland } from './islandPlanting';
@@ -9,6 +8,7 @@ import { shoreCandidates } from './shoreCandidates';
 import { treeAt, type PlantedTree } from './plantedTree';
 import { Bands, kindFor } from './speciesChoice';
 import { plantUnderstorey } from './understoreyPlanting';
+import { WaterEdge } from './waterEdge';
 import { woodlandFields, type WoodlandFields } from './woodlandFields';
 
 export type { TreeKind } from './treeKinds';
@@ -23,7 +23,7 @@ export interface PlantingGround {
 	seed: number;
 }
 
-const Planting = { SpreadOfPlot: 1.35, Attempts: 20000, FewestMostTrees: 3200, MostTreesPerPlotMetre: 5.8, TreeLineReach: 42, BackRowDepth: 16, BackRowDensity: 0.65, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
+const Planting = { SpreadOfPlot: 1.35, Attempts: 20000, FewestMostTrees: 3200, MostTreesPerPlotMetre: 5.8, TreeLineReach: 42, BackRowDepth: 16, BackRowDensity: 0.65, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7, FarFromWater: 120 } as const;
 const Density = { Clearing: 0.3, Contrast: 1.6, DeepWoodsFrom: 110, DeepWoodsShare: 0.6 } as const;
 
 function densityAt(point: WorldPoint, distanceFromWater: number, fields: WoodlandFields) {
@@ -52,15 +52,15 @@ function candidatePoints(ground: PlantingGround, random: RandomFraction) {
 	return [...shoreline, ...anywhere];
 }
 
-function plantTheBank(ground: PlantingGround, fields: WoodlandFields, random: RandomFraction) {
+function plantTheBank(ground: PlantingGround, water: WaterEdge, fields: WoodlandFields, random: RandomFraction) {
 	const trees: PlantedTree[] = [];
 	const mostTrees = Math.max(Planting.FewestMostTrees, ground.plotReach * Planting.MostTreesPerPlotMetre);
 	for (const point of candidatePoints(ground, random)) {
 		if (trees.length >= mostTrees) break;
-		if (isInsideOutline(point, ground.outline)) continue;
-		const distanceFromWater = distanceToOutline(point, ground.outline);
+		if (!water.isOnLand(point)) continue;
+		const distanceFromWater = water.metresFromWater(point);
 		if (distanceFromWater < Bands.NearestWater || random() > densityAt(point, distanceFromWater, fields)) continue;
-		const tree = treeAt(kindFor(point, distanceFromWater, fields, random), point, distanceFromWater, ground.outline, random);
+		const tree = treeAt(kindFor(point, distanceFromWater, fields, random), point, distanceFromWater, water, random);
 		if (isClearOfBankside(tree, ground.keepClear)) trees.push(tree);
 	}
 	return trees;
@@ -74,9 +74,10 @@ export interface Woodland {
 export function plantTrees(ground: PlantingGround): Woodland {
 	const random = seededRandom(ground.seed);
 	const fields = woodlandFields(random);
-	const onTheBank = plantTheBank(ground, fields, random);
+	const water = WaterEdge.aroundTheLake(ground.outline, Planting.FarFromWater);
+	const onTheBank = plantTheBank(ground, water, fields, random);
 	const onTheIslands = ground.islands.flatMap((points) => plantAnIsland(points, fields, random));
 	const edge = plantableEdgeOf(ground);
-	const understorey = [...plantUnderstorey(ground, edge, fields, random), ...plantBoundaryHedge(ground, edge, random)];
+	const understorey = [...plantUnderstorey(ground, water, edge, fields, random), ...plantBoundaryHedge(ground, water, edge, random)];
 	return { onTheBank: [...onTheBank, ...understorey], onTheIslands };
 }

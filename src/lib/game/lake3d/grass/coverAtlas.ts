@@ -26,7 +26,18 @@ const Painters: ((brush: CellBrush) => void)[] = [
 	paintCloverSward
 ];
 
+const painted = new Map<string, ReturnType<typeof paintAtlas>>();
+
 export function coverAtlas(season: SeasonName, cellPixels: number) {
+	const key = `${season}-${cellPixels}`;
+	const known = painted.get(key);
+	if (known) return known;
+	const atlas = paintCoverAtlas(season, cellPixels);
+	painted.set(key, atlas);
+	return atlas;
+}
+
+function paintCoverAtlas(season: SeasonName, cellPixels: number) {
 	const grid: AtlasGrid = { ...CoverGrid, cellWidth: cellPixels, cellHeight: cellPixels };
 	const palette = CoverPalettes[season];
 	const random = seededRandom(AtlasSeed);

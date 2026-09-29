@@ -10,9 +10,10 @@
 	import { settleAfterTheCatch, swallowKeysWhileSettling } from '$lib/game/session/catchSettling';
 	import { Orientation } from '$lib/game/stage/orientation.svelte';
 	import type { StageConditions } from '$lib/game/sky/stageConditions';
-	import { isWebGlAvailable } from '$lib/game/lake3d/lakeRenderer';
+	import { isWebGlAvailable } from '$lib/game/lake3d/webGlAvailability';
 	import LakeCanvas from '../LakeCanvas.svelte';
-	import LakeView3D from '../lake3d/LakeView3D.svelte';
+	import { lakeView3dOnDemand, type LakeView3DComponent } from '../lake3d/lake3dOnDemand';
+	import WaterVeil from '../lake3d/WaterVeil.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import SceneStage from '../stage/SceneStage.svelte';
 	import SessionDeck from './SessionDeck.svelte';
@@ -50,10 +51,15 @@
 	const CastProblemWords = { on_the_bank: 'That would land on the bank — aim for the water.', through_an_island: "You can't cast through the island — pick a spot with a clear line from your swim." } as const;
 	let isIn3d = $state(false);
 	let canShow3d = $state(false);
+	let LakeView3D = $state<LakeView3DComponent | null>(null);
 
 	$effect(() => {
 		canShow3d = isWebGlAvailable();
 		isIn3d = canShow3d;
+	});
+
+	$effect(() => {
+		if (isIn3d) void lakeView3dOnDemand().then((loaded) => (LakeView3D = loaded));
 	});
 	$effect(() => orientation.watch());
 	$effect(() => settleAfterTheCatch(session.isSettlingAfterCatch));
@@ -63,7 +69,7 @@
 
 {#snippet water()}
 	{#if isIn3d}
-		<LakeView3D {session} {lake} {swims} {carp} shoals={session.shoals} {conditions} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} onCastBlocked={(problem) => (session.notice = CastProblemWords[problem])} />
+		{#if LakeView3D}<LakeView3D {session} {lake} {swims} {carp} shoals={session.shoals} {conditions} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} onCastBlocked={(problem) => (session.notice = CastProblemWords[problem])} />{:else}<WaterVeil />{/if}
 	{:else}
 		<LakeCanvas {lake} {swims} {carp} shoals={session.shoals} {selectedSwimId} rods={session.rods} isAnglerOnBank={session.phase !== 'choose_swim'} showingAt={fishShowingAt} {castReach} {onSwimClick} {onWaterClick} {onCastBlockedByIsland} />
 	{/if}
