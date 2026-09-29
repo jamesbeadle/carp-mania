@@ -84,6 +84,9 @@ export class LakeWorld {
 		this.water.advance(timeSeconds);
 		const { sunlight } = this.sky;
 		this.vegetation.blow(timeSeconds, sunlight.windStrength);
+	}
+
+	fillCoverAround() {
 		this.vegetation.fillCoverAround(this.camera);
 	}
 

@@ -5,7 +5,7 @@ import { scatterTile, Tile, type CoverPlant, type Scattering } from './coverScat
 import { CoverSites, type CoverGround } from './coverSite';
 import type { FieldArea } from './shoreField';
 
-const TileSeedStride = 4096;
+export const Seeding = { ColumnStride: 4096 } as const;
 
 export class CoverTiles {
 	private readonly sites: CoverSites;
@@ -18,7 +18,8 @@ export class CoverTiles {
 		private readonly density: number
 	) {
 		this.sites = new CoverSites(ground);
-		this.flowerShare = CoverPalettes[ground.season].flowerShare;
+		const { flowerShare } = CoverPalettes[ground.season];
+		this.flowerShare = flowerShare;
 	}
 
 	plantsIn(column: number, row: number): CoverPlant[] {
@@ -33,7 +34,8 @@ export class CoverTiles {
 	private scatter(column: number, row: number): CoverPlant[] {
 		const corner = { x: column * Tile.Metres, z: row * Tile.Metres };
 		if (!this.isInTheArea(corner) || !this.isNearTheShore(corner)) return [];
-		const random = seededRandom(this.ground.seed + column * TileSeedStride + row);
+		const { seed } = this.ground;
+		const random = seededRandom(seed + column * Seeding.ColumnStride + row);
 		const scattering: Scattering = { sites: this.sites, flowerShare: this.flowerShare, density: this.density, mostDensity: 0, random };
 		const plants: CoverPlant[] = [];
 		scatterTile(corner, scattering, plants);

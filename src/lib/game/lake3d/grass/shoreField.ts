@@ -1,5 +1,5 @@
 import type { WorldPoint } from '../lakeFrame';
-import { rasteriseShore, type RasterFrame } from '../terrain/shoreRaster';
+import { rasteriseShore, WaterTexel, type RasterFrame } from '../terrain/shoreRaster';
 
 export interface WaterEdges {
 	outline: WorldPoint[];
@@ -12,7 +12,6 @@ export interface FieldArea {
 }
 
 const Field = { FewestMetresPerCell: 2, MostCellsAcross: 260, GradientStep: 0.5, FarthestMetres: 100 } as const;
-const WaterTexel = 1;
 
 function signedDistances(frame: RasterFrame, water: WaterEdges) {
 	const raster = rasteriseShore(frame, [water.outline, ...water.islands], Field.FarthestMetres);

@@ -5,7 +5,7 @@ import type { WorldPoint } from '../lakeFrame';
 import { sharingShape } from './coverCards';
 import type { CoverPlant } from './coverScatter';
 import { hiddenBeyond } from './chunkHiding';
-import { keptShareAt, thinningReach } from './coverThinning';
+import { hiddenBeyondMetres, keptShareAt } from './coverThinning';
 import { placementOf } from './plantPlacement';
 import { tintColour } from './plantTint';
 
@@ -69,7 +69,7 @@ function chunkMesh(plants: CoverPlant[], plan: ChunkPlan) {
 	mesh.receiveShadow = true;
 	castsShadowWith(mesh, plan.shadowMaterial);
 	thinnedByDistance(mesh, plan, plants.length);
-	return hiddenBeyond(mesh, thinningReach().goneBeyond * plan.mostReach);
+	return hiddenBeyond(mesh, hiddenBeyondMetres(plan.mostReach));
 }
 
 export function coverChunk(plants: CoverPlant[], plan: ChunkPlan, random: RandomFraction) {
