@@ -3,19 +3,21 @@ import { pickRandom, randomBetween, type RandomFraction } from '$lib/domain/rand
 import type { SeasonName } from '$lib/domain/world/worldClock';
 import type { WorldPoint } from '../lakeFrame';
 import { withSoftSheen } from '../grass/softSheen';
-import { NearDetailLayer } from '../renderQuality';
+import { CoverNoise } from '../grass/coverNoise';
+import { NearDetailLayer, renderQuality } from '../renderQuality';
 import { lilyFlowerGeometry, lilyPadGeometry } from './lilyShapes';
 import { lilyPadTexture } from './lilyTexture';
 import { scatterPads, type FloatingPad } from './padScatter';
 
-const Look = { PadRoughness: 0.5, PadSheen: 0.22, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.17, 0.26] } as const;
+const Look = { PadRoughness: 0.36, PadSheen: 0.42, PadCutOff: 0.5, FlowerRoughness: 0.55, FlowerLift: 0.012, FlowerSize: [0.17, 0.26] } as const;
 const PadTints: Record<SeasonName, string[]> = {
 	spring: ['#dce4d0', '#ccd8bc', '#bcc8a8', '#d4ccb0'],
 	summer: ['#d4dcc8', '#bccaae', '#a8b894', '#ccc098', '#b89478'],
 	autumn: ['#e8e0b0', '#d8c890', '#c89e70', '#f0e8c8', '#b88a60'],
 	winter: ['#b89a70', '#a88a64', '#c8a878']
 };
-const FlowerShare: Record<SeasonName, number> = { spring: 0.04, summer: 0.1, autumn: 0.02, winter: 0 };
+const FlowerShare: Record<SeasonName, number> = { spring: 0.012, summer: 0.03, autumn: 0.006, winter: 0 };
+const Clusters = { Wavelength: 4.5, From: 0.55, To: 0.8, Weight: 3, Seed: 57 } as const;
 const FlowerColours = ['#ffffff', '#ffffff', '#fff0f4', '#f6d23a'];
 const Up = new Vector3(0, 1, 0);
 
@@ -27,7 +29,8 @@ function padPlacement(pad: FloatingPad) {
 }
 
 function padMesh(pads: FloatingPad[], season: SeasonName, random: RandomFraction) {
-	const material = withSoftSheen(new MeshStandardMaterial({ map: lilyPadTexture(), roughness: Look.PadRoughness }), Look.PadSheen);
+	const surface = { map: lilyPadTexture(), roughness: Look.PadRoughness, alphaTest: Look.PadCutOff, alphaToCoverage: renderQuality().multisamples > 0 };
+	const material = withSoftSheen(new MeshStandardMaterial(surface), Look.PadSheen);
 	const mesh = new InstancedMesh(lilyPadGeometry(), material, Math.max(1, pads.length));
 	mesh.count = pads.length;
 	pads.forEach((pad, index) => {
@@ -39,7 +42,9 @@ function padMesh(pads: FloatingPad[], season: SeasonName, random: RandomFraction
 }
 
 function flowerMesh(pads: FloatingPad[], season: SeasonName, random: RandomFraction) {
-	const flowering = pads.filter(() => random() < FlowerShare[season]);
+	const noise = new CoverNoise(Clusters.Seed);
+	const clustering = (pad: FloatingPad) => Math.min(1, Math.max(0, (noise.at(pad.point, Clusters.Wavelength) - Clusters.From) / (Clusters.To - Clusters.From)));
+	const flowering = pads.filter((pad) => random() < FlowerShare[season] * clustering(pad) * Clusters.Weight);
 	const material = new MeshStandardMaterial({ vertexColors: true, roughness: Look.FlowerRoughness, side: DoubleSide });
 	const mesh = new InstancedMesh(lilyFlowerGeometry(), material, Math.max(1, flowering.length));
 	mesh.count = flowering.length;

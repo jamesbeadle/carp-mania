@@ -2,8 +2,9 @@ import { CanvasTexture, SRGBColorSpace } from 'three';
 import { seededRandom } from '$lib/domain/random';
 import { shadeOf } from '../grass/bladeStroke';
 
-const Leaf = { Pixels: 256, Base: '#22421a', Heart: '#2e5222', Rim: '#3c3a1e', Vein: '#3e6428', Veins: 15, Seed: 811 } as const;
-const Shades = { VeinOpacity: 0.22, VeinWidth: 1.2, VeinBend: 0.12, RimFrom: 0.93, Streaks: 40, StreakOpacity: 0.12, StreakShade: 0.1, StreakThinnest: 2, StreakSwing: 6 } as const;
+const Leaf = { Pixels: 256, Base: '#2a5220', Heart: '#386026', Rim: '#18260e', Vein: '#4a7230', Veins: 15, Seed: 811 } as const;
+const Disc = { Radius: 1 / 1.06 } as const;
+const Shades = { VeinOpacity: 0.22, VeinWidth: 1.2, VeinBend: 0.12, RimFrom: 0.84, RimTo: 0.94, Streaks: 40, StreakOpacity: 0.12, StreakShade: 0.1, StreakThinnest: 2, StreakSwing: 6 } as const;
 
 function paintVeins(context: CanvasRenderingContext2D, centre: number, random: () => number) {
 	context.strokeStyle = Leaf.Vein;
@@ -36,8 +37,12 @@ function paintStreaks(context: CanvasRenderingContext2D, centre: number, random:
 function paintSurface(context: CanvasRenderingContext2D, centre: number) {
 	const surface = context.createRadialGradient(centre, centre, 0, centre, centre, centre);
 	surface.addColorStop(0, Leaf.Heart);
-	surface.addColorStop(Shades.RimFrom, Leaf.Base);
+	surface.addColorStop(Shades.RimFrom * Disc.Radius, Leaf.Base);
+	surface.addColorStop(Shades.RimTo * Disc.Radius, Leaf.Rim);
 	surface.addColorStop(1, Leaf.Rim);
+	context.beginPath();
+	context.arc(centre, centre, centre * Disc.Radius, 0, Math.PI * 2);
+	context.clip();
 	context.fillStyle = surface;
 	context.fillRect(0, 0, Leaf.Pixels, Leaf.Pixels);
 }

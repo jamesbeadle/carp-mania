@@ -1,7 +1,7 @@
 import { BufferAttribute, BufferGeometry, CircleGeometry, Color, ConeGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-const Pad = { Segments: 16, Notch: 0.42, RimLift: 0.05 } as const;
+const Pad = { Segments: 12, Reach: 1.06, Notch: 0.42, RimLift: 0.05 } as const;
 const Petals = { Outer: 10, Inner: 8, Length: 0.55, Width: 0.24, Widest: 0.42, OuterTilt: 0.5, InnerTilt: 1.05, InnerScale: 0.75 } as const;
 const Centre = { Radius: 0.14, Height: 0.16, Colour: '#e8b82a', Segments: 8 } as const;
 const PetalRoot = new Color('#ffffff');
@@ -15,7 +15,7 @@ function withColour(geometry: BufferGeometry, colour: Color) {
 }
 
 export function lilyPadGeometry() {
-	const pad = new CircleGeometry(1, Pad.Segments, Pad.Notch / 2, Math.PI * 2 - Pad.Notch).rotateX(-Math.PI / 2);
+	const pad = new CircleGeometry(Pad.Reach, Pad.Segments, Pad.Notch / 2, Math.PI * 2 - Pad.Notch).rotateX(-Math.PI / 2);
 	const positions = pad.getAttribute('position');
 	for (let index = 0; index < positions.count; index++) {
 		const reach = Math.hypot(positions.getX(index), positions.getZ(index));
