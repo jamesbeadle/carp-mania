@@ -8,8 +8,10 @@ export function startFightTicking(fight: FightState, onOutcome: () => void) {
 	let last = performance.now();
 	const ticking = setInterval(() => {
 		const now = performance.now();
-		fight.advance(Math.min(MostSecondsPerTick, (now - last) / MillisecondsPerSecond));
+		const secondsElapsed = Math.min(MostSecondsPerTick, (now - last) / MillisecondsPerSecond);
 		last = now;
+		if (document.hidden) return;
+		fight.advance(secondsElapsed);
 		if (!fight.outcome) return;
 		clearInterval(ticking);
 		onOutcome();
