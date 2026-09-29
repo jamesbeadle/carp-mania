@@ -57,6 +57,14 @@
 
 	$effect(() => mount.scene?.setConditions(conditions));
 
+	function keyDown(event: KeyboardEvent) {
+		if (mount.hasDrawn) input.keyDown(event);
+	}
+
+	function keyUp(event: KeyboardEvent) {
+		if (mount.hasDrawn) input.keyUp(event);
+	}
+
 	$effect(() => {
 		let handle = 0;
 		let last = performance.now();
@@ -70,7 +78,7 @@
 	});
 </script>
 
-<svelte:window onkeydown={(event) => input.keyDown(event)} onkeyup={(event) => input.keyUp(event)} />
+<svelte:window onkeydown={keyDown} onkeyup={keyUp} />
 
 <div class="absolute inset-0">
 	<canvas

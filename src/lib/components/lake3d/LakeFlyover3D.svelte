@@ -29,7 +29,7 @@
 
 	$effect(() => {
 		const fish = carp.map((one) => ({ strain: one.strain, weightLb: Number(one.weight_lb) }));
-		const zoomTheDiorama = (made: LakeScene) => void (isDiorama && made.rig.zoomBy(DioramaZoom));
+		const zoomTheDiorama = isDiorama ? (made: LakeScene) => made.rig.zoomBy(DioramaZoom) : () => {};
 		return mount.open(canvas, untrack(() => ({ lake, swims, fish, conditions, isDiorama })), () => lookingOverTheLake(showingAt), zoomTheDiorama);
 	});
 
@@ -37,13 +37,15 @@
 
 	function drag(event: PointerEvent) {
 		if (!draggedFrom) return;
-		mount.scene?.rig.look(event.clientX - draggedFrom.x, event.clientY - draggedFrom.y);
+		const { scene } = mount;
+		scene?.rig.look(event.clientX - draggedFrom.x, event.clientY - draggedFrom.y);
 		draggedFrom = { x: event.clientX, y: event.clientY };
 	}
 
 	function zoom(event: WheelEvent) {
 		event.preventDefault();
-		mount.scene?.rig.zoomBy(event.deltaY > 0 ? ZoomPerWheelStep : 1 / ZoomPerWheelStep);
+		const { scene } = mount;
+		scene?.rig.zoomBy(event.deltaY > 0 ? ZoomPerWheelStep : 1 / ZoomPerWheelStep);
 	}
 </script>
 
