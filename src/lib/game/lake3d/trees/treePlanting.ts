@@ -1,16 +1,18 @@
-import { seededRandom } from '$lib/domain/random';
+import { seededRandom, type RandomFraction } from '$lib/domain/random';
 import type { ClearSpot } from '../bank/facilityGrounds';
-import { metresBetween, type WorldPoint } from '../lakeFrame';
+import type { WorldPoint } from '../lakeFrame';
 import { distanceToOutline, isInsideOutline } from '../worldGeometry';
+import { isClearOfBankside } from './bankClearance';
+import { plantBoundaryHedge } from './boundaryHedge';
+import { plantAnIsland } from './islandPlanting';
+import { shoreCandidates } from './shoreCandidates';
+import { treeAt, type PlantedTree } from './plantedTree';
+import { Bands, kindFor } from './speciesChoice';
+import { plantUnderstorey } from './understoreyPlanting';
+import { woodlandFields, type WoodlandFields } from './woodlandFields';
 
-export type TreeKind = 'poplar' | 'broadleaf' | 'willow';
-
-export interface PlantedTree {
-	kind: TreeKind;
-	point: WorldPoint;
-	height: number;
-	turn: number;
-}
+export type { TreeKind } from './treeKinds';
+export type { PlantedTree } from './plantedTree';
 
 export interface PlantingGround {
 	outline: WorldPoint[];
@@ -21,56 +23,45 @@ export interface PlantingGround {
 	seed: number;
 }
 
-const Planting = { SetbackFromWater: 9, WillowReach: 7, ClearOfBankside: 6, SpreadOfPlot: 1.35, Attempts: 5200, MostTrees: 1100, IslandTreesPerSquareMetre: 0.004, IslandEdgeSetback: 2.5 } as const;
-const TreeHeights: Record<TreeKind, { least: number; range: number }> = { poplar: { least: 16, range: 10 }, broadleaf: { least: 9, range: 8 }, willow: { least: 7, range: 4 } };
-const PoplarShare = 0.28;
+const Planting = { SpreadOfPlot: 1.35, Attempts: 20000, FewestMostTrees: 3200, MostTreesPerPlotMetre: 5.8, TreeLineReach: 42, BackRowDepth: 16, BackRowDensity: 0.65, TreeLineDensity: 0.95, TreeLineFloor: 0.45, CrownClearOfEdge: 7 } as const;
+const Density = { Clearing: 0.3, Contrast: 1.6, DeepWoodsFrom: 110, DeepWoodsShare: 0.6 } as const;
 
-const Clumping = { Wavelength: 45, Clearing: 0.35 } as const;
-
-function woodlandDensityAt(point: WorldPoint) {
-	const wave = Math.sin(point.x / Clumping.Wavelength) * Math.cos(point.z / (Clumping.Wavelength * 0.7)) + Math.sin((point.x + point.z) / (Clumping.Wavelength * 1.9));
-	return Math.min(1, Math.max(0, wave * 0.5 + Clumping.Clearing));
+function densityAt(point: WorldPoint, distanceFromWater: number, fields: WoodlandFields) {
+	const depthShare = distanceFromWater > Density.DeepWoodsFrom ? Density.DeepWoodsShare : 1;
+	const woods = (fields.density(point) - Density.Clearing) * Density.Contrast * depthShare;
+	const lineShare = Planting.TreeLineFloor + (1 - Planting.TreeLineFloor) * fields.treeLine(point);
+	const isTreeLine = distanceFromWater < Planting.TreeLineReach;
+	const isBackRow = !isTreeLine && distanceFromWater < Planting.TreeLineReach + Planting.BackRowDepth;
+	const treeLine = isTreeLine ? Planting.TreeLineDensity * lineShare + woods / 2 : 0;
+	const backRow = isBackRow ? Planting.BackRowDensity * lineShare : 0;
+	return Math.min(1, Math.max(0, woods, treeLine, backRow));
 }
 
-function treeAt(kind: TreeKind, point: WorldPoint, random: () => number): PlantedTree {
-	const heights = TreeHeights[kind];
-	return { kind, point, height: heights.least + random() * heights.range, turn: random() * Math.PI * 2 };
+function plantableEdgeOf(ground: PlantingGround): WorldPoint {
+	const { plotEdge } = ground;
+	const spread = (ground.plotReach * Planting.SpreadOfPlot) / 2;
+	if (!plotEdge) return { x: spread, z: spread };
+	return { x: plotEdge.x - Planting.CrownClearOfEdge, z: plotEdge.z - Planting.CrownClearOfEdge };
 }
 
-function isClearOfBankside(point: WorldPoint, keepClear: ClearSpot[]) {
-	return keepClear.every((spot) => metresBetween(spot.point, point) > spot.radius + Planting.ClearOfBankside);
+function candidatePoints(ground: PlantingGround, random: RandomFraction) {
+	const edge = plantableEdgeOf(ground);
+	const isOnThePlot = (point: WorldPoint) => Math.abs(point.x) < edge.x && Math.abs(point.z) < edge.z;
+	const shoreline = shoreCandidates(ground.outline, Planting.TreeLineReach + Planting.BackRowDepth, random).filter(isOnThePlot);
+	const anywhere = Array.from({ length: Planting.Attempts }, () => ({ x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z }));
+	return [...shoreline, ...anywhere];
 }
 
-function bankTreeKind(distanceFromWater: number, random: () => number): TreeKind {
-	if (distanceFromWater < Planting.WillowReach + Planting.SetbackFromWater) return 'willow';
-	return random() < PoplarShare ? 'poplar' : 'broadleaf';
-}
-
-function plantTheBank(ground: PlantingGround, random: () => number) {
-	const edge = ground.plotEdge ?? { x: (ground.plotReach * Planting.SpreadOfPlot) / 2, z: (ground.plotReach * Planting.SpreadOfPlot) / 2 };
+function plantTheBank(ground: PlantingGround, fields: WoodlandFields, random: RandomFraction) {
 	const trees: PlantedTree[] = [];
-	for (let attempt = 0; attempt < Planting.Attempts && trees.length < Planting.MostTrees; attempt++) {
-		const point = { x: (random() * 2 - 1) * edge.x, z: (random() * 2 - 1) * edge.z };
+	const mostTrees = Math.max(Planting.FewestMostTrees, ground.plotReach * Planting.MostTreesPerPlotMetre);
+	for (const point of candidatePoints(ground, random)) {
+		if (trees.length >= mostTrees) break;
 		if (isInsideOutline(point, ground.outline)) continue;
 		const distanceFromWater = distanceToOutline(point, ground.outline);
-		const isTooClose = distanceFromWater < Planting.SetbackFromWater || !isClearOfBankside(point, ground.keepClear);
-		if (isTooClose || random() > woodlandDensityAt(point)) continue;
-		trees.push(treeAt(bankTreeKind(distanceFromWater, random), point, random));
-	}
-	return trees;
-}
-
-function plantAnIsland(points: WorldPoint[], random: () => number) {
-	const xs = points.map((point) => point.x);
-	const zs = points.map((point) => point.z);
-	const least = { x: Math.min(...xs), z: Math.min(...zs) };
-	const size = { x: Math.max(...xs) - least.x, z: Math.max(...zs) - least.z };
-	const attempts = Math.ceil(size.x * size.z * Planting.IslandTreesPerSquareMetre * 2) + 3;
-	const trees: PlantedTree[] = [];
-	for (let attempt = 0; attempt < attempts; attempt++) {
-		const point = { x: least.x + random() * size.x, z: least.z + random() * size.z };
-		const isOnTheIsland = isInsideOutline(point, points) && distanceToOutline(point, points) > Planting.IslandEdgeSetback;
-		if (isOnTheIsland) trees.push(treeAt(random() < PoplarShare ? 'poplar' : 'broadleaf', point, random));
+		if (distanceFromWater < Bands.NearestWater || random() > densityAt(point, distanceFromWater, fields)) continue;
+		const tree = treeAt(kindFor(point, distanceFromWater, fields, random), point, distanceFromWater, ground.outline, random);
+		if (isClearOfBankside(tree, ground.keepClear)) trees.push(tree);
 	}
 	return trees;
 }
@@ -82,5 +73,10 @@ export interface Woodland {
 
 export function plantTrees(ground: PlantingGround): Woodland {
 	const random = seededRandom(ground.seed);
-	return { onTheBank: plantTheBank(ground, random), onTheIslands: ground.islands.flatMap((points) => plantAnIsland(points, random)) };
+	const fields = woodlandFields(random);
+	const onTheBank = plantTheBank(ground, fields, random);
+	const onTheIslands = ground.islands.flatMap((points) => plantAnIsland(points, fields, random));
+	const edge = plantableEdgeOf(ground);
+	const understorey = [...plantUnderstorey(ground, edge, fields, random), ...plantBoundaryHedge(ground, edge, random)];
+	return { onTheBank: [...onTheBank, ...understorey], onTheIslands };
 }
