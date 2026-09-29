@@ -6,6 +6,7 @@ import { sunSkyPositionOf, type SunPlacement } from './sunAndSky';
 const SkyScale = 9000;
 const LowSun = { FullDayDegrees: 20, ExtraRayleigh: 0.9, MieShed: 0.6 } as const;
 const SkyBrightness = 0.1;
+const SunDiscShare = 0.02;
 const FinalColour = 'gl_FragColor = vec4( texColor, 1.0 );';
 
 export function createClearSky(isSunShown: boolean) {
@@ -15,7 +16,7 @@ export function createClearSky(isSunShown: boolean) {
 	const { uniforms } = material;
 	const { cloudCoverage, showSunDisc } = uniforms;
 	cloudCoverage.value = 0;
-	showSunDisc.value = Number(isSunShown);
+	showSunDisc.value = isSunShown ? SunDiscShare : 0;
 	uniforms.brightness = { value: SkyBrightness };
 	const dimmed = material.fragmentShader.replace(FinalColour, 'gl_FragColor = vec4( texColor * brightness, 1.0 );');
 	material.fragmentShader = dimmed.replace('void main', 'uniform float brightness;\nvoid main');
