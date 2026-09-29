@@ -25,7 +25,7 @@ const VertexEdits = [
 ];
 
 export function swardMaterial(look: SwardLook) {
-	const { grid, field } = look;
+	const { grid, field, warmth } = look;
 	const material = coverSurface(look.atlas, Finish.roughness);
 	const uniforms = {
 		...sharedUniforms({ ...Finish, wind: look.wind }),
@@ -33,7 +33,7 @@ export function swardMaterial(look: SwardLook) {
 		swardField: { value: field.texture },
 		swardArea: { value: field.area },
 		swardReach: { value: look.reach },
-		swardWarmth: { value: new Vector3(look.warmth.r, look.warmth.g, look.warmth.b) }
+		swardWarmth: { value: new Vector3(warmth.r, warmth.g, warmth.b) }
 	};
 	material.onBeforeCompile = (shader) => {
 		Object.assign(shader.uniforms, uniforms);

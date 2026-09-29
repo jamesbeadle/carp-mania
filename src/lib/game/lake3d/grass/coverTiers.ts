@@ -23,7 +23,7 @@ export const GenerousCover: CoverQuality = {
 };
 
 export const ModestCover: CoverQuality = {
-	density: 0.65,
+	density: 0.6,
 	cellPixels: 128,
 	isShadowed: false,
 	isDetailed: false,

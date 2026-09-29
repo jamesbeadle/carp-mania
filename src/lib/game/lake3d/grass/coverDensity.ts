@@ -22,7 +22,7 @@ function busynessAt(fromPod: number) {
 
 function meadowness(site: CoverSite) {
 	const patch = ramp(site.meadow, Meadow.Threshold, 1);
-	const fringe = (1 - ramp(site.shore, Bank.Lip, Bank.FringeWidth)) * ramp(site.margin, Meadow.FringeThreshold, 1) * Meadow.Fringe;
+	const fringe = (1 - ramp(site.shore, Bank.Lip, Bank.FringeWidth)) * ramp(site.fringe, Meadow.FringeThreshold, 1) * Meadow.Fringe;
 	return Math.max(patch, fringe) * ramp(site.fromSwim, Meadow.SwimGap, Meadow.SwimGap * 2);
 }
 

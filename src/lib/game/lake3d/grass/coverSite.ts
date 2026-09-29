@@ -25,11 +25,12 @@ export interface CoverSite {
 	patch: number;
 	margin: number;
 	bloom: number;
+	fringe: number;
 }
 
-const Wavelengths = { Meadow: 24, Patch: 7, Margin: 11, Bloom: 5 } as const;
+const Wavelengths = { Meadow: 24, Patch: 7, Margin: 11, Bloom: 5, Fringe: 9 } as const;
 const FarFromSwims = 1e6;
-const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1, Feather: 3 } as const;
+const Clear = { FacilityMargin: 1.5, PlotEdgeMargin: 1, Feather: 5 } as const;
 
 export class CoverSites {
 	private readonly noise: CoverNoise;
@@ -50,7 +51,8 @@ export class CoverSites {
 			meadow: noise.at(point, Wavelengths.Meadow),
 			patch: noise.at(point, Wavelengths.Patch),
 			margin: noise.at({ x: point.z, z: point.x }, Wavelengths.Margin),
-			bloom: noise.at({ x: -point.x, z: point.z }, Wavelengths.Bloom)
+			bloom: noise.at({ x: -point.x, z: point.z }, Wavelengths.Bloom),
+			fringe: noise.at({ x: point.z, z: -point.x }, Wavelengths.Fringe)
 		};
 	}
 
