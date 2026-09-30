@@ -1,26 +1,14 @@
-import { Color, ShapeGeometry, UniformsLib, UniformsUtils, Vector2, Vector3, type Camera, type ShaderMaterial } from 'three';
+import { Color, LinearMipmapLinearFilter, ShapeGeometry, type Camera, type ShaderMaterial } from 'three';
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import type { WorldPoint } from './lakeFrame';
 import type { Sunlight } from './skyAndLight';
 import { renderQuality } from './renderQuality';
-import { rippleNormalTexture } from './rippleTexture';
-import { sharedGroundNoise } from './terrain/groundTiles';
 import type { ShoreMap } from './terrain/shoreMap';
 import { pushedTowardsLand } from './waterEdge';
 import { shapeWithHoles } from './worldShapes';
-import { WaterFragmentShader, WaterVertexShader } from './waterShader';
+import { WaterLook, waterShader } from './waterUniforms';
 
-export const WaterLook = { Tint: '#ffffff', Deep: '#2a5446', Shallow: '#4c5436', ClearestPercent: 100, CalmChop: 0.35, WindyChop: 1.1, MaximumReflectionPixels: 1024 } as const;
 const Reflection = { Multisamples: 0, RefreshEveryFrames: 2 } as const;
-
-function shoreUniforms() {
-	return { shoreMap: { value: null }, shoreOrigin: { value: new Vector2() }, shoreSize: { value: new Vector2(1, 1) }, shoreBand: { value: 1 }, deepestMetres: { value: 1 }, shallowColour: { value: new Color(WaterLook.Shallow) } };
-}
-
-function waterShader() {
-	const own = { time: { value: 0 }, sunDirection: { value: new Vector3(0, 1, 0) }, sunColour: { value: new Color() }, deepColour: { value: new Color(WaterLook.Deep) }, clarity: { value: 0.5 }, daylight: { value: 1 }, ripples: { value: rippleNormalTexture() }, waterNoise: { value: sharedGroundNoise() }, choppiness: { value: WaterLook.CalmChop }, color: { value: null }, tDiffuse: { value: null }, textureMatrix: { value: null } };
-	return { name: 'LakeWater', uniforms: UniformsUtils.merge([UniformsLib.fog, own, shoreUniforms()]), vertexShader: WaterVertexShader, fragmentShader: WaterFragmentShader };
-}
 
 function reflectionPixels(size: number) {
 	return Math.min(WaterLook.MaximumReflectionPixels, Math.round(size * renderQuality().reflectionScale));
@@ -35,6 +23,7 @@ export class LakeWater {
 		this.mesh = new Reflector(new ShapeGeometry(reachingShape), { color: new Color(WaterLook.Tint), textureWidth: reflectionPixels(width), textureHeight: reflectionPixels(height), shader: waterShader(), multisample: Reflection.Multisamples });
 		this.mesh.rotateX(-Math.PI / 2);
 		this.reflectEveryOtherFrame();
+		this.softenTheFarReflection();
 		const material = this.mesh.material as ShaderMaterial;
 		material.fog = true;
 		material.transparent = true;
@@ -80,6 +69,12 @@ export class LakeWater {
 
 	dispose() {
 		this.mesh.dispose();
+	}
+
+	private softenTheFarReflection() {
+		const reflection = this.mesh.getRenderTarget().texture;
+		reflection.generateMipmaps = true;
+		reflection.minFilter = LinearMipmapLinearFilter;
 	}
 
 	private reflectEveryOtherFrame() {
