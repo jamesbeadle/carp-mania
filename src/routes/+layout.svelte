@@ -5,6 +5,7 @@
 	import BottomTabBar from '$lib/components/hud/BottomTabBar.svelte';
 	import GameHud from '$lib/components/hud/GameHud.svelte';
 	import { sound } from '$lib/game/sound/soundEngine.svelte';
+	import { listenForAppSignIn } from '$lib/native/nativeSignInReturn';
 
 	let { data, children } = $props();
 
@@ -15,6 +16,8 @@
 	const isImmersive = $derived(page.data.isImmersive === true);
 	const hasChrome = $derived(data.user !== null && !isImmersive);
 	const avatarUrl = $derived((data.user?.user_metadata?.avatar_url as string | undefined) ?? null);
+
+	$effect(() => listenForAppSignIn());
 
 	function unlockSound() {
 		sound.unlock();

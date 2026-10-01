@@ -315,3 +315,15 @@ If any answer is "no" or "I'm not sure", fix it before saying you're done.
 - **When in doubt, choose the boring, readable option** over the clever one.
 
 <!-- project-process:end -->
+
+# This Repository's Notes
+
+## Every change is made for web, iPhone and Android
+
+Carp Mania is one game on three platforms: the website, the iPhone app and the Android app. The apps live in `mobile/` (see `mobile/README.md`) and are shells that open the live site, so almost every change is made once, in `src/`, and reaches all three when Vercel deploys. That makes every change a change to all three — a feature, a fix, a one-line bug fix alike — and no work is done until it is right on each of them.
+
+- **Build it for all three.** Nothing is web-only or app-only unless the task says so and says why. When something has to behave differently inside the apps, branch on `isNativeAppUserAgent` from `src/lib/native/nativeApp.ts`, never on screen size or guesswork.
+- **Check it on all three before calling it done.** At a desktop browser; at phone size in iPhone Safari (WebKit) and Android Chrome — in a cloud session, Playwright's WebKit and Chromium with an iPhone and a Pixel device profile; and, when the change touches sign-in, sound, touch, the keyboard, orientation, the safe areas round the notch and the home bar, fullscreen, links that leave the site or anything else the apps handle themselves, in the apps (`npm run run:ios` / `npm run run:android` in `mobile/`). Say in the work log and the pull request what was checked on which platform, and name any platform that could not be checked rather than leaving it out.
+- **Watch the things the apps do differently.** Sign-in goes through the phone's browser and comes back on `com.carpmania.app://auth/callback`; the fullscreen button is hidden; there is no browser address bar or back button, so every view needs its own way back; Android's back button walks the history; a link to another site opens the phone's browser.
+- **A change in `mobile/` is a store release.** It needs `npm run sync`, a raised version and a new build uploaded to both stores, and the pull request says so.
+- **Store rules apply to the game.** Digital goods sold inside the apps go through Apple's and Google's in-app purchase, adverts inside the apps go through AdMob, and Apple requires Sign in with Apple next to Google sign-in. A change that sells, advertises or signs in is checked against them.

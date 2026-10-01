@@ -6,7 +6,7 @@ A web game about running a carp fishery and fishing it. Every player finds a wat
 - **Angler:** spin the globe, pick a water, choose a swim, tackle up three rods, cast to a spot — an island margin, a gravel bar, the deep hole in winter — strike, play the fish, get the photo.
 - **The world:** every lake sits at a real latitude and longitude; the live feed shows big catches, records and sales flying between lakes; fish are bought and sold with transport, quarantine and fame.
 
-SvelteKit · Tailwind · Supabase (Google login, Postgres, Realtime) · Vercel.
+SvelteKit · Tailwind · Supabase (Google login, Postgres, Realtime) · Vercel · Capacitor for the Android and iPhone apps.
 
 See `SETUP.md` to run it, `DOMAIN.md` for carp-mania.com and the sign-in on its own name, `DESIGN.md` for the original stories and rules, `DESIGN-2.md` for the world, the lake builder and the fish market, and `DESIGN-10.md` for the balance model behind the long game. `CLAUDE.md` is the coding standard every file follows.
 
@@ -26,6 +26,7 @@ src/routes          the site map: /setup, /home, /lake, /lake/works, /world, /ne
 supabase/migrations tables, row-level security, and the security-definer functions that move money and fish
 supabase/tests      SQL scenarios run against a local Postgres by npm run test:sql
 scripts/pace        the balance model: a year of the game for five kinds of player, run by npm run test:pace
+mobile              the Android and iPhone apps: Capacitor shells around the live game (see mobile/README.md)
 ```
 
 <!-- code-quality:start -->

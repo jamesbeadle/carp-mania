@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Carp Mania</string>
+    <string name="title_activity_main">Carp Mania</string>
+    <string name="package_name">com.carpmania.app</string>
+    <string name="custom_url_scheme">com.carpmania.app</string>
+</resources>
