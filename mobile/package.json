@@ -1,0 +1,26 @@
+{
+	"name": "carp-mania-mobile",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"sync": "cap sync",
+		"open:android": "cap open android",
+		"open:ios": "cap open ios",
+		"run:android": "cap run android",
+		"run:ios": "cap run ios",
+		"assets": "capacitor-assets generate --android --ios --iconBackgroundColor '#060806' --iconBackgroundColorDark '#060806' --splashBackgroundColor '#060806' --splashBackgroundColorDark '#060806'"
+	},
+	"dependencies": {
+		"@capacitor/android": "^8.5.2",
+		"@capacitor/app": "^8.1.1",
+		"@capacitor/core": "^8.5.2",
+		"@capacitor/ios": "^8.5.2",
+		"@capacitor/status-bar": "^8.0.3"
+	},
+	"devDependencies": {
+		"@capacitor/assets": "^3.0.5",
+		"@capacitor/cli": "^8.5.2",
+		"typescript": "^5.9.3"
+	}
+}

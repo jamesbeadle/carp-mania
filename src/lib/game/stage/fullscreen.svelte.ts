@@ -1,10 +1,13 @@
+import { isNativeAppUserAgent } from '$lib/native/nativeApp';
+
 export class FullscreenState {
 	isFullscreen = $state(false);
 	isSupported = $state(false);
 
 	watch() {
 		if (typeof document === 'undefined') return () => {};
-		this.isSupported = document.fullscreenEnabled === true;
+		const isInsideNativeApp = isNativeAppUserAgent(navigator.userAgent);
+		this.isSupported = document.fullscreenEnabled === true && !isInsideNativeApp;
 		const sync = () => (this.isFullscreen = document.fullscreenElement !== null);
 		sync();
 		document.addEventListener('fullscreenchange', sync);

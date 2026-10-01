@@ -1,0 +1,38 @@
+:root {
+	--carbon: #060806;
+	--mist: #f2f7f2;
+	--volt: #3ee83a;
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	background: var(--carbon);
+	color: var(--mist);
+	font-family: system-ui, sans-serif;
+}
+
+main {
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: env(safe-area-inset-top) 1.5rem env(safe-area-inset-bottom);
+	text-align: center;
+}
+
+h1 {
+	font-style: italic;
+	text-transform: uppercase;
+}
+
+button {
+	padding: 0.75rem 2rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--volt);
+	color: var(--carbon);
+	font-weight: 700;
+}
