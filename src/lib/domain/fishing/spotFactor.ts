@@ -11,7 +11,7 @@ const RockWithNothingToEat = 0.6;
 const FeatureBiteFactor: Record<SwimFeature, number> = {
 	open_water: 1,
 	island_margin: 1.15,
-	snag: 1.2,
+	snag: 1,
 	gravel_bar: 1.1,
 	weed_bed: 1.1,
 	lily_pads: 1.15,

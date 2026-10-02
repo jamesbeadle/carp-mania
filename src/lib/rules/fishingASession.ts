@@ -1,6 +1,7 @@
 import { MagicHours } from '$lib/domain/fishing/magicHours';
 import { SwimMoveWords } from '$lib/domain/fishing/movingSwims';
 import { ShowingFish } from '$lib/domain/fishing/showingFish';
+import { SnagHold } from '$lib/domain/fishing/snagHold';
 import { Streak } from '$lib/domain/fishing/streak';
 import { StrikeWindow } from '$lib/domain/fishing/strikeWindow';
 import { hoursOf, MultiDay, TicketKindCatalogue, TicketKinds } from '$lib/domain/fishing/ticketBook';
@@ -10,6 +11,7 @@ import type { RuleChapter } from './ruleBookTypes';
 const ticketLines = TicketKinds.map((kind) => `${TicketKindCatalogue[kind].label}: ${TicketKindCatalogue[kind].words}`).join(' ');
 const magicLines = MagicHours.map((window) => `${window.words} (${window.fromHour}:00 to ${window.toHour === 24 ? 'midnight' : `${window.toHour}:00`}).`).join(' ');
 const dayTicketHours = hoursOf('day');
+const snagBitePercent = Math.round(SnagHold.BiteShareOfOpenWater * 100);
 
 export const FishingASession: RuleChapter = {
 	id: 'fishing',
@@ -34,7 +36,7 @@ export const FishingASession: RuleChapter = {
 		},
 		{
 			question: 'How do I cast, and does it matter where?',
-			answer: `Click or tap the water once for each rod. The spot you land on decides the bottom (gravel, silt, clay, rock), the depth and the feature you are on, and the rod card tells you which. Island margins, gravel bars, snags, reed lines and lily pads all fish better than open water, and every named carp has a favourite spot. An island blocks a cast, so pick a swim with a clear line to the water you want.`
+			answer: `Click or tap the water once for each rod. The spot you land on decides the bottom (gravel, silt, clay, rock), the depth and the feature you are on, and the rod card tells you which. Island margins, gravel bars, reed lines and lily pads all fish better than open water, and every named carp has a favourite spot. A snag is different: it bites at ${snagBitePercent}% of the rate of open water, but the bigger fish have learned it is the safest place to be, so a bite there is more likely to be one of them. An island blocks a cast, so pick a swim with a clear line to the water you want.`
 		},
 		{
 			question: 'When do the fish bite?',

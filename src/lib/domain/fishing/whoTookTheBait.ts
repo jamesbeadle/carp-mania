@@ -10,6 +10,7 @@ import { castTerrainFor } from './castTerrain';
 import { kitAgeFactorFor } from './kitAgeFactor';
 import { idsShownTruthfully, showsThisHour } from './showingFish';
 import { ratingShareOf, sizeReachOf, waterShareOf } from './sizeReach';
+import { combinedSpotBonus, snagHoldFor } from './snagHold';
 import { conditionsShareFor } from './weatherConditions';
 import { matchTackleToWater } from './tackleMatch';
 import { carpOfTaker, takerThatTookTheBait, type Taker } from './takers';
@@ -67,7 +68,7 @@ export function sizeReachFor(water: WaterToday, carpCount: number, tackleMatchOv
 export function takerOfTheBait(carpInOrder: Carp[], bite: Bite, water: WaterToday, spot: CastSpot): Taker | null {
 	const match = matchTackleToWater(bite.kit, water.lake, spot.terrain);
 	const shownIds = idsShownTruthfully(showsThisHour(bite.seed, bite.hour, carpInOrder, water.watercraft));
-	const spotBonusFor = favouriteSpotBonusAt(water.lake, water.season, spot, shownIds);
+	const spotBonusFor = combinedSpotBonus(favouriteSpotBonusAt(water.lake, water.season, spot, shownIds), snagHoldFor(spot.terrain));
 	const kitFactorFor = kitAgeFactorFor(bite.kit, Number(water.lake.transparency));
 	const mouths = carpInOrder.length + headCountOf(water.shoals);
 	const sizeReach = sizeReachFor(water, mouths, match.overall, bite.hour);

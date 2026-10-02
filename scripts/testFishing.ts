@@ -9,6 +9,7 @@ import { seededRandom } from '../src/lib/domain/random';
 import { classicCarp, classicLake } from '../src/lib/domain/sites/classicSite';
 import type { Carp, Lake } from '../src/lib/domain/types';
 import { runBiteRollScenarios } from './testBiteRoll';
+import { runSnagHoldScenarios } from './testSnagHold';
 
 const TakesToSample = 4000;
 
@@ -32,6 +33,7 @@ export function runFishingScenarios() {
 	assert.equal(pickCarpByWeight([], [], 0.5), null, 'an empty lake gives no fish');
 	console.log('fishing:', { islandLovers: islandLovers.length, plainShare: plainShare.toFixed(3), bonusShare: bonusShare.toFixed(3) });
 	runBiteRollScenarios();
+	runSnagHoldScenarios();
 }
 
 const MiddlingReach = 0.5;

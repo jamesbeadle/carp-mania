@@ -7,6 +7,7 @@ import type { Season } from '../world/seasons';
 import type { Weather } from '../world/weather';
 import { biteChanceForOneHour } from './biteChance';
 import { mix } from './sessionSeed';
+import { snagBiteShareFactor } from './snagHold';
 import { hourOfDay } from './sessionWindow';
 import { spotBiteFactor } from './spotFactor';
 import { spotSpreadFactor } from './spotSpread';
@@ -60,7 +61,8 @@ export function biteChanceThisHour(hour: number, rod: RodInTheWater, water: Wate
 	const match = matchTackleToWater(rod.kit, water.lake, rod.terrain);
 	const season = water.season;
 	const spot = spotBiteFactor(rod.terrain, season);
-	const conditions = { spotFactor: spot * spotSpreadFactor(water.difficulty, spot), seasonFactor: season.biteFactor, streakFactor: streakBiteFactor(water.streakDays) };
+	const spotFactor = spot * spotSpreadFactor(water.difficulty, spot) * snagBiteShareFactor(rod.terrain);
+	const conditions = { spotFactor, seasonFactor: season.biteFactor, streakFactor: streakBiteFactor(water.streakDays) };
 	return biteChanceForOneHour(water.lake, match.overall, water.rating, hourOfDay(hour), conditions);
 }
 
