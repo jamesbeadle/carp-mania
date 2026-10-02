@@ -16,7 +16,7 @@ export const GroundworksCatalogue: Record<WorkKind, WorkProfile> = {
 	margin_shelf: { label: 'Cut a margin shelf', blurb: 'A 25 ft shelf along the bank at 3–5 ft. Essential on a quarry.', disturbance: 0 },
 	reed_bed: { label: 'Plant a reed bed', blurb: 'Reeds along the bank. Fish hold in them and they filter the water.', disturbance: 0 },
 	lily_pads: { label: 'Plant lily pads', blurb: 'A summer holding spot in water no deeper than 6 ft. Dormant in winter.', disturbance: 0 },
-	snag: { label: 'Sink a snag', blurb: 'A fallen tree. Big fish hold there; one hooked fish in ten finds it.', disturbance: 0 },
+	snag: { label: 'Sink a snag', blurb: 'A fallen tree. Bites come slowly there, but the big fish hold in it; one hooked fish in ten finds it.', disturbance: 0 },
 	reshape_shoreline: { label: 'Reshape the shoreline', blurb: 'Drag the bank. Water you add is dug at the going rate.', disturbance: 5 },
 	sanctuary: { label: 'Mark a sanctuary', blurb: 'A stretch of bank with no pegs. Costs nothing but pegs; big fish favour it.', disturbance: 0 },
 	...facilityWorks()
