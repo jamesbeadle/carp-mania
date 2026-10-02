@@ -22,7 +22,8 @@ export type NotificationKind =
 	| 'record_lost'
 	| 'board_place_lost'
 	| 'award_won'
-	| 'prototype_lost';
+	| 'prototype_lost'
+	| 'badge_awarded';
 
 export interface Notification {
 	id: string;

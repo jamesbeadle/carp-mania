@@ -12,6 +12,7 @@
 	import AnglerRanksLine from '$lib/components/trophy/AnglerRanksLine.svelte';
 	import CatchCards from '$lib/components/trophy/CatchCards.svelte';
 	import AwardsPanel from '$lib/components/angler/AwardsPanel.svelte';
+	import BadgesPanel from '$lib/components/badge/BadgesPanel.svelte';
 	import RecordsHeld from '$lib/components/trophy/RecordsHeld.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { listPathFor } from '$lib/domain/lists/listPath';
@@ -57,6 +58,7 @@
 		<RecordsHeld records={room.recordsHeld} isMine />
 		<AwardsPanel awards={room.awards} isMine />
 	</div>
+	<BadgesPanel badges={room.badges} isMine isKeeper={angler.isKeeper} />
 	<div class="grid gap-6 lg:grid-cols-[2fr_3fr]">
 		<div class="min-w-0 space-y-6">
 			{#await data.rival}

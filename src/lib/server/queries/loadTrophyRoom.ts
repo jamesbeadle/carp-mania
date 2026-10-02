@@ -4,6 +4,7 @@ import type { HonourKind } from '$lib/domain/fishing/honours';
 import { isRecordScope, recordScopeNameFor } from '$lib/domain/trophies/recordScopes';
 import { loadCarpNames } from './loadAnglerCatches';
 import { loadAwardsHeld } from './loadAwards';
+import { loadBadgesHeld } from './loadBadges';
 import { loadStillSwimming } from './loadStillSwimming';
 
 type CardRow = {
@@ -18,7 +19,9 @@ const UnnamedFish = 'A fish nobody named';
 const NoRanksYet: AnglerRanks = { bestRank: 0, bestLb: 0, skillRank: 0, anglers: 0 };
 
 export async function loadTrophyRoom(locals: App.Locals, anglerId: string): Promise<TrophyRoom> {
-	const [cardRows, recordRows, awards, ranks] = await Promise.all([loadCards(locals, anglerId), loadRecords(locals, anglerId), loadAwardsHeld(locals.supabase, anglerId), loadRanks(locals, anglerId)]);
+	const [cardRows, recordRows, awards, badges, ranks] = await Promise.all([
+		loadCards(locals, anglerId), loadRecords(locals, anglerId), loadAwardsHeld(locals.supabase, anglerId), loadBadgesHeld(locals.supabase, anglerId), loadRanks(locals, anglerId)
+	]);
 	const carpIds = [...cardRows, ...recordRows].map((row) => row.carp_id);
 	const [names, stillSwimming] = await Promise.all([loadCarpNames(locals, carpIds), loadStillSwimming(locals, carpIds)]);
 	const nameOf = (carpId: string | null) => (carpId && names[carpId]) || UnnamedFish;
@@ -26,6 +29,7 @@ export async function loadTrophyRoom(locals: App.Locals, anglerId: string): Prom
 		cards: cardRows.map((row) => cardFrom(row, nameOf(row.carp_id), stillSwimming)),
 		recordsHeld: recordRows.filter((row) => isRecordScope(row.scope)).map((row) => recordFrom(row, nameOf(row.carp_id))),
 		awards,
+		badges,
 		ranks
 	};
 }

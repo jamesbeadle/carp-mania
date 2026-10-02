@@ -20,6 +20,7 @@ export interface AnglerProfile {
 	personalBestLb: number;
 	rating: AnglerRating;
 	trophyRoom: TrophyRoom;
+	isKeeper: boolean;
 }
 
 export async function GetAnglerProfile(locals: App.Locals, pageNumber: number): Promise<AnglerProfile> {
@@ -35,5 +36,5 @@ export async function GetAnglerProfile(locals: App.Locals, pageNumber: number): 
 		loadCarpNames(locals, catches.items.map((caught) => caught.carp_id)),
 		loadLakeNames(locals, catches.items.map((caught) => caught.lake_id))
 	]);
-	return { profile, diary, catches, carpNames, lakeNames, personalBestLb, rating: anglerRatingOf(skillsOf(profile), personalBestLb), trophyRoom };
+	return { profile, diary, catches, carpNames, lakeNames, personalBestLb, rating: anglerRatingOf(skillsOf(profile), personalBestLb), trophyRoom, isKeeper: profile.is_admin };
 }
