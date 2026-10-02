@@ -9,6 +9,7 @@
 	import CatchCards from '$lib/components/trophy/CatchCards.svelte';
 	import MeasureUp from '$lib/components/trophy/MeasureUp.svelte';
 	import AwardsPanel from '$lib/components/angler/AwardsPanel.svelte';
+	import BadgesPanel from '$lib/components/badge/BadgesPanel.svelte';
 	import RecordsHeld from '$lib/components/trophy/RecordsHeld.svelte';
 	import { placeInTheLine } from '$lib/domain/legacy/diary';
 	import { listPathFor } from '$lib/domain/lists/listPath';
@@ -48,6 +49,7 @@
 		<RecordsHeld records={room.recordsHeld} />
 		<AwardsPanel awards={room.awards} />
 	</div>
+	<BadgesPanel badges={room.badges} />
 	<div class="grid gap-6 lg:grid-cols-2">
 		<SkillsPanel stats={headlineStats} profile={angler.profile} />
 		<AnglerWaterCard waters={angler.waters} anglerName={angler.profile.display_name} />

@@ -1,5 +1,6 @@
 import type { HonourKind } from '$lib/domain/fishing/honours';
 import type { AwardWon } from './Awards';
+import type { BadgeHeld } from './Badges';
 
 export type RecordScope = 'lake' | 'region' | 'world';
 
@@ -39,6 +40,7 @@ export interface TrophyRoom {
 	cards: CatchCard[];
 	recordsHeld: RecordHeld[];
 	awards: AwardWon[];
+	badges: BadgeHeld[];
 	ranks: AnglerRanks;
 }
 
