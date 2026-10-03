@@ -37,7 +37,8 @@ function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 	traceDraft(context, draft, draft.points.map(toScene), colour);
 	context.restore();
 	drawDraftHandles(context, draft.handles ?? [], colour);
-	drawCanvasLabel(context, labelAnchorOf(draft), draft.label, colour, true);
+	const hasALabel = draft.label.length > 0;
+	if (hasALabel) drawCanvasLabel(context, labelAnchorOf(draft), draft.label, colour, true);
 }
 
 function labelAnchorOf(draft: DraftShape): Point {

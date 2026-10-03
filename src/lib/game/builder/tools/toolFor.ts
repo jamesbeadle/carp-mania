@@ -2,7 +2,6 @@ import type { BuilderTool } from '../toolCatalogue';
 import { barTool } from './bar';
 import { deepenTool } from './deepen';
 import { dredgeTool } from './dredge';
-import { extendTool } from './extend';
 import { facilityTool } from './facility';
 import { islandTool } from './island';
 import { landTool } from './land';
@@ -12,7 +11,8 @@ import { reedsTool } from './reeds';
 import { sanctuaryTool } from './sanctuary';
 import { selectTool } from './select';
 import { shelfTool } from './shelf';
-import { shoreTool } from './shore';
+import { sculptTool } from './sculpt';
+import { smoothTool } from './smooth';
 import { snagTool } from './snag';
 import { swimTool } from './swim';
 import type { ToolHandlers } from './toolHandlers';
@@ -30,8 +30,8 @@ const HandlersByTool: Record<BuilderTool, ToolHandlers> = {
 	sanctuary: sanctuaryTool,
 	swim: swimTool,
 	redraw: redrawTool,
-	shore: shoreTool,
-	extend: extendTool,
+	sculpt: sculptTool,
+	smooth: smoothTool,
 	land: landTool,
 	facility: facilityTool
 };

@@ -1,8 +1,9 @@
 import type { BankAnchor } from '$lib/domain/groundworks/bankAnchor';
 import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
 import type { Facility, LayoutPoint } from '$lib/domain/layout/layoutTypes';
+import { BrushSizes } from './brushSizes';
 import { DraftHistory } from './draftHistory.svelte';
-import type { BuilderTool } from './toolCatalogue';
+import { ToolCatalogue, type BuilderTool } from './toolCatalogue';
 
 export type DraftPhase = 'idle' | 'drawing' | 'placed';
 
@@ -13,7 +14,8 @@ export class BuilderState {
 	hover = $state<LayoutPoint | null>(null);
 	selectedSwimId = $state<string | null>(null);
 	swimPoint = $state<LayoutPoint | null>(null);
-	draggedVertex = $state<number | null>(null);
+	brushScenePixels = $state(BrushSizes.medium);
+	brushAt = $state<LayoutPoint | null>(null);
 	bankStart = $state<BankAnchor | null>(null);
 	bankPath = $state<LayoutPoint[]>([]);
 	notice = $state<string | null>(null);
@@ -36,21 +38,19 @@ export class BuilderState {
 	}
 
 	choose(tool: BuilderTool) {
+		const isTheSameKindOfWork = this.draft !== null && ToolCatalogue[tool].kind === this.draft.kind;
 		this.tool = tool;
+		if (isTheSameKindOfWork) return;
 		this.clear();
 		this.history.forget();
 	}
 
 	undo() {
-		if (!this.history.canUndo) return;
-		const previous = this.history.stepBack();
-		this.travelTo(previous);
+		this.travelTo(this.history.stepBack());
 	}
 
 	redo() {
-		if (!this.history.canRedo) return;
-		const next = this.history.stepForward();
-		this.travelTo(next);
+		this.travelTo(this.history.stepForward());
 	}
 
 	private travelTo(draft: WorkDraft | null) {
@@ -64,7 +64,7 @@ export class BuilderState {
 		this.phase = 'idle';
 		this.swimPoint = null;
 		this.selectedSwimId = null;
-		this.draggedVertex = null;
+		this.brushAt = null;
 		this.bankStart = null;
 		this.bankPath = [];
 		this.notice = null;

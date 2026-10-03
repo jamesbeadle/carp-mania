@@ -23,6 +23,7 @@ export class DraftHistory {
 	}
 
 	stepBack(): WorkDraft | null {
+		if (!this.canUndo) return this.present;
 		const previous = this.past[this.past.length - 1] ?? null;
 		this.future = [this.present, ...this.future];
 		this.past = this.past.slice(0, -1);
@@ -30,6 +31,7 @@ export class DraftHistory {
 	}
 
 	stepForward(): WorkDraft | null {
+		if (!this.canRedo) return this.present;
 		const next = this.future[0] ?? null;
 		this.past = [...this.past, this.present];
 		this.future = this.future.slice(1);

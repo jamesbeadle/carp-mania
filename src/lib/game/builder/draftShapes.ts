@@ -8,6 +8,7 @@ import { siteOf, sitesOf } from '$lib/domain/groundworks/sites/sitesOf';
 import { siteLabelOf } from '../render/drawFacilities';
 import type { DraftShape } from '../render/drawUnderConstruction';
 import type { BuilderState } from './builderState.svelte';
+import { brushRingShapes } from './brushRing';
 import { draftSiteOf, siteDraftShape } from './placement/draftSite';
 import { shapeWhileDrawing } from './shapeWhileDrawing';
 
@@ -18,7 +19,7 @@ const RedrawLabel = 'New bank — click the shoreline to finish';
 export function draftShapesFor(builder: BuilderState, failures: string[], lake: Plot, swims: Swim[], inProgress: LabelledWork[]): DraftShape[] {
 	const underWay = inProgressShapesFor(inProgress, lake, swims);
 	const onTheBench = [...currentDraftShapes(builder, failures, lake, swims), ...bankPathShapes(builder), ...swimShapes(builder, swims)];
-	return [...underWay, ...onTheBench, ...selectedSiteShapes(builder, lake, swims)];
+	return [...underWay, ...onTheBench, ...selectedSiteShapes(builder, lake, swims), ...brushRingShapes(builder)];
 }
 
 export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot, swims: Swim[]): DraftShape[] {

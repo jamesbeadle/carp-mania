@@ -2,7 +2,6 @@ import { layoutScaleFor } from '../layout/layoutScale';
 import type { LakeLayout } from '../layout/layoutTypes';
 import { polygonCentroid } from '../layout/polygonArea';
 import { depthAt } from '../layout/terrainAt';
-import { waterAcres } from '../layout/waterArea';
 import { WorkPrices } from './catalogue';
 import { acresLabel, polylineFeet } from './draftFootprint';
 import { dredgingEffectOf } from './dredging';
@@ -60,12 +59,15 @@ export function priceShoreline(draft: Extract<WorkDraft, { kind: 'reshape_shorel
 	const movedUnits = Math.ceil(change.feetMoved / FeetPerShorelineUnit);
 	const dugUnits = Math.ceil(change.acresAdded);
 	const shoreline = WorkPrices.Shoreline;
-	const before = waterAcres(layout, plotAcres);
-	const after = waterAcres({ ...layout, outline: draft.outline }, plotAcres);
 	return {
 		cost: movedUnits * shoreline.costPerHundredFeetMoved + dugUnits * shoreline.digCostPerAcreAdded,
 		days: movedUnits * shoreline.daysPerHundredFeetMoved + dugUnits * shoreline.digDaysPerAcreAdded,
 		disturbance: dugUnits * shoreline.disturbancePerAcreAdded,
-		effects: [`Bank moved ${change.feetMoved} ft`, after >= before ? `Water gained ${acresLabel(after - before)}` : `Water lost ${acresLabel(before - after)}`]
+		effects: [`Bank reworked along ${change.feetMoved} ft`, waterWordsFor(change.acresChanged)]
 	};
+}
+
+function waterWordsFor(acresChanged: number) {
+	const isGained = acresChanged >= 0;
+	return isGained ? `Water gained ${acresLabel(acresChanged)}` : `Water lost ${acresLabel(-acresChanged)}`;
 }

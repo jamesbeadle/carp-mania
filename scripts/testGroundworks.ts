@@ -11,6 +11,7 @@ import { FisheryClock } from '../src/lib/domain/simulation/elapsedDays';
 import { completeDueWorks } from '../src/lib/domain/simulation/completeWorks';
 import { runRedrawBankScenarios } from './testRedrawBank';
 import { placedDraft, runFacilitySiteScenarios } from './testFacilitySites';
+import { runShorelineScenarios } from './testShoreline';
 import { classicLake, classicSwims } from '../src/lib/domain/sites/classicSite';
 import type { Lake, Swim } from '../src/lib/domain/types';
 import type { LakeWork } from '../src/lib/domain/worldTypes';
@@ -91,5 +92,6 @@ export function runGroundworksScenarios() {
 	completionScenarios();
 	runRedrawBankScenarios();
 	runFacilitySiteScenarios();
+	runShorelineScenarios();
 	console.log('groundworks:', { island: GetGroundworksQuote(island, lake, swims, []), dredge: GetGroundworksQuote(dredge, lake, swims, []).effects });
 }
