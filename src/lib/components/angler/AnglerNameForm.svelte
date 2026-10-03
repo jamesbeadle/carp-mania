@@ -4,7 +4,7 @@
 	let { name }: { name: string } = $props();
 
 	let isEditing = $state(false);
-	const pattern = $derived(AnglerName.Allowed.source.slice(1, -1));
+	const pattern = AnglerName.InputPattern;
 </script>
 
 {#if isEditing}

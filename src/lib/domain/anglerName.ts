@@ -1,4 +1,6 @@
-export const AnglerName = { ShortestLength: 3, LongestLength: 24, Allowed: /^[A-Za-z0-9]+$/ } as const;
+const AllowedCharacters = '[A-Za-z0-9]+';
+
+export const AnglerName = { ShortestLength: 3, LongestLength: 24, Allowed: new RegExp(`^${AllowedCharacters}$`), InputPattern: AllowedCharacters } as const;
 
 export function isAnglerName(value: string) {
 	const isRightLength = value.length >= AnglerName.ShortestLength && value.length <= AnglerName.LongestLength;
