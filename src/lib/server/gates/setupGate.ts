@@ -1,5 +1,6 @@
 import { currentWaterOf } from '$lib/domain/estate/estateRules';
 import { loadCurrentLakeId, loadMyWaters } from '../queries/loadMyWaters';
+import { isUnderAny } from './pathRoots';
 
 const OpenDuringSetup = ['/setup', '/auth', '/inbox', '/news', '/world', '/lakes', '/carp', '/anglers', '/admin'];
 const OpenOnceTheWaterExists = ['/lake/works'];
@@ -19,8 +20,4 @@ export async function whereSetupSendsYou(locals: App.Locals, ownerId: string, pa
 function firstWaterGate(hasBoughtTheSite: boolean, pathname: string) {
 	if (hasBoughtTheSite && isUnderAny(pathname, OpenOnceTheWaterExists)) return null;
 	return SetupPath;
-}
-
-function isUnderAny(pathname: string, roots: string[]) {
-	return roots.some((root) => pathname === root || pathname.startsWith(`${root}/`));
 }
