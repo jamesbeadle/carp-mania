@@ -4,6 +4,7 @@ import { smoothClosedPath, toScene, type Point } from '../scene/lakeShape';
 import { DraftPalette } from '../scene/palette';
 import { drawCanvasLabel } from './drawCanvasLabel';
 import { drawDraftHandles, type DraftHandle } from './drawDraftHandles';
+import { paintSitePreview, type SitePreview } from './sites/paintSitePreview';
 
 export type DraftKind = 'polygon' | 'point' | 'polyline';
 
@@ -14,6 +15,7 @@ export interface DraftShape {
 	isValid: boolean;
 	isBeingDrawn?: boolean;
 	handles?: DraftHandle[];
+	preview?: SitePreview;
 }
 
 const DraftDash: number[] = [8, 6];
@@ -25,6 +27,7 @@ export function drawDrafts(context: CanvasRenderingContext2D, drafts: DraftShape
 
 function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 	if (draft.points.length === 0) return;
+	if (draft.preview) paintSitePreview(context, draft.preview);
 	const colour = draft.isValid ? DraftPalette.Valid : DraftPalette.Invalid;
 	context.save();
 	context.setLineDash(DraftDash);
@@ -40,6 +43,7 @@ function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 function traceDraft(context: CanvasRenderingContext2D, draft: DraftShape, points: Point[], colour: string) {
 	if (draft.kind === 'point') return traceDraftPoint(context, points[0], colour);
 	if (draft.isBeingDrawn) return traceUnderConstruction(context, draft.kind, points);
+	if (draft.preview) return context.stroke(straightClosedPath(points));
 	if (draft.kind === 'polyline' || points.length < Draft.MinimumPolygonPoints) return traceDraftLine(context, points);
 	const polygon = smoothClosedPath(points);
 	context.fill(polygon);

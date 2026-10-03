@@ -4,6 +4,7 @@ import { FacilityCatalogue } from '../facilities';
 import type { Plan } from '../plan';
 import type { FacilityDraft, WorkDraft } from '../workKinds';
 import { carParkOf } from './carParkOf';
+import { CarParkRules } from './carParkPlan';
 import { whyCarParkUpgradeIsRefused } from './carParkPrice';
 import { siteFitFailures } from './siteFit';
 import { siteOfMove, siteOfPlacement, siteOfWork, type MoveDraft } from './siteOfWork';
@@ -18,7 +19,14 @@ function fitAmongNeighbours(plan: Plan, site: FacilitySite, leavingOut: Facility
 	return siteFitFailures(site, { layout: plan.layout, scale: plan.scale, pegs: pegPointsOf(plan.swims), neighbours });
 }
 
+function spacesFailure(spaces: number) {
+	const isWithinTheRules = Number.isInteger(spaces) && spaces >= CarParkRules.MinimumSpaces && spaces <= CarParkRules.MaximumSpaces;
+	return isWithinTheRules ? [] : [`A car park has from ${CarParkRules.MinimumSpaces} to ${CarParkRules.MaximumSpaces} whole spaces`];
+}
+
 export function placedFacilityFailures(plan: Plan, draft: FacilityDraft) {
+	const spaces = draft.kind === 'car_park' ? spacesFailure(draft.carPark?.spaces ?? CarParkRules.MinimumSpaces) : [];
+	if (spaces.length > 0) return spaces;
 	const replaced = FacilityCatalogue[draft.kind].replaces;
 	return fitAmongNeighbours(plan, siteOfPlacement(draft), replaced ? [replaced] : []);
 }
@@ -30,6 +38,8 @@ export function carParkUpgradeFailures(plan: Plan, draft: UpgradeDraft) {
 	if (isAlreadyBeingWorked(plan, 'car_park')) return ['The car park already has works under way'];
 	const refusal = whyCarParkUpgradeIsRefused(current, draft.carPark);
 	if (refusal) return [refusal];
+	const spaces = spacesFailure(draft.carPark.spaces);
+	if (spaces.length > 0) return spaces;
 	return fitAmongNeighbours(plan, { ...site, carPark: draft.carPark }, []);
 }
 

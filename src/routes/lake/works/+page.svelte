@@ -60,12 +60,12 @@
 		<Bench {builder} failures={quote?.failures ?? []} {lake} swims={data.fishery.swims} onDetails={() => (isSheetOpen = true)} />
 		<LayerToggles bind:layers />
 	</div>
-	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} /></div>
+	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} swims={data.fishery.swims} profile={data.profile} {hasEarthworksInProgress} /></div>
 </div>
 
 {#if screen.isPhone}
 	<PlaceSheet title={SheetTitle} isOpen={isSheetOpen} onClose={() => (isSheetOpen = false)}>
-		<PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} />
+		<PropertiesPanel {builder} {quote} {lake} swims={data.fishery.swims} profile={data.profile} {hasEarthworksInProgress} />
 	</PlaceSheet>
 {/if}
 

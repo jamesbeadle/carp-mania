@@ -1,5 +1,6 @@
 import { PerspectiveCamera, Scene } from 'three';
 import { createFacilities } from './bank/facilities3d';
+import { sitesAmongPegs } from '$lib/domain/groundworks/sites/sitesOf';
 import { plotFacilities } from './bank/facilityGrounds';
 import { untilTheNextFrame } from './frameYield';
 import { lakeFrameFor, plotReachOf, worldPointOf, type LakeFrame, type WorldPoint } from './lakeFrame';
@@ -55,7 +56,7 @@ export async function buildLakeWorld(plan: LakeWorldPlan, width: number, height:
 	const { groundAt } = land;
 	water.useShoreMap(land.shoreMap);
 	await untilTheNextFrame(signal);
-	const plots = plotFacilities(layout, { outline, islands }, pegs, plot.wholePlot);
+	const plots = plotFacilities(sitesAmongPegs(layout, plan.plotAcres, plan.pegs), frame);
 	const facilities = createFacilities(plots, groundAt);
 	await untilTheNextFrame(signal);
 	const keepClear = [...pegs.map((point) => ({ point, radius: PegClearing })), ...plots.map((one) => ({ point: one.point, radius: one.footprintMetres / 2 }))];

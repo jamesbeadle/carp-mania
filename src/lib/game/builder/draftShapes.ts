@@ -2,9 +2,13 @@ import type { LabelledWork } from '$lib/contracts/MyGroundworks';
 import { footprintOf } from '$lib/domain/groundworks/draftFootprint';
 import { workLabelFor } from '$lib/domain/groundworks/workLabels';
 import { draftOf } from '$lib/domain/groundworks/worksLedger';
+import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
 import type { Lake, Swim } from '$lib/domain/types';
+import { siteOf, sitesOf } from '$lib/domain/groundworks/sites/sitesOf';
+import { siteLabelOf } from '../render/drawFacilities';
 import type { DraftShape } from '../render/drawUnderConstruction';
 import type { BuilderState } from './builderState.svelte';
+import { draftSiteOf, siteDraftShape } from './placement/draftSite';
 import { shapeWhileDrawing } from './shapeWhileDrawing';
 
 type Plot = Pick<Lake, 'layout' | 'plot_acres'>;
@@ -12,23 +16,25 @@ type Plot = Pick<Lake, 'layout' | 'plot_acres'>;
 const RedrawLabel = 'New bank — click the shoreline to finish';
 
 export function draftShapesFor(builder: BuilderState, failures: string[], lake: Plot, swims: Swim[], inProgress: LabelledWork[]): DraftShape[] {
-	return [...inProgressShapesFor(inProgress, lake), ...currentDraftShapes(builder, failures, lake), ...bankPathShapes(builder), ...swimShapes(builder, swims)];
+	return [...inProgressShapesFor(inProgress, lake, swims), ...currentDraftShapes(builder, failures, lake, swims), ...bankPathShapes(builder), ...swimShapes(builder, swims), ...selectedSiteShapes(builder, lake, swims)];
 }
 
-export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot): DraftShape[] {
-	return inProgress
-		.map((work) => ({ work, footprint: footprintOf(draftOf(work), lake.layout, Number(lake.plot_acres)) }))
-		.filter(({ footprint }) => footprint.points.length > 0)
-		.map(({ work, footprint }) => ({ kind: footprint.shape, points: footprint.points, label: `${work.label} — in progress, ${work.daysLeft} ${work.daysLeft === 1 ? 'day' : 'days'}`, isValid: true }));
+export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot, swims: Swim[]): DraftShape[] {
+	return inProgress.flatMap((work) => shapesOf(draftOf(work), lake, swims, `${work.label} — in progress, ${work.daysLeft} ${work.daysLeft === 1 ? 'day' : 'days'}`, true));
 }
 
-function currentDraftShapes(builder: BuilderState, failures: string[], lake: Plot): DraftShape[] {
+function shapesOf(draft: WorkDraft, lake: Plot, swims: Swim[], label: string, isValid: boolean): DraftShape[] {
+	const site = draftSiteOf(draft, lake, swims);
+	if (site) return [siteDraftShape(site, lake, label, isValid)];
+	const footprint = footprintOf(draft, lake.layout, Number(lake.plot_acres));
+	return footprint.points.length > 0 ? [{ kind: footprint.shape, points: footprint.points, label, isValid }] : [];
+}
+
+function currentDraftShapes(builder: BuilderState, failures: string[], lake: Plot, swims: Swim[]): DraftShape[] {
 	const draft = builder.draft;
 	if (!draft) return [];
 	if (builder.isDrawing) return shapeWhileDrawing(draft, builder.hover, workLabelFor(draft), failures);
-	const footprint = footprintOf(draft, lake.layout, Number(lake.plot_acres));
-	if (footprint.points.length === 0) return [];
-	return [{ kind: footprint.shape, points: footprint.points, label: workLabelFor(draft), isValid: failures.length === 0 }];
+	return shapesOf(draft, lake, swims, workLabelFor(draft), failures.length === 0);
 }
 
 function bankPathShapes(builder: BuilderState): DraftShape[] {
@@ -44,4 +50,12 @@ function swimShapes(builder: BuilderState, swims: Swim[]): DraftShape[] {
 	const selected = swims.find((swim) => swim.id === builder.selectedSwimId);
 	const label = selected ? `Move ${selected.name} here` : 'New swim';
 	return [{ kind: 'point', points: [builder.swimPoint], label, isValid: true }];
+}
+
+function selectedSiteShapes(builder: BuilderState, lake: Plot, swims: Swim[]): DraftShape[] {
+	const facility = builder.selectedFacility;
+	if (!facility || builder.draft) return [];
+	const site = siteOf(sitesOf(lake.layout, Number(lake.plot_acres), swims), facility);
+	if (!site) return [];
+	return [siteDraftShape(site, lake, siteLabelOf(site), true)];
 }

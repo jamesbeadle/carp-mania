@@ -6,9 +6,13 @@ import type { Swim } from '../../types';
 import { defaultSiteFor } from './defaultSite';
 
 export function sitesOf(layout: LakeLayout, plotAcres: number, swims: Pick<Swim, 'position_x' | 'position_y'>[]): FacilitySite[] {
+	return sitesAmongPegs(layout, plotAcres, pegPointsOf(swims));
+}
+
+export function sitesAmongPegs(layout: LakeLayout, plotAcres: number, pegs: LayoutPoint[]): FacilitySite[] {
 	const built = Facilities.filter((facility) => layout.facilities.includes(facility));
 	const stored = (layout.sites ?? []).filter((site) => built.includes(site.facility));
-	const surroundings = { layout, scale: layoutScaleFor(plotAcres), pegs: pegPointsOf(swims), neighbours: [...stored] };
+	const surroundings = { layout, scale: layoutScaleFor(plotAcres), pegs, neighbours: [...stored] };
 	const unsited = built.filter((facility) => !stored.some((site) => site.facility === facility));
 	for (const [index, facility] of unsited.entries()) surroundings.neighbours.push(defaultSiteFor(facility, index, surroundings));
 	return surroundings.neighbours;

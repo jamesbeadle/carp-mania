@@ -1,6 +1,6 @@
 import type { BankAnchor } from '$lib/domain/groundworks/bankAnchor';
 import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
-import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
+import type { Facility, LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import type { BuilderTool } from './toolCatalogue';
 
 export type DraftPhase = 'idle' | 'drawing' | 'placed';
@@ -16,6 +16,9 @@ export class BuilderState {
 	bankStart = $state<BankAnchor | null>(null);
 	bankPath = $state<LayoutPoint[]>([]);
 	notice = $state<string | null>(null);
+	selectedFacility = $state<Facility | null>(null);
+	siteGrab = $state<LayoutPoint | null>(null);
+	isTurningTheSite = $state(false);
 
 	get isReadyToOrder() {
 		return this.draft !== null && this.phase === 'placed';
@@ -43,6 +46,9 @@ export class BuilderState {
 		this.bankStart = null;
 		this.bankPath = [];
 		this.notice = null;
+		this.selectedFacility = null;
+		this.siteGrab = null;
+		this.isTurningTheSite = false;
 	}
 
 	startDrawing(draft: WorkDraft) {

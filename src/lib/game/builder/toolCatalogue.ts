@@ -9,7 +9,7 @@ export interface ToolProfile {
 }
 
 export const ToolCatalogue: Record<BuilderTool, ToolProfile> = {
-	select: { label: 'Select', hint: 'Click a swim to rename, move or take it out. Drag it, or click the bank, to choose where it moves to.', kind: null },
+	select: { label: 'Select', hint: 'Click a swim to rename, move or take it out, or a building to move it or upgrade the car park. Drag a swim, or click the bank, to choose where it moves to.', kind: null },
 	island: { label: 'Island', hint: 'Click the water to place the island, then drag to turn it.', kind: 'island' },
 	bar: { label: 'Bar', hint: 'Click the water to lay out the bar; click the first point again to close it.', kind: 'gravel_bar' },
 	deepen: { label: 'Deepen', hint: 'Click the water to outline the hole; click the first point again to close it.', kind: 'deepen' },
@@ -24,7 +24,7 @@ export const ToolCatalogue: Record<BuilderTool, ToolProfile> = {
 	shore: { label: 'Shore', hint: 'Drag a point of the shoreline to move the bank.', kind: 'reshape_shoreline' },
 	extend: { label: 'Extend', hint: 'Drag anywhere on the shoreline to pull out a new point.', kind: 'reshape_shoreline' },
 	land: { label: 'Land', hint: 'Buy five acres next door; the plot grows around the water.', kind: null },
-	facility: { label: 'Facility', hint: 'Choose what to build.', kind: null }
+	facility: { label: 'Facility', hint: 'Choose what to build; it is set out on a clear spot. Click your land or drag it to move it, and drag beside it to turn it.', kind: null }
 };
 
 export const BuilderTools = Object.keys(ToolCatalogue) as BuilderTool[];
