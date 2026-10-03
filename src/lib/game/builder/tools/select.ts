@@ -31,4 +31,9 @@ function delegate(gesture: keyof ToolHandlers): ToolAction {
 	return (builder, point, context) => handlersFor(builder)[gesture]?.(builder, point, context);
 }
 
-export const selectTool: ToolHandlers = { onClick: delegate('onClick'), onDragStart: delegate('onDragStart'), onDrag: delegate('onDrag'), onDragEnd: delegate('onDragEnd') };
+export const selectTool: ToolHandlers = {
+	onClick: delegate('onClick'),
+	onDragStart: delegate('onDragStart'),
+	onDrag: delegate('onDrag'),
+	onDragEnd: delegate('onDragEnd')
+};

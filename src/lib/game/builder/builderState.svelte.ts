@@ -1,6 +1,7 @@
 import type { BankAnchor } from '$lib/domain/groundworks/bankAnchor';
 import type { WorkDraft } from '$lib/domain/groundworks/workKinds';
 import type { Facility, LayoutPoint } from '$lib/domain/layout/layoutTypes';
+import { DraftHistory } from './draftHistory.svelte';
 import type { BuilderTool } from './toolCatalogue';
 
 export type DraftPhase = 'idle' | 'drawing' | 'placed';
@@ -19,6 +20,8 @@ export class BuilderState {
 	selectedFacility = $state<Facility | null>(null);
 	siteGrab = $state<LayoutPoint | null>(null);
 	isTurningTheSite = $state(false);
+	isPointerDown = $state(false);
+	history = new DraftHistory();
 
 	get isReadyToOrder() {
 		return this.draft !== null && this.phase === 'placed';
@@ -35,6 +38,25 @@ export class BuilderState {
 	choose(tool: BuilderTool) {
 		this.tool = tool;
 		this.clear();
+		this.history.forget();
+	}
+
+	undo() {
+		if (!this.history.canUndo) return;
+		const previous = this.history.stepBack();
+		this.travelTo(previous);
+	}
+
+	redo() {
+		if (!this.history.canRedo) return;
+		const next = this.history.stepForward();
+		this.travelTo(next);
+	}
+
+	private travelTo(draft: WorkDraft | null) {
+		this.draft = draft;
+		if (draft === null) this.phase = 'idle';
+		if (draft !== null && this.phase === 'idle') this.phase = 'placed';
 	}
 
 	clear() {

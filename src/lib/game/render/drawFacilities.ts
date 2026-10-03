@@ -20,7 +20,8 @@ export function drawFacilities(context: CanvasRenderingContext2D, scene: SitesOn
 	for (const site of scene.sites) {
 		const centre = toScene(site.centre);
 		if (site.facility !== 'car_park') drawBadge(context, centre, site);
-		if (isLabelled) drawCanvasLabel(context, centre, siteLabelOf(site), BankPalette.FacilityLabel, false);
+		const label = siteLabelOf(site);
+		if (isLabelled) drawCanvasLabel(context, centre, label, BankPalette.FacilityLabel, false);
 	}
 }
 

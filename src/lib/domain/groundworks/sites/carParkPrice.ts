@@ -31,7 +31,7 @@ export function carParkUpgradeDays(current: CarParkSpec, wanted: CarParkSpec) {
 	return CarParkPrices.BaseDays + Math.ceil(added / CarParkPrices.SpacesLaidPerDay) + (isResurfaced ? CarParkPrices.ResurfaceDays : 0);
 }
 
-export function whyCarParkUpgradeIsRefused(current: CarParkSpec, wanted: CarParkSpec): string | null {
+export function carParkUpgradeRefusal(current: CarParkSpec, wanted: CarParkSpec): string | null {
 	if (wanted.spaces < current.spaces) return `The car park keeps its ${current.spaces} spaces — it can only grow`;
 	if (current.surface === 'tarmac' && wanted.surface === 'gravel') return 'Tarmac is not dug back up to gravel';
 	if (current.isLit && !wanted.isLit) return 'The lights stay once they are up';

@@ -51,7 +51,8 @@ export interface AnglerDay {
 export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, today: VisitingDay): AnglerDay {
 	const wanting = today.isClosedForRestocking ? NobodyComes : anglersArrivingToday(lake, today.season, today.book, today.stockDraw);
 	const count = Math.min(wanting, Math.round(today.pegsPerDay), parkingCapacityOf(lake.layout));
-	const day: AnglerDay = { visits: [], catches: [], records: today.standing, lodgeTakings: 0, turnedAway: wanting - count, parkedOnTheVerge: anglersOnTheVerge(lake.layout, count) };
+	const parkedOnTheVerge = anglersOnTheVerge(lake.layout, count);
+	const day: AnglerDay = { visits: [], catches: [], records: today.standing, lodgeTakings: 0, turnedAway: wanting - count, parkedOnTheVerge };
 	const fishable = carp.filter(isFishable);
 	for (let index = 0; index < count; index++) day.visits.push(simulateOneAngler(lake, fishable, swims, random, today, day));
 	day.lodgeTakings = count * takingsPerHeadAt(lake);

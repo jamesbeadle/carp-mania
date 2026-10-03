@@ -37,13 +37,23 @@ function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 	traceDraft(context, draft, draft.points.map(toScene), colour);
 	context.restore();
 	drawDraftHandles(context, draft.handles ?? [], colour);
-	drawCanvasLabel(context, toScene(polygonCentroid(draft.points)), draft.label, colour, true);
+	drawCanvasLabel(context, labelAnchorOf(draft), draft.label, colour, true);
+}
+
+function labelAnchorOf(draft: DraftShape): Point {
+	const centre = toScene(polygonCentroid(draft.points));
+	if (!draft.preview) return centre;
+	const lowest = Math.max(...draft.points.map((point) => toScene(point).y));
+	return { x: centre.x, y: lowest };
 }
 
 function traceDraft(context: CanvasRenderingContext2D, draft: DraftShape, points: Point[], colour: string) {
 	if (draft.kind === 'point') return traceDraftPoint(context, points[0], colour);
 	if (draft.isBeingDrawn) return traceUnderConstruction(context, draft.kind, points);
-	if (draft.preview) return context.stroke(straightClosedPath(points));
+	const isASite = draft.preview !== undefined;
+	if (isASite) {
+		return context.stroke(straightClosedPath(points));
+	}
 	if (draft.kind === 'polyline' || points.length < Draft.MinimumPolygonPoints) return traceDraftLine(context, points);
 	const polygon = smoothClosedPath(points);
 	context.fill(polygon);

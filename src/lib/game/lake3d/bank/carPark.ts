@@ -18,7 +18,8 @@ const metres = (feet: number) => feet * MetresPerFoot;
 function bayLines(plan: CarParkPlan): BoxSpec[] {
 	const length = metres(ParkingBaySize.LengthFeet);
 	const halfWidth = metres(ParkingBaySize.WidthFeet) / 2;
-	return plan.bays.flatMap((bay) => [-halfWidth, halfWidth].map((side): BoxSpec => ({ size: [Line.Width, 0.01, length], at: [metres(bay.acrossFeet) + side, Surface.Height + Line.Lift, metres(bay.downFeet)] })));
+	const lineAt = (bay: ParkingBay, side: number): BoxSpec => ({ size: [Line.Width, 0.01, length], at: [metres(bay.acrossFeet) + side, Surface.Height + Line.Lift, metres(bay.downFeet)] });
+	return plan.bays.flatMap((bay) => [-halfWidth, halfWidth].map((side) => lineAt(bay, side)));
 }
 
 function parkedCar(bay: ParkingBay, index: number) {
@@ -31,7 +32,8 @@ function parkedCar(bay: ParkingBay, index: number) {
 function lampPosts(plan: CarParkPlan) {
 	const ends = [-1, 1].map((side) => side * (metres(plan.widthFeet) / 2 - Lamp.Inset));
 	const spots = plan.aislesDownFeet.flatMap((aisle) => ends.map((across) => [across, metres(aisle)] as const));
-	const posts = mergedBoxes(spots.map(([x, z]) => ({ size: [Lamp.Post, Lamp.Height, Lamp.Post], at: [x, Lamp.Height / 2, z] })), surface(BuildingLook.Iron, 0.4));
+	const postBoxes = spots.map(([x, z]): BoxSpec => ({ size: [Lamp.Post, Lamp.Height, Lamp.Post], at: [x, Lamp.Height / 2, z] }));
+	const posts = mergedBoxes(postBoxes, surface(BuildingLook.Iron, 0.4));
 	const glowing = new MeshStandardMaterial({ color: LampLight.Colour, emissive: LampLight.Colour, emissiveIntensity: LampLight.Glow });
 	const heads = mergedBoxes(spots.map(([x, z]) => ({ size: [Lamp.Head, Lamp.Head / 2, Lamp.Head], at: [x, Lamp.Height, z] })), glowing);
 	return new Group().add(posts, heads);
@@ -43,7 +45,6 @@ export function carPark(spec: CarParkSpec) {
 	const pad = block(metres(plan.widthFeet), Surface.Height, metres(plan.depthFeet), isTarmac ? Surface.Tarmac : BuildingLook.Gravel);
 	const lines = mergedBoxes(bayLines(plan), surface(isTarmac ? Line.Tarmac : Line.Gravel, 0.6));
 	const cars = plan.bays.slice(0, carsOnATypicalDay(spec)).map(parkedCar);
-	const park = new Group().add(pad, lines, ...cars);
-	if (spec.isLit) park.add(lampPosts(plan));
-	return park;
+	const lamps = spec.isLit ? [lampPosts(plan)] : [];
+	return new Group().add(pad, lines, ...cars, ...lamps);
 }

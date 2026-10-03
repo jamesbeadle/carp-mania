@@ -10,12 +10,13 @@ const LabelLift = 9;
 export function createFacilities(plots: FacilityPlot[], groundAt: (point: WorldPoint) => number) {
 	const group = new Group();
 	const labels = plots.map((plot) => {
-		const model = FacilityModels[plot.site.facility];
-		const building = model.build(plot.site);
+		const { site } = plot;
+		const model = FacilityModels[site.facility];
+		const building = model.build(site);
 		const { point } = plot;
 		building.position.set(point.x, model.isInTheWater ? 0 : groundAt(point), point.z);
 		building.rotateY(plot.facing);
-		const label = labelSprite(siteLabelOf(plot.site));
+		const label = labelSprite(siteLabelOf(site));
 		label.position.set(point.x, groundAt(point) + LabelLift, point.z);
 		group.add(building, label);
 		return label;

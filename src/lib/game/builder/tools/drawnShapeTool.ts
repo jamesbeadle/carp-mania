@@ -1,10 +1,12 @@
 import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
 import { isOnFinishHandle } from '../drawingHandles';
 import { drawnShapeOf, finishDrawing, isPointsDraft, type PointsDraft } from '../finishDrawing';
+import { freehandStroke } from './freehandStroke';
 import type { ToolHandlers } from './toolHandlers';
 
 export function drawnShapeTool(createDraft: (points: LayoutPoint[]) => PointsDraft): ToolHandlers {
 	return {
+		...freehandStroke(createDraft),
 		onClick(builder, point) {
 			const draft = builder.draft;
 			if (!builder.isDrawing || !draft || !isPointsDraft(draft)) return builder.startDrawing(createDraft([point]));

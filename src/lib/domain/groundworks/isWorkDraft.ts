@@ -5,7 +5,7 @@ import { CarParkRules } from './sites/carParkPlan';
 import { isWorkKind, type WorkDraft } from './workKinds';
 
 export const WorkNameLength = { Minimum: 2, Maximum: 40 } as const;
-const MaximumPointsPerDraft = 200;
+export const MaximumPointsPerDraft = 200;
 const IslandSizes = ['small', 'medium', 'large'];
 const ShelfBeds = ['gravel', 'clay'];
 
@@ -21,8 +21,13 @@ export function isWorkDraft(candidate: unknown): candidate is WorkDraft {
 	if (kind === 'snag') return isPoint(candidate.point) && isName(candidate.name);
 	if (kind === 'reshape_shoreline') return isPointList(candidate.outline);
 	if (kind === 'upgrade_car_park') return isCarParkSpec(candidate.carPark);
-	if (kind === 'move_facility') return isFacility(String(candidate.facility)) && isPlacement(candidate);
+	const isMovingAFacility = kind === 'move_facility';
+	if (isMovingAFacility) return isFacilityName(candidate.facility) && isPlacement(candidate);
 	return isPlacement(candidate) && (kind === 'car_park' ? isCarParkSpec(candidate.carPark) : candidate.carPark === undefined);
+}
+
+function isFacilityName(value: unknown) {
+	return typeof value === 'string' && isFacility(value);
 }
 
 function isPlacement(candidate: Candidate) {
@@ -31,7 +36,8 @@ function isPlacement(candidate: Candidate) {
 
 export function isCarParkSpec(value: unknown): value is CarParkSpec {
 	if (!isRecord(value)) return false;
-	const isSpacesInRange = Number.isInteger(value.spaces) && Number(value.spaces) >= CarParkRules.MinimumSpaces && Number(value.spaces) <= CarParkRules.MaximumSpaces;
+	const spaces = Number(value.spaces);
+	const isSpacesInRange = Number.isInteger(value.spaces) && spaces >= CarParkRules.MinimumSpaces && spaces <= CarParkRules.MaximumSpaces;
 	return isSpacesInRange && (CarParkSurfaces as unknown[]).includes(value.surface) && typeof value.isLit === 'boolean';
 }
 

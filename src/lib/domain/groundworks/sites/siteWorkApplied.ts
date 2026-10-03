@@ -10,7 +10,9 @@ type SwimPosition = Pick<Swim, 'position_x' | 'position_y'>;
 
 export function layoutAfterSiteWork(layout: LakeLayout, draft: WorkDraft, plotAcres: number, swims: SwimPosition[]): LakeLayout {
 	const settled: LakeLayout = { ...layout, sites: sitesOf(layout, plotAcres, swims) };
-	if (draft.kind === 'move_facility') return withSite(settled, siteOfMove(draft, settled), []);
+	if (draft.kind === 'move_facility') {
+		return withSite(settled, siteOfMove(draft, settled), []);
+	}
 	if (draft.kind === 'upgrade_car_park') return withCarParkSpec(settled, draft.carPark);
 	return isFacilityDraft(draft) ? withBuiltFacility(settled, draft, plotAcres, swims) : settled;
 }

@@ -16,11 +16,14 @@ type Plot = Pick<Lake, 'layout' | 'plot_acres'>;
 const RedrawLabel = 'New bank — click the shoreline to finish';
 
 export function draftShapesFor(builder: BuilderState, failures: string[], lake: Plot, swims: Swim[], inProgress: LabelledWork[]): DraftShape[] {
-	return [...inProgressShapesFor(inProgress, lake, swims), ...currentDraftShapes(builder, failures, lake, swims), ...bankPathShapes(builder), ...swimShapes(builder, swims), ...selectedSiteShapes(builder, lake, swims)];
+	const underWay = inProgressShapesFor(inProgress, lake, swims);
+	const onTheBench = [...currentDraftShapes(builder, failures, lake, swims), ...bankPathShapes(builder), ...swimShapes(builder, swims)];
+	return [...underWay, ...onTheBench, ...selectedSiteShapes(builder, lake, swims)];
 }
 
 export function inProgressShapesFor(inProgress: LabelledWork[], lake: Plot, swims: Swim[]): DraftShape[] {
-	return inProgress.flatMap((work) => shapesOf(draftOf(work), lake, swims, `${work.label} — in progress, ${work.daysLeft} ${work.daysLeft === 1 ? 'day' : 'days'}`, true));
+	const labelOf = (work: LabelledWork) => `${work.label} — in progress, ${work.daysLeft} ${work.daysLeft === 1 ? 'day' : 'days'}`;
+	return inProgress.flatMap((work) => shapesOf(draftOf(work), lake, swims, labelOf(work), true));
 }
 
 function shapesOf(draft: WorkDraft, lake: Plot, swims: Swim[], label: string, isValid: boolean): DraftShape[] {

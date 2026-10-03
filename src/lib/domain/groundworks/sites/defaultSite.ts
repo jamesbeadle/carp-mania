@@ -26,7 +26,8 @@ function firstFitAlong(site: FacilitySite, bearing: number, surroundings: SiteSu
 		const centre = pointToward(site.centre, bearing, feet, surroundings);
 		if (isInWater(surroundings.layout, centre)) continue;
 		const candidate = { ...site, centre };
-		if (siteFitFailures(candidate, surroundings).length === 0) return candidate;
+		const failures = siteFitFailures(candidate, surroundings);
+		if (failures.length === 0) return candidate;
 	}
 	return null;
 }
@@ -37,7 +38,8 @@ function pointToward(from: LayoutPoint, bearing: number, feet: number, surroundi
 	return { x: from.x + across, y: from.y + down };
 }
 
-function openWaterSpot(surroundings: SiteSurroundings): LayoutPoint {
-	const centre = lakeCentroid(surroundings.layout);
-	return isInWater(surroundings.layout, centre) ? centre : surroundings.layout.outline[0];
+function openWaterSpot({ layout }: SiteSurroundings): LayoutPoint {
+	const centre = lakeCentroid(layout);
+	const [firstBankPoint] = layout.outline;
+	return isInWater(layout, centre) ? centre : firstBankPoint;
 }

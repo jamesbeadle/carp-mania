@@ -30,7 +30,8 @@ export function priceFacilityMove(draft: MoveDraft, layout: LakeLayout): Measure
 }
 
 function buildPriceOf(facility: Facility, layout: LakeLayout) {
-	if (facility === 'car_park') return { cost: carParkCost(carParkOf(layout) ?? StandardCarPark), days: carParkDays(carParkOf(layout) ?? StandardCarPark) };
+	const carPark = carParkOf(layout) ?? StandardCarPark;
+	if (facility === 'car_park') return { cost: carParkCost(carPark), days: carParkDays(carPark) };
 	const profile = FacilityCatalogue[facility];
 	return { cost: profile.cost, days: profile.days };
 }

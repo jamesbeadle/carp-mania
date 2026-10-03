@@ -18,9 +18,10 @@ export function siteCorners(site: FacilitySite, scale: LayoutScale): LayoutPoint
 }
 
 export function sitePointAt(site: FacilitySite, scale: LayoutScale, acrossFeet: number, downFeet: number): LayoutPoint {
+	const { centre } = site;
 	const cosine = Math.cos(site.rotation);
 	const sine = Math.sin(site.rotation);
 	const turnedAcross = acrossFeet * cosine - downFeet * sine;
 	const turnedDown = acrossFeet * sine + downFeet * cosine;
-	return { x: site.centre.x + fractionAcrossForFeet(scale, turnedAcross), y: site.centre.y + fractionDownForFeet(scale, turnedDown) };
+	return { x: centre.x + fractionAcrossForFeet(scale, turnedAcross), y: centre.y + fractionDownForFeet(scale, turnedDown) };
 }

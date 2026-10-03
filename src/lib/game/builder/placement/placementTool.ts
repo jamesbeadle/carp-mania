@@ -16,8 +16,9 @@ function siteOfDraft(draft: PlacementDraft, context: ToolContext) {
 function grabOrTurn(builder: BuilderState, point: LayoutPoint, context: ToolContext) {
 	const draft = builder.draft;
 	if (!isPlacementDraft(draft)) return;
+	const { centre } = draft;
 	const isOnTheSite = siteAt([siteOfDraft(draft, context)], point, context.plotAcres) !== null;
-	builder.siteGrab = isOnTheSite ? { x: draft.centre.x - point.x, y: draft.centre.y - point.y } : null;
+	builder.siteGrab = isOnTheSite ? { x: centre.x - point.x, y: centre.y - point.y } : null;
 	builder.isTurningTheSite = !isOnTheSite;
 }
 

@@ -14,7 +14,9 @@ export function vergeCapacityOf(spec: CarParkSpec) {
 }
 
 export function carParkEffects(spec: CarParkSpec): string[] {
-	const effects = [carParkSummary(spec), `Anglers ×${FacilityCatalogue.car_park.anglerFactor}`, `Parks ${spec.spaces} anglers a day; up to ${vergeCapacityOf(spec)} if they use the verge, which the regulars hate`];
+	const profile = FacilityCatalogue.car_park;
+	const parking = `Parks ${spec.spaces} anglers a day; up to ${vergeCapacityOf(spec)} if they use the verge, which the regulars hate`;
+	const effects = [carParkSummary(spec), `Anglers ×${profile.anglerFactor}`, parking];
 	if (spec.surface === 'tarmac') effects.push(`Anglers pay ×${CarParkEffects.TarmacPayFactor}`);
 	if (spec.isLit) effects.push(`Multi-day tickets ×${CarParkEffects.LightingMultiDayFactor}`, `£${CarParkPrices.LightingPerDay} a day to light`);
 	return effects;

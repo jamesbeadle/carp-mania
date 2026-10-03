@@ -20,6 +20,7 @@
 		isOrdering = false;
 		if (outcome.message !== undefined) return (builder.notice = outcome.message);
 		builder.clear();
+		builder.history.forget();
 		builder.notice = `Ordered — the crew is on it for ${days} ${days === 1 ? 'day' : 'days'}`;
 		await invalidateAll();
 	}

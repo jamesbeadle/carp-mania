@@ -36,10 +36,10 @@ function plotFailure(site: FacilitySite, corners: LayoutPoint[]) {
 	return isOnThePlot ? null : `The ${nameOf(site)} must sit wholly on your land`;
 }
 
-function dryLandFailure(site: FacilitySite, corners: LayoutPoint[], surroundings: SiteSurroundings) {
-	const outline = surroundings.layout.outline;
+function dryLandFailure(site: FacilitySite, corners: LayoutPoint[], { layout, scale }: SiteSurroundings) {
+	const outline = layout.outline;
 	const isTouchingWater = doPolygonsOverlap(corners, outline);
-	const isOnTheWatersEdge = corners.some((corner) => feetToNearestEdge(surroundings.scale, corner, outline) < SiteClearance.FromTheWaterFeet);
+	const isOnTheWatersEdge = corners.some((corner) => feetToNearestEdge(scale, corner, outline) < SiteClearance.FromTheWaterFeet);
 	return isTouchingWater || isOnTheWatersEdge ? `The ${nameOf(site)} must sit on dry land, ${SiteClearance.FromTheWaterFeet} ft back from the water` : null;
 }
 
@@ -49,7 +49,8 @@ function openWaterFailure(site: FacilitySite, corners: LayoutPoint[], surroundin
 }
 
 function pegFailure(corners: LayoutPoint[], surroundings: SiteSurroundings) {
-	const isCrowdingAPeg = surroundings.pegs.some((peg) => isPointInPolygon(peg, corners) || feetToNearestEdge(surroundings.scale, peg, corners) < SiteClearance.FromAPegFeet);
+	const isTooClose = (peg: LayoutPoint) => isPointInPolygon(peg, corners) || feetToNearestEdge(surroundings.scale, peg, corners) < SiteClearance.FromAPegFeet;
+	const isCrowdingAPeg = surroundings.pegs.some(isTooClose);
 	return isCrowdingAPeg ? `Keep it ${SiteClearance.FromAPegFeet} ft clear of the pegs` : null;
 }
 
