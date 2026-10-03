@@ -27,6 +27,7 @@ export interface Profile {
 	plot_longitude: number | null;
 	current_lake_id: string | null;
 	is_admin: boolean;
+	licence_signed_at: string | null;
 }
 
 export interface Lake {
