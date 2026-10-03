@@ -1,4 +1,5 @@
 import { anglerFactorOf, payFactorOf } from '../groundworks/facilities';
+import { carParkPayFactor } from '../groundworks/sites/carParkTrade';
 import type { TicketProduct } from '../fishing/ticketBook';
 import { anglersPerDayFor } from '../reputation';
 import type { Lake } from '../types';
@@ -21,7 +22,7 @@ export function anglersArrivingToday(lake: Lake, season: Pick<Season, 'anglerFac
 
 export function willingnessAt(lake: Lake, stockDraw = NoDraw) {
 	const willingness = willingnessToPayFor(Number(lake.reputation), lake.region);
-	return willingness * payFactorOf(lake.layout.facilities) * drawPayFactor(stockDraw);
+	return willingness * payFactorOf(lake.layout.facilities) * carParkPayFactor(lake.layout) * drawPayFactor(stockDraw);
 }
 
 export function affordabilityAt(lake: Lake, book: TicketProduct[], stockDraw = NoDraw) {

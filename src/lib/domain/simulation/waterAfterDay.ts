@@ -1,4 +1,5 @@
 import { reputationPerDayOf } from '../groundworks/facilities';
+import { vergeReputationCost } from '../groundworks/sites/carParkTrade';
 import { clampReputation, reputationFromCatch } from '../reputation';
 import { shopTierOf } from '../tackle/shopTier';
 import type { Lake } from '../types';
@@ -18,7 +19,7 @@ export function waterAfterDay(lake: Lake, anglers: AnglerDay, stockDraw: number,
 
 function reputationAfterDay(lake: Lake, anglers: AnglerDay, stockDraw: number, species: LakeSpecies[]) {
 	const reputation = Number(lake.reputation);
-	const fromFacilities = reputationPerDayOf(lake.layout.facilities);
+	const fromFacilities = reputationPerDayOf(lake.layout.facilities) - vergeReputationCost(anglers.parkedOnTheVerge);
 	const gained = anglers.catches.reduce((total, caught) => total + reputationFromCatch(caught.weight_lb, reputation), fromFacilities);
 	const quality = overallWaterQuality(Number(lake.transparency), Number(lake.weed), Number(lake.silt));
 	const settled = clampReputation(reputation + gained);

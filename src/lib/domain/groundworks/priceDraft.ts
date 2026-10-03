@@ -4,7 +4,9 @@ import { GroundworksCatalogue, IslandWorks, WorkPrices } from './catalogue';
 import { acresLabel, perimeterFeet, polygonAcres } from './draftFootprint';
 import { FacilityCatalogue, isFacility, type FacilityProfile } from './facilities';
 import { islandAcresFor, islandPolygonFor } from './islandTemplates';
+import { priceCarPark, priceCarParkUpgrade, priceFacilityMove } from './sites/priceSiteWork';
 import { priceDredge, priceReeds, priceShelf, priceShoreline, type MeasuredPrice } from './priceMeasuredWorks';
+import { StandardCarPark } from './sites/carParkPlan';
 import type { WorkDraft } from './workKinds';
 
 export interface WorkPrice {
@@ -31,6 +33,8 @@ function priceByKind(draft: WorkDraft, layout: LakeLayout, plotAcres: number): M
 	if (draft.kind === 'lily_pads') return { ...WorkPrices.LilyPads, effects: [`Lilies over ${acresLabel(polygonAcres(draft.points, plotAcres))} — a summer holding spot`] };
 	if (draft.kind === 'snag') return { ...WorkPrices.Snag, effects: ['Big fish hold here; one hooked fish in ten finds it'] };
 	if (draft.kind === 'reshape_shoreline') return priceShoreline(draft, layout, plotAcres);
+	if (draft.kind === 'upgrade_car_park') return priceCarParkUpgrade(draft, layout);
+	if (draft.kind === 'move_facility') return priceFacilityMove(draft, layout);
 	return priceFacility(draft);
 }
 
@@ -42,6 +46,7 @@ function priceIsland(draft: Extract<WorkDraft, { kind: 'island' }>, plotAcres: n
 
 function priceFacility(draft: WorkDraft): MeasuredPrice {
 	if (!isFacility(draft.kind)) return priceSanctuary();
+	if (draft.kind === 'car_park') return priceCarPark(draft.carPark ?? StandardCarPark);
 	const facility = FacilityCatalogue[draft.kind];
 	return { cost: facility.cost, days: facility.days, effects: facilityEffects(facility) };
 }

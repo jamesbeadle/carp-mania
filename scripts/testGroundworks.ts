@@ -10,6 +10,7 @@ import { isInWater } from '../src/lib/domain/layout/waterArea';
 import { FisheryClock } from '../src/lib/domain/simulation/elapsedDays';
 import { completeDueWorks } from '../src/lib/domain/simulation/completeWorks';
 import { runRedrawBankScenarios } from './testRedrawBank';
+import { placedDraft, runFacilitySiteScenarios } from './testFacilitySites';
 import { classicLake, classicSwims } from '../src/lib/domain/sites/classicSite';
 import type { Lake, Swim } from '../src/lib/domain/types';
 import type { LakeWork } from '../src/lib/domain/worldTypes';
@@ -42,11 +43,9 @@ function islandScenarios() {
 	const threeEarthworks: WorkDraft[] = [snagFar, { ...snagFar, point: { x: 0.85, y: 0.55 } }, { ...snagFar, point: { x: 0.8, y: 0.6 } }];
 	const fourth = validateDraft(lake.layout, plotAcres, swims, threeEarthworks, island);
 	assert.ok(fourth.some((failure) => failure.includes('already in progress')), `a fourth earthwork fails: ${fourth.join('; ')}`);
-	assert.deepEqual(validateDraft(lake.layout, plotAcres, swims, threeEarthworks, { kind: 'lodge' }), [], 'facilities do not count as earthworks');
-	const skipped = validateDraft(lake.layout, plotAcres, swims, [], { kind: 'club_house' });
+	assert.deepEqual(validateDraft(lake.layout, plotAcres, swims, threeEarthworks, placedDraft('lodge')), [], 'facilities do not count as earthworks');
+	const skipped = validateDraft(lake.layout, plotAcres, swims, [], placedDraft('club_house'));
 	assert.ok(skipped.some((failure) => failure.includes('needs the washrooms')), `the service refuses a club house without the washrooms: ${skipped.join('; ')}`);
-	const withWashrooms = { ...lake, layout: { ...lake.layout, facilities: ['toilets' as const] } };
-	assert.deepEqual(applyCompletedWork(withWashrooms, { kind: 'washrooms' }, 'work-washrooms').layout.facilities, ['washrooms'], 'finished washrooms replace the toilets');
 }
 
 function dredgeScenarios() {
@@ -91,5 +90,6 @@ export function runGroundworksScenarios() {
 	shelfScenario();
 	completionScenarios();
 	runRedrawBankScenarios();
+	runFacilitySiteScenarios();
 	console.log('groundworks:', { island: GetGroundworksQuote(island, lake, swims, []), dredge: GetGroundworksQuote(dredge, lake, swims, []).effects });
 }

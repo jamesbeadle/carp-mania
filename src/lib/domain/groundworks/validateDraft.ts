@@ -3,12 +3,13 @@ import { doPolygonsOverlap } from '../layout/pointInPolygon';
 import type { Swim } from '../types';
 import { GroundworksCatalogue, WorksInProgress } from './catalogue';
 import { isFacility, whyFacilityCannotBeBuilt } from './facilities';
-import { footprintOf, isAreaDraft, isBankDraft, isFacilityDraft } from './draftFootprint';
+import { footprintOf, isAreaDraft, isBankDraft } from './draftFootprint';
 import { planFor, type Plan } from './plan';
 import { validateArea, validateSnag } from './validateArea';
 import { validateBankStretch, validateShoreline } from './validateBank';
 import { validateIsland } from './validateIsland';
-import { isEarthwork, type WorkDraft } from './workKinds';
+import { carParkUpgradeFailures, facilityMoveFailures, placedFacilityFailures } from './sites/siteWorkFailures';
+import { isEarthwork, isFacilityDraft, isSiteWork, type WorkDraft } from './workKinds';
 
 export function validateDraft(layout: LakeLayout, plotAcres: number, swims: Swim[], worksInProgress: WorkDraft[], draft: WorkDraft): string[] {
 	const plan = planFor(layout, plotAcres, swims, worksInProgress);
@@ -42,14 +43,20 @@ function shapeFailures(plan: Plan, draft: WorkDraft): string[] {
 	if (draft.kind === 'reshape_shoreline') return validateShoreline(plan, draft);
 	if (isAreaDraft(draft)) return validateArea(plan, draft);
 	if (isBankDraft(draft)) return validateBankStretch(plan, draft);
-	return [];
+	return siteFailures(plan, draft);
+}
+
+function siteFailures(plan: Plan, draft: WorkDraft): string[] {
+	if (draft.kind === 'upgrade_car_park') return carParkUpgradeFailures(plan, draft);
+	if (draft.kind === 'move_facility') return facilityMoveFailures(plan, draft);
+	return isFacilityDraft(draft) ? placedFacilityFailures(plan, draft) : [];
 }
 
 function overlapFailures(plan: Plan, draft: WorkDraft): string[] {
-	if (draft.kind === 'reshape_shoreline' || isFacilityDraft(draft)) return [];
+	if (draft.kind === 'reshape_shoreline' || isSiteWork(draft)) return [];
 	const footprint = footprintOf(draft, plan.layout, plan.plotAcres);
 	const isOverlapping = plan.worksInProgress
-		.filter((work) => work.kind !== 'reshape_shoreline' && !isFacilityDraft(work))
+		.filter((work) => work.kind !== 'reshape_shoreline' && !isSiteWork(work))
 		.map((work) => footprintOf(work, plan.layout, plan.plotAcres))
 		.some((other) => doPolygonsOverlap(footprint.points, other.points));
 	return isOverlapping ? ['That overlaps works already in progress'] : [];

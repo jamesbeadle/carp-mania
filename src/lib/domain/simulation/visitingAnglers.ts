@@ -1,5 +1,6 @@
 import { feeCollectionOf, type Bailiff } from '../bailiffs/bailiffTeam';
 import { multiDayFactorOf, takingsPerAnglerOf } from '../groundworks/facilities';
+import { anglersOnTheVerge, carParkMultiDayFactor, parkingCapacityOf } from '../groundworks/sites/carParkTrade';
 import { ShopSpendPerAngler } from '../tackle/shopTier';
 import type { StandingRecords } from '../market/records';
 import type { TicketProduct } from '../fishing/ticketBook';
@@ -44,12 +45,13 @@ export interface AnglerDay {
 	records: StandingRecords;
 	lodgeTakings: number;
 	turnedAway: number;
+	parkedOnTheVerge: number;
 }
 
 export function simulateVisitingAnglers(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, today: VisitingDay): AnglerDay {
 	const wanting = today.isClosedForRestocking ? NobodyComes : anglersArrivingToday(lake, today.season, today.book, today.stockDraw);
-	const count = Math.min(wanting, Math.round(today.pegsPerDay));
-	const day: AnglerDay = { visits: [], catches: [], records: today.standing, lodgeTakings: 0, turnedAway: wanting - count };
+	const count = Math.min(wanting, Math.round(today.pegsPerDay), parkingCapacityOf(lake.layout));
+	const day: AnglerDay = { visits: [], catches: [], records: today.standing, lodgeTakings: 0, turnedAway: wanting - count, parkedOnTheVerge: anglersOnTheVerge(lake.layout, count) };
 	const fishable = carp.filter(isFishable);
 	for (let index = 0; index < count; index++) day.visits.push(simulateOneAngler(lake, fishable, swims, random, today, day));
 	day.lodgeTakings = count * takingsPerHeadAt(lake);
@@ -64,7 +66,7 @@ function simulateOneAngler(lake: Lake, carp: Carp[], swims: Swim[], random: Rand
 	const fishCaught = Math.round(goodDay * randomBetween(random, 0.4, 1.1));
 	for (let index = 0; index < fishCaught; index++) recordNpcCatch(lake, carp, swims, random, anglerName, rating, today, day);
 	const isFeePaid = random() < feeCollectionOf(today.bailiffs);
-	const ticket = chooseTicket(today.book, willingnessAt(lake, today.stockDraw), random, multiDayFactorOf(builtAt(lake)));
+	const ticket = chooseTicket(today.book, willingnessAt(lake, today.stockDraw), random, multiDayFactorOf(builtAt(lake)) * carParkMultiDayFactor(lake.layout));
 	const fee = feeFor(ticket, Number(lake.day_ticket_fee));
 	return { lake_id: lake.id, angler_id: null, angler_name: anglerName, fee_paid: isFeePaid ? fee : 0, fish_caught: fishCaught };
 }

@@ -1,4 +1,7 @@
+import { CarParkSurfaces, type CarParkSpec } from '../layout/facilitySite';
 import type { LayoutPoint } from '../layout/layoutTypes';
+import { isFacility } from './facilities';
+import { CarParkRules } from './sites/carParkPlan';
 import { isWorkKind, type WorkDraft } from './workKinds';
 
 export const WorkNameLength = { Minimum: 2, Maximum: 40 } as const;
@@ -17,7 +20,19 @@ export function isWorkDraft(candidate: unknown): candidate is WorkDraft {
 	if (kind === 'margin_shelf') return isPointList(candidate.points) && ShelfBeds.includes(String(candidate.bed));
 	if (kind === 'snag') return isPoint(candidate.point) && isName(candidate.name);
 	if (kind === 'reshape_shoreline') return isPointList(candidate.outline);
-	return true;
+	if (kind === 'upgrade_car_park') return isCarParkSpec(candidate.carPark);
+	if (kind === 'move_facility') return isFacility(String(candidate.facility)) && isPlacement(candidate);
+	return isPlacement(candidate) && (kind === 'car_park' ? isCarParkSpec(candidate.carPark) : candidate.carPark === undefined);
+}
+
+function isPlacement(candidate: Candidate) {
+	return isPoint(candidate.centre) && isFiniteNumber(candidate.rotation);
+}
+
+export function isCarParkSpec(value: unknown): value is CarParkSpec {
+	if (!isRecord(value)) return false;
+	const isSpacesInRange = Number.isInteger(value.spaces) && Number(value.spaces) >= CarParkRules.MinimumSpaces && Number(value.spaces) <= CarParkRules.MaximumSpaces;
+	return isSpacesInRange && (CarParkSurfaces as unknown[]).includes(value.surface) && typeof value.isLit === 'boolean';
 }
 
 export function isName(value: unknown): value is string {
