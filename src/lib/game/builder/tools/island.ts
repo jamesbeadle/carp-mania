@@ -1,5 +1,4 @@
-import { layoutScaleFor } from '$lib/domain/layout/layoutScale';
-import type { LayoutPoint } from '$lib/domain/layout/layoutTypes';
+import { bearingFrom } from '../bearingFrom';
 import type { ToolHandlers } from './toolHandlers';
 
 const DefaultIslandName = 'New Island';
@@ -16,8 +15,3 @@ export const islandTool: ToolHandlers = {
 		builder.draft = { ...draft, rotation: bearingFrom(draft.centre, point, context.plotAcres) };
 	}
 };
-
-function bearingFrom(centre: LayoutPoint, point: LayoutPoint, plotAcres: number) {
-	const scale = layoutScaleFor(plotAcres);
-	return Math.atan2((point.y - centre.y) * scale.feetDown, (point.x - centre.x) * scale.feetAcross);
-}

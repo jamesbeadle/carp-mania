@@ -1,5 +1,5 @@
 import { Group } from 'three';
-import { FacilityCatalogue } from '$lib/domain/groundworks/facilities';
+import { siteLabelOf } from '../../render/drawFacilities';
 import type { WorldPoint } from '../lakeFrame';
 import { labelSprite } from './labelSprite';
 import type { FacilityPlot } from './facilityGrounds';
@@ -10,13 +10,13 @@ const LabelLift = 9;
 export function createFacilities(plots: FacilityPlot[], groundAt: (point: WorldPoint) => number) {
 	const group = new Group();
 	const labels = plots.map((plot) => {
-		const model = FacilityModels[plot.facility];
-		const building = model.build();
+		const { site } = plot;
+		const model = FacilityModels[site.facility];
+		const building = model.build(site);
 		const { point } = plot;
 		building.position.set(point.x, model.isInTheWater ? 0 : groundAt(point), point.z);
 		building.rotateY(plot.facing);
-		const profile = FacilityCatalogue[plot.facility];
-		const label = labelSprite(profile.label);
+		const label = labelSprite(siteLabelOf(site));
 		label.position.set(point.x, groundAt(point) + LabelLift, point.z);
 		group.add(building, label);
 		return label;

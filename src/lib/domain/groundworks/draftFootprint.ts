@@ -3,7 +3,9 @@ import type { LakeLayout, LayoutPoint } from '../layout/layoutTypes';
 import { polygonAreaFraction } from '../layout/polygonArea';
 import { islandPolygonFor } from './islandTemplates';
 import { shelfPolygonFor } from './shelfStrip';
-import { FacilityKinds, type WorkDraft } from './workKinds';
+import { siteCorners } from './sites/siteFootprint';
+import { siteOfWork } from './sites/siteOfWork';
+import type { WorkDraft } from './workKinds';
 
 export type FootprintShape = 'polygon' | 'polyline' | 'point';
 
@@ -23,10 +25,6 @@ export function isBankDraft(draft: WorkDraft): draft is BankDraft {
 	return draft.kind === 'margin_shelf' || draft.kind === 'reed_bed' || draft.kind === 'sanctuary';
 }
 
-export function isFacilityDraft(draft: WorkDraft) {
-	return FacilityKinds.includes(draft.kind);
-}
-
 export function footprintOf(draft: WorkDraft, layout: LakeLayout, plotAcres: number): Footprint {
 	if (draft.kind === 'island') return { shape: 'polygon', points: islandPolygonFor(draft.size, draft.centre, draft.rotation, plotAcres) };
 	if (draft.kind === 'margin_shelf') return { shape: 'polygon', points: shelfPolygonFor(draft.points, layout, layoutScaleFor(plotAcres)) };
@@ -34,7 +32,8 @@ export function footprintOf(draft: WorkDraft, layout: LakeLayout, plotAcres: num
 	if (draft.kind === 'snag') return { shape: 'point', points: [draft.point] };
 	if (draft.kind === 'reshape_shoreline') return { shape: 'polygon', points: draft.outline };
 	if (isAreaDraft(draft)) return { shape: 'polygon', points: draft.points };
-	return { shape: 'point', points: [] };
+	const site = siteOfWork(draft, layout);
+	return site ? { shape: 'polygon', points: siteCorners(site, layoutScaleFor(plotAcres)) } : { shape: 'point', points: [] };
 }
 
 export function polygonAcres(points: LayoutPoint[], plotAcres: number) {

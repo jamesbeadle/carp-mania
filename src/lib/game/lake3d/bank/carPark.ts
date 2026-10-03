@@ -1,65 +1,50 @@
-import { CylinderGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
-import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { Group, MeshStandardMaterial } from 'three';
+import { carParkPlanFor, ParkingBaySize, type CarParkPlan, type ParkingBay } from '$lib/domain/groundworks/sites/carParkPlan';
+import type { CarParkSpec } from '$lib/domain/layout/facilitySite';
+import { carsOnATypicalDay } from '../../scene/parkedCars';
+import { MetresPerFoot } from '../lakeFrame';
 import { block, BuildingLook, surface } from './buildingLook';
 import { mergedBoxes, type BoxSpec } from './mergedBoxes';
+import { car, CarPaints } from './parkedCar3d';
 
-const Car = { Length: 4.3, Width: 1.8, BodyHeight: 0.6, BodyLift: 0.3, CabinLength: 2.2, CabinHeight: 0.52, CabinInset: 0.13, CabinBack: -0.3, Rounding: 0.14, RoofHeight: 0.07 } as const;
-const Wheel = { Radius: 0.33, Width: 0.24, FromEnd: 0.8, Hub: 0.55 } as const;
-const Lamp = { Width: 0.32, Height: 0.12, Depth: 0.05, FromSide: 0.25, Lift: 0.66 } as const;
-const Park = { Width: 22, Depth: 14, Gravel: 0.08, Bays: 5, BayWidth: 3, LineLength: 5, LineWidth: 0.1, Row: -2.5 } as const;
-const Sign = { Post: 0.08, Height: 2.2, Board: 0.9 } as const;
-const CarPaints = ['#8a1d1d', '#1d3f8a', '#d9d9d9', '#2a2a2a', '#3f6a3a'];
-const CarLook = { Glass: '#1a232c', Rubber: '#141414', Chrome: '#c9ced2', Headlamp: '#fff6dc', Tail: '#d8261e', Line: '#f2f2ec', SignBoard: '#1f4fa8' } as const;
-const ParkedBays = [0, 1, 3];
+const Surface = { Height: 0.08, Tarmac: '#3a3d42' } as const;
+const Line = { Width: 0.1, Lift: 0.005, Gravel: '#5a4330', Tarmac: '#f2f2ec' } as const;
+const Lamp = { Post: 0.12, Height: 5, Head: 0.5, Inset: 1 } as const;
+const LampLight = { Colour: '#ffe9b0', Glow: 0.9 } as const;
+const HalfTurn = Math.PI;
 
-function rounded(width: number, height: number, depth: number, material: MeshStandardMaterial, lift: number, along = 0) {
-	const mesh = new Mesh(new RoundedBoxGeometry(width, height, depth, 3, Car.Rounding), material);
-	mesh.position.set(0, lift + height / 2, along);
-	mesh.castShadow = true;
-	return mesh;
+const metres = (feet: number) => feet * MetresPerFoot;
+
+function bayLines(plan: CarParkPlan): BoxSpec[] {
+	const length = metres(ParkingBaySize.LengthFeet);
+	const halfWidth = metres(ParkingBaySize.WidthFeet) / 2;
+	const lineAt = (bay: ParkingBay, side: number): BoxSpec => ({ size: [Line.Width, 0.01, length], at: [metres(bay.acrossFeet) + side, Surface.Height + Line.Lift, metres(bay.downFeet)] });
+	return plan.bays.flatMap((bay) => [-halfWidth, halfWidth].map((side) => lineAt(bay, side)));
 }
 
-function wheels() {
-	const spots = [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([side, end]) => [(side * (Car.Width - Wheel.Width)) / 2, Wheel.Radius, end * (Car.Length / 2 - Wheel.FromEnd)]);
-	const tyre = (radius: number, width: number) => mergeGeometries(spots.map(([x, y, z]) => new CylinderGeometry(radius, radius, width, 18).rotateZ(Math.PI / 2).translate(x, y, z)));
-	const tyres = new Mesh(tyre(Wheel.Radius, Wheel.Width), new MeshStandardMaterial({ color: CarLook.Rubber, roughness: 0.9 }));
-	const hubs = new Mesh(tyre(Wheel.Radius * Wheel.Hub, Wheel.Width + 0.02), new MeshStandardMaterial({ color: CarLook.Chrome, metalness: 0.9, roughness: 0.25 }));
-	return [tyres, hubs];
+function parkedCar(bay: ParkingBay, index: number) {
+	const parked = car(CarPaints[(index * 3) % CarPaints.length]);
+	parked.position.set(metres(bay.acrossFeet), Surface.Height, metres(bay.downFeet));
+	if (!bay.isFacingDown) parked.rotateY(HalfTurn);
+	return parked;
 }
 
-function lamps() {
-	const pair = (end: number): BoxSpec[] => [-1, 1].map((side) => ({ size: [Lamp.Width, Lamp.Height, Lamp.Depth], at: [side * (Car.Width / 2 - Lamp.FromSide), Lamp.Lift, end * (Car.Length / 2)] }));
-	const glowing = (colour: string) => new MeshStandardMaterial({ color: colour, emissive: colour, emissiveIntensity: 0.4 });
-	return [mergedBoxes(pair(1), glowing(CarLook.Headlamp)), mergedBoxes(pair(-1), glowing(CarLook.Tail))];
+function lampPosts(plan: CarParkPlan) {
+	const ends = [-1, 1].map((side) => side * (metres(plan.widthFeet) / 2 - Lamp.Inset));
+	const spots = plan.aislesDownFeet.flatMap((aisle) => ends.map((across) => [across, metres(aisle)] as const));
+	const postBoxes = spots.map(([x, z]): BoxSpec => ({ size: [Lamp.Post, Lamp.Height, Lamp.Post], at: [x, Lamp.Height / 2, z] }));
+	const posts = mergedBoxes(postBoxes, surface(BuildingLook.Iron, 0.4));
+	const glowing = new MeshStandardMaterial({ color: LampLight.Colour, emissive: LampLight.Colour, emissiveIntensity: LampLight.Glow });
+	const heads = mergedBoxes(spots.map(([x, z]) => ({ size: [Lamp.Head, Lamp.Head / 2, Lamp.Head], at: [x, Lamp.Height, z] })), glowing);
+	return new Group().add(posts, heads);
 }
 
-function car(paint: string) {
-	const body = new MeshStandardMaterial({ color: paint, metalness: 0.55, roughness: 0.3 });
-	const cabinWidth = Car.Width - Car.CabinInset * 2;
-	const cabin = rounded(cabinWidth, Car.CabinHeight, Car.CabinLength, new MeshStandardMaterial({ color: CarLook.Glass, metalness: 0.6, roughness: 0.08 }), Car.BodyLift + Car.BodyHeight - 0.04, Car.CabinBack);
-	const roof = rounded(cabinWidth - 0.04, Car.RoofHeight, Car.CabinLength * 0.78, body, Car.BodyLift + Car.BodyHeight + Car.CabinHeight - 0.08, Car.CabinBack);
-	return new Group().add(rounded(Car.Width, Car.BodyHeight, Car.Length, body, Car.BodyLift), cabin, roof, ...wheels(), ...lamps());
-}
-
-function bayLines(): BoxSpec[] {
-	return Array.from({ length: Park.Bays + 1 }, (_, index) => ({ size: [Park.LineWidth, 0.01, Park.LineLength], at: [(index - Park.Bays / 2) * Park.BayWidth, Park.Gravel + 0.005, Park.Row] }));
-}
-
-function parkingSign() {
-	const post = mergedBoxes([{ size: [Sign.Post, Sign.Height, Sign.Post], at: [0, Sign.Height / 2, 0] }], surface(BuildingLook.Iron, 0.4));
-	const board = mergedBoxes([{ size: [Sign.Board, Sign.Board, 0.05], at: [0, Sign.Height, 0.05] }], new MeshStandardMaterial({ color: CarLook.SignBoard, roughness: 0.4 }));
-	const sign = new Group().add(post, board);
-	sign.position.set(Park.Width / 2 - 1, 0, Park.Depth / 2 - 1);
-	return sign;
-}
-
-export function carPark() {
-	const pad = block(Park.Width, Park.Gravel, Park.Depth, BuildingLook.Gravel);
-	const cars = ParkedBays.map((bay, index) => {
-		const parked = car(CarPaints[index % CarPaints.length]);
-		parked.position.set((bay - Park.Bays / 2 + 0.5) * Park.BayWidth, Park.Gravel, Park.Row);
-		return parked;
-	});
-	return new Group().add(pad, mergedBoxes(bayLines(), surface(CarLook.Line, 0.6)), parkingSign(), ...cars);
+export function carPark(spec: CarParkSpec) {
+	const plan = carParkPlanFor(spec);
+	const isTarmac = spec.surface === 'tarmac';
+	const pad = block(metres(plan.widthFeet), Surface.Height, metres(plan.depthFeet), isTarmac ? Surface.Tarmac : BuildingLook.Gravel);
+	const lines = mergedBoxes(bayLines(plan), surface(isTarmac ? Line.Tarmac : Line.Gravel, 0.6));
+	const cars = plan.bays.slice(0, carsOnATypicalDay(spec)).map(parkedCar);
+	const lamps = spec.isLit ? [lampPosts(plan)] : [];
+	return new Group().add(pad, lines, ...cars, ...lamps);
 }

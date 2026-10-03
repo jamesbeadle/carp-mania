@@ -5,6 +5,7 @@
 	import LayerToggles from '$lib/components/builder/LayerToggles.svelte';
 	import PropertiesPanel from '$lib/components/builder/PropertiesPanel.svelte';
 	import ToolRail from '$lib/components/builder/ToolRail.svelte';
+	import UndoRedo from '$lib/components/builder/UndoRedo.svelte';
 	import WorksLedgerPanel from '$lib/components/lake/WorksLedgerPanel.svelte';
 	import PlaceBanner from '$lib/components/place/PlaceBanner.svelte';
 	import PlaceSheet from '$lib/components/stage/PlaceSheet.svelte';
@@ -27,12 +28,13 @@
 	let wasWantingDetails = false;
 
 	const lake = $derived(data.fishery.lake);
+	const swims = $derived(data.fishery.swims);
 	const inProgress = $derived(data.groundworks.inProgress);
 	const hasEarthworksInProgress = $derived(inProgress.some((work) => isWorkKind(work.kind) && isEarthwork(work.kind)));
-	const quote = $derived(builder.draft ? GetGroundworksQuote(builder.draft, lake, data.fishery.swims, inProgress) : null);
-	const drafts = $derived(draftShapesFor(builder, quote?.failures ?? [], lake, data.fishery.swims, inProgress));
+	const quote = $derived(builder.draft ? GetGroundworksQuote(builder.draft, lake, swims, inProgress) : null);
+	const drafts = $derived(draftShapesFor(builder, quote?.failures ?? [], lake, swims, inProgress));
 	const sceneLake = $derived(lakeWithLayersHidden(lake, layers));
-	const sceneSwims = $derived(layers.swims ? data.fishery.swims : []);
+	const sceneSwims = $derived(layers.swims ? swims : []);
 	const worksWord = $derived(`${inProgress.length} ${inProgress.length === 1 ? 'work' : 'works'} in progress`);
 
 	$effect(() => screen.watch());
@@ -56,16 +58,17 @@
 <div class="grid gap-4 lg:grid-cols-[auto_1fr_20rem]">
 	<ToolRail {builder} />
 	<div>
-		<BuilderStage {builder} {lake} {sceneLake} swims={data.fishery.swims} {sceneSwims} carp={data.fishery.carp} {drafts} />
-		<Bench {builder} failures={quote?.failures ?? []} {lake} swims={data.fishery.swims} onDetails={() => (isSheetOpen = true)} />
+		<BuilderStage {builder} {lake} {sceneLake} {swims} {sceneSwims} carp={data.fishery.carp} {drafts} />
+		<UndoRedo {builder} />
+		<Bench {builder} failures={quote?.failures ?? []} {lake} {swims} onDetails={() => (isSheetOpen = true)} />
 		<LayerToggles bind:layers />
 	</div>
-	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} /></div>
+	<div class="hidden lg:block"><PropertiesPanel {builder} {quote} {lake} {swims} profile={data.profile} {hasEarthworksInProgress} /></div>
 </div>
 
 {#if screen.isPhone}
 	<PlaceSheet title={SheetTitle} isOpen={isSheetOpen} onClose={() => (isSheetOpen = false)}>
-		<PropertiesPanel {builder} {quote} {lake} profile={data.profile} {hasEarthworksInProgress} />
+		<PropertiesPanel {builder} {quote} {lake} {swims} profile={data.profile} {hasEarthworksInProgress} />
 	</PlaceSheet>
 {/if}
 

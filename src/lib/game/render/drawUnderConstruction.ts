@@ -4,6 +4,7 @@ import { smoothClosedPath, toScene, type Point } from '../scene/lakeShape';
 import { DraftPalette } from '../scene/palette';
 import { drawCanvasLabel } from './drawCanvasLabel';
 import { drawDraftHandles, type DraftHandle } from './drawDraftHandles';
+import { paintSitePreview, type SitePreview } from './sites/paintSitePreview';
 
 export type DraftKind = 'polygon' | 'point' | 'polyline';
 
@@ -14,6 +15,7 @@ export interface DraftShape {
 	isValid: boolean;
 	isBeingDrawn?: boolean;
 	handles?: DraftHandle[];
+	preview?: SitePreview;
 }
 
 const DraftDash: number[] = [8, 6];
@@ -25,6 +27,7 @@ export function drawDrafts(context: CanvasRenderingContext2D, drafts: DraftShape
 
 function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 	if (draft.points.length === 0) return;
+	if (draft.preview) paintSitePreview(context, draft.preview);
 	const colour = draft.isValid ? DraftPalette.Valid : DraftPalette.Invalid;
 	context.save();
 	context.setLineDash(DraftDash);
@@ -34,12 +37,24 @@ function drawDraft(context: CanvasRenderingContext2D, draft: DraftShape) {
 	traceDraft(context, draft, draft.points.map(toScene), colour);
 	context.restore();
 	drawDraftHandles(context, draft.handles ?? [], colour);
-	drawCanvasLabel(context, toScene(polygonCentroid(draft.points)), draft.label, colour, true);
+	const hasALabel = draft.label.length > 0;
+	if (hasALabel) drawCanvasLabel(context, labelAnchorOf(draft), draft.label, colour, true);
+}
+
+function labelAnchorOf(draft: DraftShape): Point {
+	const centre = toScene(polygonCentroid(draft.points));
+	if (!draft.preview) return centre;
+	const lowest = Math.max(...draft.points.map((point) => toScene(point).y));
+	return { x: centre.x, y: lowest };
 }
 
 function traceDraft(context: CanvasRenderingContext2D, draft: DraftShape, points: Point[], colour: string) {
 	if (draft.kind === 'point') return traceDraftPoint(context, points[0], colour);
 	if (draft.isBeingDrawn) return traceUnderConstruction(context, draft.kind, points);
+	const isASite = draft.preview !== undefined;
+	if (isASite) {
+		return context.stroke(straightClosedPath(points));
+	}
 	if (draft.kind === 'polyline' || points.length < Draft.MinimumPolygonPoints) return traceDraftLine(context, points);
 	const polygon = smoothClosedPath(points);
 	context.fill(polygon);

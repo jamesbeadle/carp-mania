@@ -7,6 +7,7 @@ import type { Swim } from '../types';
 import { IslandRules } from './catalogue';
 import type { BankDraft } from './draftFootprint';
 import type { Plan } from './plan';
+import { doesBankCrossItself, swallowedBuildingFailures } from './shoreline/shorelineGuards';
 import type { WorkDraft } from './workKinds';
 
 const MinimumStretchPoints = 2;
@@ -23,11 +24,13 @@ export function validateShoreline(plan: Plan, draft: Extract<WorkDraft, { kind: 
 	const outline = draft.outline;
 	if (outline.length < MinimumOutlinePoints) return [`The shoreline needs at least ${MinimumOutlinePoints} points`];
 	if (!outline.every(isInsidePlot)) return ['The shoreline must stay inside the plot'];
+	if (doesBankCrossItself(outline)) return ['The bank cannot cross over itself'];
 	const reshaped = { ...plan.layout, outline };
 	const failures: string[] = [];
 	if (waterAcres(reshaped, plan.plotAcres) < IslandRules.MinimumWaterAcres) failures.push(`The water must stay at least ${IslandRules.MinimumWaterAcres} acre`);
 	if (!plan.layout.islands.every((island) => isPolygonInsidePolygon(island.points, outline))) failures.push('Every island must stay in the water');
-	return [...failures, ...plan.swims.flatMap((swim) => strandedSwimFailure(reshaped, plan, swim))];
+	const stranded = plan.swims.flatMap((swim) => strandedSwimFailure(reshaped, plan, swim));
+	return [...failures, ...stranded, ...swallowedBuildingFailures(plan, outline)];
 }
 
 function strandedSwimFailure(reshaped: LakeLayout, plan: Plan, swim: Swim): string[] {

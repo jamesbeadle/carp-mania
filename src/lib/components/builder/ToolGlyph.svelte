@@ -16,8 +16,8 @@
 		sanctuary: 'M4 18c3-3 5-3 8 0s5 3 8 0M12 3l2 4h-4zM12 7v5',
 		swim: 'M12 3v18M8 21h8M12 7l6 3-6 3',
 		redraw: 'M3 16c4-8 8-8 12-4M15 12l4-4M17 5l2 2M5 20l3-1-2-2z',
-		shore: 'M3 12c3-4 6-4 9 0s6 4 9 0M3 18c3-4 6-4 9 0s6 4 9 0',
-		extend: 'M4 20l7-7M4 20v-6M4 20h6M14 4h6v6M20 4l-7 7',
+		sculpt: 'M3 17c4 0 5-8 9-8s5 8 9 8M12 9V3M9 6l3-3 3 3',
+		smooth: 'M3 15c3-5 6-5 9 0s6 5 9 0M5 20h14',
 		land: 'M3 3h18v18H3zM12 8v8M8 12h8',
 		facility: 'M3 11l9-7 9 7M6 10v10h12V10M10 20v-5h4v5'
 	};

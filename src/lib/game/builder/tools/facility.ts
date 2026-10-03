@@ -1,3 +1,3 @@
-import { NoHandlers } from './toolHandlers';
+import { placementTool } from '../placement/placementTool';
 
-export const facilityTool = NoHandlers;
+export const facilityTool = placementTool;

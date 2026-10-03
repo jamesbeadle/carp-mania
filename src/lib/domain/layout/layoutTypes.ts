@@ -1,4 +1,5 @@
 import type { BedType } from '../types';
+import type { FacilitySite } from './facilitySite';
 
 export interface LayoutPoint {
 	x: number;
@@ -66,6 +67,7 @@ export interface LakeLayout {
 	bedPatches: BedPatch[];
 	features: LakeFeature[];
 	facilities: Facility[];
+	sites?: FacilitySite[];
 }
 
 export function isSnag(feature: LakeFeature): feature is Snag {

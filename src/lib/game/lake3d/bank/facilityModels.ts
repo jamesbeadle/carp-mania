@@ -1,4 +1,6 @@
 import { Group } from 'three';
+import { StandardCarPark } from '$lib/domain/groundworks/sites/carParkPlan';
+import type { FacilitySite } from '$lib/domain/layout/facilitySite';
 import type { Facility } from '$lib/domain/layout/layoutTypes';
 import { aerator } from './aeratorModel';
 import { BuildingLook } from './buildingLook';
@@ -8,8 +10,7 @@ import { clubHouse, estateHouse, washrooms } from './comfortModels';
 import { benchOut, hangingSign, terrace } from './facilityProps';
 
 export interface FacilityModel {
-	build: () => Group;
-	footprintMetres: number;
+	build: (site: FacilitySite) => Group;
 	isInTheWater?: boolean;
 }
 
@@ -27,15 +28,15 @@ function withProps(plan: HousePlan, props: (front: number) => Group) {
 }
 
 export const FacilityModels: Record<Facility, FacilityModel> = {
-	car_park: { build: carPark, footprintMetres: 24 },
-	lodge: { build: withProps(Lodge, (front) => new Group().add(benchOut(front, -BenchAcross), benchOut(front, BenchAcross))), footprintMetres: 11 },
-	toilets: { build: () => house(Toilets), footprintMetres: 7 },
-	washrooms: { build: washrooms, footprintMetres: 10 },
-	club_house: { build: clubHouse, footprintMetres: 19 },
-	estate_house: { build: estateHouse, footprintMetres: 34 },
-	tackle_shop: { build: withProps(TackleShop, (front) => new Group().add(hangingSign(front), benchOut(front, -BenchAcross))), footprintMetres: 9 },
-	bar: { build: withProps(Bar, (front) => terrace(front, Terraces.BarTables)), footprintMetres: 15 },
-	restaurant: { build: withProps(Restaurant, (front) => terrace(front, Terraces.RestaurantTables, true)), footprintMetres: 19 },
-	hotel: { build: withProps(Hotel, (front) => new Group().add(benchOut(front, -BenchAcross * 2), benchOut(front, BenchAcross * 2))), footprintMetres: 31 },
-	aerator: { build: aerator, footprintMetres: 3, isInTheWater: true }
+	car_park: { build: (site) => carPark(site.carPark ?? StandardCarPark) },
+	lodge: { build: withProps(Lodge, (front) => new Group().add(benchOut(front, -BenchAcross), benchOut(front, BenchAcross))) },
+	toilets: { build: () => house(Toilets) },
+	washrooms: { build: washrooms },
+	club_house: { build: clubHouse },
+	estate_house: { build: estateHouse },
+	tackle_shop: { build: withProps(TackleShop, (front) => new Group().add(hangingSign(front), benchOut(front, -BenchAcross))) },
+	bar: { build: withProps(Bar, (front) => terrace(front, Terraces.BarTables)) },
+	restaurant: { build: withProps(Restaurant, (front) => terrace(front, Terraces.RestaurantTables, true)) },
+	hotel: { build: withProps(Hotel, (front) => new Group().add(benchOut(front, -BenchAcross * 2), benchOut(front, BenchAcross * 2))) },
+	aerator: { build: aerator, isInTheWater: true }
 };

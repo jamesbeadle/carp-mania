@@ -6,6 +6,7 @@ import { fishInTheWater, isStockedToOpen } from '../stock/stockedToOpen';
 import type { Carp, Lake, Swim } from '../types';
 import { weatherFor } from '../world/weather';
 import { ageCarpIfNewYear } from './ageing';
+import { carParkRunningPerDay } from '../groundworks/sites/carParkTrade';
 import { completeDueWorks } from './completeWorks';
 import { driftWaterForOneDay } from './driftWater';
 import { driftTeamForOneDay } from '../bailiffs/performance';
@@ -35,7 +36,7 @@ function visitingDayOf(lake: Lake, context: DayContext, carp: Carp[], shoals: Sh
 }
 
 export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: RandomFraction, context: DayContext, shoals: Shoal[] = NoShoals): DayOutcome {
-	const works = completeDueWorks(lake, context.works, context.dayEnd);
+	const works = completeDueWorks(lake, context.works, context.dayEnd, swims);
 	const fertile = { ...works.lake, fertility: driftFertilityForOneDay(works.lake) };
 	const fed = feedTheLakeForOneDay(fertile, carp, context.season.growthFactor, shoals, context.species);
 	const watered = driftWaterForOneDay(fed.lake, context.bailiffs);
@@ -60,7 +61,7 @@ export function simulateOneDay(lake: Lake, carp: Carp[], swims: Swim[], random: 
 		feesCollected: anglers.visits.reduce((total, visit) => total + visit.fee_paid, 0),
 		lodgeTakings: anglers.lodgeTakings,
 		bailiffWages: wagesOf(context.bailiffs),
-		aeratorRunning: runningCostOf(hunted.lake.layout.facilities),
+		aeratorRunning: runningCostOf(hunted.lake.layout.facilities) + carParkRunningPerDay(hunted.lake.layout),
 		isHeatwave,
 		records: anglers.records,
 		worksCompleted: works.completed,

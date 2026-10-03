@@ -19,6 +19,8 @@ export const GroundworksCatalogue: Record<WorkKind, WorkProfile> = {
 	snag: { label: 'Sink a snag', blurb: 'A fallen tree. Bites come slowly there, but the big fish hold in it; one hooked fish in ten finds it.', disturbance: 0 },
 	reshape_shoreline: { label: 'Reshape the shoreline', blurb: 'Drag the bank. Water you add is dug at the going rate.', disturbance: 5 },
 	sanctuary: { label: 'Mark a sanctuary', blurb: 'A stretch of bank with no pegs. Costs nothing but pegs; big fish favour it.', disturbance: 0 },
+	upgrade_car_park: { label: 'Upgrade the car park', blurb: 'More spaces, a tarmac surface or lights. You pay for what is added.', disturbance: 0 },
+	move_facility: { label: 'Move a building', blurb: 'Taken down and put up somewhere better, for two fifths of what it cost.', disturbance: 0 },
 	...facilityWorks()
 };
 

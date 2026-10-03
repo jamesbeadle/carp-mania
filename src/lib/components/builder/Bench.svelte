@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Lake, Swim } from '$lib/domain/types';
 	import type { BuilderState } from '$lib/game/builder/builderState.svelte';
+	import BrushControls from './BrushControls.svelte';
 	import DrawingControls from './DrawingControls.svelte';
 	import RedrawControls from './RedrawControls.svelte';
 	import NewSwimPanel from './NewSwimPanel.svelte';
@@ -22,6 +23,7 @@
 	const isPlaced = $derived(builder.draft !== null && builder.phase === 'placed');
 	const isNamingASwim = $derived(builder.tool === 'swim' && builder.swimPoint !== null);
 	const isASwimChosen = $derived(builder.tool === 'select' && selectedSwim !== null);
+	const isBrushingTheBank = $derived(builder.tool === 'sculpt' || builder.tool === 'smooth');
 	const hasSomethingOnTheBench = $derived(builder.isDrawing || builder.isRedrawingTheBank || isPlaced || isNamingASwim || isASwimChosen);
 </script>
 
@@ -48,3 +50,4 @@
 {:else}
 	<ToolHint {builder} {onDetails} />
 {/if}
+{#if isBrushingTheBank}<div class="panel mt-2 py-3"><BrushControls {builder} /></div>{/if}

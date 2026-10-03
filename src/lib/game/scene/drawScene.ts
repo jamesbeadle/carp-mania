@@ -1,5 +1,4 @@
-import type { LakeLayout, LayoutPoint } from '$lib/domain/layout/layoutTypes';
-import type { Lake, Swim } from '$lib/domain/types';
+import type { LakeLayout } from '$lib/domain/layout/layoutTypes';
 import { drawAngler } from '../render/drawAngler';
 import { drawBank } from '../render/drawBank';
 import { drawBars } from '../render/drawBars';
@@ -13,35 +12,20 @@ import { drawSanctuaries } from '../render/drawSanctuaries';
 import { drawSnags } from '../render/drawSnags';
 import { drawSoftBed, paintSoftBed } from '../render/softBed';
 import { drawPegs, drawSwimLabels, swimScenePoint } from '../render/drawSwims';
-import { drawDrafts, type DraftShape } from '../render/drawUnderConstruction';
+import { drawDrafts } from '../render/drawUnderConstruction';
 import { drawClusters } from '../render/drawClusters';
 import { clusterSwims, isClustered } from './clusterSwims';
 import { drawWater } from '../render/drawWater';
 import { drawCastReach } from '../render/drawCastReach';
 import { drawFacilities } from '../render/drawFacilities';
 import { drawSponsorBoard } from '../render/drawSponsorBoard';
-import type { CastReach } from '../session/castReach';
 import { drawReeds, drawWeedBeds } from '../render/drawWeedAndReeds';
 import { createFacingTheWater } from './facingTheWater';
-import type { SwimmingFish } from './fishSchool';
 import { moveFishSchool } from './fishSteering';
 import type { WaterBody } from './fishWhiskers';
 import { islandPathsFrom, lakeCentreOf, lakePathFrom, type Point } from './lakeShape';
-import type { RodOnBank } from './rodState';
-
-export interface SceneInput {
-	lake: Lake;
-	swims: Swim[];
-	school: SwimmingFish[];
-	selectedSwimId: string | null;
-	hoveredSwimId: string | null;
-	rods: RodOnBank[];
-	isAnglerOnBank: boolean;
-	drafts?: DraftShape[];
-	showingAt?: LayoutPoint[];
-	pixelsPerScenePixel?: number;
-	castReach?: CastReach | null;
-}
+import type { SceneInput } from './sceneInput';
+import { createSitesOnTheScene } from './sitesOnTheScene';
 
 const LabelsFromPixelsPerScenePixel = 0.5;
 const FacilityLabelsFromPixelsPerScenePixel = 1.6;
@@ -52,6 +36,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 	const islandPaths = islandPathsFrom(layout);
 	const centre = lakeCentreOf(layout);
 	const softBed = paintSoftBed(layout);
+	const sitesOnTheScene = createSitesOnTheScene(layout);
 	let facingTheWaterFrom: ((peg: Point) => number) | null = null;
 	let waterBody: WaterBody | null = null;
 
@@ -75,7 +60,7 @@ export function createSceneDrawer(layout: LakeLayout) {
 		drawSponsorBoard(context, input.lake, new Date());
 		const scale = input.pixelsPerScenePixel ?? FullDetail;
 		const isLabelled = scale >= LabelsFromPixelsPerScenePixel;
-		drawFacilities(context, layout, input.swims, scale >= FacilityLabelsFromPixelsPerScenePixel);
+		drawFacilities(context, sitesOnTheScene(input.lake, input.swims), scale >= FacilityLabelsFromPixelsPerScenePixel, timeSeconds);
 		drawCastReach(context, lakePath, input.castReach ?? null, timeSeconds);
 		const clusters = clusterSwims(input.swims, scale);
 		const loosePegs = clusters.filter((cluster) => !isClustered(cluster)).flatMap((cluster) => cluster.swims);

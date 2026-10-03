@@ -30,7 +30,7 @@
 	const groundworks = $derived(data.groundworks);
 	const isSick = (fish: Carp) => Number(fish.condition) < PikeRules.SickCarpConditionBelow;
 	const sickCarpCount = $derived(carp.filter(isSick).length);
-	const worksUnderway = $derived(inProgressShapesFor(groundworks.inProgress, lake));
+	const worksUnderway = $derived(inProgressShapesFor(groundworks.inProgress, lake, swims));
 	const stockDraw = $derived(stockDrawOf(carp, shoals));
 	const word = $derived(bailiffsWord(lake, data.whileAway, new Date(data.loadedAt).getDate()));
 	const offerCount = $derived(data.sponsorship.offers.length);
